@@ -5,9 +5,9 @@ import Accueil from './pages/Accueil'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
 import Dashboard from './pages/Dashboard'
-import Explorer from './pages/Explorer'
 import Portefeuille from './pages/Portefeuille'
-import Communaute from './pages/Communaute'
+import Investissement from './pages/Investissement'
+import Croissance from './pages/Croissance'
 import Concentration from './pages/Concentration'
 import Abonnement from './pages/Abonnement'
 import Compte from './pages/Compte'
@@ -21,9 +21,9 @@ createRoot(document.getElementById('root')).render(
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/explorer" element={<Explorer />} />
         <Route path="/portefeuille" element={<Portefeuille />} />
-        <Route path="/communaute" element={<Communaute />} />
+        <Route path="/investissement" element={<Investissement />} />
+        <Route path="/croissance" element={<Croissance />} />
         <Route path="/concentration" element={<Concentration />} />
         <Route path="/abonnement" element={<Abonnement />} />
         <Route path="/compte" element={<Compte />} />

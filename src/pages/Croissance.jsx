@@ -1,0 +1,170 @@
+import { useState, useEffect } from 'react'
+import { supabase } from '../lib/supabase'
+import Navbar from '../components/Navbar'
+
+function simulerDCA(capitalInitial, versementMensuel, tauxAnnuel, dureeAnnees) {
+  const tauxMensuel = tauxAnnuel / 100 / 12
+  const mois = dureeAnnees * 12
+  let capital = capitalInitial
+  const historique = []
+  for (let i = 0; i <= mois; i++) {
+    if (i > 0) {
+      capital = capital * (1 + tauxMensuel) + versementMensuel
+    }
+    if (i % 12 === 0) {
+      const capitalInvesti = capitalInitial + versementMensuel * i
+      historique.push({
+        annee: i / 12,
+        capitalInvesti: Math.round(capitalInvesti),
+        capitalTotal: Math.round(capital),
+        interets: Math.round(capital - capitalInvesti),
+      })
+    }
+  }
+  return historique
+}
+
+export default function Croissance() {
+  const [user, setUser] = useState(null)
+  const [investissable, setInvestissable] = useState(0)
+  const [capitalInitial, setCapitalInitial] = useState(10000)
+  const [versement, setVersement] = useState(300)
+  const [taux, setTaux] = useState(7)
+  const [duree, setDuree] = useState(25)
+  const [enveloppe, setEnveloppe] = useState('PEA')
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+      setUser(user)
+      const { data: fin } = await supabase.from('finances').select('*').eq('user_id', user.id).single()
+      if (fin) {
+        const { data: ech } = await supabase.from('echeances').select('*').eq('user_id', user.id)
+        const totalEch = ech ? ech.reduce((acc, e) => acc + (e.montant_annuel / 12), 0) : 0
+        const dispo = fin.revenus - fin.depenses - totalEch
+        const inv = Math.round(dispo * fin.pourcentage_invest / 100)
+        setInvestissable(inv)
+        setVersement(inv)
+      }
+    }
+    fetchData()
+  }, [])
+
+  const initiale = user?.user_metadata?.prenom?.[0]?.toUpperCase() || '?'
+  const historique = simulerDCA(capitalInitial, versement, taux, duree)
+  const derniere = historique[historique.length - 1]
+  const fiscalite = enveloppe === 'PEA' ? 0.172 : 0.30
+  const capitalApresFisc = derniere ? Math.round(derniere.capitalInvesti + derniere.interets * (1 - fiscalite)) : 0
+  const maxVal = derniere?.capitalTotal || 1
+
+  return (
+    <div style={{ background: '#F4F7F5', height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <Navbar page="Croissance" initiale={initiale} />
+
+      <div style={{ padding: '16px 20px', flex: 1, overflow: 'auto' }}>
+        <div style={{ marginBottom: 16 }}>
+          <div style={{ fontSize: 16, fontWeight: 500, color: '#1B2E4B' }}>Simulateur de croissance</div>
+          <div style={{ fontSize: 12, color: '#9CA3AF', marginTop: 2 }}>Projetez votre patrimoine sur le long terme</div>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: 16 }}>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div style={{ background: '#fff', border: '0.5px solid #E0EAE3', borderRadius: 12, padding: 16 }}>
+              <div style={{ fontSize: 13, fontWeight: 500, color: '#1B2E4B', marginBottom: 14 }}>Paramètres</div>
+
+              <div style={{ marginBottom: 14 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: '#9CA3AF', marginBottom: 6 }}>
+                  <span>Capital initial (€)</span>
+                  <span style={{ fontWeight: 500, color: '#1B2E4B' }}>{capitalInitial.toLocaleString('fr-FR')} €</span>
+                </div>
+                <input type="range" min={0} max={100000} step={500} value={capitalInitial} onChange={e => setCapitalInitial(Number(e.target.value))} style={{ width: '100%' }} />
+              </div>
+
+              <div style={{ marginBottom: 14 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: '#9CA3AF', marginBottom: 6 }}>
+                  <span>Versement mensuel (€)</span>
+                  <span style={{ fontWeight: 500, color: '#4CAF2E' }}>{versement.toLocaleString('fr-FR')} €</span>
+                </div>
+                <input type="range" min={0} max={5000} step={50} value={versement} onChange={e => setVersement(Number(e.target.value))} style={{ width: '100%' }} />
+                {investissable > 0 && (
+                  <div style={{ fontSize: 10, color: '#9CA3AF', marginTop: 4 }}>
+                    Investissable depuis Mes Finances : <span style={{ color: '#4CAF2E', fontWeight: 500 }}>{investissable} €</span>
+                    {versement !== investissable && <span onClick={() => setVersement(investissable)} style={{ color: '#1565C0', cursor: 'pointer', marginLeft: 6 }}>Réinitialiser</span>}
+                  </div>
+                )}
+              </div>
+
+              <div style={{ marginBottom: 14 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: '#9CA3AF', marginBottom: 6 }}>
+                  <span>Taux annuel (%)</span>
+                  <span style={{ fontWeight: 500, color: '#1B2E4B' }}>{taux}%</span>
+                </div>
+                <input type="range" min={1} max={15} step={0.5} value={taux} onChange={e => setTaux(Number(e.target.value))} style={{ width: '100%' }} />
+                <div style={{ fontSize: 10, color: '#9CA3AF', marginTop: 4 }}>7% = performance historique moyenne ETF monde</div>
+              </div>
+
+              <div style={{ marginBottom: 14 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: '#9CA3AF', marginBottom: 6 }}>
+                  <span>Durée (années)</span>
+                  <span style={{ fontWeight: 500, color: '#1B2E4B' }}>{duree} ans</span>
+                </div>
+                <input type="range" min={1} max={50} step={1} value={duree} onChange={e => setDuree(Number(e.target.value))} style={{ width: '100%' }} />
+              </div>
+
+              <div>
+                <div style={{ fontSize: 11, color: '#9CA3AF', marginBottom: 6 }}>Enveloppe fiscale</div>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  {['PEA', 'CTO'].map(e => (
+                    <div key={e} onClick={() => setEnveloppe(e)} style={{ flex: 1, textAlign: 'center', padding: '7px', borderRadius: 8, background: enveloppe === e ? '#1B2E4B' : '#F4F7F5', color: enveloppe === e ? '#fff' : '#6B7280', fontSize: 12, fontWeight: enveloppe === e ? 500 : 400, cursor: 'pointer', border: '0.5px solid #E0EAE3' }}>{e}</div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0,1fr))', gap: 10 }}>
+              {[
+                ['Capital investi', `${derniere?.capitalInvesti.toLocaleString('fr-FR')} €`, '#1B2E4B'],
+                ['Capital total', `${derniere?.capitalTotal.toLocaleString('fr-FR')} €`, '#4CAF2E'],
+                ['Intérêts gagnés', `${derniere?.interets.toLocaleString('fr-FR')} €`, '#4CAF2E'],
+                [`Après fiscalité (${enveloppe})`, `${capitalApresFisc.toLocaleString('fr-FR')} €`, '#1565C0'],
+              ].map(([l, v, c]) => (
+                <div key={l} style={{ background: '#fff', border: '0.5px solid #E0EAE3', borderRadius: 12, padding: 12 }}>
+                  <div style={{ fontSize: 10, color: '#9CA3AF', marginBottom: 4 }}>{l}</div>
+                  <div style={{ fontSize: 16, fontWeight: 500, color: c }}>{v}</div>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ background: '#fff', border: '0.5px solid #E0EAE3', borderRadius: 12, padding: 16, flex: 1 }}>
+              <div style={{ fontSize: 12, fontWeight: 500, color: '#1B2E4B', marginBottom: 12 }}>Évolution du capital sur {duree} ans</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {historique.filter((_, i) => i % Math.max(1, Math.floor(historique.length / 8)) === 0 || i === historique.length - 1).map(({ annee, capitalInvesti, capitalTotal, interets }) => (
+                  <div key={annee} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div style={{ fontSize: 10, color: '#9CA3AF', width: 40, flexShrink: 0 }}>An {annee}</div>
+                    <div style={{ flex: 1, position: 'relative', height: 20 }}>
+                      <div style={{ position: 'absolute', left: 0, top: 4, height: 12, borderRadius: 3, background: '#E3F0FF', width: `${capitalInvesti / maxVal * 100}%` }} />
+                      <div style={{ position: 'absolute', left: `${capitalInvesti / maxVal * 100}%`, top: 4, height: 12, borderRadius: '0 3px 3px 0', background: '#4CAF2E', width: `${interets / maxVal * 100}%` }} />
+                    </div>
+                    <div style={{ fontSize: 10, fontWeight: 500, color: '#1B2E4B', width: 90, textAlign: 'right', flexShrink: 0 }}>{capitalTotal.toLocaleString('fr-FR')} €</div>
+                  </div>
+                ))}
+              </div>
+              <div style={{ display: 'flex', gap: 16, marginTop: 12 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: '#9CA3AF' }}>
+                  <div style={{ width: 10, height: 10, borderRadius: 2, background: '#E3F0FF' }} />Capital investi
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: '#9CA3AF' }}>
+                  <div style={{ width: 10, height: 10, borderRadius: 2, background: '#4CAF2E' }} />Intérêts composés
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}

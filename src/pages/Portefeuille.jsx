@@ -1,152 +1,164 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import Navbar from '../components/Navbar'
 
-const comptes = [
-  { nom: 'Livret A', type: 'Sécurité', dispo: 'Immédiate', solde: 5000, objectif: 10000, couleur: '#EAF6E4', texte: '#2E7D1E' },
-  { nom: 'LDDS', type: 'Sécurité', dispo: 'Immédiate', solde: 4000, objectif: 5000, couleur: '#EAF6E4', texte: '#2E7D1E' },
-  { nom: 'PEA', type: 'Investissement', dispo: 'Bloqué 5 ans', solde: 2190, objectif: null, couleur: '#E3F0FF', texte: '#1565C0' },
-  { nom: 'CTO', type: 'Investissement', dispo: 'Flexible', solde: 2548, objectif: null, couleur: '#EBE9FC', texte: '#3C3489' },
-]
-
-const investissements = [
-  { date: '01/01/2026', ticker: 'VUAA', nom: 'Vanguard S&P 500 UCITS ETF', enveloppe: 'CTO', type: 'Capitalisant', qte: 20, prixAchat: 100, prixActuel: 109.74, ter: 0.07, frais: 3 },
-  { date: '01/01/2026', ticker: 'PE500', nom: 'Amundi PEA S&P 500 Screened', enveloppe: 'PEA', type: 'Capitalisant', qte: 10, prixAchat: 40, prixActuel: 46.98, ter: 0.25, frais: 2.22 },
-]
+const enveloppes = ['Livret A', 'LDDS', 'LEP', 'Livret Jeune', 'CEL', 'PEL', 'PEA', 'CTO', 'Assurance-vie', 'PER', 'PEAC']
 
 export default function Portefeuille() {
   const navigate = useNavigate()
   const [user, setUser] = useState(null)
-  const [onglet, setOnglet] = useState('stock')
+  const [comptes, setComptes] = useState([])
+  const [showModal, setShowModal] = useState(false)
+  const [form, setForm] = useState({ nom: '', type: '', solde: '', objectif: '' })
+  const [depensesMensuelles, setDepensesMensuelles] = useState(0)
 
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchData = async () => {
       const { data: { user } } = await supabase.auth.getUser()
-      if (user) setUser(user)
+      if (!user) return
+      setUser(user)
+      const { data: fin } = await supabase.from('finances').select('*').eq('user_id', user.id).single()
+      if (fin) setDepensesMensuelles(fin.depenses)
     }
-    fetchUser()
+    fetchData()
   }, [])
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut()
-    navigate('/')
+  const initiale = user?.user_metadata?.prenom?.[0]?.toUpperCase() || '?'
+  const totalPatrimoine = comptes.reduce((acc, c) => acc + (parseFloat(c.solde) || 0), 0)
+  const objectifMatelas = depensesMensuelles * 6
+  const epargneDisponible = comptes.filter(c => ['Livret A', 'LDDS', 'LEP', 'Livret Jeune'].includes(c.nom)).reduce((acc, c) => acc + (parseFloat(c.solde) || 0), 0)
+
+  const repartition = comptes.reduce((acc, c) => {
+    const type = ['Livret A', 'LDDS', 'LEP', 'Livret Jeune', 'CEL', 'PEL'].includes(c.nom) ? 'Sécurité' :
+      ['PEA', 'CTO', 'Assurance-vie', 'PER', 'PEAC'].includes(c.nom) ? 'Investissement' : 'Autre'
+    acc[type] = (acc[type] || 0) + (parseFloat(c.solde) || 0)
+    return acc
+  }, {})
+
+  const couleurs = { 'Sécurité': '#4CAF2E', 'Investissement': '#1565C0', 'Autre': '#BA7517' }
+
+  const handleAddCompte = () => {
+    if (!form.nom || !form.solde) return
+    setComptes([...comptes, { ...form, id: Date.now() }])
+    setForm({ nom: '', type: '', solde: '', objectif: '' })
+    setShowModal(false)
   }
 
-  const initiale = user?.user_metadata?.prenom?.[0]?.toUpperCase() || '?'
-  const totalStock = comptes.reduce((acc, c) => acc + c.solde, 0)
-  const totalInvesti = investissements.reduce((acc, i) => acc + i.qte * i.prixAchat, 0)
-  const totalActuel = investissements.reduce((acc, i) => acc + i.qte * i.prixActuel, 0)
-  const plusValue = totalActuel - totalInvesti
+  const handleDelete = (id) => {
+    setComptes(comptes.filter(c => c.id !== id))
+  }
 
   return (
     <div style={{ background: '#F4F7F5', height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
 
-      <nav style={{ background: '#fff', borderBottom: '0.5px solid #E0EAE3', padding: '0 20px', height: '50px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
-        <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1 }}>
-          <div>
-            <span style={{ fontSize: 15, fontWeight: 500, color: '#1B2E4B', fontStyle: 'italic' }}>START</span>
-            <span style={{ fontSize: 15, fontWeight: 700, color: '#4CAF2E', fontStyle: 'italic' }}>INVEST</span>
-          </div>
-          <div style={{ fontSize: 8, color: '#1B2E4B', opacity: .5 }}>Bâtir son mental, <span style={{ color: '#4CAF2E' }}>construire son avenir.</span></div>
-        </div>
-        <div style={{ display: 'flex', gap: 2 }}>
-          {[['Finances', '/dashboard'], ['Explorer', '/explorer'], ['Portefeuille', '/portefeuille'], ['Communauté', '/communaute'], ['Concentration', '/concentration'], ['Abonnement', '/abonnement'], ['Compte', '/compte']].map(([l, path]) => (
-            <div key={l} onClick={() => navigate(path)} style={{ fontSize: 12, color: l === 'Portefeuille' ? '#4CAF2E' : '#6B7280', padding: '5px 10px', borderRadius: 6, cursor: 'pointer', fontWeight: l === 'Portefeuille' ? 500 : 400 }}>{l}</div>
-          ))}
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#E8F5E1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 500, color: '#2E7D1E' }}>{initiale}</div>
-          <button onClick={handleLogout} style={{ background: '#1B2E4B', color: '#fff', fontSize: 11, fontWeight: 500, padding: '5px 12px', borderRadius: 7, border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>Déconnexion</button>
-        </div>
-      </nav>
-
-      <div style={{ padding: '16px 20px', flex: 1, overflow: 'auto' }}>
-
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0,1fr))', gap: 10, marginBottom: 16 }}>
-          {[
-            ['Total patrimoine', `${totalStock.toLocaleString('fr-FR')} €`, '#1B2E4B'],
-            ['Total investi', `${totalInvesti.toLocaleString('fr-FR')} €`, '#1565C0'],
-            ['Valeur actuelle', `${totalActuel.toLocaleString('fr-FR')} €`, '#4CAF2E'],
-            ['Plus-value', `${plusValue >= 0 ? '+' : ''}${Math.round(plusValue).toLocaleString('fr-FR')} €`, plusValue >= 0 ? '#4CAF2E' : '#E24B4A'],
-          ].map(([l, v, c]) => (
-            <div key={l} style={{ background: '#fff', border: '0.5px solid #E0EAE3', borderRadius: 12, padding: 14 }}>
-              <div style={{ fontSize: 10, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 6 }}>{l}</div>
-              <div style={{ fontSize: 20, fontWeight: 500, color: c }}>{v}</div>
+      {showModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 }}>
+          <div style={{ background: '#fff', borderRadius: 16, padding: '28px', width: 380, border: '0.5px solid #E0EAE3' }}>
+            <div style={{ fontSize: 15, fontWeight: 500, color: '#1B2E4B', marginBottom: 16 }}>Ajouter un compte</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <div>
+                <div style={{ fontSize: 11, color: '#9CA3AF', marginBottom: 4 }}>Enveloppe / Compte</div>
+                <select value={form.nom} onChange={e => setForm({ ...form, nom: e.target.value })} style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: '0.5px solid #C8D8CE', fontSize: 14, fontFamily: 'inherit', outline: 'none', background: '#fff' }}>
+                  <option value="">Sélectionner</option>
+                  {enveloppes.map(e => <option key={e} value={e}>{e}</option>)}
+                </select>
+              </div>
+              <div>
+                <div style={{ fontSize: 11, color: '#9CA3AF', marginBottom: 4 }}>Solde actuel (€)</div>
+                <input type="number" placeholder="ex: 5000" value={form.solde} onChange={e => setForm({ ...form, solde: e.target.value })} style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: '0.5px solid #C8D8CE', fontSize: 14, fontFamily: 'inherit', outline: 'none' }} />
+              </div>
+              <div>
+                <div style={{ fontSize: 11, color: '#9CA3AF', marginBottom: 4 }}>Objectif (€) — optionnel</div>
+                <input type="number" placeholder="ex: 10000" value={form.objectif} onChange={e => setForm({ ...form, objectif: e.target.value })} style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: '0.5px solid #C8D8CE', fontSize: 14, fontFamily: 'inherit', outline: 'none' }} />
+              </div>
             </div>
-          ))}
+            <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
+              <button onClick={() => setShowModal(false)} style={{ flex: 1, padding: '9px', borderRadius: 8, border: '0.5px solid #C8D8CE', background: '#fff', fontSize: 13, cursor: 'pointer', fontFamily: 'inherit' }}>Annuler</button>
+              <button onClick={handleAddCompte} style={{ flex: 1, padding: '9px', borderRadius: 8, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Ajouter</button>
+            </div>
+          </div>
         </div>
+      )}
 
-        <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-          {[['stock', 'Le Stock'], ['journal', "Journal d'investissement"]].map(([id, label]) => (
-            <div key={id} onClick={() => setOnglet(id)} style={{ fontSize: 13, padding: '6px 16px', borderRadius: 20, background: onglet === id ? '#1B2E4B' : '#fff', color: onglet === id ? '#fff' : '#6B7280', border: '0.5px solid #E0EAE3', cursor: 'pointer', fontWeight: onglet === id ? 500 : 400 }}>{label}</div>
-          ))}
-        </div>
+      <Navbar page="Portefeuille" initiale={initiale} />
 
-        {onglet === 'stock' && (
-          <div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0,1fr))', gap: 10, marginBottom: 16 }}>
-              {comptes.map(({ nom, type, dispo, solde, objectif, couleur, texte }) => (
-                <div key={nom} style={{ background: '#fff', border: '0.5px solid #E0EAE3', borderRadius: 12, padding: 14 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <div style={{ width: 32, height: 32, borderRadius: 8, background: couleur, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, color: texte }}>{nom[0]}</div>
-                      <div>
-                        <div style={{ fontSize: 13, fontWeight: 500, color: '#1B2E4B' }}>{nom}</div>
-                        <div style={{ fontSize: 10, color: '#9CA3AF' }}>{type} · {dispo}</div>
-                      </div>
-                    </div>
-                    <div style={{ fontSize: 16, fontWeight: 500, color: '#1B2E4B' }}>{solde.toLocaleString('fr-FR')} €</div>
-                  </div>
-                  {objectif && (
-                    <div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: '#9CA3AF', marginBottom: 4 }}>
-                        <span>Progression</span><span>{Math.round(solde / objectif * 100)}% / {objectif.toLocaleString('fr-FR')} €</span>
-                      </div>
-                      <div style={{ background: '#EAF6E4', borderRadius: 3, height: 5, overflow: 'hidden' }}>
-                        <div style={{ height: '100%', borderRadius: 3, background: '#4CAF2E', width: `${Math.min(solde / objectif * 100, 100)}%` }} />
-                      </div>
-                    </div>
-                  )}
+      <div style={{ padding: '12px 20px', flex: 1, overflow: 'auto' }}>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0,1fr))', gap: 10, marginBottom: 12 }}>
+          <div style={{ background: '#fff', border: '0.5px solid #E0EAE3', borderRadius: 12, padding: 14 }}>
+            <div style={{ fontSize: 10, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 6 }}>Total patrimoine</div>
+            <div style={{ fontSize: 22, fontWeight: 500, color: '#1B2E4B' }}>{totalPatrimoine.toLocaleString('fr-FR')} €</div>
+          </div>
+          <div style={{ background: '#fff', border: '0.5px solid #E0EAE3', borderRadius: 12, padding: 14 }}>
+            <div style={{ fontSize: 10, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 6 }}>Matelas de sécurité</div>
+            <div style={{ fontSize: 22, fontWeight: 500, color: '#4CAF2E', marginBottom: 6 }}>{epargneDisponible.toLocaleString('fr-FR')} €</div>
+            <div style={{ background: '#EAF6E4', borderRadius: 3, height: 5, overflow: 'hidden', marginBottom: 4 }}>
+              <div style={{ height: '100%', borderRadius: 3, background: '#4CAF2E', width: `${Math.min((epargneDisponible / (objectifMatelas || 1)) * 100, 100)}%` }} />
+            </div>
+            <div style={{ fontSize: 10, color: '#9CA3AF' }}>Objectif 6 mois : {objectifMatelas.toLocaleString('fr-FR')} €</div>
+          </div>
+          <div style={{ background: '#fff', border: '0.5px solid #E0EAE3', borderRadius: 12, padding: 14 }}>
+            <div style={{ fontSize: 10, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 8 }}>Répartition du portefeuille</div>
+            {Object.entries(repartition).map(([type, val]) => (
+              <div key={type} style={{ marginBottom: 6 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 3 }}>
+                  <span style={{ color: '#6B7280' }}>{type}</span>
+                  <span style={{ fontWeight: 500, color: couleurs[type] }}>{totalPatrimoine > 0 ? Math.round(val / totalPatrimoine * 100) : 0}%</span>
                 </div>
-              ))}
-            </div>
+                <div style={{ background: '#F4F7F5', borderRadius: 3, height: 5, overflow: 'hidden' }}>
+                  <div style={{ height: '100%', borderRadius: 3, background: couleurs[type], width: `${totalPatrimoine > 0 ? val / totalPatrimoine * 100 : 0}%` }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+          <div style={{ fontSize: 14, fontWeight: 500, color: '#1B2E4B' }}>Mes comptes</div>
+          <button onClick={() => setShowModal(true)} style={{ background: '#4CAF2E', color: '#fff', fontSize: 12, fontWeight: 500, padding: '7px 14px', borderRadius: 8, border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>+ Ajouter</button>
+        </div>
+
+        {comptes.length === 0 && (
+          <div style={{ background: '#fff', border: '0.5px solid #E0EAE3', borderRadius: 12, padding: '32px', textAlign: 'center' }}>
+            <div style={{ fontSize: 13, color: '#9CA3AF', marginBottom: 8 }}>Aucun compte ajouté</div>
+            <div style={{ fontSize: 12, color: '#C4C9C7' }}>Cliquez sur "+ Ajouter" pour commencer</div>
           </div>
         )}
 
-        {onglet === 'journal' && (
-          <div style={{ background: '#fff', border: '0.5px solid #E0EAE3', borderRadius: 12, overflow: 'hidden' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
-              <thead>
-                <tr style={{ background: '#F4F7F5' }}>
-                  {['Date', 'Ticker', 'Nom', 'Enveloppe', 'Qté', 'Prix achat', 'Prix actuel', 'Total investi', 'Valeur actuelle', 'Plus-value'].map(h => (
-                    <th key={h} style={{ padding: '10px 12px', textAlign: 'left', fontSize: 10, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '.04em', fontWeight: 500, borderBottom: '0.5px solid #E0EAE3' }}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {investissements.map((inv, i) => {
-                  const totalInv = inv.qte * inv.prixAchat
-                  const valActuelle = inv.qte * inv.prixActuel
-                  const pv = valActuelle - totalInv
-                  return (
-                    <tr key={i} style={{ borderBottom: '0.5px solid #F3F4F6' }}>
-                      <td style={{ padding: '10px 12px', color: '#9CA3AF' }}>{inv.date}</td>
-                      <td style={{ padding: '10px 12px', fontWeight: 500, color: '#1B2E4B' }}>{inv.ticker}</td>
-                      <td style={{ padding: '10px 12px', color: '#6B7280', maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{inv.nom}</td>
-                      <td style={{ padding: '10px 12px' }}><span style={{ background: inv.enveloppe === 'PEA' ? '#E3F0FF' : '#EBE9FC', color: inv.enveloppe === 'PEA' ? '#1565C0' : '#3C3489', padding: '2px 8px', borderRadius: 20, fontSize: 10, fontWeight: 500 }}>{inv.enveloppe}</span></td>
-                      <td style={{ padding: '10px 12px', color: '#1B2E4B' }}>{inv.qte}</td>
-                      <td style={{ padding: '10px 12px', color: '#1B2E4B' }}>{inv.prixAchat} €</td>
-                      <td style={{ padding: '10px 12px', color: '#1B2E4B' }}>{inv.prixActuel} €</td>
-                      <td style={{ padding: '10px 12px', color: '#1B2E4B' }}>{totalInv.toLocaleString('fr-FR')} €</td>
-                      <td style={{ padding: '10px 12px', color: '#4CAF2E', fontWeight: 500 }}>{Math.round(valActuelle).toLocaleString('fr-FR')} €</td>
-                      <td style={{ padding: '10px 12px', fontWeight: 500, color: pv >= 0 ? '#4CAF2E' : '#E24B4A' }}>{pv >= 0 ? '+' : ''}{Math.round(pv).toLocaleString('fr-FR')} €</td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0,1fr))', gap: 10 }}>
+          {comptes.map(({ id, nom, solde, objectif }) => {
+            const typeCompte = ['Livret A', 'LDDS', 'LEP', 'Livret Jeune', 'CEL', 'PEL'].includes(nom) ? 'Sécurité' : 'Investissement'
+            const bg = typeCompte === 'Sécurité' ? '#EAF6E4' : '#E3F0FF'
+            const color = typeCompte === 'Sécurité' ? '#2E7D1E' : '#1565C0'
+            return (
+              <div key={id} style={{ background: '#fff', border: '0.5px solid #E0EAE3', borderRadius: 12, padding: 14 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div style={{ width: 32, height: 32, borderRadius: 8, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, color }}>{nom[0]}</div>
+                    <div>
+                      <div style={{ fontSize: 13, fontWeight: 500, color: '#1B2E4B' }}>{nom}</div>
+                      <div style={{ fontSize: 10, color: '#9CA3AF' }}>{typeCompte}</div>
+                    </div>
+                  </div>
+                  <button onClick={() => handleDelete(id)} style={{ background: '#FCEBEB', color: '#E24B4A', border: 'none', borderRadius: 6, padding: '3px 7px', fontSize: 10, cursor: 'pointer', fontFamily: 'inherit' }}>×</button>
+                </div>
+                <div style={{ fontSize: 18, fontWeight: 500, color: '#1B2E4B', marginBottom: objectif ? 8 : 0 }}>{parseFloat(solde).toLocaleString('fr-FR')} €</div>
+                {objectif && (
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: '#9CA3AF', marginBottom: 4 }}>
+                      <span>Progression</span>
+                      <span>{Math.round(parseFloat(solde) / parseFloat(objectif) * 100)}% / {parseFloat(objectif).toLocaleString('fr-FR')} €</span>
+                    </div>
+                    <div style={{ background: '#EAF6E4', borderRadius: 3, height: 5, overflow: 'hidden' }}>
+                      <div style={{ height: '100%', borderRadius: 3, background: '#4CAF2E', width: `${Math.min(parseFloat(solde) / parseFloat(objectif) * 100, 100)}%` }} />
+                    </div>
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
       </div>
     </div>
   )
