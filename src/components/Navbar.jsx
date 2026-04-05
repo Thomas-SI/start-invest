@@ -33,7 +33,7 @@ export default function Navbar({ page, initiale }) {
             <div style={{ fontSize: 7, color: '#606060', letterSpacing: 0.3 }}>Bâtir son mental, <span style={{ color: '#4CAF2E' }}>construire son avenir.</span></div>
           </div>
         ) : (
-          <img src="/src/assets/E56575E5-BB39-4CDE-9235-D9DDE9EB8418.jpeg" alt="StartInvest" style={{ height: 48, width: 'auto' }} />
+          <img src="/logo-clair.jpeg" alt="StartInvest" style={{ height: 48, width: 'auto' }} />
         )}
       </div>
       <div style={{ display: 'flex', gap: 2 }}>
