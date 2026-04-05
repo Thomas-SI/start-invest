@@ -21,9 +21,10 @@ export default function Dashboard() {
   const [showAddEch, setShowAddEch] = useState(false)
 
   const disponible = finances.revenus - finances.depenses
-  const totalEcheances = echeances.reduce((acc, e) => acc + (e.montant_annuel / 12), 0)
+  const totalEcheances = echeances.reduce((acc, e) => acc + (parseFloat(e.montant_annuel) || 0) / 12, 0)
   const investissable = Math.round((disponible - totalEcheances) * finances.pourcentage_invest / 100)
   const moisActuel = new Date().getMonth()
+  const totalAnnuel = echeances.reduce((acc, e) => acc + (parseFloat(e.montant_annuel) || 0), 0)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -64,15 +65,18 @@ export default function Dashboard() {
     if (!formEch.categorie || !formEch.libelle || !formEch.mois || !formEch.montant_annuel) return
     const { data: { user } } = await supabase.auth.getUser()
     const payload = { user_id: user.id, categorie: formEch.categorie, libelle: formEch.libelle, mois: formEch.mois, montant_annuel: parseFloat(formEch.montant_annuel) }
-    const { data } = await supabase.from('echeances').insert(payload).select().single()
-    if (data) setEcheances([...echeances, data])
-    setFormEch({ categorie: '', libelle: '', mois: '', montant_annuel: '' })
-    setShowAddEch(false)
+    const { data, error } = await supabase.from('echeances').insert(payload).select().single()
+    if (data) {
+      setEcheances(prev => [...prev, data])
+      setFormEch({ categorie: '', libelle: '', mois: '', montant_annuel: '' })
+      setShowAddEch(false)
+    }
+    if (error) console.error('Erreur ajout échéance:', error)
   }
 
   const handleDeleteEcheance = async (id) => {
     await supabase.from('echeances').delete().eq('id', id)
-    setEcheances(echeances.filter(e => e.id !== id))
+    setEcheances(prev => prev.filter(e => e.id !== id))
   }
 
   const initiale = user?.user_metadata?.prenom?.[0]?.toUpperCase() || '?'
@@ -82,8 +86,6 @@ export default function Dashboard() {
     if (items.length > 0) acc[cat] = items
     return acc
   }, {})
-
-  const totalAnnuel = echeances.reduce((acc, e) => acc + parseFloat(e.montant_annuel || 0), 0)
 
   return (
     <div style={{ background: t.bg, height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
@@ -165,7 +167,7 @@ export default function Dashboard() {
               {[
                 ['Taux d\'épargne', `${finances.revenus > 0 ? Math.round((disponible / finances.revenus) * 100) : 0}%`, '#4CAF2E'],
                 ['Dépenses fixes', `${Math.round((finances.depenses / (finances.revenus || 1)) * 100)}% du revenu`, '#E24B4A'],
-                ['Provision échéances', `${Math.round(totalEcheances)} €/mois`, '#BA7517'],
+                ['Provision échéances', echeances.length > 0 ? `${Math.round(totalEcheances)} €/mois` : '—', '#BA7517'],
                 ['Reste après invest.', `${Math.round(disponible - totalEcheances - investissable)} €`, t.text],
               ].map(([l, v, c]) => (
                 <div key={l} style={{ background: t.bgSecondary, borderRadius: 10, padding: 12 }}>
@@ -240,7 +242,7 @@ export default function Dashboard() {
                         <td style={{ padding: '7px 14px', color: t.text }}>{e.libelle}</td>
                         <td style={{ padding: '7px 14px', color: t.textSecondary }}>{e.mois}</td>
                         <td style={{ padding: '7px 14px', color: t.text, fontWeight: 500 }}>{parseFloat(e.montant_annuel).toLocaleString('fr-FR')} €</td>
-                        <td style={{ padding: '7px 14px', color: '#4CAF2E', fontWeight: 500 }}>{Math.round(e.montant_annuel / 12)} €</td>
+                        <td style={{ padding: '7px 14px', color: '#4CAF2E', fontWeight: 500 }}>{Math.round(parseFloat(e.montant_annuel) / 12)} €</td>
                         <td style={{ padding: '7px 14px' }}>
                           <button onClick={() => handleDeleteEcheance(e.id)} style={{ background: '#FCEBEB', color: '#E24B4A', border: 'none', borderRadius: 5, padding: '2px 7px', fontSize: 10, cursor: 'pointer', fontFamily: 'inherit' }}>×</button>
                         </td>
