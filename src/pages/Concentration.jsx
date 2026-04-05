@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import Navbar from '../components/Navbar'
+import { useTheme } from '../lib/ThemeContext'
 
 const conseils = [
   {
@@ -36,6 +37,7 @@ const conseils = [
 ]
 
 export default function Concentration() {
+  const t = useTheme()
   const [user, setUser] = useState(null)
   const [ouvert, setOuvert] = useState(null)
 
@@ -50,32 +52,32 @@ export default function Concentration() {
   const initiale = user?.user_metadata?.prenom?.[0]?.toUpperCase() || '?'
 
   return (
-    <div style={{ background: '#F4F7F5', height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+    <div style={{ background: t.bg, height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       <Navbar page="Concentration" initiale={initiale} />
 
       <div style={{ padding: '16px 20px', flex: 1, overflow: 'auto' }}>
         <div style={{ marginBottom: 16 }}>
-          <div style={{ fontSize: 16, fontWeight: 500, color: '#1B2E4B' }}>Concentration & Résilience</div>
-          <div style={{ fontSize: 12, color: '#9CA3AF', marginTop: 2 }}>Développez votre mindset d'investisseur long terme</div>
+          <div style={{ fontSize: 16, fontWeight: 500, color: t.text }}>Concentration & Résilience</div>
+          <div style={{ fontSize: 12, color: t.textMuted, marginTop: 2 }}>Développez votre mindset d'investisseur long terme</div>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {conseils.map(({ id, titre, categorie, couleur, texte, contenu, conseil }) => (
-            <div key={id} style={{ background: '#fff', border: '0.5px solid #E0EAE3', borderRadius: 12, padding: 16, cursor: 'pointer' }} onClick={() => setOuvert(ouvert === id ? null : id)}>
+            <div key={id} style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: 16, cursor: 'pointer' }} onClick={() => setOuvert(ouvert === id ? null : id)}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                   <div style={{ width: 8, height: 8, borderRadius: '50%', background: couleur === '#EAF6E4' ? '#4CAF2E' : couleur === '#E3F0FF' ? '#1565C0' : '#534AB7', flexShrink: 0 }} />
-                  <span style={{ fontSize: 13, fontWeight: 500, color: '#1B2E4B' }}>{titre}</span>
+                  <span style={{ fontSize: 13, fontWeight: 500, color: t.text }}>{titre}</span>
                   <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 20, background: couleur, color: texte }}>{categorie}</span>
                 </div>
-                <span style={{ fontSize: 16, color: '#9CA3AF' }}>{ouvert === id ? '−' : '+'}</span>
+                <span style={{ fontSize: 16, color: t.textMuted }}>{ouvert === id ? '−' : '+'}</span>
               </div>
               {ouvert === id && (
-                <div style={{ marginTop: 12, paddingTop: 12, borderTop: '0.5px solid #F3F4F6' }}>
-                  <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.65, marginBottom: 12 }}>{contenu}</p>
-                  <div style={{ background: '#F4F7F5', borderRadius: 8, padding: '10px 14px', borderLeft: '3px solid #4CAF2E' }}>
+                <div style={{ marginTop: 12, paddingTop: 12, borderTop: `0.5px solid ${t.border}` }}>
+                  <p style={{ fontSize: 13, color: t.textSecondary, lineHeight: 1.65, marginBottom: 12 }}>{contenu}</p>
+                  <div style={{ background: t.bgSecondary, borderRadius: 8, padding: '10px 14px', borderLeft: '3px solid #4CAF2E' }}>
                     <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', marginBottom: 4 }}>Conseil pratique</div>
-                    <div style={{ fontSize: 12, color: '#1B2E4B', lineHeight: 1.6 }}>{conseil}</div>
+                    <div style={{ fontSize: 12, color: t.text, lineHeight: 1.6 }}>{conseil}</div>
                   </div>
                 </div>
               )}
