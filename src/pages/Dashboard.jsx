@@ -64,7 +64,13 @@ export default function Dashboard() {
   const handleAddEcheance = async () => {
     if (!formEch.categorie || !formEch.libelle || !formEch.mois || !formEch.montant_annuel) return
     const { data: { user } } = await supabase.auth.getUser()
-    const payload = { user_id: user.id, categorie: formEch.categorie, libelle: formEch.libelle, mois: formEch.mois, montant_annuel: parseFloat(formEch.montant_annuel) }
+    const payload = {
+      user_id: user.id,
+      categorie: formEch.categorie,
+      libelle: formEch.libelle,
+      mois: formEch.mois,
+      montant_annuel: parseFloat(formEch.montant_annuel)
+    }
     const { data, error } = await supabase.from('echeances').insert(payload).select().single()
     if (data) {
       setEcheances(prev => [...prev, data])
@@ -82,7 +88,7 @@ export default function Dashboard() {
   const initiale = user?.user_metadata?.prenom?.[0]?.toUpperCase() || '?'
 
   const echeancesParCategorie = categoriesListe.reduce((acc, cat) => {
-    const items = echeances.filter(e => e.categorie === cat)
+    const items = echeances.filter(e => e.categorie?.toLowerCase() === cat.toLowerCase())
     if (items.length > 0) acc[cat] = items
     return acc
   }, {})
