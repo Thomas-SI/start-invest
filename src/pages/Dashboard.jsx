@@ -28,7 +28,6 @@ export default function Dashboard() {
   const investissable20 = Math.round(totalRevenus * 0.20)
   const reelInvestissable = Math.round(totalRevenus - totalDepenses - totalEcheances)
   const pourcentageReel = totalRevenus > 0 ? Math.round((reelInvestissable / totalRevenus) * 100) : 0
-
   const moisActuel = new Date().getMonth()
 
   useEffect(() => {
@@ -56,16 +55,16 @@ export default function Dashboard() {
 
   const handleSave = async () => {
     setLoading(true)
-    const { data: { user } } = await supabase.auth.getUser()
+    const { data: { user: currentUser } } = await supabase.auth.getUser()
     const payload = {
-      user_id: user.id,
+      user_id: currentUser.id,
       revenus: parseFloat(form.revenus) || 0,
       autre_revenu: parseFloat(form.autre_revenu) || 0,
       depenses_fixes: parseFloat(form.depenses_fixes) || 0,
       depenses_variables: parseFloat(form.depenses_variables) || 0,
     }
-    const { data: existing } = await supabase.from('finances').select('*').eq('user_id', user.id).single()
-    if (existing) await supabase.from('finances').update(payload).eq('user_id', user.id)
+    const { data: existing } = await supabase.from('finances').select('*').eq('user_id', currentUser.id).single()
+    if (existing) await supabase.from('finances').update(payload).eq('user_id', currentUser.id)
     else await supabase.from('finances').insert(payload)
     setFinances(payload)
     setShowModal(false)
@@ -74,9 +73,10 @@ export default function Dashboard() {
 
   const handleAddEcheance = async () => {
     if (!formEch.categorie || !formEch.libelle || !formEch.mois || !formEch.montant_annuel) return
-    const { data: { user } } = await supabase.auth.getUser()
+    const { data: { user: currentUser } } = await supabase.auth.getUser()
+    if (!currentUser) return
     const payload = {
-      user_id: user.id,
+      user_id: currentUser.id,
       categorie: formEch.categorie,
       libelle: formEch.libelle,
       mois: formEch.mois,
@@ -87,7 +87,7 @@ export default function Dashboard() {
       setEcheances(prev => [...prev, data])
       setFormEch({ categorie: '', libelle: '', mois: '', montant_annuel: '' })
     }
-    if (error) console.error('Erreur ajout échéance:', error)
+    if (error) console.error('Erreur:', error)
   }
 
   const handleDeleteEcheance = async (id) => {
