@@ -42,10 +42,11 @@ export default function Croissance() {
       if (fin) {
         const { data: ech } = await supabase.from('echeances').select('*').eq('user_id', user.id)
         const totalEch = ech ? ech.reduce((acc, e) => acc + (e.montant_annuel / 12), 0) : 0
-        const dispo = fin.revenus - fin.depenses - totalEch
-        const inv = Math.round(dispo * fin.pourcentage_invest / 100)
-        setInvestissable(inv)
-        setVersement(inv)
+        const totalRev = (fin.revenus || 0) + (fin.autre_revenu || 0)
+        const totalDep = (fin.depenses_fixes || 0) + (fin.depenses_variables || 0)
+        const inv = Math.round(totalRev - totalDep - totalEch)
+        setInvestissable(inv > 0 ? inv : 0)
+        setVersement(inv > 0 ? inv : 300)
       }
     }
     fetchData()
@@ -69,7 +70,6 @@ export default function Croissance() {
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: 16 }}>
-
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: 16 }}>
               <div style={{ fontSize: 13, fontWeight: 500, color: t.text, marginBottom: 14 }}>Paramètres</div>

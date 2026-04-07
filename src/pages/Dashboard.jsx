@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import Navbar from '../components/Navbar'
@@ -17,6 +17,120 @@ const placeholders = {
   'Autres': 'ex: Cotisation club',
 }
 
+function simulerDCA(versement, capitalInitial, taux, annees) {
+  const tauxMensuel = taux / 100 / 12
+  let capital = capitalInitial
+  const labels = []
+  const investi = []
+  const interets = []
+  for (let an = 0; an <= annees; an++) {
+    if (an > 0) {
+      for (let m = 0; m < 12; m++) {
+        capital = capital * (1 + tauxMensuel) + versement
+      }
+    }
+    const totalInvesti = capitalInitial + versement * an * 12
+    labels.push('An ' + an)
+    investi.push(Math.round(totalInvesti))
+    interets.push(Math.max(0, Math.round(capital - totalInvesti)))
+  }
+  return { labels, investi, interets, final: Math.round(capital) }
+}
+
+function PopupSimulateur({ versement, onClose }) {
+  const canvasRef = useRef(null)
+  const chartRef = useRef(null)
+  const [duree, setDuree] = useState(10)
+  const taux = 7
+
+  useEffect(() => {
+    if (!canvasRef.current || versement <= 0) return
+    const { labels, investi, interets } = simulerDCA(versement, 0, taux, duree)
+
+    if (chartRef.current) chartRef.current.destroy()
+
+    const ctx = canvasRef.current.getContext('2d')
+    chartRef.current = new window.Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [
+          { label: 'Capital investi', data: investi, backgroundColor: '#E3F0FF', stack: 'a' },
+          { label: 'Intérêts', data: interets, backgroundColor: '#4CAF2E', stack: 'a' }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: ctx => ' ' + ctx.dataset.label + ' : ' + Math.round(ctx.raw).toLocaleString('fr-FR') + ' €'
+            }
+          }
+        },
+        scales: {
+          x: { stacked: true, ticks: { font: { size: 10 }, color: '#9CA3AF' }, grid: { display: false } },
+          y: { stacked: true, ticks: { font: { size: 10 }, color: '#9CA3AF', callback: v => Math.round(v / 1000) + 'k €' }, grid: { color: 'rgba(0,0,0,0.05)' } }
+        }
+      }
+    })
+
+    return () => { if (chartRef.current) chartRef.current.destroy() }
+  }, [versement, duree])
+
+  const { final } = simulerDCA(versement, 0, taux, duree)
+  const totalInvesti = versement * duree * 12
+  const totalInterets = final - totalInvesti
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200 }}>
+      <div style={{ background: '#fff', borderRadius: 16, padding: 24, width: 560, border: '0.5px solid #E0EAE3', maxHeight: '90vh', overflow: 'auto' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <div>
+            <div style={{ fontSize: 15, fontWeight: 500, color: '#1B2E4B' }}>Projection de croissance</div>
+            <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>Basé sur {versement.toLocaleString('fr-FR')} €/mois · taux 7%/an</div>
+          </div>
+          <button onClick={onClose} style={{ background: '#F4F7F5', border: 'none', borderRadius: 8, padding: '6px 10px', fontSize: 14, cursor: 'pointer', color: '#6B7280' }}>×</button>
+        </div>
+
+        <div style={{ display: 'flex', gap: 6, marginBottom: 16 }}>
+          {[10, 20, 30].map(d => (
+            <div key={d} onClick={() => setDuree(d)} style={{ fontSize: 12, fontWeight: 500, padding: '5px 14px', borderRadius: 20, cursor: 'pointer', background: duree === d ? '#1B2E4B' : '#F4F7F5', color: duree === d ? '#fff' : '#6B7280', border: '0.5px solid #E0EAE3' }}>{d} ans</div>
+          ))}
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0,1fr))', gap: 10, marginBottom: 16 }}>
+          {[
+            ['Total investi', `${totalInvesti.toLocaleString('fr-FR')} €`, '#1B2E4B'],
+            ['Capital final', `${final.toLocaleString('fr-FR')} €`, '#4CAF2E'],
+            ['Intérêts générés', `+${totalInterets.toLocaleString('fr-FR')} €`, '#4CAF2E'],
+          ].map(([l, v, c]) => (
+            <div key={l} style={{ background: '#F4F7F5', borderRadius: 10, padding: 12 }}>
+              <div style={{ fontSize: 10, color: '#9CA3AF', marginBottom: 4 }}>{l}</div>
+              <div style={{ fontSize: 16, fontWeight: 500, color: c }}>{v}</div>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ position: 'relative', height: 220 }}>
+          <canvas ref={canvasRef} />
+        </div>
+
+        <div style={{ display: 'flex', gap: 16, marginTop: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: '#9CA3AF' }}>
+            <div style={{ width: 10, height: 10, borderRadius: 2, background: '#E3F0FF' }} />Capital investi
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: '#9CA3AF' }}>
+            <div style={{ width: 10, height: 10, borderRadius: 2, background: '#4CAF2E' }} />Intérêts composés
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function Dashboard() {
   const navigate = useNavigate()
   const t = useTheme()
@@ -31,6 +145,8 @@ export default function Dashboard() {
   const [showAddEch, setShowAddEch] = useState(false)
   const [editingId, setEditingId] = useState(null)
   const [editForm, setEditForm] = useState({ libelle: '', mois: '', montant_annuel: '' })
+  const [chartLoaded, setChartLoaded] = useState(false)
+  const [showSimulateur, setShowSimulateur] = useState(false)
 
   const totalRevenus = (parseFloat(finances.revenus) || 0) + (parseFloat(finances.autre_revenu) || 0)
   const totalDepenses = (parseFloat(finances.depenses_fixes) || 0) + (parseFloat(finances.depenses_variables) || 0)
@@ -51,7 +167,6 @@ export default function Dashboard() {
     invest: pourcentageReel,
   } : { besoins: 0, envies: 0, invest: 0 }
 
-  // Rouge si on dépasse le plafond (besoins>50, envies>30) ou si on investit pas assez (<20)
   const couleurBesoins = regle5030.besoins > 50 ? '#E24B4A' : bleu
   const couleurEnvies = regle5030.envies > 30 ? '#E24B4A' : bleu
   const couleurInvest = regle5030.invest < 20 ? '#E24B4A' : bleu
@@ -77,6 +192,15 @@ export default function Dashboard() {
       }
     }
     fetchData()
+
+    if (!window.Chart) {
+      const script = document.createElement('script')
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js'
+      script.onload = () => setChartLoaded(true)
+      document.head.appendChild(script)
+    } else {
+      setChartLoaded(true)
+    }
   }, [])
 
   const handleSave = async () => {
@@ -148,6 +272,10 @@ export default function Dashboard() {
   return (
     <div style={{ background: t.bg, height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
 
+      {showSimulateur && chartLoaded && (
+        <PopupSimulateur versement={reelInvestissable} onClose={() => setShowSimulateur(false)} />
+      )}
+
       {showModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 }}>
           <div style={{ background: t.bgCard, borderRadius: 16, padding: '32px 28px', width: 400, border: `0.5px solid ${t.border}` }}>
@@ -202,6 +330,11 @@ export default function Dashboard() {
               <div style={{ fontSize: 10, color: '#E24B4A', background: '#FCEBEB', padding: '5px 8px', borderRadius: 6 }}>
                 ⚠️ Vos dépenses dépassent vos revenus !
               </div>
+            )}
+            {reelInvestissable > 0 && (
+              <button onClick={() => setShowSimulateur(true)} style={{ width: '100%', marginTop: 10, background: '#EAF6E4', color: '#2E7D1E', fontSize: 11, fontWeight: 500, padding: 7, borderRadius: 7, border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
+                📈 Voir ma projection de croissance
+              </button>
             )}
           </div>
 
