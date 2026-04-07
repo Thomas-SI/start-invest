@@ -4,8 +4,18 @@ import { supabase } from '../lib/supabase'
 import Navbar from '../components/Navbar'
 import { useTheme } from '../lib/ThemeContext'
 
-const moisListe = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
+const moisListe = ['Mensuel', 'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
 const categoriesListe = ['Logement', 'Véhicules', 'Abonnement', 'Santé', 'Impôts', 'Assurances', 'Autres']
+
+const placeholders = {
+  'Logement': 'ex: Taxe foncière',
+  'Véhicules': 'ex: Contrôle technique',
+  'Abonnement': 'ex: Netflix',
+  'Santé': 'ex: Mutuelle',
+  'Impôts': 'ex: Impôt sur le revenu',
+  'Assurances': 'ex: Assurance auto',
+  'Autres': 'ex: Cotisation club',
+}
 
 export default function Dashboard() {
   const navigate = useNavigate()
@@ -244,7 +254,12 @@ export default function Dashboard() {
                   </div>
                   <div>
                     <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 3 }}>Libellé</div>
-                    <input placeholder="ex: Taxe foncière" value={formEch.libelle} onChange={e => setFormEch({ ...formEch, libelle: e.target.value })} style={{ width: '100%', padding: '7px 8px', borderRadius: 6, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgCard, color: t.text }} />
+                    <input
+                      placeholder={placeholders[formEch.categorie] || 'ex: Libellé'}
+                      value={formEch.libelle}
+                      onChange={e => setFormEch({ ...formEch, libelle: e.target.value })}
+                      style={{ width: '100%', padding: '7px 8px', borderRadius: 6, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgCard, color: t.text }}
+                    />
                   </div>
                   <div>
                     <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 3 }}>Mois</div>
