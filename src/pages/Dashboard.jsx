@@ -42,6 +42,20 @@ export default function Dashboard() {
   const pourcentageReel = totalRevenus > 0 ? Math.round((reelInvestissable / totalRevenus) * 100) : 0
   const moisActuel = new Date().getMonth()
 
+  const bleu = t.dark ? '#3B82F6' : '#1B2E4B'
+  const bleuBg = t.dark ? 'rgba(59,130,246,0.15)' : '#E8EEF6'
+
+  const regle5030 = totalRevenus > 0 ? {
+    besoins: Math.round((parseFloat(finances.depenses_fixes) || 0) / totalRevenus * 100),
+    envies: Math.round((parseFloat(finances.depenses_variables) || 0) / totalRevenus * 100),
+    invest: pourcentageReel,
+  } : { besoins: 0, envies: 0, invest: 0 }
+
+  // Rouge si on dépasse le plafond (besoins>50, envies>30) ou si on investit pas assez (<20)
+  const couleurBesoins = regle5030.besoins > 50 ? '#E24B4A' : bleu
+  const couleurEnvies = regle5030.envies > 30 ? '#E24B4A' : bleu
+  const couleurInvest = regle5030.invest < 20 ? '#E24B4A' : bleu
+
   useEffect(() => {
     const fetchData = async () => {
       const { data: { user } } = await supabase.auth.getUser()
@@ -131,12 +145,6 @@ export default function Dashboard() {
     return acc
   }, {})
 
-  const regle5030 = totalRevenus > 0 ? {
-    besoins: Math.round((parseFloat(finances.depenses_fixes) || 0) / totalRevenus * 100),
-    envies: Math.round((parseFloat(finances.depenses_variables) || 0) / totalRevenus * 100),
-    invest: pourcentageReel,
-  } : { besoins: 0, envies: 0, invest: 0 }
-
   return (
     <div style={{ background: t.bg, height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
 
@@ -180,15 +188,19 @@ export default function Dashboard() {
             <div style={{ fontSize: 22, fontWeight: 500, color: reelInvestissable >= investissable20 ? '#4CAF2E' : '#E24B4A', marginBottom: 6 }}>{reelInvestissable} € <span style={{ fontSize: 11, color: t.textMuted, fontWeight: 400 }}>/mois</span></div>
             <div style={{ fontSize: 11, color: t.textMuted, marginBottom: 8 }}>Objectif 20% : <span style={{ fontWeight: 500, color: t.text }}>{investissable20} €</span></div>
             <div style={{ background: t.bgSecondary, borderRadius: 3, height: 5, overflow: 'hidden', marginBottom: 6 }}>
-              <div style={{ height: '100%', borderRadius: 3, background: reelInvestissable >= investissable20 ? '#4CAF2E' : '#E24B4A', width: `${Math.min(pourcentageReel, 100)}%`, transition: 'width 0.3s' }} />
+              <div style={{ height: '100%', borderRadius: 3, background: reelInvestissable >= investissable20 ? bleu : '#E24B4A', width: `${Math.min(Math.max(pourcentageReel, 0), 100)}%`, transition: 'width 0.3s' }} />
             </div>
             {pourcentageReel >= 20 ? (
-              <div style={{ fontSize: 10, color: '#4CAF2E', background: '#EAF6E4', padding: '5px 8px', borderRadius: 6 }}>
+              <div style={{ fontSize: 10, color: '#fff', background: bleu, padding: '5px 8px', borderRadius: 6, fontWeight: 500 }}>
                 🎉 Bravo ! Vous investissez {pourcentageReel}% de vos revenus !
+              </div>
+            ) : pourcentageReel > 0 ? (
+              <div style={{ fontSize: 10, color: '#E24B4A', background: '#FCEBEB', padding: '5px 8px', borderRadius: 6 }}>
+                ⚠️ Seulement {pourcentageReel}% investis — objectif : 20%
               </div>
             ) : (
               <div style={{ fontSize: 10, color: '#E24B4A', background: '#FCEBEB', padding: '5px 8px', borderRadius: 6 }}>
-                ⚠️ Seulement {pourcentageReel}% investis — objectif : 20%
+                ⚠️ Vos dépenses dépassent vos revenus !
               </div>
             )}
           </div>
@@ -208,7 +220,7 @@ export default function Dashboard() {
                 <span style={{ fontSize: 13, fontWeight: 500, color: c }}>{v}</span>
               </div>
             ))}
-            <button onClick={() => { setForm({ revenus: finances.revenus || '', autre_revenu: finances.autre_revenu || '', depenses_fixes: finances.depenses_fixes || '', depenses_variables: finances.depenses_variables || '' }); setShowModal(true) }} style={{ width: '100%', marginTop: 10, background: '#EAF6E4', color: '#2E7D1E', fontSize: 11, fontWeight: 500, padding: 7, borderRadius: 7, border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
+            <button onClick={() => { setForm({ revenus: finances.revenus || '', autre_revenu: finances.autre_revenu || '', depenses_fixes: finances.depenses_fixes || '', depenses_variables: finances.depenses_variables || '' }); setShowModal(true) }} style={{ width: '100%', marginTop: 10, background: bleu, color: '#fff', fontSize: 11, fontWeight: 500, padding: 7, borderRadius: 7, border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
               + Modifier mes finances
             </button>
           </div>
@@ -232,17 +244,17 @@ export default function Dashboard() {
             <div style={{ fontSize: 11, color: t.textMuted, marginBottom: 12 }}>50% besoins · 30% envies · 20% investissement</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {[
-                ['Besoins (dép. fixes)', regle5030.besoins, 50, '#1565C0'],
-                ['Envies (dép. variables)', regle5030.envies, 30, '#BA7517'],
-                ['Investissement', regle5030.invest, 20, '#4CAF2E'],
+                ['Besoins (dép. fixes)', regle5030.besoins, 50, couleurBesoins],
+                ['Envies (dép. variables)', regle5030.envies, 30, couleurEnvies],
+                ['Investissement', regle5030.invest, 20, couleurInvest],
               ].map(([label, val, objectif, couleur]) => (
                 <div key={label}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 4 }}>
                     <span style={{ color: t.textSecondary }}>{label}</span>
-                    <span style={{ fontWeight: 500, color: val <= objectif ? couleur : '#E24B4A' }}>{val}% <span style={{ color: t.textMuted, fontWeight: 400 }}>/ {objectif}%</span></span>
+                    <span style={{ fontWeight: 500, color: couleur }}>{val}% <span style={{ color: t.textMuted, fontWeight: 400 }}>/ {objectif}%</span></span>
                   </div>
                   <div style={{ background: t.bgSecondary, borderRadius: 3, height: 6, overflow: 'hidden' }}>
-                    <div style={{ height: '100%', borderRadius: 3, background: val <= objectif ? couleur : '#E24B4A', width: `${Math.min(val, 100)}%`, transition: 'width 0.3s' }} />
+                    <div style={{ height: '100%', borderRadius: 3, background: couleur, width: `${Math.min(Math.abs(val), 100)}%`, transition: 'width 0.3s' }} />
                   </div>
                 </div>
               ))}
@@ -341,7 +353,7 @@ export default function Dashboard() {
                             <td style={{ padding: '7px 14px', color: '#4CAF2E', fontWeight: 500 }}>{Math.round(parseFloat(e.montant_annuel) / 12)} €</td>
                             <td style={{ padding: '7px 14px' }}>
                               <div style={{ display: 'flex', gap: 4 }}>
-                                <button onClick={() => handleEditStart(e)} style={{ background: '#E3F0FF', color: '#1565C0', border: 'none', borderRadius: 5, padding: '2px 7px', fontSize: 10, cursor: 'pointer', fontFamily: 'inherit' }}>✏️</button>
+                                <button onClick={() => handleEditStart(e)} style={{ background: bleuBg, color: bleu, border: 'none', borderRadius: 5, padding: '2px 7px', fontSize: 10, cursor: 'pointer', fontFamily: 'inherit' }}>✏️</button>
                                 <button onClick={() => handleDeleteEcheance(e.id)} style={{ background: '#FCEBEB', color: '#E24B4A', border: 'none', borderRadius: 5, padding: '2px 7px', fontSize: 10, cursor: 'pointer', fontFamily: 'inherit' }}>×</button>
                               </div>
                             </td>
