@@ -41,14 +41,24 @@ function PopupSimulateur({ versement, onClose }) {
   const canvasRef = useRef(null)
   const chartRef = useRef(null)
   const [duree, setDuree] = useState(10)
+  const [ready, setReady] = useState(false)
   const taux = 7
 
   useEffect(() => {
-    if (!canvasRef.current || versement <= 0) return
+    const loadChart = () => {
+      if (window.Chart) { setReady(true); return }
+      const script = document.createElement('script')
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js'
+      script.onload = () => setReady(true)
+      document.head.appendChild(script)
+    }
+    loadChart()
+  }, [])
+
+  useEffect(() => {
+    if (!ready || !canvasRef.current) return
     const { labels, investi, interets } = simulerDCA(versement, 0, taux, duree)
-
     if (chartRef.current) chartRef.current.destroy()
-
     const ctx = canvasRef.current.getContext('2d')
     chartRef.current = new window.Chart(ctx, {
       type: 'bar',
@@ -64,11 +74,7 @@ function PopupSimulateur({ versement, onClose }) {
         maintainAspectRatio: false,
         plugins: {
           legend: { display: false },
-          tooltip: {
-            callbacks: {
-              label: ctx => ' ' + ctx.dataset.label + ' : ' + Math.round(ctx.raw).toLocaleString('fr-FR') + ' €'
-            }
-          }
+          tooltip: { callbacks: { label: ctx => ' ' + ctx.dataset.label + ' : ' + Math.round(ctx.raw).toLocaleString('fr-FR') + ' €' } }
         },
         scales: {
           x: { stacked: true, ticks: { font: { size: 10 }, color: '#9CA3AF' }, grid: { display: false } },
@@ -76,9 +82,8 @@ function PopupSimulateur({ versement, onClose }) {
         }
       }
     })
-
     return () => { if (chartRef.current) chartRef.current.destroy() }
-  }, [versement, duree])
+  }, [ready, versement, duree])
 
   const { final } = simulerDCA(versement, 0, taux, duree)
   const totalInvesti = versement * duree * 12
@@ -114,9 +119,13 @@ function PopupSimulateur({ versement, onClose }) {
           ))}
         </div>
 
-        <div style={{ position: 'relative', height: 220 }}>
-          <canvas ref={canvasRef} />
-        </div>
+        {ready ? (
+          <div style={{ position: 'relative', height: 220 }}>
+            <canvas ref={canvasRef} />
+          </div>
+        ) : (
+          <div style={{ height: 220, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9CA3AF', fontSize: 12 }}>Chargement...</div>
+        )}
 
         <div style={{ display: 'flex', gap: 16, marginTop: 10 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: '#9CA3AF' }}>
@@ -145,7 +154,6 @@ export default function Dashboard() {
   const [showAddEch, setShowAddEch] = useState(false)
   const [editingId, setEditingId] = useState(null)
   const [editForm, setEditForm] = useState({ libelle: '', mois: '', montant_annuel: '' })
-  const [chartLoaded, setChartLoaded] = useState(false)
   const [showSimulateur, setShowSimulateur] = useState(false)
 
   const totalRevenus = (parseFloat(finances.revenus) || 0) + (parseFloat(finances.autre_revenu) || 0)
@@ -192,15 +200,6 @@ export default function Dashboard() {
       }
     }
     fetchData()
-
-    if (!window.Chart) {
-      const script = document.createElement('script')
-      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js'
-      script.onload = () => setChartLoaded(true)
-      document.head.appendChild(script)
-    } else {
-      setChartLoaded(true)
-    }
   }, [])
 
   const handleSave = async () => {
@@ -272,7 +271,7 @@ export default function Dashboard() {
   return (
     <div style={{ background: t.bg, height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
 
-      {showSimulateur && chartLoaded && (
+      {showSimulateur && (
         <PopupSimulateur versement={reelInvestissable} onClose={() => setShowSimulateur(false)} />
       )}
 
