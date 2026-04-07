@@ -29,6 +29,8 @@ export default function Dashboard() {
   const [user, setUser] = useState(null)
   const [alertes, setAlertes] = useState([])
   const [showAddEch, setShowAddEch] = useState(false)
+  const [editingId, setEditingId] = useState(null)
+  const [editForm, setEditForm] = useState({ libelle: '', mois: '', montant_annuel: '' })
 
   const totalRevenus = (parseFloat(finances.revenus) || 0) + (parseFloat(finances.autre_revenu) || 0)
   const totalDepenses = (parseFloat(finances.depenses_fixes) || 0) + (parseFloat(finances.depenses_variables) || 0)
@@ -103,6 +105,22 @@ export default function Dashboard() {
   const handleDeleteEcheance = async (id) => {
     await supabase.from('echeances').delete().eq('id', id)
     setEcheances(prev => prev.filter(e => e.id !== id))
+  }
+
+  const handleEditStart = (e) => {
+    setEditingId(e.id)
+    setEditForm({ libelle: e.libelle, mois: e.mois, montant_annuel: e.montant_annuel })
+  }
+
+  const handleEditSave = async (id) => {
+    const payload = {
+      libelle: editForm.libelle,
+      mois: editForm.mois,
+      montant_annuel: parseFloat(editForm.montant_annuel)
+    }
+    await supabase.from('echeances').update(payload).eq('id', id)
+    setEcheances(prev => prev.map(e => e.id === id ? { ...e, ...payload } : e))
+    setEditingId(null)
   }
 
   const initiale = user?.user_metadata?.prenom?.[0]?.toUpperCase() || '?'
@@ -254,12 +272,7 @@ export default function Dashboard() {
                   </div>
                   <div>
                     <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 3 }}>Libellé</div>
-                    <input
-                      placeholder={placeholders[formEch.categorie] || 'ex: Libellé'}
-                      value={formEch.libelle}
-                      onChange={e => setFormEch({ ...formEch, libelle: e.target.value })}
-                      style={{ width: '100%', padding: '7px 8px', borderRadius: 6, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgCard, color: t.text }}
-                    />
+                    <input placeholder={placeholders[formEch.categorie] || 'ex: Libellé'} value={formEch.libelle} onChange={e => setFormEch({ ...formEch, libelle: e.target.value })} style={{ width: '100%', padding: '7px 8px', borderRadius: 6, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgCard, color: t.text }} />
                   </div>
                   <div>
                     <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 3 }}>Mois</div>
@@ -293,19 +306,47 @@ export default function Dashboard() {
                 <tbody>
                   {Object.entries(echeancesParCategorie).map(([cat, items]) => (
                     items.map((e, i) => (
-                      <tr key={e.id} style={{ borderBottom: `0.5px solid ${t.border}` }}>
+                      <tr key={e.id} style={{ borderBottom: `0.5px solid ${t.border}`, background: editingId === e.id ? t.bgSecondary : 'transparent' }}>
                         {i === 0 && (
                           <td rowSpan={items.length} style={{ padding: '8px 14px', fontWeight: 500, color: t.text, verticalAlign: 'middle', borderRight: `0.5px solid ${t.border}`, background: t.bgSecondary, fontSize: 11 }}>
                             {cat}
                           </td>
                         )}
-                        <td style={{ padding: '7px 14px', color: t.text }}>{e.libelle}</td>
-                        <td style={{ padding: '7px 14px', color: t.textSecondary }}>{e.mois}</td>
-                        <td style={{ padding: '7px 14px', color: t.text, fontWeight: 500 }}>{parseFloat(e.montant_annuel).toLocaleString('fr-FR')} €</td>
-                        <td style={{ padding: '7px 14px', color: '#4CAF2E', fontWeight: 500 }}>{Math.round(parseFloat(e.montant_annuel) / 12)} €</td>
-                        <td style={{ padding: '7px 14px' }}>
-                          <button onClick={() => handleDeleteEcheance(e.id)} style={{ background: '#FCEBEB', color: '#E24B4A', border: 'none', borderRadius: 5, padding: '2px 7px', fontSize: 10, cursor: 'pointer', fontFamily: 'inherit' }}>×</button>
-                        </td>
+                        {editingId === e.id ? (
+                          <>
+                            <td style={{ padding: '6px 8px' }}>
+                              <input value={editForm.libelle} onChange={ev => setEditForm({ ...editForm, libelle: ev.target.value })} style={{ width: '100%', padding: '5px 8px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgCard, color: t.text }} />
+                            </td>
+                            <td style={{ padding: '6px 8px' }}>
+                              <select value={editForm.mois} onChange={ev => setEditForm({ ...editForm, mois: ev.target.value })} style={{ width: '100%', padding: '5px 8px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgCard, color: t.text }}>
+                                {moisListe.map(m => <option key={m} value={m}>{m}</option>)}
+                              </select>
+                            </td>
+                            <td style={{ padding: '6px 8px' }}>
+                              <input type="number" value={editForm.montant_annuel} onChange={ev => setEditForm({ ...editForm, montant_annuel: ev.target.value })} style={{ width: '100%', padding: '5px 8px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgCard, color: t.text }} />
+                            </td>
+                            <td style={{ padding: '6px 8px', color: '#4CAF2E', fontWeight: 500 }}>{Math.round(parseFloat(editForm.montant_annuel) / 12)} €</td>
+                            <td style={{ padding: '6px 8px' }}>
+                              <div style={{ display: 'flex', gap: 4 }}>
+                                <button onClick={() => handleEditSave(e.id)} style={{ background: '#EAF6E4', color: '#2E7D1E', border: 'none', borderRadius: 5, padding: '2px 7px', fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>✓</button>
+                                <button onClick={() => setEditingId(null)} style={{ background: t.bgSecondary, color: t.textMuted, border: `0.5px solid ${t.border}`, borderRadius: 5, padding: '2px 7px', fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>✕</button>
+                              </div>
+                            </td>
+                          </>
+                        ) : (
+                          <>
+                            <td style={{ padding: '7px 14px', color: t.text }}>{e.libelle}</td>
+                            <td style={{ padding: '7px 14px', color: t.textSecondary }}>{e.mois}</td>
+                            <td style={{ padding: '7px 14px', color: t.text, fontWeight: 500 }}>{parseFloat(e.montant_annuel).toLocaleString('fr-FR')} €</td>
+                            <td style={{ padding: '7px 14px', color: '#4CAF2E', fontWeight: 500 }}>{Math.round(parseFloat(e.montant_annuel) / 12)} €</td>
+                            <td style={{ padding: '7px 14px' }}>
+                              <div style={{ display: 'flex', gap: 4 }}>
+                                <button onClick={() => handleEditStart(e)} style={{ background: '#E3F0FF', color: '#1565C0', border: 'none', borderRadius: 5, padding: '2px 7px', fontSize: 10, cursor: 'pointer', fontFamily: 'inherit' }}>✏️</button>
+                                <button onClick={() => handleDeleteEcheance(e.id)} style={{ background: '#FCEBEB', color: '#E24B4A', border: 'none', borderRadius: 5, padding: '2px 7px', fontSize: 10, cursor: 'pointer', fontFamily: 'inherit' }}>×</button>
+                              </div>
+                            </td>
+                          </>
+                        )}
                       </tr>
                     ))
                   ))}
