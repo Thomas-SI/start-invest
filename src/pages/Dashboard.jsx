@@ -5,12 +5,11 @@ import Navbar from '../components/Navbar'
 import { useTheme } from '../lib/ThemeContext'
 
 const moisListe = ['Mensuel', 'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
-const categoriesListe = ['Logement', 'Véhicules', 'Abonnement', 'Santé', 'Impôts', 'Assurances', 'Autres']
+const categoriesListe = ['Logement', 'Véhicules', 'Santé', 'Impôts', 'Assurances', 'Autres']
 
 const placeholders = {
   'Logement': 'ex: Taxe foncière',
   'Véhicules': 'ex: Contrôle technique',
-  'Abonnement': 'ex: Netflix',
   'Santé': 'ex: Mutuelle',
   'Impôts': 'ex: Impôt sur le revenu',
   'Assurances': 'ex: Assurance auto',
@@ -45,14 +44,11 @@ function PopupSimulateur({ versement, onClose }) {
   const taux = 7
 
   useEffect(() => {
-    const loadChart = () => {
-      if (window.Chart) { setReady(true); return }
-      const script = document.createElement('script')
-      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js'
-      script.onload = () => setReady(true)
-      document.head.appendChild(script)
-    }
-    loadChart()
+    if (window.Chart) { setReady(true); return }
+    const script = document.createElement('script')
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js'
+    script.onload = () => setReady(true)
+    document.head.appendChild(script)
   }, [])
 
   useEffect(() => {
@@ -99,13 +95,11 @@ function PopupSimulateur({ versement, onClose }) {
           </div>
           <button onClick={onClose} style={{ background: '#F4F7F5', border: 'none', borderRadius: 8, padding: '6px 10px', fontSize: 14, cursor: 'pointer', color: '#6B7280' }}>×</button>
         </div>
-
         <div style={{ display: 'flex', gap: 6, marginBottom: 16 }}>
           {[10, 20, 30].map(d => (
             <div key={d} onClick={() => setDuree(d)} style={{ fontSize: 12, fontWeight: 500, padding: '5px 14px', borderRadius: 20, cursor: 'pointer', background: duree === d ? '#1B2E4B' : '#F4F7F5', color: duree === d ? '#fff' : '#6B7280', border: '0.5px solid #E0EAE3' }}>{d} ans</div>
           ))}
         </div>
-
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0,1fr))', gap: 10, marginBottom: 16 }}>
           {[
             ['Total investi', `${totalInvesti.toLocaleString('fr-FR')} €`, '#1B2E4B'],
@@ -118,7 +112,6 @@ function PopupSimulateur({ versement, onClose }) {
             </div>
           ))}
         </div>
-
         {ready ? (
           <div style={{ position: 'relative', height: 220 }}>
             <canvas ref={canvasRef} />
@@ -126,7 +119,6 @@ function PopupSimulateur({ versement, onClose }) {
         ) : (
           <div style={{ height: 220, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9CA3AF', fontSize: 12 }}>Chargement...</div>
         )}
-
         <div style={{ display: 'flex', gap: 16, marginTop: 10 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: '#9CA3AF' }}>
             <div style={{ width: 10, height: 10, borderRadius: 2, background: '#E3F0FF' }} />Capital investi
@@ -168,6 +160,9 @@ export default function Dashboard() {
 
   const bleu = t.dark ? '#3B82F6' : '#1B2E4B'
   const bleuBg = t.dark ? 'rgba(59,130,246,0.15)' : '#E8EEF6'
+  const bleuAlerte = t.dark ? 'rgba(59,130,246,0.15)' : '#E8EEF6'
+  const bleuAlerteText = t.dark ? '#3B82F6' : '#1B2E4B'
+  const bleuAlerteBorder = t.dark ? 'rgba(59,130,246,0.3)' : '#B8CCE4'
 
   const regle5030 = totalRevenus > 0 ? {
     besoins: Math.round((parseFloat(finances.depenses_fixes) || 0) / totalRevenus * 100),
@@ -194,7 +189,7 @@ export default function Dashboard() {
           const moisEch = moisListe.indexOf(e.mois)
           const diff = moisEch - moisActuel
           if (diff === 1) alertesTemp.push({ ...e, type: '1 mois' })
-          if (diff === 0) alertesTemp.push({ ...e, type: '7 jours' })
+          if (diff === 0) alertesTemp.push({ ...e, type: 'ce mois' })
         })
         setAlertes(alertesTemp)
       }
@@ -277,23 +272,30 @@ export default function Dashboard() {
 
       {showModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 }}>
-          <div style={{ background: t.bgCard, borderRadius: 16, padding: '32px 28px', width: 400, border: `0.5px solid ${t.border}` }}>
+          <div style={{ background: t.bgCard, borderRadius: 16, padding: '32px 28px', width: 420, border: `0.5px solid ${t.border}` }}>
             <div style={{ fontSize: 15, fontWeight: 500, color: t.text, marginBottom: 20 }}>Modifier mes finances</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <div style={{ fontSize: 11, fontWeight: 500, color: t.textMuted, textTransform: 'uppercase', letterSpacing: '.06em' }}>Revenus</div>
-              {[['Salaire / Revenus principaux (€)', 'revenus', 'ex: 3400'], ['Autres revenus (€)', 'autre_revenu', 'ex: 200']].map(([label, key, ph]) => (
-                <div key={key}>
-                  <div style={{ fontSize: 11, color: t.textMuted, marginBottom: 4 }}>{label}</div>
-                  <input type="number" placeholder={ph} value={form[key]} onChange={e => setForm({ ...form, [key]: e.target.value })} style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `0.5px solid ${t.border}`, fontSize: 14, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }} />
-                </div>
-              ))}
-              <div style={{ fontSize: 11, fontWeight: 500, color: t.textMuted, textTransform: 'uppercase', letterSpacing: '.06em', marginTop: 4 }}>Dépenses</div>
-              {[['Dépenses fixes — Besoins (€)', 'depenses_fixes', 'ex: 1500'], ['Dépenses variables — Envies (€)', 'depenses_variables', 'ex: 500']].map(([label, key, ph]) => (
-                <div key={key}>
-                  <div style={{ fontSize: 11, color: t.textMuted, marginBottom: 4 }}>{label}</div>
-                  <input type="number" placeholder={ph} value={form[key]} onChange={e => setForm({ ...form, [key]: e.target.value })} style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `0.5px solid ${t.border}`, fontSize: 14, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }} />
-                </div>
-              ))}
+              <div>
+                <div style={{ fontSize: 11, color: t.textMuted, marginBottom: 4 }}>Salaire / Revenus principaux (€)</div>
+                <input type="number" placeholder="ex: 3 400" value={form.revenus} onChange={e => setForm({ ...form, revenus: e.target.value })} style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `0.5px solid ${t.border}`, fontSize: 14, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }} />
+              </div>
+              <div>
+                <div style={{ fontSize: 11, color: t.textMuted, marginBottom: 4 }}>Autres revenus (€)</div>
+                <input type="number" placeholder="ex: Supplément ou complément de salaire" value={form.autre_revenu} onChange={e => setForm({ ...form, autre_revenu: e.target.value })} style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `0.5px solid ${t.border}`, fontSize: 14, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }} />
+              </div>
+              <div style={{ fontSize: 11, fontWeight: 500, color: t.textMuted, textTransform: 'uppercase', letterSpacing: '.06em', marginTop: 4 }}>Dépenses fixes — Besoins</div>
+              <div style={{ fontSize: 10, color: t.textMuted, marginTop: -8 }}>Loyer/Prêt · Électricité/Eau · Abonnements · Frais bancaires · Courses</div>
+              <div>
+                <div style={{ fontSize: 11, color: t.textMuted, marginBottom: 4 }}>Total dépenses fixes (€)</div>
+                <input type="number" placeholder="ex: Loyer, électricité, courses..." value={form.depenses_fixes} onChange={e => setForm({ ...form, depenses_fixes: e.target.value })} style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `0.5px solid ${t.border}`, fontSize: 14, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }} />
+              </div>
+              <div style={{ fontSize: 11, fontWeight: 500, color: t.textMuted, textTransform: 'uppercase', letterSpacing: '.06em', marginTop: 4 }}>Dépenses variables — Envies</div>
+              <div style={{ fontSize: 10, color: t.textMuted, marginTop: -8 }}>Essence/Transport · Sorties · Sport/Loisirs · Shopping/Divers</div>
+              <div>
+                <div style={{ fontSize: 11, color: t.textMuted, marginBottom: 4 }}>Total dépenses variables (€)</div>
+                <input type="number" placeholder="ex: Sorties, shopping, loisirs..." value={form.depenses_variables} onChange={e => setForm({ ...form, depenses_variables: e.target.value })} style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `0.5px solid ${t.border}`, fontSize: 14, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }} />
+              </div>
             </div>
             <div style={{ display: 'flex', gap: 8, marginTop: 20 }}>
               <button onClick={() => setShowModal(false)} style={{ flex: 1, padding: '9px', borderRadius: 8, border: `0.5px solid ${t.border}`, background: t.bgSecondary, fontSize: 13, cursor: 'pointer', fontFamily: 'inherit', color: t.text }}>Annuler</button>
@@ -363,9 +365,14 @@ export default function Dashboard() {
           {alertes.length > 0 && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {alertes.map((a, i) => (
-                <div key={i} style={{ background: a.type === '7 jours' ? '#FCEBEB' : '#FFF8E6', border: `0.5px solid ${a.type === '7 jours' ? '#F09595' : '#FAC775'}`, borderRadius: 10, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <span>{a.type === '7 jours' ? '🔴' : '🟠'}</span>
-                  <span style={{ fontSize: 12, fontWeight: 500, color: a.type === '7 jours' ? '#A32D2D' : '#633806' }}>Échéance dans {a.type} — {a.libelle} · {a.montant_annuel} €</span>
+                <div key={i} style={{ background: bleuAlerte, border: `0.5px solid ${bleuAlerteBorder}`, borderRadius: 10, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <span style={{ fontSize: 14 }}>📅</span>
+                  <div>
+                    <span style={{ fontSize: 12, fontWeight: 500, color: bleuAlerteText }}>
+                      {a.type === 'ce mois' ? 'Échéance ce mois — ' : `Échéance dans ${a.type} — `}
+                    </span>
+                    <span style={{ fontSize: 12, color: bleuAlerteText }}>{a.libelle} · {a.montant_annuel} €</span>
+                  </div>
                 </div>
               ))}
             </div>
