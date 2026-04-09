@@ -16,6 +16,21 @@ const placeholders = {
   'Autres': 'ex: Cotisation club',
 }
 
+const DEPENSES_FIXES_DEFAULT = [
+  { categorie: 'Loyer / Prêt', montant: 0, defaut: true },
+  { categorie: 'Électricité / Eau', montant: 0, defaut: true },
+  { categorie: 'Abonnements', montant: 0, defaut: true },
+  { categorie: 'Frais bancaires', montant: 0, defaut: true },
+  { categorie: 'Courses', montant: 0, defaut: true },
+]
+
+const DEPENSES_VARIABLES_DEFAULT = [
+  { categorie: 'Essence / Transport', montant: 0, defaut: true },
+  { categorie: 'Sorties', montant: 0, defaut: true },
+  { categorie: 'Sport / Loisirs', montant: 0, defaut: true },
+  { categorie: 'Shopping / Divers', montant: 0, defaut: true },
+]
+
 function simulerDCA(versement, capitalInitial, taux, annees) {
   const tauxMensuel = taux / 100 / 12
   let capital = capitalInitial
@@ -132,12 +147,131 @@ function PopupSimulateur({ versement, onClose }) {
   )
 }
 
+function ModalDepenses({ t, onClose, onSave, depensesFixesInit, depensesVariablesInit }) {
+  const [fixes, setFixes] = useState(depensesFixesInit)
+  const [variables, setVariables] = useState(depensesVariablesInit)
+  const [newFixe, setNewFixe] = useState('')
+  const [newVariable, setNewVariable] = useState('')
+
+  const totalFixes = fixes.reduce((acc, d) => acc + (parseFloat(d.montant) || 0), 0)
+  const totalVariables = variables.reduce((acc, d) => acc + (parseFloat(d.montant) || 0), 0)
+
+  const handleAddFixe = () => {
+    if (!newFixe.trim()) return
+    setFixes([...fixes, { categorie: newFixe, montant: 0, defaut: false }])
+    setNewFixe('')
+  }
+
+  const handleAddVariable = () => {
+    if (!newVariable.trim()) return
+    setVariables([...variables, { categorie: newVariable, montant: 0, defaut: false }])
+    setNewVariable('')
+  }
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 }}>
+      <div style={{ background: t.bgCard, borderRadius: 16, padding: '28px', width: 520, border: `0.5px solid ${t.border}`, maxHeight: '90vh', overflow: 'auto' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+          <div style={{ fontSize: 15, fontWeight: 500, color: t.text }}>Mes dépenses</div>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: t.textMuted }}>×</button>
+        </div>
+
+        <div style={{ marginBottom: 20 }}>
+          <div style={{ fontSize: 12, fontWeight: 500, color: t.text, marginBottom: 10 }}>Dépenses fixes — Besoins</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {fixes.map((d, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ flex: 1, fontSize: 12, color: t.text }}>{d.categorie}</div>
+                <input
+                  type="number"
+                  placeholder="0"
+                  value={d.montant || ''}
+                  onChange={e => {
+                    const updated = [...fixes]
+                    updated[i] = { ...updated[i], montant: e.target.value }
+                    setFixes(updated)
+                  }}
+                  style={{ width: 90, padding: '6px 10px', borderRadius: 7, border: `0.5px solid ${t.border}`, fontSize: 13, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text, textAlign: 'right' }}
+                />
+                <span style={{ fontSize: 12, color: t.textMuted }}>€</span>
+                {!d.defaut ? (
+                  <button onClick={() => setFixes(fixes.filter((_, j) => j !== i))} style={{ background: '#FCEBEB', color: '#E24B4A', border: 'none', borderRadius: 5, padding: '3px 7px', fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>×</button>
+                ) : (
+                  <div style={{ width: 28 }} />
+                )}
+              </div>
+            ))}
+          </div>
+          <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+            <input
+              placeholder="Ajouter une catégorie..."
+              value={newFixe}
+              onChange={e => setNewFixe(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && handleAddFixe()}
+              style={{ flex: 1, padding: '7px 10px', borderRadius: 7, border: `0.5px solid ${t.border}`, fontSize: 12, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }}
+            />
+            <button onClick={handleAddFixe} style={{ background: t.bgSecondary, color: t.text, border: `0.5px solid ${t.border}`, borderRadius: 7, padding: '7px 12px', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>+ Ajouter</button>
+          </div>
+          <div style={{ fontSize: 12, fontWeight: 500, color: '#E24B4A', marginTop: 8, textAlign: 'right' }}>Total : {totalFixes.toLocaleString('fr-FR')} €</div>
+        </div>
+
+        <div style={{ borderTop: `0.5px solid ${t.border}`, paddingTop: 20, marginBottom: 20 }}>
+          <div style={{ fontSize: 12, fontWeight: 500, color: t.text, marginBottom: 10 }}>Dépenses variables — Envies</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {variables.map((d, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ flex: 1, fontSize: 12, color: t.text }}>{d.categorie}</div>
+                <input
+                  type="number"
+                  placeholder="0"
+                  value={d.montant || ''}
+                  onChange={e => {
+                    const updated = [...variables]
+                    updated[i] = { ...updated[i], montant: e.target.value }
+                    setVariables(updated)
+                  }}
+                  style={{ width: 90, padding: '6px 10px', borderRadius: 7, border: `0.5px solid ${t.border}`, fontSize: 13, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text, textAlign: 'right' }}
+                />
+                <span style={{ fontSize: 12, color: t.textMuted }}>€</span>
+                {!d.defaut ? (
+                  <button onClick={() => setVariables(variables.filter((_, j) => j !== i))} style={{ background: '#FCEBEB', color: '#E24B4A', border: 'none', borderRadius: 5, padding: '3px 7px', fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>×</button>
+                ) : (
+                  <div style={{ width: 28 }} />
+                )}
+              </div>
+            ))}
+          </div>
+          <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+            <input
+              placeholder="Ajouter une catégorie..."
+              value={newVariable}
+              onChange={e => setNewVariable(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && handleAddVariable()}
+              style={{ flex: 1, padding: '7px 10px', borderRadius: 7, border: `0.5px solid ${t.border}`, fontSize: 12, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }}
+            />
+            <button onClick={handleAddVariable} style={{ background: t.bgSecondary, color: t.text, border: `0.5px solid ${t.border}`, borderRadius: 7, padding: '7px 12px', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>+ Ajouter</button>
+          </div>
+          <div style={{ fontSize: 12, fontWeight: 500, color: '#BA7517', marginTop: 8, textAlign: 'right' }}>Total : {totalVariables.toLocaleString('fr-FR')} €</div>
+        </div>
+
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button onClick={onClose} style={{ flex: 1, padding: '9px', borderRadius: 8, border: `0.5px solid ${t.border}`, background: t.bgSecondary, fontSize: 13, cursor: 'pointer', fontFamily: 'inherit', color: t.text }}>Annuler</button>
+          <button onClick={() => onSave(fixes, variables)} style={{ flex: 1, padding: '9px', borderRadius: 8, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Sauvegarder</button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function Dashboard() {
   const navigate = useNavigate()
   const t = useTheme()
   const [finances, setFinances] = useState({ revenus: 0, autre_revenu: 0, depenses_fixes: 0, depenses_variables: 0 })
-  const [showModal, setShowModal] = useState(false)
-  const [form, setForm] = useState({ revenus: '', autre_revenu: '', depenses_fixes: '', depenses_variables: '' })
+  const [showModalRevenu, setShowModalRevenu] = useState(false)
+  const [showModalDepenses, setShowModalDepenses] = useState(false)
+  const [formRevenu, setFormRevenu] = useState({ revenus: '', autre_revenu: '' })
+  const [depensesFixesDetail, setDepensesFixesDetail] = useState(DEPENSES_FIXES_DEFAULT)
+  const [depensesVariablesDetail, setDepensesVariablesDetail] = useState(DEPENSES_VARIABLES_DEFAULT)
   const [echeances, setEcheances] = useState([])
   const [formEch, setFormEch] = useState({ categorie: '', libelle: '', mois: '', montant_annuel: '' })
   const [loading, setLoading] = useState(false)
@@ -149,14 +283,15 @@ export default function Dashboard() {
   const [showSimulateur, setShowSimulateur] = useState(false)
 
   const totalRevenus = (parseFloat(finances.revenus) || 0) + (parseFloat(finances.autre_revenu) || 0)
-  const totalDepenses = (parseFloat(finances.depenses_fixes) || 0) + (parseFloat(finances.depenses_variables) || 0)
+  const totalDepensesFixes = depensesFixesDetail.reduce((acc, d) => acc + (parseFloat(d.montant) || 0), 0)
+  const totalDepensesVariables = depensesVariablesDetail.reduce((acc, d) => acc + (parseFloat(d.montant) || 0), 0)
+  const totalDepenses = totalDepensesFixes + totalDepensesVariables
   const totalEcheances = echeances.reduce((acc, e) => acc + (parseFloat(e.montant_annuel) || 0) / 12, 0)
   const totalAnnuel = echeances.reduce((acc, e) => acc + (parseFloat(e.montant_annuel) || 0), 0)
 
   const investissable20 = Math.round(totalRevenus * 0.20)
   const reelInvestissable = Math.round(totalRevenus - totalDepenses - totalEcheances)
   const pourcentageReel = totalRevenus > 0 ? Math.round((reelInvestissable / totalRevenus) * 100) : 0
-  const moisActuel = new Date().getMonth()
 
   const bleu = t.dark ? '#3B82F6' : '#1B2E4B'
   const bleuBg = t.dark ? 'rgba(59,130,246,0.15)' : '#E8EEF6'
@@ -165,8 +300,8 @@ export default function Dashboard() {
   const bleuAlerteBorder = t.dark ? 'rgba(59,130,246,0.3)' : '#B8CCE4'
 
   const regle5030 = totalRevenus > 0 ? {
-    besoins: Math.round((parseFloat(finances.depenses_fixes) || 0) / totalRevenus * 100),
-    envies: Math.round((parseFloat(finances.depenses_variables) || 0) / totalRevenus * 100),
+    besoins: Math.round(totalDepensesFixes / totalRevenus * 100),
+    envies: Math.round(totalDepensesVariables / totalRevenus * 100),
     invest: pourcentageReel,
   } : { besoins: 0, envies: 0, invest: 0 }
 
@@ -179,17 +314,37 @@ export default function Dashboard() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
       setUser(user)
+
       const { data: fin } = await supabase.from('finances').select('*').eq('user_id', user.id).single()
       if (fin) setFinances(fin)
+
+      const { data: dep } = await supabase.from('depenses').select('*').eq('user_id', user.id)
+      if (dep && dep.length > 0) {
+        const fixes = dep.filter(d => d.type === 'fixes').map(d => ({
+          categorie: d.categorie,
+          montant: d.montant,
+          defaut: DEPENSES_FIXES_DEFAULT.some(df => df.categorie === d.categorie)
+        }))
+        const variables = dep.filter(d => d.type === 'variables').map(d => ({
+          categorie: d.categorie,
+          montant: d.montant,
+          defaut: DEPENSES_VARIABLES_DEFAULT.some(dv => dv.categorie === d.categorie)
+        }))
+        if (fixes.length > 0) setDepensesFixesDetail(fixes)
+        if (variables.length > 0) setDepensesVariablesDetail(variables)
+      }
+
       const { data: ech } = await supabase.from('echeances').select('*').eq('user_id', user.id)
       if (ech) {
         setEcheances(ech)
         const alertesTemp = []
+        const moisActuel = new Date().getMonth() + 1
         ech.forEach(e => {
           const moisEch = moisListe.indexOf(e.mois)
-          const diff = moisEch - moisActuel
-          if (diff === 1) alertesTemp.push({ ...e, type: '1 mois' })
-          if (diff === 0) alertesTemp.push({ ...e, type: 'ce mois' })
+          if (moisEch === 0) return
+          if (moisEch === moisActuel) alertesTemp.push({ ...e, type: 'ce mois' })
+          if (moisEch === moisActuel + 1) alertesTemp.push({ ...e, type: '1 mois' })
+          if (moisActuel === 12 && moisEch === 1) alertesTemp.push({ ...e, type: '1 mois' })
         })
         setAlertes(alertesTemp)
       }
@@ -197,21 +352,58 @@ export default function Dashboard() {
     fetchData()
   }, [])
 
-  const handleSave = async () => {
+  const handleSaveRevenu = async () => {
     setLoading(true)
     const { data: { user: currentUser } } = await supabase.auth.getUser()
     const payload = {
       user_id: currentUser.id,
-      revenus: parseFloat(form.revenus) || 0,
-      autre_revenu: parseFloat(form.autre_revenu) || 0,
-      depenses_fixes: parseFloat(form.depenses_fixes) || 0,
-      depenses_variables: parseFloat(form.depenses_variables) || 0,
+      revenus: parseFloat(formRevenu.revenus) || 0,
+      autre_revenu: parseFloat(formRevenu.autre_revenu) || 0,
+      depenses_fixes: totalDepensesFixes,
+      depenses_variables: totalDepensesVariables,
     }
     const { data: existing } = await supabase.from('finances').select('*').eq('user_id', currentUser.id).single()
     if (existing) await supabase.from('finances').update(payload).eq('user_id', currentUser.id)
     else await supabase.from('finances').insert(payload)
     setFinances(payload)
-    setShowModal(false)
+    setShowModalRevenu(false)
+    setLoading(false)
+  }
+
+  const handleSaveDepenses = async (fixes, variables) => {
+    setLoading(true)
+    const { data: { user: currentUser } } = await supabase.auth.getUser()
+
+    await supabase.from('depenses').delete().eq('user_id', currentUser.id)
+
+    const toInsert = [
+      ...fixes.map(d => ({ user_id: currentUser.id, type: 'fixes', categorie: d.categorie, montant: parseFloat(d.montant) || 0 })),
+      ...variables.map(d => ({ user_id: currentUser.id, type: 'variables', categorie: d.categorie, montant: parseFloat(d.montant) || 0 })),
+    ]
+
+    if (toInsert.length > 0) await supabase.from('depenses').insert(toInsert)
+
+    const newFixes = fixes.map(d => ({ ...d, montant: parseFloat(d.montant) || 0 }))
+    const newVars = variables.map(d => ({ ...d, montant: parseFloat(d.montant) || 0 }))
+    setDepensesFixesDetail(newFixes)
+    setDepensesVariablesDetail(newVars)
+
+    const newTotalFixes = newFixes.reduce((acc, d) => acc + d.montant, 0)
+    const newTotalVars = newVars.reduce((acc, d) => acc + d.montant, 0)
+
+    const payload = {
+      user_id: currentUser.id,
+      revenus: finances.revenus,
+      autre_revenu: finances.autre_revenu,
+      depenses_fixes: newTotalFixes,
+      depenses_variables: newTotalVars,
+    }
+    const { data: existing } = await supabase.from('finances').select('*').eq('user_id', currentUser.id).single()
+    if (existing) await supabase.from('finances').update(payload).eq('user_id', currentUser.id)
+    else await supabase.from('finances').insert(payload)
+    setFinances(payload)
+
+    setShowModalDepenses(false)
     setLoading(false)
   }
 
@@ -245,11 +437,7 @@ export default function Dashboard() {
   }
 
   const handleEditSave = async (id) => {
-    const payload = {
-      libelle: editForm.libelle,
-      mois: editForm.mois,
-      montant_annuel: parseFloat(editForm.montant_annuel)
-    }
+    const payload = { libelle: editForm.libelle, mois: editForm.mois, montant_annuel: parseFloat(editForm.montant_annuel) }
     await supabase.from('echeances').update(payload).eq('id', id)
     setEcheances(prev => prev.map(e => e.id === id ? { ...e, ...payload } : e))
     setEditingId(null)
@@ -270,36 +458,33 @@ export default function Dashboard() {
         <PopupSimulateur versement={reelInvestissable} onClose={() => setShowSimulateur(false)} />
       )}
 
-      {showModal && (
+      {showModalDepenses && (
+        <ModalDepenses
+          t={t}
+          onClose={() => setShowModalDepenses(false)}
+          onSave={handleSaveDepenses}
+          depensesFixesInit={depensesFixesDetail}
+          depensesVariablesInit={depensesVariablesDetail}
+        />
+      )}
+
+      {showModalRevenu && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 }}>
-          <div style={{ background: t.bgCard, borderRadius: 16, padding: '32px 28px', width: 420, border: `0.5px solid ${t.border}` }}>
-            <div style={{ fontSize: 15, fontWeight: 500, color: t.text, marginBottom: 20 }}>Modifier mes finances</div>
+          <div style={{ background: t.bgCard, borderRadius: 16, padding: '32px 28px', width: 380, border: `0.5px solid ${t.border}` }}>
+            <div style={{ fontSize: 15, fontWeight: 500, color: t.text, marginBottom: 20 }}>Modifier mes revenus</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <div style={{ fontSize: 11, fontWeight: 500, color: t.textMuted, textTransform: 'uppercase', letterSpacing: '.06em' }}>Revenus</div>
               <div>
                 <div style={{ fontSize: 11, color: t.textMuted, marginBottom: 4 }}>Salaire / Revenus principaux (€)</div>
-                <input type="number" placeholder="ex: 3 400" value={form.revenus} onChange={e => setForm({ ...form, revenus: e.target.value })} style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `0.5px solid ${t.border}`, fontSize: 14, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }} />
+                <input type="number" placeholder="ex: 3 400" value={formRevenu.revenus} onChange={e => setFormRevenu({ ...formRevenu, revenus: e.target.value })} style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `0.5px solid ${t.border}`, fontSize: 14, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }} />
               </div>
               <div>
                 <div style={{ fontSize: 11, color: t.textMuted, marginBottom: 4 }}>Autres revenus (€)</div>
-                <input type="number" placeholder="ex: Supplément ou complément de salaire" value={form.autre_revenu} onChange={e => setForm({ ...form, autre_revenu: e.target.value })} style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `0.5px solid ${t.border}`, fontSize: 14, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }} />
-              </div>
-              <div style={{ fontSize: 11, fontWeight: 500, color: t.textMuted, textTransform: 'uppercase', letterSpacing: '.06em', marginTop: 4 }}>Dépenses fixes — Besoins</div>
-              <div style={{ fontSize: 10, color: t.textMuted, marginTop: -8 }}>Loyer/Prêt · Électricité/Eau · Abonnements · Frais bancaires · Courses</div>
-              <div>
-                <div style={{ fontSize: 11, color: t.textMuted, marginBottom: 4 }}>Total dépenses fixes (€)</div>
-                <input type="number" placeholder="ex: Loyer, électricité, courses..." value={form.depenses_fixes} onChange={e => setForm({ ...form, depenses_fixes: e.target.value })} style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `0.5px solid ${t.border}`, fontSize: 14, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }} />
-              </div>
-              <div style={{ fontSize: 11, fontWeight: 500, color: t.textMuted, textTransform: 'uppercase', letterSpacing: '.06em', marginTop: 4 }}>Dépenses variables — Envies</div>
-              <div style={{ fontSize: 10, color: t.textMuted, marginTop: -8 }}>Essence/Transport · Sorties · Sport/Loisirs · Shopping/Divers</div>
-              <div>
-                <div style={{ fontSize: 11, color: t.textMuted, marginBottom: 4 }}>Total dépenses variables (€)</div>
-                <input type="number" placeholder="ex: Sorties, shopping, loisirs..." value={form.depenses_variables} onChange={e => setForm({ ...form, depenses_variables: e.target.value })} style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `0.5px solid ${t.border}`, fontSize: 14, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }} />
+                <input type="number" placeholder="Supplément ou complément de salaire" value={formRevenu.autre_revenu} onChange={e => setFormRevenu({ ...formRevenu, autre_revenu: e.target.value })} style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `0.5px solid ${t.border}`, fontSize: 14, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }} />
               </div>
             </div>
             <div style={{ display: 'flex', gap: 8, marginTop: 20 }}>
-              <button onClick={() => setShowModal(false)} style={{ flex: 1, padding: '9px', borderRadius: 8, border: `0.5px solid ${t.border}`, background: t.bgSecondary, fontSize: 13, cursor: 'pointer', fontFamily: 'inherit', color: t.text }}>Annuler</button>
-              <button onClick={handleSave} disabled={loading} style={{ flex: 1, padding: '9px', borderRadius: 8, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>
+              <button onClick={() => setShowModalRevenu(false)} style={{ flex: 1, padding: '9px', borderRadius: 8, border: `0.5px solid ${t.border}`, background: t.bgSecondary, fontSize: 13, cursor: 'pointer', fontFamily: 'inherit', color: t.text }}>Annuler</button>
+              <button onClick={handleSaveRevenu} disabled={loading} style={{ flex: 1, padding: '9px', borderRadius: 8, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>
                 {loading ? 'Sauvegarde...' : 'Sauvegarder'}
               </button>
             </div>
@@ -344,8 +529,8 @@ export default function Dashboard() {
             {[
               ['Revenus', `${finances.revenus || 0} €`, '#4CAF2E'],
               ['Autres revenus', `${finances.autre_revenu || 0} €`, '#4CAF2E'],
-              ['Dép. fixes', `-${finances.depenses_fixes || 0} €`, '#E24B4A'],
-              ['Dép. variables', `-${finances.depenses_variables || 0} €`, '#BA7517'],
+              ['Dép. fixes', `-${Math.round(totalDepensesFixes)} €`, '#E24B4A'],
+              ['Dép. variables', `-${Math.round(totalDepensesVariables)} €`, '#BA7517'],
               ['Échéances', `-${Math.round(totalEcheances)} €`, '#BA7517'],
               ['Investissable', `${reelInvestissable} €`, reelInvestissable >= investissable20 ? '#4CAF2E' : '#E24B4A'],
             ].map(([l, v, c]) => (
@@ -354,9 +539,14 @@ export default function Dashboard() {
                 <span style={{ fontSize: 13, fontWeight: 500, color: c }}>{v}</span>
               </div>
             ))}
-            <button onClick={() => { setForm({ revenus: finances.revenus || '', autre_revenu: finances.autre_revenu || '', depenses_fixes: finances.depenses_fixes || '', depenses_variables: finances.depenses_variables || '' }); setShowModal(true) }} style={{ width: '100%', marginTop: 10, background: bleu, color: '#fff', fontSize: 11, fontWeight: 500, padding: 7, borderRadius: 7, border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
-              + Modifier mes finances
-            </button>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 10 }}>
+              <button onClick={() => { setFormRevenu({ revenus: finances.revenus || '', autre_revenu: finances.autre_revenu || '' }); setShowModalRevenu(true) }} style={{ width: '100%', background: bleu, color: '#fff', fontSize: 11, fontWeight: 500, padding: 7, borderRadius: 7, border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
+                + Modifier mes revenus
+              </button>
+              <button onClick={() => setShowModalDepenses(true)} style={{ width: '100%', background: t.bgSecondary, color: t.text, fontSize: 11, fontWeight: 500, padding: 7, borderRadius: 7, border: `0.5px solid ${t.border}`, cursor: 'pointer', fontFamily: 'inherit' }}>
+                + Modifier mes dépenses
+              </button>
+            </div>
           </div>
         </div>
 
@@ -366,10 +556,9 @@ export default function Dashboard() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {alertes.map((a, i) => (
                 <div key={i} style={{ background: bleuAlerte, border: `0.5px solid ${bleuAlerteBorder}`, borderRadius: 10, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <span style={{ fontSize: 14 }}>📅</span>
                   <div>
                     <span style={{ fontSize: 12, fontWeight: 500, color: bleuAlerteText }}>
-                      {a.type === 'ce mois' ? 'Échéance ce mois — ' : `Échéance dans ${a.type} — `}
+                      {a.type === 'ce mois' ? 'Échéance ce mois — ' : 'Échéance dans 1 mois — '}
                     </span>
                     <span style={{ fontSize: 12, color: bleuAlerteText }}>{a.libelle} · {a.montant_annuel} €</span>
                   </div>
