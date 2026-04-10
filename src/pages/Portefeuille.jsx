@@ -75,11 +75,12 @@ export default function Portefeuille() {
       const { data: fin } = await supabase.from('finances').select('*').eq('user_id', user.id).single()
       if (fin) {
         const { data: dep } = await supabase.from('depenses').select('*').eq('user_id', user.id)
+        const totalDepFixes = dep ? dep.filter(d => d.type === 'fixes').reduce((acc, d) => acc + (parseFloat(d.montant) || 0), 0) : 0
         const totalDep = dep ? dep.reduce((acc, d) => acc + (parseFloat(d.montant) || 0), 0) : 0
         const { data: ech } = await supabase.from('echeances').select('*').eq('user_id', user.id)
         const totalEch = ech ? ech.reduce((acc, e) => acc + (parseFloat(e.montant_annuel) || 0) / 12, 0) : 0
         const totalRev = (fin.revenus || 0) + (fin.autre_revenu || 0)
-        setDepensesFixes(Math.round((fin.depenses_fixes || 0)))
+        setDepensesFixes(Math.round(totalDepFixes))
         setInvestissable(Math.round(totalRev - totalDep - totalEch))
       }
 
