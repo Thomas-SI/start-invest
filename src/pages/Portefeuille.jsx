@@ -50,16 +50,17 @@ export default function Portefeuille() {
   const [newDispoCustom, setNewDispoCustom] = useState('Immédiate')
   const [newSolde, setNewSolde] = useState('')
   const [newObjectif, setNewObjectif] = useState('')
-  const [depensesMensuelles, setDepensesMensuelles] = useState(0)
+  const [depensesFixes, setDepensesFixes] = useState(0)
   const [investissable, setInvestissable] = useState(0)
   const [chartReady, setChartReady] = useState(false)
   const [user, setUser] = useState(null)
   const [saving, setSaving] = useState(false)
   const [loaded, setLoaded] = useState(false)
+  const [nbMoisMatelas, setNbMoisMatelas] = useState(6)
 
   const total = comptes.reduce((acc, c) => acc + (parseFloat(c.solde) || 0), 0)
   const totalSecurite = comptes.filter(c => c.type === 'sécurité').reduce((acc, c) => acc + (parseFloat(c.solde) || 0), 0)
-  const objectifMatelas = depensesMensuelles * 6
+  const objectifMatelas = depensesFixes * nbMoisMatelas
   const remplissageMatelas = objectifMatelas > 0 ? Math.min(Math.round((totalSecurite / objectifMatelas) * 100), 100) : 0
   const bleu = t.dark ? '#3B82F6' : '#1B2E4B'
   const totalPourcentage = virements.reduce((acc, v) => acc + (parseFloat(v.pourcentage) || 0), 0)
@@ -77,25 +78,18 @@ export default function Portefeuille() {
         const totalDep = dep ? dep.reduce((acc, d) => acc + (parseFloat(d.montant) || 0), 0) : 0
         const { data: ech } = await supabase.from('echeances').select('*').eq('user_id', user.id)
         const totalEch = ech ? ech.reduce((acc, e) => acc + (parseFloat(e.montant_annuel) || 0) / 12, 0) : 0
-        setDepensesMensuelles(Math.round(totalDep + totalEch))
         const totalRev = (fin.revenus || 0) + (fin.autre_revenu || 0)
+        setDepensesFixes(Math.round((fin.depenses_fixes || 0)))
         setInvestissable(Math.round(totalRev - totalDep - totalEch))
       }
 
       const { data: comptesData } = await supabase.from('comptes').select('*').eq('user_id', user.id).order('created_at', { ascending: true })
-      if (comptesData && comptesData.length > 0) {
-        setComptes(comptesData)
-      } else {
-        // Pas de données en base — on affiche les défauts SANS sauvegarder
-        setComptes(COMPTES_DEFAULT)
-      }
+      if (comptesData && comptesData.length > 0) setComptes(comptesData)
+      else setComptes(COMPTES_DEFAULT)
 
       const { data: virementsData } = await supabase.from('virements').select('*').eq('user_id', user.id).order('ordre', { ascending: true })
-      if (virementsData && virementsData.length > 0) {
-        setVirements(virementsData)
-      } else {
-        setVirements(VIREMENTS_DEFAULT)
-      }
+      if (virementsData && virementsData.length > 0) setVirements(virementsData)
+      else setVirements(VIREMENTS_DEFAULT)
 
       setLoaded(true)
     }
@@ -370,7 +364,17 @@ export default function Portefeuille() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 500, color: t.text }}>Matelas de sécurité</div>
-                  <div style={{ fontSize: 11, color: t.textMuted, marginTop: 2 }}>Objectif : couvrir 6 mois de dépenses courantes</div>
+                  <div style={{ fontSize: 11, color: t.textMuted, marginTop: 2 }}>
+                    Couvrir{' '}
+                    <select
+                      value={nbMoisMatelas}
+                      onChange={e => setNbMoisMatelas(parseInt(e.target.value))}
+                      style={{ padding: '2px 6px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }}
+                    >
+                      {[3,4,5,6,7,8,9,10,11,12].map(m => <option key={m} value={m}>{m}</option>)}
+                    </select>
+                    {' '}mois de dépenses fixes
+                  </div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
                   <div style={{ fontSize: 18, fontWeight: 500, color: remplissageMatelas >= 100 ? '#4CAF2E' : t.text }}>{totalSecurite.toLocaleString('fr-FR')} €</div>
@@ -382,7 +386,7 @@ export default function Portefeuille() {
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ fontSize: 11, color: t.textMuted }}>
-                  Dépenses mensuelles : <span style={{ fontWeight: 500, color: t.text }}>{depensesMensuelles.toLocaleString('fr-FR')} €/mois</span>
+                  Dépenses fixes : <span style={{ fontWeight: 500, color: t.text }}>{depensesFixes.toLocaleString('fr-FR')} €/mois</span>
                 </div>
                 <div style={{ fontSize: 13, fontWeight: 500, color: remplissageMatelas >= 100 ? '#4CAF2E' : '#E24B4A' }}>
                   {remplissageMatelas}%{remplissageMatelas >= 100 && ' ✓'}
@@ -390,7 +394,7 @@ export default function Portefeuille() {
               </div>
               {remplissageMatelas < 100 && objectifMatelas > 0 && (
                 <div style={{ marginTop: 8, fontSize: 11, color: bleu, background: bleu + '15', padding: '6px 10px', borderRadius: 7, border: `0.5px solid ${bleu}30` }}>
-                  Il vous manque <strong>{(objectifMatelas - totalSecurite).toLocaleString('fr-FR')} €</strong> pour atteindre votre objectif de 6 mois
+                  Il vous manque <strong>{(objectifMatelas - totalSecurite).toLocaleString('fr-FR')} €</strong> pour atteindre votre objectif de {nbMoisMatelas} mois
                 </div>
               )}
               {remplissageMatelas >= 100 && (
