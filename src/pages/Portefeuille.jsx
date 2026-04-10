@@ -295,12 +295,14 @@ export default function Portefeuille() {
         </div>
 
         {/* 2. MES COMPTES */}
-        <div>
-          <div style={{ fontSize: 14, fontWeight: 500, color: t.text }}>Mes comptes</div>
-          <div style={{ fontSize: 12, color: t.textMuted, marginTop: 2 }}>Total : <span style={{ fontWeight: 500, color: t.text }}>{total.toLocaleString('fr-FR')} €</span></div>
-          <button onClick={() => setShowAdd(v => !v)} style={{ marginTop: 8, background: '#4CAF2E', color: '#fff', fontSize: 12, fontWeight: 500, padding: '7px 14px', borderRadius: 8, border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
-            {showAdd ? '− Fermer' : '+ Ajouter un compte'}
-          </button>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div>
+            <div style={{ fontSize: 14, fontWeight: 500, color: t.text }}>Mes comptes</div>
+            <div style={{ fontSize: 12, color: t.textMuted, marginTop: 2 }}>Total : <span style={{ fontWeight: 500, color: t.text }}>{total.toLocaleString('fr-FR')} €</span></div>
+            <button onClick={() => setShowAdd(v => !v)} style={{ marginTop: 8, background: '#4CAF2E', color: '#fff', fontSize: 12, fontWeight: 500, padding: '7px 14px', borderRadius: 8, border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
+              {showAdd ? '− Fermer' : '+ Ajouter un compte'}
+            </button>
+          </div>
         </div>
 
         {showAdd && (
