@@ -55,6 +55,7 @@ export default function Portefeuille() {
   const [chartReady, setChartReady] = useState(false)
   const [user, setUser] = useState(null)
   const [saving, setSaving] = useState(false)
+  const [loaded, setLoaded] = useState(false)
 
   const total = comptes.reduce((acc, c) => acc + (parseFloat(c.solde) || 0), 0)
   const totalSecurite = comptes.filter(c => c.type === 'sécurité').reduce((acc, c) => acc + (parseFloat(c.solde) || 0), 0)
@@ -82,12 +83,21 @@ export default function Portefeuille() {
       }
 
       const { data: comptesData } = await supabase.from('comptes').select('*').eq('user_id', user.id).order('created_at', { ascending: true })
-      if (comptesData && comptesData.length > 0) setComptes(comptesData)
-      else setComptes(COMPTES_DEFAULT)
+      if (comptesData && comptesData.length > 0) {
+        setComptes(comptesData)
+      } else {
+        // Pas de données en base — on affiche les défauts SANS sauvegarder
+        setComptes(COMPTES_DEFAULT)
+      }
 
       const { data: virementsData } = await supabase.from('virements').select('*').eq('user_id', user.id).order('ordre', { ascending: true })
-      if (virementsData && virementsData.length > 0) setVirements(virementsData)
-      else setVirements(VIREMENTS_DEFAULT)
+      if (virementsData && virementsData.length > 0) {
+        setVirements(virementsData)
+      } else {
+        setVirements(VIREMENTS_DEFAULT)
+      }
+
+      setLoaded(true)
     }
     fetchData()
 
@@ -136,7 +146,7 @@ export default function Portefeuille() {
   }, [chartReady, comptes, total])
 
   const saveComptes = async (newComptes) => {
-    if (!user) return
+    if (!user || !loaded) return
     setSaving(true)
     await supabase.from('comptes').delete().eq('user_id', user.id)
     if (newComptes.length > 0) {
@@ -153,7 +163,7 @@ export default function Portefeuille() {
   }
 
   const saveVirements = async (newVirements) => {
-    if (!user) return
+    if (!user || !loaded) return
     await supabase.from('virements').delete().eq('user_id', user.id)
     if (newVirements.length > 0) {
       await supabase.from('virements').insert(newVirements.map((v, i) => ({
