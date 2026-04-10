@@ -218,10 +218,10 @@ export default function Portefeuille() {
   const inputStyle = { padding: '5px 8px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgCard, color: t.text, width: '100%' }
 
   return (
-    <div style={{ background: t.bg, height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+    <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar page="Portefeuille" />
 
-      <div style={{ padding: '16px 20px', flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div style={{ padding: '16px 20px', flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
 
         {/* 1. MATELAS DE SÉCURITÉ */}
         <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: 16 }}>
@@ -331,7 +331,7 @@ export default function Portefeuille() {
           </div>
         )}
 
-        <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, overflow: 'hidden' }}>
+        <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12 }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
             <thead>
               <tr style={{ background: t.bgSecondary }}>
@@ -445,7 +445,7 @@ export default function Portefeuille() {
         </div>
 
         {/* 4. PLAN DE VIREMENT MENSUEL */}
-        <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, overflow: 'hidden' }}>
+        <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, marginBottom: 20 }}>
           <div style={{ padding: '12px 16px', borderBottom: `0.5px solid ${t.border}` }}>
             <div style={{ fontSize: 13, fontWeight: 500, color: t.text }}>Plan de virement mensuel</div>
             <div style={{ fontSize: 11, color: t.textMuted, marginTop: 2 }}>
@@ -506,7 +506,7 @@ export default function Portefeuille() {
             </tbody>
           </table>
           {totalPourcentage !== 100 && (
-            <div style={{ padding: '8px 16px', background: '#FCEBEB', borderTop: `0.5px solid ${t.border}` }}>
+            <div style={{ padding: '8px 16px', background: '#FCEBEB', borderTop: `0.5px solid ${t.border}`, borderRadius: '0 0 12px 12px' }}>
               <span style={{ fontSize: 11, color: '#E24B4A' }}>⚠️ Le total des pourcentages doit être égal à 100% (actuellement {totalPourcentage}%)</span>
             </div>
           )}
