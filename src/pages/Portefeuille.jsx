@@ -21,9 +21,9 @@ const COMPTES_DEFAULT = [
 ]
 
 const VIREMENTS_DEFAULT = [
-  { destination: 'Sécurité (Matelas)', compte: 'Livret A', pourcentage: 30, ordre: 0 },
-  { destination: 'Projets (voyages, vacances...)', compte: 'Livret A', pourcentage: 20, ordre: 1 },
-  { destination: 'Investissement', compte: 'PEA', pourcentage: 50, ordre: 2 },
+  { destination: 'Sécurité (Matelas)', compte: 'Livret A', pourcentage: 30, ordre: 0, checked: false, checked_date: null },
+  { destination: 'Projets (voyages, vacances...)', compte: 'Livret A', pourcentage: 20, ordre: 1, checked: false, checked_date: null },
+  { destination: 'Investissement', compte: 'PEA', pourcentage: 50, ordre: 2, checked: false, checked_date: null },
 ]
 
 const TYPES_DISPONIBILITE = {
@@ -66,6 +66,17 @@ export default function Portefeuille() {
   const totalPourcentage = virements.reduce((acc, v) => acc + (parseFloat(v.pourcentage) || 0), 0)
   const predefiniSelectionne = COMPTES_PREDEFINIS.find(c => c.nom === selectedPredefini)
 
+  const moisActuelStr = () => {
+    const now = new Date()
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+  }
+
+  const isCheckedCeMois = (v) => {
+    if (!v.checked || !v.checked_date) return false
+    const dateStr = v.checked_date.substring(0, 7)
+    return dateStr === moisActuelStr()
+  }
+
   useEffect(() => {
     const fetchData = async () => {
       const { data: { user } } = await supabase.auth.getUser()
@@ -89,8 +100,11 @@ export default function Portefeuille() {
       else setComptes(COMPTES_DEFAULT)
 
       const { data: virementsData } = await supabase.from('virements').select('*').eq('user_id', user.id).order('ordre', { ascending: true })
-      if (virementsData && virementsData.length > 0) setVirements(virementsData)
-      else setVirements(VIREMENTS_DEFAULT)
+      if (virementsData && virementsData.length > 0) {
+        setVirements(virementsData)
+      } else {
+        setVirements(VIREMENTS_DEFAULT)
+      }
 
       setLoaded(true)
     }
@@ -167,6 +181,8 @@ export default function Portefeuille() {
         compte: v.compte,
         pourcentage: parseFloat(v.pourcentage) || 0,
         ordre: i,
+        checked: v.checked || false,
+        checked_date: v.checked_date || null,
       })))
     }
   }
@@ -215,7 +231,21 @@ export default function Portefeuille() {
     await saveVirements(updated)
   }
 
+  const handleCheck = async (i) => {
+    const updated = [...virements]
+    const nowChecked = !isCheckedCeMois(updated[i])
+    updated[i] = {
+      ...updated[i],
+      checked: nowChecked,
+      checked_date: nowChecked ? new Date().toISOString().split('T')[0] : null
+    }
+    setVirements(updated)
+    await saveVirements(updated)
+  }
+
   const inputStyle = { padding: '5px 8px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgCard, color: t.text, width: '100%' }
+
+  const tousCoches = virements.length > 0 && virements.every(v => isCheckedCeMois(v))
 
   return (
     <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -446,11 +476,18 @@ export default function Portefeuille() {
 
         {/* 4. PLAN DE VIREMENT MENSUEL */}
         <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, marginBottom: 20 }}>
-          <div style={{ padding: '12px 16px', borderBottom: `0.5px solid ${t.border}` }}>
-            <div style={{ fontSize: 13, fontWeight: 500, color: t.text }}>Plan de virement mensuel</div>
-            <div style={{ fontSize: 11, color: t.textMuted, marginTop: 2 }}>
-              Basé sur votre investissable : <span style={{ fontWeight: 500, color: '#4CAF2E' }}>{investissable.toLocaleString('fr-FR')} €/mois</span>
+          <div style={{ padding: '12px 16px', borderBottom: `0.5px solid ${t.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 500, color: t.text }}>Plan de virement mensuel</div>
+              <div style={{ fontSize: 11, color: t.textMuted, marginTop: 2 }}>
+                Basé sur votre investissable : <span style={{ fontWeight: 500, color: '#4CAF2E' }}>{investissable.toLocaleString('fr-FR')} €/mois</span>
+              </div>
             </div>
+            {tousCoches && (
+              <div style={{ fontSize: 11, color: '#2E7D1E', background: '#EAF6E4', padding: '5px 10px', borderRadius: 7, fontWeight: 500 }}>
+                ✓ Tous les virements effectués ce mois !
+              </div>
+            )}
           </div>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
             <thead>
@@ -461,39 +498,47 @@ export default function Portefeuille() {
               </tr>
             </thead>
             <tbody>
-              {virements.map((v, i) => (
-                <tr key={i} style={{ borderBottom: `0.5px solid ${t.border}` }}>
-                  <td style={{ padding: '10px 14px' }}>
-                    <input type="checkbox" style={{ accentColor: bleu }} />
-                  </td>
-                  <td style={{ padding: '10px 14px', color: t.text, fontWeight: 500 }}>{v.destination}</td>
-                  <td style={{ padding: '8px 14px' }}>
-                    <select
-                      value={v.compte}
-                      onChange={e => handleVirementChange(i, 'compte', e.target.value)}
-                      style={{ padding: '5px 8px', borderRadius: 6, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }}
-                    >
-                      {comptes.map(c => <option key={c.nom} value={c.nom}>{c.nom}</option>)}
-                    </select>
-                  </td>
-                  <td style={{ padding: '8px 14px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              {virements.map((v, i) => {
+                const coche = isCheckedCeMois(v)
+                return (
+                  <tr key={i} style={{ borderBottom: `0.5px solid ${t.border}`, background: coche ? (t.dark ? 'rgba(76,175,46,0.08)' : '#F6FFF3') : 'transparent' }}>
+                    <td style={{ padding: '10px 14px' }}>
                       <input
-                        type="number"
-                        min="0"
-                        max="100"
-                        value={v.pourcentage}
-                        onChange={e => handleVirementChange(i, 'pourcentage', parseFloat(e.target.value) || 0)}
-                        style={{ width: 60, padding: '5px 8px', borderRadius: 6, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text, textAlign: 'right' }}
+                        type="checkbox"
+                        checked={coche}
+                        onChange={() => handleCheck(i)}
+                        style={{ accentColor: bleu, cursor: 'pointer', width: 14, height: 14 }}
                       />
-                      <span style={{ fontSize: 11, color: t.textMuted }}>%</span>
-                    </div>
-                  </td>
-                  <td style={{ padding: '10px 14px', fontWeight: 500, color: '#4CAF2E' }}>
-                    {Math.round(investissable * v.pourcentage / 100).toLocaleString('fr-FR')} €
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                    <td style={{ padding: '10px 14px', color: coche ? '#4CAF2E' : t.text, fontWeight: 500, textDecoration: coche ? 'line-through' : 'none' }}>{v.destination}</td>
+                    <td style={{ padding: '8px 14px' }}>
+                      <select
+                        value={v.compte}
+                        onChange={e => handleVirementChange(i, 'compte', e.target.value)}
+                        style={{ padding: '5px 8px', borderRadius: 6, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }}
+                      >
+                        {comptes.map(c => <option key={c.nom} value={c.nom}>{c.nom}</option>)}
+                      </select>
+                    </td>
+                    <td style={{ padding: '8px 14px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <input
+                          type="number"
+                          min="0"
+                          max="100"
+                          value={v.pourcentage}
+                          onChange={e => handleVirementChange(i, 'pourcentage', parseFloat(e.target.value) || 0)}
+                          style={{ width: 60, padding: '5px 8px', borderRadius: 6, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text, textAlign: 'right' }}
+                        />
+                        <span style={{ fontSize: 11, color: t.textMuted }}>%</span>
+                      </div>
+                    </td>
+                    <td style={{ padding: '10px 14px', fontWeight: 500, color: coche ? '#4CAF2E' : '#4CAF2E' }}>
+                      {Math.round(investissable * v.pourcentage / 100).toLocaleString('fr-FR')} €
+                    </td>
+                  </tr>
+                )
+              })}
               <tr style={{ background: t.bgSecondary, borderTop: `0.5px solid ${t.border}` }}>
                 <td colSpan={3} style={{ padding: '10px 14px', fontWeight: 500, color: t.text, fontSize: 11 }}>TOTAL</td>
                 <td style={{ padding: '10px 14px', fontWeight: 500, color: totalPourcentage === 100 ? '#4CAF2E' : '#E24B4A' }}>
