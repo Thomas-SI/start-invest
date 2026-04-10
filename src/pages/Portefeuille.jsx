@@ -100,11 +100,8 @@ export default function Portefeuille() {
       else setComptes(COMPTES_DEFAULT)
 
       const { data: virementsData } = await supabase.from('virements').select('*').eq('user_id', user.id).order('ordre', { ascending: true })
-      if (virementsData && virementsData.length > 0) {
-        setVirements(virementsData)
-      } else {
-        setVirements(VIREMENTS_DEFAULT)
-      }
+      if (virementsData && virementsData.length > 0) setVirements(virementsData)
+      else setVirements(VIREMENTS_DEFAULT)
 
       setLoaded(true)
     }
@@ -244,7 +241,6 @@ export default function Portefeuille() {
   }
 
   const inputStyle = { padding: '5px 8px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgCard, color: t.text, width: '100%' }
-
   const tousCoches = virements.length > 0 && virements.every(v => isCheckedCeMois(v))
 
   return (
@@ -298,13 +294,11 @@ export default function Portefeuille() {
           )}
         </div>
 
-        {/* 2. TABLEAU DES AVOIRS */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div>
-            <div style={{ fontSize: 14, fontWeight: 500, color: t.text }}>Tableau des avoirs</div>
-            <div style={{ fontSize: 12, color: t.textMuted, marginTop: 2 }}>Total : <span style={{ fontWeight: 500, color: t.text }}>{total.toLocaleString('fr-FR')} €</span></div>
-          </div>
-          <button onClick={() => setShowAdd(v => !v)} style={{ background: '#4CAF2E', color: '#fff', fontSize: 12, fontWeight: 500, padding: '7px 14px', borderRadius: 8, border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
+        {/* 2. MES COMPTES */}
+        <div>
+          <div style={{ fontSize: 14, fontWeight: 500, color: t.text }}>Mes comptes</div>
+          <div style={{ fontSize: 12, color: t.textMuted, marginTop: 2 }}>Total : <span style={{ fontWeight: 500, color: t.text }}>{total.toLocaleString('fr-FR')} €</span></div>
+          <button onClick={() => setShowAdd(v => !v)} style={{ marginTop: 8, background: '#4CAF2E', color: '#fff', fontSize: 12, fontWeight: 500, padding: '7px 14px', borderRadius: 8, border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
             {showAdd ? '− Fermer' : '+ Ajouter un compte'}
           </button>
         </div>
@@ -533,7 +527,7 @@ export default function Portefeuille() {
                         <span style={{ fontSize: 11, color: t.textMuted }}>%</span>
                       </div>
                     </td>
-                    <td style={{ padding: '10px 14px', fontWeight: 500, color: coche ? '#4CAF2E' : '#4CAF2E' }}>
+                    <td style={{ padding: '10px 14px', fontWeight: 500, color: '#4CAF2E' }}>
                       {Math.round(investissable * v.pourcentage / 100).toLocaleString('fr-FR')} €
                     </td>
                   </tr>
