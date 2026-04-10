@@ -3,13 +3,20 @@ import { supabase } from '../lib/supabase'
 import Navbar from '../components/Navbar'
 import { useTheme } from '../lib/ThemeContext'
 
+const COMPTES_PREDEFINIS = [
+  { nom: 'Livret A', type: 'sécurité', disponibilite: 'Immédiate' },
+  { nom: 'LDDS', type: 'sécurité', disponibilite: 'Immédiate' },
+  { nom: 'LEP', type: 'sécurité', disponibilite: 'Immédiate' },
+  { nom: 'CEL', type: 'immobilier', disponibilite: 'Quelques jours' },
+  { nom: 'PEA', type: 'investissement', disponibilite: 'Bloqué (5 ans)' },
+  { nom: 'CTO', type: 'investissement', disponibilite: 'Quelques jours' },
+  { nom: 'Assurance-vie', type: 'investissement', disponibilite: 'Quelques jours' },
+  { nom: 'Autre', type: 'autre', disponibilite: 'Immédiate' },
+]
+
 const COMPTES_DEFAULT = [
   { nom: 'Livret A', type: 'sécurité', disponibilite: 'Immédiate', solde: 0, objectif: 0 },
-  { nom: 'LDDS', type: 'sécurité', disponibilite: 'Immédiate', solde: 0, objectif: 0 },
-  { nom: 'LEP', type: 'sécurité', disponibilite: 'Immédiate', solde: 0, objectif: 0 },
-  { nom: 'CEL', type: 'immobilier', disponibilite: 'Quelques jours', solde: 0, objectif: 0 },
   { nom: 'PEA', type: 'investissement', disponibilite: 'Bloqué (5 ans)', solde: 0, objectif: 0 },
-  { nom: 'CTO', type: 'investissement', disponibilite: 'Quelques jours', solde: 0, objectif: 0 },
   { nom: 'Assurance-vie', type: 'investissement', disponibilite: 'Quelques jours', solde: 0, objectif: 0 },
 ]
 
@@ -19,8 +26,13 @@ const VIREMENTS_DEFAULT = [
   { destination: 'Investissement', compte: 'PEA', pourcentage: 50, ordre: 2 },
 ]
 
-const TYPES = ['sécurité', 'investissement', 'immobilier']
-const DISPONIBILITES = ['Immédiate', 'Quelques jours', 'Bloqué (5 ans)']
+const TYPES_DISPONIBILITE = {
+  'sécurité': { color: '#4CAF2E' },
+  'investissement': { color: '#1B2E4B' },
+  'immobilier': { color: '#BA7517' },
+  'autre': { color: '#9CA3AF' },
+}
+
 const COULEURS = ['#1B2E4B', '#4CAF2E', '#BA7517', '#3B82F6', '#E24B4A', '#8B5CF6', '#06B6D4', '#F59E0B', '#10B981', '#EC4899']
 
 export default function Portefeuille() {
@@ -32,7 +44,12 @@ export default function Portefeuille() {
   const [editingIdx, setEditingIdx] = useState(null)
   const [editForm, setEditForm] = useState({})
   const [showAdd, setShowAdd] = useState(false)
-  const [newCompte, setNewCompte] = useState({ nom: '', type: 'sécurité', disponibilite: 'Immédiate', solde: 0, objectif: 0 })
+  const [selectedPredefini, setSelectedPredefini] = useState('Livret A')
+  const [newNomCustom, setNewNomCustom] = useState('')
+  const [newTypeCustom, setNewTypeCustom] = useState('sécurité')
+  const [newDispoCustom, setNewDispoCustom] = useState('Immédiate')
+  const [newSolde, setNewSolde] = useState('')
+  const [newObjectif, setNewObjectif] = useState('')
   const [depensesMensuelles, setDepensesMensuelles] = useState(0)
   const [investissable, setInvestissable] = useState(0)
   const [chartReady, setChartReady] = useState(false)
@@ -45,6 +62,7 @@ export default function Portefeuille() {
   const remplissageMatelas = objectifMatelas > 0 ? Math.min(Math.round((totalSecurite / objectifMatelas) * 100), 100) : 0
   const bleu = t.dark ? '#3B82F6' : '#1B2E4B'
   const totalPourcentage = virements.reduce((acc, v) => acc + (parseFloat(v.pourcentage) || 0), 0)
+  const predefiniSelectionne = COMPTES_PREDEFINIS.find(c => c.nom === selectedPredefini)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -64,18 +82,12 @@ export default function Portefeuille() {
       }
 
       const { data: comptesData } = await supabase.from('comptes').select('*').eq('user_id', user.id).order('created_at', { ascending: true })
-      if (comptesData && comptesData.length > 0) {
-        setComptes(comptesData)
-      } else {
-        setComptes(COMPTES_DEFAULT)
-      }
+      if (comptesData && comptesData.length > 0) setComptes(comptesData)
+      else setComptes(COMPTES_DEFAULT)
 
       const { data: virementsData } = await supabase.from('virements').select('*').eq('user_id', user.id).order('ordre', { ascending: true })
-      if (virementsData && virementsData.length > 0) {
-        setVirements(virementsData)
-      } else {
-        setVirements(VIREMENTS_DEFAULT)
-      }
+      if (virementsData && virementsData.length > 0) setVirements(virementsData)
+      else setVirements(VIREMENTS_DEFAULT)
     }
     fetchData()
 
@@ -154,18 +166,16 @@ export default function Portefeuille() {
     }
   }
 
-  const couleurType = (type) => {
-    if (type === 'sécurité') return '#4CAF2E'
-    if (type === 'investissement') return '#1B2E4B'
-    if (type === 'immobilier') return '#BA7517'
-    return '#9CA3AF'
-  }
+  const couleurType = (type) => TYPES_DISPONIBILITE[type]?.color || '#9CA3AF'
 
-  const handleEditStart = (i) => { setEditingIdx(i); setEditForm({ ...comptes[i] }) }
+  const handleEditStart = (i) => {
+    setEditingIdx(i)
+    setEditForm({ solde: comptes[i].solde, objectif: comptes[i].objectif })
+  }
 
   const handleEditSave = async (i) => {
     const updated = [...comptes]
-    updated[i] = { ...editForm, solde: parseFloat(editForm.solde) || 0, objectif: parseFloat(editForm.objectif) || 0 }
+    updated[i] = { ...updated[i], solde: parseFloat(editForm.solde) || 0, objectif: parseFloat(editForm.objectif) || 0 }
     setComptes(updated)
     setEditingIdx(null)
     await saveComptes(updated)
@@ -178,10 +188,17 @@ export default function Portefeuille() {
   }
 
   const handleAdd = async () => {
-    if (!newCompte.nom.trim()) return
-    const updated = [...comptes, { ...newCompte, solde: parseFloat(newCompte.solde) || 0, objectif: parseFloat(newCompte.objectif) || 0 }]
+    const isAutre = selectedPredefini === 'Autre'
+    const nom = isAutre ? newNomCustom.trim() : selectedPredefini
+    if (!nom) return
+    const type = isAutre ? newTypeCustom : predefiniSelectionne.type
+    const disponibilite = isAutre ? newDispoCustom : predefiniSelectionne.disponibilite
+    const updated = [...comptes, { nom, type, disponibilite, solde: parseFloat(newSolde) || 0, objectif: parseFloat(newObjectif) || 0 }]
     setComptes(updated)
-    setNewCompte({ nom: '', type: 'sécurité', disponibilite: 'Immédiate', solde: 0, objectif: 0 })
+    setSelectedPredefini('Livret A')
+    setNewNomCustom('')
+    setNewSolde('')
+    setNewObjectif('')
     setShowAdd(false)
     await saveComptes(updated)
   }
@@ -217,27 +234,44 @@ export default function Portefeuille() {
             <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1fr 1fr auto', gap: 10, alignItems: 'end' }}>
               <div>
                 <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Compte / Support</div>
-                <input placeholder="ex: Livret A" value={newCompte.nom} onChange={e => setNewCompte({ ...newCompte, nom: e.target.value })} style={inputStyle} />
+                <select value={selectedPredefini} onChange={e => setSelectedPredefini(e.target.value)} style={inputStyle}>
+                  {COMPTES_PREDEFINIS.map(c => <option key={c.nom} value={c.nom}>{c.nom}</option>)}
+                </select>
+                {selectedPredefini === 'Autre' && (
+                  <input placeholder="Nom du compte" value={newNomCustom} onChange={e => setNewNomCustom(e.target.value)} style={{ ...inputStyle, marginTop: 6 }} />
+                )}
               </div>
               <div>
                 <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Type</div>
-                <select value={newCompte.type} onChange={e => setNewCompte({ ...newCompte, type: e.target.value })} style={inputStyle}>
-                  {TYPES.map(ty => <option key={ty} value={ty}>{ty}</option>)}
-                </select>
+                {selectedPredefini === 'Autre' ? (
+                  <select value={newTypeCustom} onChange={e => setNewTypeCustom(e.target.value)} style={inputStyle}>
+                    {Object.keys(TYPES_DISPONIBILITE).map(ty => <option key={ty} value={ty}>{ty}</option>)}
+                  </select>
+                ) : (
+                  <div style={{ padding: '6px 8px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, background: t.bgSecondary, color: t.textMuted }}>
+                    {predefiniSelectionne?.type}
+                  </div>
+                )}
               </div>
               <div>
                 <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Disponibilité</div>
-                <select value={newCompte.disponibilite} onChange={e => setNewCompte({ ...newCompte, disponibilite: e.target.value })} style={inputStyle}>
-                  {DISPONIBILITES.map(d => <option key={d} value={d}>{d}</option>)}
-                </select>
+                {selectedPredefini === 'Autre' ? (
+                  <select value={newDispoCustom} onChange={e => setNewDispoCustom(e.target.value)} style={inputStyle}>
+                    {['Immédiate', 'Quelques jours', 'Bloqué (5 ans)'].map(d => <option key={d} value={d}>{d}</option>)}
+                  </select>
+                ) : (
+                  <div style={{ padding: '6px 8px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, background: t.bgSecondary, color: t.textMuted }}>
+                    {predefiniSelectionne?.disponibilite}
+                  </div>
+                )}
               </div>
               <div>
                 <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Solde actuel (€)</div>
-                <input type="number" placeholder="0" value={newCompte.solde || ''} onChange={e => setNewCompte({ ...newCompte, solde: e.target.value })} style={inputStyle} />
+                <input type="number" placeholder="0" value={newSolde} onChange={e => setNewSolde(e.target.value)} style={inputStyle} />
               </div>
               <div>
                 <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Objectif (€)</div>
-                <input type="number" placeholder="0" value={newCompte.objectif || ''} onChange={e => setNewCompte({ ...newCompte, objectif: e.target.value })} style={inputStyle} />
+                <input type="number" placeholder="0" value={newObjectif} onChange={e => setNewObjectif(e.target.value)} style={inputStyle} />
               </div>
               <button onClick={handleAdd} style={{ background: '#4CAF2E', color: '#fff', fontSize: 11, fontWeight: 500, padding: '7px 12px', borderRadius: 7, border: 'none', cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>
                 {saving ? '...' : 'Ajouter'}
@@ -265,19 +299,17 @@ export default function Portefeuille() {
                       <tr key={i} style={{ borderBottom: `0.5px solid ${t.border}`, background: editingIdx === i ? t.bgSecondary : 'transparent' }}>
                         {editingIdx === i ? (
                           <>
-                            <td style={{ padding: '6px 8px' }}><input value={editForm.nom} onChange={e => setEditForm({ ...editForm, nom: e.target.value })} style={inputStyle} /></td>
+                            <td style={{ padding: '10px 14px', fontWeight: 500, color: t.text }}>{c.nom}</td>
+                            <td style={{ padding: '10px 14px' }}>
+                              <span style={{ fontSize: 10, fontWeight: 500, padding: '2px 8px', borderRadius: 20, background: couleurType(c.type) + '20', color: couleurType(c.type) }}>{c.type}</span>
+                            </td>
+                            <td style={{ padding: '10px 14px', color: t.textSecondary, fontSize: 11 }}>{c.disponibilite}</td>
                             <td style={{ padding: '6px 8px' }}>
-                              <select value={editForm.type} onChange={e => setEditForm({ ...editForm, type: e.target.value })} style={inputStyle}>
-                                {TYPES.map(ty => <option key={ty} value={ty}>{ty}</option>)}
-                              </select>
+                              <input type="number" value={editForm.solde} onChange={e => setEditForm({ ...editForm, solde: e.target.value })} style={{ ...inputStyle, width: 90 }} />
                             </td>
                             <td style={{ padding: '6px 8px' }}>
-                              <select value={editForm.disponibilite} onChange={e => setEditForm({ ...editForm, disponibilite: e.target.value })} style={inputStyle}>
-                                {DISPONIBILITES.map(d => <option key={d} value={d}>{d}</option>)}
-                              </select>
+                              <input type="number" value={editForm.objectif} onChange={e => setEditForm({ ...editForm, objectif: e.target.value })} style={{ ...inputStyle, width: 90 }} />
                             </td>
-                            <td style={{ padding: '6px 8px' }}><input type="number" value={editForm.solde} onChange={e => setEditForm({ ...editForm, solde: e.target.value })} style={inputStyle} /></td>
-                            <td style={{ padding: '6px 8px' }}><input type="number" value={editForm.objectif} onChange={e => setEditForm({ ...editForm, objectif: e.target.value })} style={inputStyle} /></td>
                             <td style={{ padding: '6px 8px', color: t.textMuted }}>—</td>
                             <td style={{ padding: '6px 8px', color: t.textMuted }}>—</td>
                             <td style={{ padding: '6px 8px' }}>
