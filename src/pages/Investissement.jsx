@@ -112,7 +112,7 @@ export default function Investissement() {
           {[
             ['Total investi', `${Math.round(totalInvesti).toLocaleString('fr-FR')} €`, t.text],
             ['Valeur actuelle', `${Math.round(valeurActuelle).toLocaleString('fr-FR')} €`, '#4CAF2E'],
-            ['Plus-value', `${plusValue >= 0 ? '+' : ''}${Math.round(plusValue).toLocaleString('fr-FR')} €`, plusValue >= 0 ? '#4CAF2E' : '#E24B4A'],
+            ['Plus-value (en attente)', `${plusValue >= 0 ? '+' : ''}${Math.round(plusValue).toLocaleString('fr-FR')} €`, plusValue >= 0 ? '#4CAF2E' : '#E24B4A'],
             ['Nb positions', nbPositions.toString(), bleu],
           ].map(([l, v, c]) => (
             <div key={l} style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: 16 }}>
@@ -269,7 +269,7 @@ export default function Investissement() {
                 return (
                   <div key={env} style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, overflow: 'hidden' }}>
 
-                    {/* HEADER AVEC MINI CARTES */}
+                    {/* HEADER AVEC MINI CARTES 2x2 */}
                     <div style={{ padding: '12px 16px', borderBottom: `0.5px solid ${t.border}`, background: t.bgSecondary, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16 }}>
                       <div>
                         <div style={{ fontSize: 13, fontWeight: 500, color: t.text }}>{ENVELOPPE_LABELS[env] || env}</div>
@@ -280,16 +280,16 @@ export default function Investissement() {
                         )}
                       </div>
 
-                      {/* MINI CARTES */}
-                      <div style={{ display: 'flex', gap: 8 }}>
+                      {/* GRILLE 2x2 */}
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
                         {[
                           ['Total investi', `${Math.round(totalInvestiEnv).toLocaleString('fr-FR')} €`, t.text],
                           ['Valeur actuelle', `${Math.round(totalEnv).toLocaleString('fr-FR')} €`, '#4CAF2E'],
-                          ['Plus-value', `${plusValueEnv >= 0 ? '+' : ''}${Math.round(plusValueEnv).toLocaleString('fr-FR')} €`, plusValueEnv >= 0 ? '#4CAF2E' : '#E24B4A'],
+                          ['Plus-value (en attente)', `${plusValueEnv >= 0 ? '+' : ''}${Math.round(plusValueEnv).toLocaleString('fr-FR')} €`, plusValueEnv >= 0 ? '#4CAF2E' : '#E24B4A'],
                           ['Positions', nbPositionsEnv.toString(), bleu],
                         ].map(([l, v, c]) => (
-                          <div key={l} style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 8, padding: '6px 12px', textAlign: 'center', minWidth: 90 }}>
-                            <div style={{ fontSize: 9, color: t.textMuted, textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 3 }}>{l}</div>
+                          <div key={l} style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 7, padding: '5px 10px', minWidth: 110 }}>
+                            <div style={{ fontSize: 9, color: t.textMuted, textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 2 }}>{l}</div>
                             <div style={{ fontSize: 13, fontWeight: 500, color: c }}>{v}</div>
                           </div>
                         ))}
