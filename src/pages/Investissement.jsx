@@ -269,105 +269,100 @@ export default function Investissement() {
                 return (
                   <div key={env} style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, overflow: 'hidden' }}>
 
-                    {/* HEADER : INFOS + CARTES CÔTE À CÔTE */}
-                    <div style={{ padding: '14px 16px', borderBottom: `0.5px solid ${t.border}`, background: t.bgSecondary, display: 'flex', alignItems: 'center', gap: 16, justifyContent: 'space-between' }}>
+                    {/* TITRE */}
+                    <div style={{ padding: '10px 16px', borderBottom: `0.5px solid ${t.border}`, background: t.bgSecondary, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div style={{ fontSize: 13, fontWeight: 500, color: t.text }}>{ENVELOPPE_LABELS[env] || env}</div>
+                      {totalCible > 0 && (
+                        <div style={{ fontSize: 11, fontWeight: 500, color: totalCible === 100 ? '#4CAF2E' : '#E24B4A' }}>
+                          % Cible total : {totalCible}%
+                        </div>
+                      )}
+                    </div>
 
-                      {/* GAUCHE : titre + stats inline */}
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 24, flex: 1 }}>
-                        <div>
-                          <div style={{ fontSize: 13, fontWeight: 500, color: t.text }}>{ENVELOPPE_LABELS[env] || env}</div>
-                          {totalCible > 0 && (
-                            <div style={{ fontSize: 10, color: totalCible === 100 ? '#4CAF2E' : '#E24B4A', marginTop: 2 }}>
-                              % Cible total : {totalCible}%
-                            </div>
-                          )}
-                        </div>
-                        <div style={{ display: 'flex', gap: 0, border: `0.5px solid ${t.border}`, borderRadius: 8, overflow: 'hidden' }}>
-                          {[
-                            ['Valeur totale', `${Math.round(totalEnv).toLocaleString('fr-FR')} €`, '#4CAF2E'],
-                            ['Total investi', `${Math.round(totalInvestiEnv).toLocaleString('fr-FR')} €`, t.text],
-                            ['Positions', nbPositionsEnv.toString(), bleu],
-                          ].map(([l, v, c], idx, arr) => (
-                            <div key={l} style={{ padding: '6px 14px', borderRight: idx < arr.length - 1 ? `0.5px solid ${t.border}` : 'none', background: t.bgCard }}>
-                              <div style={{ fontSize: 9, color: t.textMuted, textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 2 }}>{l}</div>
-                              <div style={{ fontSize: 13, fontWeight: 500, color: c }}>{v}</div>
-                            </div>
-                          ))}
-                        </div>
+                    {/* CORPS : 75% tableau + 25% cartes */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '3fr 1fr' }}>
+
+                      {/* TABLEAU 75% */}
+                      <div style={{ borderRight: `0.5px solid ${t.border}` }}>
+                        {lignes.length === 0 ? (
+                          <div style={{ padding: '24px', textAlign: 'center', color: t.textMuted, fontSize: 12 }}>
+                            Aucune position dans cette enveloppe
+                          </div>
+                        ) : (
+                          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+                            <thead>
+                              <tr style={{ background: t.bgSecondary }}>
+                                {['Ticker', 'Actif', 'Prix actuel', 'Position', 'Valeur EUR', '% Actuel', '% Cible', 'Achat/Vente'].map(h => (
+                                  <th key={h} style={{ padding: '8px 14px', textAlign: 'left', fontSize: 10, color: t.textMuted, fontWeight: 500, borderBottom: `0.5px solid ${t.border}`, whiteSpace: 'nowrap' }}>{h}</th>
+                                ))}
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {lignes.map((inv) => {
+                                const valAct = calcValeurActuelle(inv)
+                                const pctActuel = totalEnv > 0 ? Math.round((valAct / totalEnv) * 100) : 0
+                                const cibleKey = `${env}-${inv.ticker}`
+                                const pctCible = cibles[cibleKey] || 0
+                                const prixActuel = parseFloat(inv.prix_actuel) || parseFloat(inv.prix_achat_unitaire)
+                                const diff = pctCible > 0 ? Math.round((pctCible - pctActuel) / 100 * totalEnv / prixActuel) : 0
+                                return (
+                                  <tr key={inv.id} style={{ borderBottom: `0.5px solid ${t.border}` }}>
+                                    <td style={{ padding: '10px 14px', fontWeight: 500, color: bleu }}>{inv.ticker}</td>
+                                    <td style={{ padding: '10px 14px', color: t.text, maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{inv.actif}</td>
+                                    <td style={{ padding: '10px 14px', color: t.text }}>{prixActuel.toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €</td>
+                                    <td style={{ padding: '10px 14px', color: t.text }}>{inv.quantite}</td>
+                                    <td style={{ padding: '10px 14px', fontWeight: 500, color: t.text }}>{Math.round(valAct).toLocaleString('fr-FR')} €</td>
+                                    <td style={{ padding: '10px 14px', color: t.text }}>{pctActuel}%</td>
+                                    <td style={{ padding: '10px 14px' }}>
+                                      <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                                        <input
+                                          type="number" min="0" max="100" placeholder="0"
+                                          value={cibles[cibleKey] || ''}
+                                          onChange={e => setCibles(prev => ({ ...prev, [cibleKey]: parseFloat(e.target.value) || 0 }))}
+                                          style={{ width: 60, padding: '4px 6px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text, textAlign: 'right' }}
+                                        />
+                                        <span style={{ fontSize: 11, color: t.textMuted }}>%</span>
+                                      </div>
+                                    </td>
+                                    <td style={{ padding: '10px 14px', fontWeight: 500, color: diff > 0 ? '#4CAF2E' : diff < 0 ? '#E24B4A' : t.textMuted }}>
+                                      {pctCible > 0 ? (diff === 0 ? '✓ OK' : `${diff > 0 ? '+' : ''}${diff} titres`) : '—'}
+                                    </td>
+                                  </tr>
+                                )
+                              })}
+                              <tr style={{ background: t.bgSecondary, borderTop: `0.5px solid ${t.border}` }}>
+                                <td colSpan={4} style={{ padding: '10px 14px', fontWeight: 500, color: t.text, fontSize: 11 }}>TOTAL</td>
+                                <td style={{ padding: '10px 14px', fontWeight: 500, color: t.text }}>{Math.round(totalEnv).toLocaleString('fr-FR')} €</td>
+                                <td style={{ padding: '10px 14px', fontWeight: 500, color: t.text }}>100%</td>
+                                <td style={{ padding: '10px 14px', fontWeight: 500, color: totalCible === 100 ? '#4CAF2E' : '#E24B4A' }}>{totalCible}%</td>
+                                <td></td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        )}
                       </div>
 
-                      {/* DROITE : 4 cartes 2x2 */}
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, flexShrink: 0 }}>
+                      {/* CARTES 2x2 — 25% */}
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr', gap: 0 }}>
                         {[
                           ['Total investi', `${Math.round(totalInvestiEnv).toLocaleString('fr-FR')} €`, t.text],
                           ['Valeur actuelle', `${Math.round(totalEnv).toLocaleString('fr-FR')} €`, '#4CAF2E'],
                           ["Plus-value (l'attente)", `${plusValueEnv >= 0 ? '+' : ''}${Math.round(plusValueEnv).toLocaleString('fr-FR')} €`, plusValueEnv >= 0 ? '#4CAF2E' : '#E24B4A'],
                           ['Nb positions', nbPositionsEnv.toString(), bleu],
-                        ].map(([l, v, c]) => (
-                          <div key={l} style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 7, padding: '6px 12px', minWidth: 120 }}>
-                            <div style={{ fontSize: 9, color: t.textMuted, textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 3 }}>{l}</div>
-                            <div style={{ fontSize: 13, fontWeight: 500, color: c }}>{v}</div>
+                        ].map(([l, v, c], idx) => (
+                          <div key={l} style={{
+                            padding: '16px',
+                            borderBottom: idx < 2 ? `0.5px solid ${t.border}` : 'none',
+                            borderRight: idx % 2 === 0 ? `0.5px solid ${t.border}` : 'none',
+                            display: 'flex', flexDirection: 'column', justifyContent: 'center',
+                          }}>
+                            <div style={{ fontSize: 9, color: t.textMuted, textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 6 }}>{l}</div>
+                            <div style={{ fontSize: 16, fontWeight: 500, color: c }}>{v}</div>
                           </div>
                         ))}
                       </div>
-                    </div>
 
-                    {lignes.length === 0 ? (
-                      <div style={{ padding: '20px', textAlign: 'center', color: t.textMuted, fontSize: 12 }}>
-                        Aucune position dans cette enveloppe
-                      </div>
-                    ) : (
-                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
-                        <thead>
-                          <tr style={{ background: t.bgSecondary }}>
-                            {['Ticker', 'Actif', 'Prix actuel', 'Position', 'Valeur EUR', '% Actuel', '% Cible', 'Achat/Vente'].map(h => (
-                              <th key={h} style={{ padding: '8px 14px', textAlign: 'left', fontSize: 10, color: t.textMuted, fontWeight: 500, borderBottom: `0.5px solid ${t.border}`, whiteSpace: 'nowrap' }}>{h}</th>
-                            ))}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {lignes.map((inv) => {
-                            const valAct = calcValeurActuelle(inv)
-                            const pctActuel = totalEnv > 0 ? Math.round((valAct / totalEnv) * 100) : 0
-                            const cibleKey = `${env}-${inv.ticker}`
-                            const pctCible = cibles[cibleKey] || 0
-                            const prixActuel = parseFloat(inv.prix_actuel) || parseFloat(inv.prix_achat_unitaire)
-                            const diff = pctCible > 0 ? Math.round((pctCible - pctActuel) / 100 * totalEnv / prixActuel) : 0
-                            return (
-                              <tr key={inv.id} style={{ borderBottom: `0.5px solid ${t.border}` }}>
-                                <td style={{ padding: '10px 14px', fontWeight: 500, color: bleu }}>{inv.ticker}</td>
-                                <td style={{ padding: '10px 14px', color: t.text, maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{inv.actif}</td>
-                                <td style={{ padding: '10px 14px', color: t.text }}>{prixActuel.toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €</td>
-                                <td style={{ padding: '10px 14px', color: t.text }}>{inv.quantite}</td>
-                                <td style={{ padding: '10px 14px', fontWeight: 500, color: t.text }}>{Math.round(valAct).toLocaleString('fr-FR')} €</td>
-                                <td style={{ padding: '10px 14px', color: t.text }}>{pctActuel}%</td>
-                                <td style={{ padding: '10px 14px' }}>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                                    <input
-                                      type="number" min="0" max="100" placeholder="0"
-                                      value={cibles[cibleKey] || ''}
-                                      onChange={e => setCibles(prev => ({ ...prev, [cibleKey]: parseFloat(e.target.value) || 0 }))}
-                                      style={{ width: 60, padding: '4px 6px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text, textAlign: 'right' }}
-                                    />
-                                    <span style={{ fontSize: 11, color: t.textMuted }}>%</span>
-                                  </div>
-                                </td>
-                                <td style={{ padding: '10px 14px', fontWeight: 500, color: diff > 0 ? '#4CAF2E' : diff < 0 ? '#E24B4A' : t.textMuted }}>
-                                  {pctCible > 0 ? (diff === 0 ? '✓ OK' : `${diff > 0 ? '+' : ''}${diff} titres`) : '—'}
-                                </td>
-                              </tr>
-                            )
-                          })}
-                          <tr style={{ background: t.bgSecondary, borderTop: `0.5px solid ${t.border}` }}>
-                            <td colSpan={4} style={{ padding: '10px 14px', fontWeight: 500, color: t.text, fontSize: 11 }}>TOTAL</td>
-                            <td style={{ padding: '10px 14px', fontWeight: 500, color: t.text }}>{Math.round(totalEnv).toLocaleString('fr-FR')} €</td>
-                            <td style={{ padding: '10px 14px', fontWeight: 500, color: t.text }}>100%</td>
-                            <td style={{ padding: '10px 14px', fontWeight: 500, color: totalCible === 100 ? '#4CAF2E' : '#E24B4A' }}>{totalCible}%</td>
-                            <td></td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    )}
+                    </div>
                   </div>
                 )
               })}
