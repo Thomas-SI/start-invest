@@ -126,7 +126,7 @@ export default function Investissement() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0,1fr))', gap: 10 }}>
           {[
             ['Total investi', `${Math.round(totalInvesti).toLocaleString('fr-FR')} €`, t.text],
-            ['Valeur actuelle', `${Math.round(valeurActuelle).toLocaleString('fr-FR')} €', '#4CAF2E'],
+            ['Valeur actuelle', `${Math.round(valeurActuelle).toLocaleString('fr-FR')} €`, '#4CAF2E'],
             ['Plus-value', `${plusValue >= 0 ? '+' : ''}${Math.round(plusValue).toLocaleString('fr-FR')} €`, plusValue >= 0 ? '#4CAF2E' : '#E24B4A'],
             ['Nb positions', nbPositions.toString(), bleu],
           ].map(([l, v, c]) => (
