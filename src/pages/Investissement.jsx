@@ -3,174 +3,308 @@ import { supabase } from '../lib/supabase'
 import Navbar from '../components/Navbar'
 import { useTheme } from '../lib/ThemeContext'
 
-const enveloppes = ['CTO', 'PEA', 'Assurance-vie', 'PER']
-const typesETF = ['Capitalisant', 'Distributif']
+const ENVELOPPES = ['CTO', 'PEA', 'Assurance-vie']
+const TYPES_ETF = ['Capitalisant', 'Distribuant']
+const TYPES = ['Achat', 'Vente']
 
 export default function Investissement() {
   const t = useTheme()
-  const [user, setUser] = useState(null)
   const [investissements, setInvestissements] = useState([])
-  const [showModal, setShowModal] = useState(false)
-  const [form, setForm] = useState({ date: '', ticker: '', nom: '', enveloppe: 'PEA', type: 'Capitalisant', quantite: '', prixAchat: '', prixActuel: '', ter: '', frais: '' })
+  const [user, setUser] = useState(null)
+  const [showAdd, setShowAdd] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [editingId, setEditingId] = useState(null)
+  const [editForm, setEditForm] = useState({})
+  const [form, setForm] = useState({
+    date: new Date().toISOString().split('T')[0],
+    ticker: '',
+    actif: '',
+    enveloppe: 'PEA',
+    type_etf: 'Capitalisant',
+    type: 'Achat',
+    quantite: '',
+    prix_achat_unitaire: '',
+    prix_actuel: '',
+    ter: '',
+    frais_courtage: '',
+  })
+
+  const bleu = t.dark ? '#3B82F6' : '#1B2E4B'
+
+  const totalInvesti = investissements.reduce((acc, i) => acc + (parseFloat(i.quantite) * parseFloat(i.prix_achat_unitaire) + parseFloat(i.frais_courtage || 0)), 0)
+  const valeurActuelle = investissements.reduce((acc, i) => acc + (parseFloat(i.quantite) * parseFloat(i.prix_actuel || i.prix_achat_unitaire)), 0)
+  const plusValue = valeurActuelle - investissements.reduce((acc, i) => acc + (parseFloat(i.quantite) * parseFloat(i.prix_achat_unitaire)), 0)
+  const nbPositions = investissements.length
 
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchData = async () => {
       const { data: { user } } = await supabase.auth.getUser()
-      if (user) setUser(user)
+      if (!user) return
+      setUser(user)
+      const { data } = await supabase.from('investissements').select('*').eq('user_id', user.id).order('date', { ascending: false })
+      if (data) setInvestissements(data)
     }
-    fetchUser()
+    fetchData()
   }, [])
+
+  const handleAdd = async () => {
+    if (!form.ticker || !form.quantite || !form.prix_achat_unitaire) return
+    setLoading(true)
+    const payload = {
+      user_id: user.id,
+      date: form.date,
+      ticker: form.ticker.toUpperCase(),
+      actif: form.actif,
+      enveloppe: form.enveloppe,
+      type_etf: form.type_etf,
+      type: form.type,
+      quantite: parseFloat(form.quantite),
+      prix_achat_unitaire: parseFloat(form.prix_achat_unitaire),
+      prix_actuel: parseFloat(form.prix_actuel) || parseFloat(form.prix_achat_unitaire),
+      ter: parseFloat(form.ter) || 0,
+      frais_courtage: parseFloat(form.frais_courtage) || 0,
+    }
+    const { data, error } = await supabase.from('investissements').insert(payload).select().single()
+    if (data) {
+      setInvestissements(prev => [data, ...prev])
+      setForm({
+        date: new Date().toISOString().split('T')[0],
+        ticker: '', actif: '', enveloppe: 'PEA', type_etf: 'Capitalisant',
+        type: 'Achat', quantite: '', prix_achat_unitaire: '', prix_actuel: '', ter: '', frais_courtage: '',
+      })
+      setShowAdd(false)
+    }
+    if (error) console.error(error)
+    setLoading(false)
+  }
+
+  const handleDelete = async (id) => {
+    await supabase.from('investissements').delete().eq('id', id)
+    setInvestissements(prev => prev.filter(i => i.id !== id))
+  }
+
+  const handleEditStart = (inv) => {
+    setEditingId(inv.id)
+    setEditForm({ ...inv })
+  }
+
+  const handleEditSave = async () => {
+    const payload = {
+      date: editForm.date,
+      ticker: editForm.ticker?.toUpperCase(),
+      actif: editForm.actif,
+      enveloppe: editForm.enveloppe,
+      type_etf: editForm.type_etf,
+      type: editForm.type,
+      quantite: parseFloat(editForm.quantite),
+      prix_achat_unitaire: parseFloat(editForm.prix_achat_unitaire),
+      prix_actuel: parseFloat(editForm.prix_actuel) || parseFloat(editForm.prix_achat_unitaire),
+      ter: parseFloat(editForm.ter) || 0,
+      frais_courtage: parseFloat(editForm.frais_courtage) || 0,
+    }
+    await supabase.from('investissements').update(payload).eq('id', editingId)
+    setInvestissements(prev => prev.map(i => i.id === editingId ? { ...i, ...payload } : i))
+    setEditingId(null)
+  }
+
+  const inputStyle = { padding: '5px 8px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgCard, color: t.text, width: '100%' }
+  const selectStyle = { ...inputStyle }
+
+  const calcTotalInvesti = (inv) => (parseFloat(inv.quantite) * parseFloat(inv.prix_achat_unitaire)) + (parseFloat(inv.frais_courtage) || 0)
+  const calcValeurActuelle = (inv) => parseFloat(inv.quantite) * (parseFloat(inv.prix_actuel) || parseFloat(inv.prix_achat_unitaire))
+  const calcPlusValue = (inv) => calcValeurActuelle(inv) - (parseFloat(inv.quantite) * parseFloat(inv.prix_achat_unitaire))
 
   const initiale = user?.user_metadata?.prenom?.[0]?.toUpperCase() || '?'
 
-  const handleAdd = () => {
-    if (!form.ticker || !form.quantite || !form.prixAchat) return
-    setInvestissements([...investissements, { ...form, id: Date.now() }])
-    setForm({ date: '', ticker: '', nom: '', enveloppe: 'PEA', type: 'Capitalisant', quantite: '', prixAchat: '', prixActuel: '', ter: '', frais: '' })
-    setShowModal(false)
-  }
-
-  const handleDelete = (id) => setInvestissements(investissements.filter(i => i.id !== id))
-
-  const pea = investissements.filter(i => i.enveloppe === 'PEA')
-  const cto = investissements.filter(i => i.enveloppe === 'CTO')
-  const autres = investissements.filter(i => !['PEA', 'CTO'].includes(i.enveloppe))
-
-  const totalInvesti = investissements.reduce((acc, i) => acc + (parseFloat(i.quantite) * parseFloat(i.prixAchat) || 0), 0)
-  const totalActuel = investissements.reduce((acc, i) => acc + (parseFloat(i.quantite) * parseFloat(i.prixActuel || i.prixAchat) || 0), 0)
-  const plusValue = totalActuel - totalInvesti
-
-  const TableauInvestissements = ({ items, titre, couleur }) => {
-    if (items.length === 0) return null
-    return (
-      <div style={{ marginBottom: 16 }}>
-        <div style={{ fontSize: 13, fontWeight: 500, color: t.text, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ width: 10, height: 10, borderRadius: '50%', background: couleur, display: 'inline-block' }} />
-          {titre}
-        </div>
-        <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, overflow: 'hidden' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
-            <thead>
-              <tr style={{ background: t.bgSecondary }}>
-                {['Date', 'Ticker', 'Nom', 'Type', 'Qté', 'Prix achat', 'Prix actuel', 'TER', 'Frais', 'Total investi', 'Valeur actuelle', 'Plus-value', ''].map(h => (
-                  <th key={h} style={{ padding: '8px 10px', textAlign: 'left', fontSize: 10, color: t.textMuted, textTransform: 'uppercase', letterSpacing: '.04em', fontWeight: 500, borderBottom: `0.5px solid ${t.border}`, whiteSpace: 'nowrap' }}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((inv) => {
-                const totalInv = parseFloat(inv.quantite) * parseFloat(inv.prixAchat) || 0
-                const valActuelle = parseFloat(inv.quantite) * parseFloat(inv.prixActuel || inv.prixAchat) || 0
-                const pv = valActuelle - totalInv
-                return (
-                  <tr key={inv.id} style={{ borderBottom: `0.5px solid ${t.border}` }}>
-                    <td style={{ padding: '8px 10px', color: t.textMuted, whiteSpace: 'nowrap' }}>{inv.date}</td>
-                    <td style={{ padding: '8px 10px', fontWeight: 500, color: t.text }}>{inv.ticker}</td>
-                    <td style={{ padding: '8px 10px', color: t.textSecondary, maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{inv.nom}</td>
-                    <td style={{ padding: '8px 10px' }}>
-                      <span style={{ background: inv.type === 'Capitalisant' ? '#EAF6E4' : '#E3F0FF', color: inv.type === 'Capitalisant' ? '#2E7D1E' : '#1565C0', padding: '2px 7px', borderRadius: 20, fontSize: 10, fontWeight: 500 }}>{inv.type}</span>
-                    </td>
-                    <td style={{ padding: '8px 10px', color: t.text }}>{inv.quantite}</td>
-                    <td style={{ padding: '8px 10px', color: t.text }}>{parseFloat(inv.prixAchat).toFixed(2)} €</td>
-                    <td style={{ padding: '8px 10px', color: t.text }}>{parseFloat(inv.prixActuel || inv.prixAchat).toFixed(2)} €</td>
-                    <td style={{ padding: '8px 10px', color: t.textMuted }}>{inv.ter ? `${inv.ter}%` : '—'}</td>
-                    <td style={{ padding: '8px 10px', color: t.textMuted }}>{inv.frais ? `${inv.frais} €` : '—'}</td>
-                    <td style={{ padding: '8px 10px', color: t.text, fontWeight: 500 }}>{totalInv.toFixed(2)} €</td>
-                    <td style={{ padding: '8px 10px', color: '#4CAF2E', fontWeight: 500 }}>{valActuelle.toFixed(2)} €</td>
-                    <td style={{ padding: '8px 10px', fontWeight: 500, color: pv >= 0 ? '#4CAF2E' : '#E24B4A' }}>{pv >= 0 ? '+' : ''}{pv.toFixed(2)} €</td>
-                    <td style={{ padding: '8px 10px' }}>
-                      <button onClick={() => handleDelete(inv.id)} style={{ background: '#FCEBEB', color: '#E24B4A', border: 'none', borderRadius: 6, padding: '3px 7px', fontSize: 10, cursor: 'pointer', fontFamily: 'inherit' }}>×</button>
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    )
-  }
-
   return (
-    <div style={{ background: t.bg, height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-
-      {showModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 }}>
-          <div style={{ background: t.bgCard, borderRadius: 16, padding: '28px', width: 520, border: `0.5px solid ${t.border}`, maxHeight: '85vh', overflow: 'auto' }}>
-            <div style={{ fontSize: 15, fontWeight: 500, color: t.text, marginBottom: 16 }}>Ajouter un investissement</div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
-              {[
-                ['Date', 'date', 'date', ''],
-                ['Ticker', 'ticker', 'text', 'ex: VUAA'],
-              ].map(([label, key, type, ph]) => (
-                <div key={key}>
-                  <div style={{ fontSize: 11, color: t.textMuted, marginBottom: 4 }}>{label}</div>
-                  <input type={type} placeholder={ph} value={form[key]} onChange={e => setForm({ ...form, [key]: type === 'text' && key === 'ticker' ? e.target.value.toUpperCase() : e.target.value })} style={{ width: '100%', padding: '8px 10px', borderRadius: 7, border: `0.5px solid ${t.border}`, fontSize: 13, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }} />
-                </div>
-              ))}
-              <div style={{ gridColumn: '1 / -1' }}>
-                <div style={{ fontSize: 11, color: t.textMuted, marginBottom: 4 }}>Nom complet</div>
-                <input placeholder="ex: Vanguard S&P 500 UCITS ETF" value={form.nom} onChange={e => setForm({ ...form, nom: e.target.value })} style={{ width: '100%', padding: '8px 10px', borderRadius: 7, border: `0.5px solid ${t.border}`, fontSize: 13, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }} />
-              </div>
-              <div>
-                <div style={{ fontSize: 11, color: t.textMuted, marginBottom: 4 }}>Enveloppe</div>
-                <select value={form.enveloppe} onChange={e => setForm({ ...form, enveloppe: e.target.value })} style={{ width: '100%', padding: '8px 10px', borderRadius: 7, border: `0.5px solid ${t.border}`, fontSize: 13, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }}>
-                  {enveloppes.map(e => <option key={e} value={e}>{e}</option>)}
-                </select>
-              </div>
-              <div>
-                <div style={{ fontSize: 11, color: t.textMuted, marginBottom: 4 }}>Type d'ETF</div>
-                <select value={form.type} onChange={e => setForm({ ...form, type: e.target.value })} style={{ width: '100%', padding: '8px 10px', borderRadius: 7, border: `0.5px solid ${t.border}`, fontSize: 13, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }}>
-                  {typesETF.map(ty => <option key={ty} value={ty}>{ty}</option>)}
-                </select>
-              </div>
-              {[['Quantité', 'quantite', 'ex: 10'], ['Prix d\'achat (€)', 'prixAchat', 'ex: 100'], ['Prix actuel (€)', 'prixActuel', 'ex: 110'], ['TER (%)', 'ter', 'ex: 0.07'], ['Frais courtage (€)', 'frais', 'ex: 2.5']].map(([label, key, ph]) => (
-                <div key={key}>
-                  <div style={{ fontSize: 11, color: t.textMuted, marginBottom: 4 }}>{label}</div>
-                  <input type="number" placeholder={ph} value={form[key]} onChange={e => setForm({ ...form, [key]: e.target.value })} style={{ width: '100%', padding: '8px 10px', borderRadius: 7, border: `0.5px solid ${t.border}`, fontSize: 13, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }} />
-                </div>
-              ))}
-            </div>
-            <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
-              <button onClick={() => setShowModal(false)} style={{ flex: 1, padding: '9px', borderRadius: 8, border: `0.5px solid ${t.border}`, background: t.bgSecondary, fontSize: 13, cursor: 'pointer', fontFamily: 'inherit', color: t.text }}>Annuler</button>
-              <button onClick={handleAdd} style={{ flex: 1, padding: '9px', borderRadius: 8, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Ajouter</button>
-            </div>
-          </div>
-        </div>
-      )}
-
+    <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar page="Investissement" initiale={initiale} />
 
-      <div style={{ padding: '12px 20px', flex: 1, overflow: 'auto' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0,1fr))', gap: 10, marginBottom: 16 }}>
+      <div style={{ padding: '16px 20px', flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
+
+        {/* CARTES RÉSUMÉ */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0,1fr))', gap: 10 }}>
           {[
-            ['Total investi', `${totalInvesti.toFixed(2)} €`, t.text],
-            ['Valeur actuelle', `${totalActuel.toFixed(2)} €`, '#4CAF2E'],
-            ['Plus-value', `${plusValue >= 0 ? '+' : ''}${plusValue.toFixed(2)} €`, plusValue >= 0 ? '#4CAF2E' : '#E24B4A'],
-            ['Nb positions', `${investissements.length}`, '#1565C0'],
+            ['Total investi', `${Math.round(totalInvesti).toLocaleString('fr-FR')} €`, t.text],
+            ['Valeur actuelle', `${Math.round(valeurActuelle).toLocaleString('fr-FR')} €', '#4CAF2E'],
+            ['Plus-value', `${plusValue >= 0 ? '+' : ''}${Math.round(plusValue).toLocaleString('fr-FR')} €`, plusValue >= 0 ? '#4CAF2E' : '#E24B4A'],
+            ['Nb positions', nbPositions.toString(), bleu],
           ].map(([l, v, c]) => (
-            <div key={l} style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: 14 }}>
-              <div style={{ fontSize: 10, color: t.textMuted, textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 6 }}>{l}</div>
-              <div style={{ fontSize: 20, fontWeight: 500, color: c }}>{v}</div>
+            <div key={l} style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: 16 }}>
+              <div style={{ fontSize: 10, color: t.textMuted, textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 8 }}>{l}</div>
+              <div style={{ fontSize: 22, fontWeight: 500, color: c }}>{v}</div>
             </div>
           ))}
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+        {/* EN-TÊTE JOURNAL */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ fontSize: 14, fontWeight: 500, color: t.text }}>Journal d'investissement</div>
-          <button onClick={() => setShowModal(true)} style={{ background: '#4CAF2E', color: '#fff', fontSize: 12, fontWeight: 500, padding: '7px 14px', borderRadius: 8, border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>+ Ajouter</button>
+          <button onClick={() => setShowAdd(v => !v)} style={{ background: '#4CAF2E', color: '#fff', fontSize: 12, fontWeight: 500, padding: '7px 14px', borderRadius: 8, border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
+            {showAdd ? '− Fermer' : '+ Ajouter'}
+          </button>
         </div>
 
-        {investissements.length === 0 && (
-          <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: '32px', textAlign: 'center' }}>
-            <div style={{ fontSize: 13, color: t.textMuted, marginBottom: 4 }}>Aucun investissement enregistré</div>
-            <div style={{ fontSize: 12, color: t.textMuted, opacity: 0.6 }}>Cliquez sur "+ Ajouter" pour enregistrer votre premier achat</div>
+        {/* FORMULAIRE AJOUT */}
+        {showAdd && (
+          <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: 16 }}>
+            <div style={{ fontSize: 12, fontWeight: 500, color: t.text, marginBottom: 12 }}>Nouvel investissement</div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, minmax(0,1fr))', gap: 10, marginBottom: 10 }}>
+              <div>
+                <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Date</div>
+                <input type="date" value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} style={inputStyle} />
+              </div>
+              <div>
+                <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Ticker</div>
+                <input placeholder="ex: PE500" value={form.ticker} onChange={e => setForm({ ...form, ticker: e.target.value })} style={inputStyle} />
+              </div>
+              <div>
+                <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Actif</div>
+                <input placeholder="ex: Amundi PEA S&P 500" value={form.actif} onChange={e => setForm({ ...form, actif: e.target.value })} style={inputStyle} />
+              </div>
+              <div>
+                <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Enveloppe</div>
+                <select value={form.enveloppe} onChange={e => setForm({ ...form, enveloppe: e.target.value })} style={selectStyle}>
+                  {ENVELOPPES.map(e => <option key={e} value={e}>{e}</option>)}
+                </select>
+              </div>
+              <div>
+                <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Type d'ETF</div>
+                <select value={form.type_etf} onChange={e => setForm({ ...form, type_etf: e.target.value })} style={selectStyle}>
+                  {TYPES_ETF.map(e => <option key={e} value={e}>{e}</option>)}
+                </select>
+              </div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, minmax(0,1fr))', gap: 10, marginBottom: 12 }}>
+              <div>
+                <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Type</div>
+                <select value={form.type} onChange={e => setForm({ ...form, type: e.target.value })} style={selectStyle}>
+                  {TYPES.map(e => <option key={e} value={e}>{e}</option>)}
+                </select>
+              </div>
+              <div>
+                <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Quantité</div>
+                <input type="number" placeholder="ex: 10" value={form.quantite} onChange={e => setForm({ ...form, quantite: e.target.value })} style={inputStyle} />
+              </div>
+              <div>
+                <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Prix achat unitaire (€)</div>
+                <input type="number" placeholder="ex: 48.10" value={form.prix_achat_unitaire} onChange={e => setForm({ ...form, prix_achat_unitaire: e.target.value })} style={inputStyle} />
+              </div>
+              <div>
+                <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Prix actuel (€)</div>
+                <input type="number" placeholder="ex: 52.00" value={form.prix_actuel} onChange={e => setForm({ ...form, prix_actuel: e.target.value })} style={inputStyle} />
+              </div>
+              <div>
+                <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>TER (%)</div>
+                <input type="number" placeholder="ex: 0.25" value={form.ter} onChange={e => setForm({ ...form, ter: e.target.value })} style={inputStyle} />
+              </div>
+              <div>
+                <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Frais courtage (€)</div>
+                <input type="number" placeholder="ex: 2.22" value={form.frais_courtage} onChange={e => setForm({ ...form, frais_courtage: e.target.value })} style={inputStyle} />
+              </div>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
+              <button onClick={() => setShowAdd(false)} style={{ padding: '7px 14px', borderRadius: 8, border: `0.5px solid ${t.border}`, background: t.bgSecondary, fontSize: 12, cursor: 'pointer', fontFamily: 'inherit', color: t.text }}>Annuler</button>
+              <button onClick={handleAdd} disabled={loading} style={{ padding: '7px 14px', borderRadius: 8, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>
+                {loading ? 'Sauvegarde...' : 'Ajouter'}
+              </button>
+            </div>
           </div>
         )}
 
-        <TableauInvestissements items={pea} titre="PEA — Plan d'Épargne Actions" couleur="#1565C0" />
-        <TableauInvestissements items={cto} titre="CTO — Compte-Titres Ordinaire" couleur="#534AB7" />
-        <TableauInvestissements items={autres} titre="Autres enveloppes" couleur="#BA7517" />
+        {/* TABLEAU */}
+        {investissements.length === 0 ? (
+          <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: '40px', textAlign: 'center', color: t.textMuted, fontSize: 12 }}>
+            Aucun investissement enregistré — cliquez sur "+ Ajouter" pour enregistrer votre premier achat
+          </div>
+        ) : (
+          <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, overflow: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, minWidth: 1100 }}>
+              <thead>
+                <tr style={{ background: t.bgSecondary }}>
+                  {['Date', 'Ticker', 'Actif', 'Enveloppe', 'Type ETF', 'Type', 'Qté', 'Prix achat', 'Prix actuel', 'TER %', 'Frais', 'Total investi', 'Valeur actuelle', 'Plus-value', ''].map(h => (
+                    <th key={h} style={{ padding: '8px 12px', textAlign: 'left', fontSize: 10, color: t.textMuted, fontWeight: 500, borderBottom: `0.5px solid ${t.border}`, whiteSpace: 'nowrap' }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {investissements.map((inv) => {
+                  const pv = calcPlusValue(inv)
+                  const totalInv = calcTotalInvesti(inv)
+                  const valAct = calcValeurActuelle(inv)
+                  const isEditing = editingId === inv.id
+                  return (
+                    <tr key={inv.id} style={{ borderBottom: `0.5px solid ${t.border}`, background: isEditing ? t.bgSecondary : 'transparent' }}>
+                      {isEditing ? (
+                        <>
+                          <td style={{ padding: '6px 8px' }}><input type="date" value={editForm.date} onChange={e => setEditForm({ ...editForm, date: e.target.value })} style={{ ...inputStyle, width: 120 }} /></td>
+                          <td style={{ padding: '6px 8px' }}><input value={editForm.ticker} onChange={e => setEditForm({ ...editForm, ticker: e.target.value })} style={{ ...inputStyle, width: 70 }} /></td>
+                          <td style={{ padding: '6px 8px' }}><input value={editForm.actif} onChange={e => setEditForm({ ...editForm, actif: e.target.value })} style={{ ...inputStyle, width: 150 }} /></td>
+                          <td style={{ padding: '6px 8px' }}>
+                            <select value={editForm.enveloppe} onChange={e => setEditForm({ ...editForm, enveloppe: e.target.value })} style={{ ...inputStyle, width: 80 }}>
+                              {ENVELOPPES.map(e => <option key={e} value={e}>{e}</option>)}
+                            </select>
+                          </td>
+                          <td style={{ padding: '6px 8px' }}>
+                            <select value={editForm.type_etf} onChange={e => setEditForm({ ...editForm, type_etf: e.target.value })} style={{ ...inputStyle, width: 110 }}>
+                              {TYPES_ETF.map(e => <option key={e} value={e}>{e}</option>)}
+                            </select>
+                          </td>
+                          <td style={{ padding: '6px 8px' }}>
+                            <select value={editForm.type} onChange={e => setEditForm({ ...editForm, type: e.target.value })} style={{ ...inputStyle, width: 80 }}>
+                              {TYPES.map(e => <option key={e} value={e}>{e}</option>)}
+                            </select>
+                          </td>
+                          <td style={{ padding: '6px 8px' }}><input type="number" value={editForm.quantite} onChange={e => setEditForm({ ...editForm, quantite: e.target.value })} style={{ ...inputStyle, width: 60 }} /></td>
+                          <td style={{ padding: '6px 8px' }}><input type="number" value={editForm.prix_achat_unitaire} onChange={e => setEditForm({ ...editForm, prix_achat_unitaire: e.target.value })} style={{ ...inputStyle, width: 80 }} /></td>
+                          <td style={{ padding: '6px 8px' }}><input type="number" value={editForm.prix_actuel} onChange={e => setEditForm({ ...editForm, prix_actuel: e.target.value })} style={{ ...inputStyle, width: 80 }} /></td>
+                          <td style={{ padding: '6px 8px' }}><input type="number" value={editForm.ter} onChange={e => setEditForm({ ...editForm, ter: e.target.value })} style={{ ...inputStyle, width: 60 }} /></td>
+                          <td style={{ padding: '6px 8px' }}><input type="number" value={editForm.frais_courtage} onChange={e => setEditForm({ ...editForm, frais_courtage: e.target.value })} style={{ ...inputStyle, width: 70 }} /></td>
+                          <td style={{ padding: '6px 8px', color: t.textMuted, fontSize: 11 }}>—</td>
+                          <td style={{ padding: '6px 8px', color: t.textMuted, fontSize: 11 }}>—</td>
+                          <td style={{ padding: '6px 8px', color: t.textMuted, fontSize: 11 }}>—</td>
+                          <td style={{ padding: '6px 8px' }}>
+                            <div style={{ display: 'flex', gap: 4 }}>
+                              <button onClick={handleEditSave} style={{ background: '#EAF6E4', color: '#2E7D1E', border: 'none', borderRadius: 5, padding: '2px 7px', fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>✓</button>
+                              <button onClick={() => setEditingId(null)} style={{ background: t.bgSecondary, color: t.textMuted, border: `0.5px solid ${t.border}`, borderRadius: 5, padding: '2px 7px', fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>✕</button>
+                            </div>
+                          </td>
+                        </>
+                      ) : (
+                        <>
+                          <td style={{ padding: '8px 12px', color: t.textSecondary, whiteSpace: 'nowrap' }}>{new Date(inv.date).toLocaleDateString('fr-FR')}</td>
+                          <td style={{ padding: '8px 12px', fontWeight: 500, color: bleu }}>{inv.ticker}</td>
+                          <td style={{ padding: '8px 12px', color: t.text, maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{inv.actif}</td>
+                          <td style={{ padding: '8px 12px' }}>
+                            <span style={{ fontSize: 10, fontWeight: 500, padding: '2px 8px', borderRadius: 20, background: inv.enveloppe === 'PEA' ? '#EAF6E4' : inv.enveloppe === 'CTO' ? '#E8EEF6' : '#FFF8E6', color: inv.enveloppe === 'PEA' ? '#2E7D1E' : inv.enveloppe === 'CTO' ? bleu : '#BA7517' }}>{inv.enveloppe}</span>
+                          </td>
+                          <td style={{ padding: '8px 12px', color: t.textSecondary, fontSize: 11 }}>{inv.type_etf}</td>
+                          <td style={{ padding: '8px 12px' }}>
+                            <span style={{ fontSize: 10, fontWeight: 500, padding: '2px 8px', borderRadius: 20, background: inv.type === 'Achat' ? '#EAF6E4' : '#FCEBEB', color: inv.type === 'Achat' ? '#2E7D1E' : '#E24B4A' }}>{inv.type}</span>
+                          </td>
+                          <td style={{ padding: '8px 12px', color: t.text }}>{inv.quantite}</td>
+                          <td style={{ padding: '8px 12px', color: t.text }}>{parseFloat(inv.prix_achat_unitaire).toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €</td>
+                          <td style={{ padding: '8px 12px', color: t.text }}>{parseFloat(inv.prix_actuel || inv.prix_achat_unitaire).toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €</td>
+                          <td style={{ padding: '8px 12px', color: t.textSecondary }}>{inv.ter}%</td>
+                          <td style={{ padding: '8px 12px', color: t.textSecondary }}>{parseFloat(inv.frais_courtage || 0).toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €</td>
+                          <td style={{ padding: '8px 12px', fontWeight: 500, color: t.text }}>{Math.round(totalInv).toLocaleString('fr-FR')} €</td>
+                          <td style={{ padding: '8px 12px', fontWeight: 500, color: '#4CAF2E' }}>{Math.round(valAct).toLocaleString('fr-FR')} €</td>
+                          <td style={{ padding: '8px 12px', fontWeight: 500, color: pv >= 0 ? '#4CAF2E' : '#E24B4A' }}>{pv >= 0 ? '+' : ''}{Math.round(pv).toLocaleString('fr-FR')} €</td>
+                          <td style={{ padding: '8px 12px' }}>
+                            <div style={{ display: 'flex', gap: 4 }}>
+                              <button onClick={() => handleEditStart(inv)} style={{ background: t.bgSecondary, color: t.textMuted, border: `0.5px solid ${t.border}`, borderRadius: 5, padding: '2px 7px', fontSize: 10, cursor: 'pointer', fontFamily: 'inherit' }}>✏️</button>
+                              <button onClick={() => handleDelete(inv.id)} style={{ background: '#FCEBEB', color: '#E24B4A', border: 'none', borderRadius: 5, padding: '2px 7px', fontSize: 10, cursor: 'pointer', fontFamily: 'inherit' }}>×</button>
+                            </div>
+                          </td>
+                        </>
+                      )}
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   )
