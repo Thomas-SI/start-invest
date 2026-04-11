@@ -25,16 +25,8 @@ export default function Investissement() {
   const [editForm, setEditForm] = useState({})
   const [form, setForm] = useState({
     date: new Date().toISOString().split('T')[0],
-    ticker: '',
-    actif: '',
-    enveloppe: 'PEA',
-    type_etf: 'Capitalisant',
-    type: 'Achat',
-    quantite: '',
-    prix_achat_unitaire: '',
-    prix_actuel: '',
-    ter: '',
-    frais_courtage: '',
+    ticker: '', actif: '', enveloppe: 'PEA', type_etf: 'Capitalisant',
+    type: 'Achat', quantite: '', prix_achat_unitaire: '', prix_actuel: '', ter: '', frais_courtage: '',
   })
 
   const bleu = t.dark ? '#3B82F6' : '#1B2E4B'
@@ -54,10 +46,8 @@ export default function Investissement() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
       setUser(user)
-
       const { data: inv } = await supabase.from('investissements').select('*').eq('user_id', user.id).order('date', { ascending: false })
       if (inv) setInvestissements(inv)
-
       const { data: comp } = await supabase.from('comptes').select('*').eq('user_id', user.id)
       if (comp) setComptes(comp)
     }
@@ -72,27 +62,16 @@ export default function Investissement() {
     if (!form.ticker || !form.quantite || !form.prix_achat_unitaire) return
     setLoading(true)
     const payload = {
-      user_id: user.id,
-      date: form.date,
-      ticker: form.ticker.toUpperCase(),
-      actif: form.actif,
-      enveloppe: form.enveloppe,
-      type_etf: form.type_etf,
-      type: form.type,
-      quantite: parseFloat(form.quantite),
-      prix_achat_unitaire: parseFloat(form.prix_achat_unitaire),
+      user_id: user.id, date: form.date, ticker: form.ticker.toUpperCase(), actif: form.actif,
+      enveloppe: form.enveloppe, type_etf: form.type_etf, type: form.type,
+      quantite: parseFloat(form.quantite), prix_achat_unitaire: parseFloat(form.prix_achat_unitaire),
       prix_actuel: parseFloat(form.prix_actuel) || parseFloat(form.prix_achat_unitaire),
-      ter: parseFloat(form.ter) || 0,
-      frais_courtage: parseFloat(form.frais_courtage) || 0,
+      ter: parseFloat(form.ter) || 0, frais_courtage: parseFloat(form.frais_courtage) || 0,
     }
     const { data, error } = await supabase.from('investissements').insert(payload).select().single()
     if (data) {
       setInvestissements(prev => [data, ...prev])
-      setForm({
-        date: new Date().toISOString().split('T')[0],
-        ticker: '', actif: '', enveloppe: 'PEA', type_etf: 'Capitalisant',
-        type: 'Achat', quantite: '', prix_achat_unitaire: '', prix_actuel: '', ter: '', frais_courtage: '',
-      })
+      setForm({ date: new Date().toISOString().split('T')[0], ticker: '', actif: '', enveloppe: 'PEA', type_etf: 'Capitalisant', type: 'Achat', quantite: '', prix_achat_unitaire: '', prix_actuel: '', ter: '', frais_courtage: '' })
       setShowAdd(false)
     }
     if (error) console.error(error)
@@ -104,24 +83,15 @@ export default function Investissement() {
     setInvestissements(prev => prev.filter(i => i.id !== id))
   }
 
-  const handleEditStart = (inv) => {
-    setEditingId(inv.id)
-    setEditForm({ ...inv })
-  }
+  const handleEditStart = (inv) => { setEditingId(inv.id); setEditForm({ ...inv }) }
 
   const handleEditSave = async () => {
     const payload = {
-      date: editForm.date,
-      ticker: editForm.ticker?.toUpperCase(),
-      actif: editForm.actif,
-      enveloppe: editForm.enveloppe,
-      type_etf: editForm.type_etf,
-      type: editForm.type,
-      quantite: parseFloat(editForm.quantite),
-      prix_achat_unitaire: parseFloat(editForm.prix_achat_unitaire),
+      date: editForm.date, ticker: editForm.ticker?.toUpperCase(), actif: editForm.actif,
+      enveloppe: editForm.enveloppe, type_etf: editForm.type_etf, type: editForm.type,
+      quantite: parseFloat(editForm.quantite), prix_achat_unitaire: parseFloat(editForm.prix_achat_unitaire),
       prix_actuel: parseFloat(editForm.prix_actuel) || parseFloat(editForm.prix_achat_unitaire),
-      ter: parseFloat(editForm.ter) || 0,
-      frais_courtage: parseFloat(editForm.frais_courtage) || 0,
+      ter: parseFloat(editForm.ter) || 0, frais_courtage: parseFloat(editForm.frais_courtage) || 0,
     }
     await supabase.from('investissements').update(payload).eq('id', editingId)
     setInvestissements(prev => prev.map(i => i.id === editingId ? { ...i, ...payload } : i))
@@ -130,11 +100,10 @@ export default function Investissement() {
 
   const inputStyle = { padding: '5px 8px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgCard, color: t.text, width: '100%' }
   const selectStyle = { ...inputStyle }
-  const initiale = user?.user_metadata?.prenom?.[0]?.toUpperCase() || '?'
 
   return (
     <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <Navbar page="Investissement" initiale={initiale} />
+      <Navbar page="Investissement" />
 
       <div style={{ padding: '16px 20px', flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
 
@@ -166,18 +135,9 @@ export default function Investissement() {
           <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: 16 }}>
             <div style={{ fontSize: 12, fontWeight: 500, color: t.text, marginBottom: 12 }}>Nouvel investissement</div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, minmax(0,1fr))', gap: 10, marginBottom: 10 }}>
-              <div>
-                <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Date</div>
-                <input type="date" value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} style={inputStyle} />
-              </div>
-              <div>
-                <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Ticker</div>
-                <input placeholder="ex: PE500" value={form.ticker} onChange={e => setForm({ ...form, ticker: e.target.value })} style={inputStyle} />
-              </div>
-              <div>
-                <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Actif</div>
-                <input placeholder="ex: Amundi PEA S&P 500" value={form.actif} onChange={e => setForm({ ...form, actif: e.target.value })} style={inputStyle} />
-              </div>
+              <div><div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Date</div><input type="date" value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} style={inputStyle} /></div>
+              <div><div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Ticker</div><input placeholder="ex: PE500" value={form.ticker} onChange={e => setForm({ ...form, ticker: e.target.value })} style={inputStyle} /></div>
+              <div><div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Actif</div><input placeholder="ex: Amundi PEA S&P 500" value={form.actif} onChange={e => setForm({ ...form, actif: e.target.value })} style={inputStyle} /></div>
               <div>
                 <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Enveloppe</div>
                 <select value={form.enveloppe} onChange={e => setForm({ ...form, enveloppe: e.target.value })} style={selectStyle}>
@@ -198,32 +158,15 @@ export default function Investissement() {
                   {TYPES.map(e => <option key={e} value={e}>{e}</option>)}
                 </select>
               </div>
-              <div>
-                <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Quantité</div>
-                <input type="number" placeholder="ex: 10" value={form.quantite} onChange={e => setForm({ ...form, quantite: e.target.value })} style={inputStyle} />
-              </div>
-              <div>
-                <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Prix achat unitaire (€)</div>
-                <input type="number" placeholder="ex: 48.10" value={form.prix_achat_unitaire} onChange={e => setForm({ ...form, prix_achat_unitaire: e.target.value })} style={inputStyle} />
-              </div>
-              <div>
-                <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Prix actuel (€)</div>
-                <input type="number" placeholder="ex: 52.00" value={form.prix_actuel} onChange={e => setForm({ ...form, prix_actuel: e.target.value })} style={inputStyle} />
-              </div>
-              <div>
-                <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>TER (%)</div>
-                <input type="number" placeholder="ex: 0.25" value={form.ter} onChange={e => setForm({ ...form, ter: e.target.value })} style={inputStyle} />
-              </div>
-              <div>
-                <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Frais courtage (€)</div>
-                <input type="number" placeholder="ex: 2.22" value={form.frais_courtage} onChange={e => setForm({ ...form, frais_courtage: e.target.value })} style={inputStyle} />
-              </div>
+              <div><div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Quantité</div><input type="number" placeholder="ex: 10" value={form.quantite} onChange={e => setForm({ ...form, quantite: e.target.value })} style={inputStyle} /></div>
+              <div><div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Prix achat unitaire (€)</div><input type="number" placeholder="ex: 48.10" value={form.prix_achat_unitaire} onChange={e => setForm({ ...form, prix_achat_unitaire: e.target.value })} style={inputStyle} /></div>
+              <div><div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Prix actuel (€)</div><input type="number" placeholder="ex: 52.00" value={form.prix_actuel} onChange={e => setForm({ ...form, prix_actuel: e.target.value })} style={inputStyle} /></div>
+              <div><div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>TER (%)</div><input type="number" placeholder="ex: 0.25" value={form.ter} onChange={e => setForm({ ...form, ter: e.target.value })} style={inputStyle} /></div>
+              <div><div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Frais courtage (€)</div><input type="number" placeholder="ex: 2.22" value={form.frais_courtage} onChange={e => setForm({ ...form, frais_courtage: e.target.value })} style={inputStyle} /></div>
             </div>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
               <button onClick={() => setShowAdd(false)} style={{ padding: '7px 14px', borderRadius: 8, border: `0.5px solid ${t.border}`, background: t.bgSecondary, fontSize: 12, cursor: 'pointer', fontFamily: 'inherit', color: t.text }}>Annuler</button>
-              <button onClick={handleAdd} disabled={loading} style={{ padding: '7px 14px', borderRadius: 8, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>
-                {loading ? 'Sauvegarde...' : 'Ajouter'}
-              </button>
+              <button onClick={handleAdd} disabled={loading} style={{ padding: '7px 14px', borderRadius: 8, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>{loading ? 'Sauvegarde...' : 'Ajouter'}</button>
             </div>
           </div>
         )}
@@ -256,21 +199,9 @@ export default function Investissement() {
                           <td style={{ padding: '6px 8px' }}><input type="date" value={editForm.date} onChange={e => setEditForm({ ...editForm, date: e.target.value })} style={{ ...inputStyle, width: 120 }} /></td>
                           <td style={{ padding: '6px 8px' }}><input value={editForm.ticker} onChange={e => setEditForm({ ...editForm, ticker: e.target.value })} style={{ ...inputStyle, width: 70 }} /></td>
                           <td style={{ padding: '6px 8px' }}><input value={editForm.actif} onChange={e => setEditForm({ ...editForm, actif: e.target.value })} style={{ ...inputStyle, width: 150 }} /></td>
-                          <td style={{ padding: '6px 8px' }}>
-                            <select value={editForm.enveloppe} onChange={e => setEditForm({ ...editForm, enveloppe: e.target.value })} style={{ ...inputStyle, width: 80 }}>
-                              {ENVELOPPES.map(e => <option key={e} value={e}>{e}</option>)}
-                            </select>
-                          </td>
-                          <td style={{ padding: '6px 8px' }}>
-                            <select value={editForm.type_etf} onChange={e => setEditForm({ ...editForm, type_etf: e.target.value })} style={{ ...inputStyle, width: 110 }}>
-                              {TYPES_ETF.map(e => <option key={e} value={e}>{e}</option>)}
-                            </select>
-                          </td>
-                          <td style={{ padding: '6px 8px' }}>
-                            <select value={editForm.type} onChange={e => setEditForm({ ...editForm, type: e.target.value })} style={{ ...inputStyle, width: 80 }}>
-                              {TYPES.map(e => <option key={e} value={e}>{e}</option>)}
-                            </select>
-                          </td>
+                          <td style={{ padding: '6px 8px' }}><select value={editForm.enveloppe} onChange={e => setEditForm({ ...editForm, enveloppe: e.target.value })} style={{ ...inputStyle, width: 80 }}>{ENVELOPPES.map(e => <option key={e} value={e}>{e}</option>)}</select></td>
+                          <td style={{ padding: '6px 8px' }}><select value={editForm.type_etf} onChange={e => setEditForm({ ...editForm, type_etf: e.target.value })} style={{ ...inputStyle, width: 110 }}>{TYPES_ETF.map(e => <option key={e} value={e}>{e}</option>)}</select></td>
+                          <td style={{ padding: '6px 8px' }}><select value={editForm.type} onChange={e => setEditForm({ ...editForm, type: e.target.value })} style={{ ...inputStyle, width: 80 }}>{TYPES.map(e => <option key={e} value={e}>{e}</option>)}</select></td>
                           <td style={{ padding: '6px 8px' }}><input type="number" value={editForm.quantite} onChange={e => setEditForm({ ...editForm, quantite: e.target.value })} style={{ ...inputStyle, width: 60 }} /></td>
                           <td style={{ padding: '6px 8px' }}><input type="number" value={editForm.prix_achat_unitaire} onChange={e => setEditForm({ ...editForm, prix_achat_unitaire: e.target.value })} style={{ ...inputStyle, width: 80 }} /></td>
                           <td style={{ padding: '6px 8px' }}><input type="number" value={editForm.prix_actuel} onChange={e => setEditForm({ ...editForm, prix_actuel: e.target.value })} style={{ ...inputStyle, width: 80 }} /></td>
@@ -326,26 +257,45 @@ export default function Investissement() {
         {enveloppesActives.length > 0 && (
           <>
             <div style={{ fontSize: 14, fontWeight: 500, color: t.text, marginTop: 4 }}>Allocations par enveloppe</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 20 }}>
               {enveloppesActives.map(env => {
                 const lignes = investissements.filter(i => i.enveloppe === env)
                 const totalEnv = lignes.reduce((acc, i) => acc + calcValeurActuelle(i), 0)
+                const totalInvestiEnv = lignes.reduce((acc, i) => acc + calcTotalInvesti(i), 0)
+                const plusValueEnv = totalEnv - lignes.reduce((acc, i) => acc + (parseFloat(i.quantite) * parseFloat(i.prix_achat_unitaire)), 0)
+                const nbPositionsEnv = lignes.length
                 const totalCible = Object.entries(cibles).filter(([k]) => k.startsWith(env + '-')).reduce((a, [, v]) => a + v, 0)
+
                 return (
                   <div key={env} style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, overflow: 'hidden' }}>
-                    <div style={{ padding: '12px 16px', borderBottom: `0.5px solid ${t.border}`, background: t.bgSecondary, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+
+                    {/* HEADER AVEC MINI CARTES */}
+                    <div style={{ padding: '12px 16px', borderBottom: `0.5px solid ${t.border}`, background: t.bgSecondary, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16 }}>
                       <div>
                         <div style={{ fontSize: 13, fontWeight: 500, color: t.text }}>{ENVELOPPE_LABELS[env] || env}</div>
-                        <div style={{ fontSize: 11, color: t.textMuted, marginTop: 2 }}>
-                          Valeur totale : <span style={{ fontWeight: 500, color: '#4CAF2E' }}>{Math.round(totalEnv).toLocaleString('fr-FR')} €</span>
-                        </div>
+                        {totalCible > 0 && (
+                          <div style={{ fontSize: 11, color: totalCible === 100 ? '#4CAF2E' : '#E24B4A', marginTop: 2 }}>
+                            % Cible total : {totalCible}%
+                          </div>
+                        )}
                       </div>
-                      {totalCible > 0 && (
-                        <div style={{ fontSize: 11, fontWeight: 500, color: totalCible === 100 ? '#4CAF2E' : '#E24B4A', background: totalCible === 100 ? '#EAF6E4' : '#FCEBEB', padding: '4px 10px', borderRadius: 6 }}>
-                          % Cible total : {totalCible}%
-                        </div>
-                      )}
+
+                      {/* MINI CARTES */}
+                      <div style={{ display: 'flex', gap: 8 }}>
+                        {[
+                          ['Total investi', `${Math.round(totalInvestiEnv).toLocaleString('fr-FR')} €`, t.text],
+                          ['Valeur actuelle', `${Math.round(totalEnv).toLocaleString('fr-FR')} €`, '#4CAF2E'],
+                          ['Plus-value', `${plusValueEnv >= 0 ? '+' : ''}${Math.round(plusValueEnv).toLocaleString('fr-FR')} €`, plusValueEnv >= 0 ? '#4CAF2E' : '#E24B4A'],
+                          ['Positions', nbPositionsEnv.toString(), bleu],
+                        ].map(([l, v, c]) => (
+                          <div key={l} style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 8, padding: '6px 12px', textAlign: 'center', minWidth: 90 }}>
+                            <div style={{ fontSize: 9, color: t.textMuted, textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 3 }}>{l}</div>
+                            <div style={{ fontSize: 13, fontWeight: 500, color: c }}>{v}</div>
+                          </div>
+                        ))}
+                      </div>
                     </div>
+
                     {lignes.length === 0 ? (
                       <div style={{ padding: '20px', textAlign: 'center', color: t.textMuted, fontSize: 12 }}>
                         Aucune position dans cette enveloppe
@@ -378,10 +328,7 @@ export default function Investissement() {
                                 <td style={{ padding: '10px 14px' }}>
                                   <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                                     <input
-                                      type="number"
-                                      min="0"
-                                      max="100"
-                                      placeholder="0"
+                                      type="number" min="0" max="100" placeholder="0"
                                       value={cibles[cibleKey] || ''}
                                       onChange={e => setCibles(prev => ({ ...prev, [cibleKey]: parseFloat(e.target.value) || 0 }))}
                                       style={{ width: 60, padding: '4px 6px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text, textAlign: 'right' }}
@@ -411,7 +358,6 @@ export default function Investissement() {
             </div>
           </>
         )}
-
       </div>
     </div>
   )
