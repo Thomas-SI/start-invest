@@ -7,9 +7,17 @@ const ENVELOPPES = ['CTO', 'PEA', 'Assurance-vie']
 const TYPES_ETF = ['Capitalisant', 'Distribuant']
 const TYPES = ['Achat', 'Vente']
 
+const ENVELOPPE_LABELS = {
+  'CTO': 'Compte-Titres Ordinaire (CTO)',
+  'PEA': "Plan d'Épargne en Actions (PEA)",
+  'Assurance-vie': 'Assurance-vie',
+}
+
 export default function Investissement() {
   const t = useTheme()
   const [investissements, setInvestissements] = useState([])
+  const [comptes, setComptes] = useState([])
+  const [cibles, setCibles] = useState({})
   const [user, setUser] = useState(null)
   const [showAdd, setShowAdd] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -36,16 +44,29 @@ export default function Investissement() {
   const plusValue = valeurActuelle - investissements.reduce((acc, i) => acc + (parseFloat(i.quantite) * parseFloat(i.prix_achat_unitaire)), 0)
   const nbPositions = investissements.length
 
+  const enveloppesActives = [...new Set([
+    ...comptes.filter(c => c.type === 'investissement' || c.nom === 'CTO' || c.nom === 'PEA' || c.nom === 'Assurance-vie').map(c => c.nom),
+    ...investissements.map(i => i.enveloppe)
+  ])].filter(e => ENVELOPPES.includes(e))
+
   useEffect(() => {
     const fetchData = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
       setUser(user)
-      const { data } = await supabase.from('investissements').select('*').eq('user_id', user.id).order('date', { ascending: false })
-      if (data) setInvestissements(data)
+
+      const { data: inv } = await supabase.from('investissements').select('*').eq('user_id', user.id).order('date', { ascending: false })
+      if (inv) setInvestissements(inv)
+
+      const { data: comp } = await supabase.from('comptes').select('*').eq('user_id', user.id)
+      if (comp) setComptes(comp)
     }
     fetchData()
   }, [])
+
+  const calcTotalInvesti = (inv) => (parseFloat(inv.quantite) * parseFloat(inv.prix_achat_unitaire)) + (parseFloat(inv.frais_courtage) || 0)
+  const calcValeurActuelle = (inv) => parseFloat(inv.quantite) * (parseFloat(inv.prix_actuel) || parseFloat(inv.prix_achat_unitaire))
+  const calcPlusValue = (inv) => calcValeurActuelle(inv) - (parseFloat(inv.quantite) * parseFloat(inv.prix_achat_unitaire))
 
   const handleAdd = async () => {
     if (!form.ticker || !form.quantite || !form.prix_achat_unitaire) return
@@ -109,11 +130,6 @@ export default function Investissement() {
 
   const inputStyle = { padding: '5px 8px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgCard, color: t.text, width: '100%' }
   const selectStyle = { ...inputStyle }
-
-  const calcTotalInvesti = (inv) => (parseFloat(inv.quantite) * parseFloat(inv.prix_achat_unitaire)) + (parseFloat(inv.frais_courtage) || 0)
-  const calcValeurActuelle = (inv) => parseFloat(inv.quantite) * (parseFloat(inv.prix_actuel) || parseFloat(inv.prix_achat_unitaire))
-  const calcPlusValue = (inv) => calcValeurActuelle(inv) - (parseFloat(inv.quantite) * parseFloat(inv.prix_achat_unitaire))
-
   const initiale = user?.user_metadata?.prenom?.[0]?.toUpperCase() || '?'
 
   return (
@@ -136,6 +152,86 @@ export default function Investissement() {
             </div>
           ))}
         </div>
+
+        {/* TABLEAUX D'ALLOCATION PAR ENVELOPPE */}
+        {enveloppesActives.length > 0 && (
+          <div style={{ display: 'grid', gridTemplateColumns: enveloppesActives.length === 1 ? '1fr' : 'repeat(2, minmax(0,1fr))', gap: 12 }}>
+            {enveloppesActives.map(env => {
+              const lignes = investissements.filter(i => i.enveloppe === env)
+              const totalEnv = lignes.reduce((acc, i) => acc + calcValeurActuelle(i), 0)
+              return (
+                <div key={env} style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, overflow: 'hidden' }}>
+                  <div style={{ padding: '12px 16px', borderBottom: `0.5px solid ${t.border}`, background: t.bgSecondary }}>
+                    <div style={{ fontSize: 13, fontWeight: 500, color: t.text }}>{ENVELOPPE_LABELS[env] || env}</div>
+                    <div style={{ fontSize: 11, color: t.textMuted, marginTop: 2 }}>
+                      Valeur totale : <span style={{ fontWeight: 500, color: '#4CAF2E' }}>{Math.round(totalEnv).toLocaleString('fr-FR')} €</span>
+                    </div>
+                  </div>
+                  {lignes.length === 0 ? (
+                    <div style={{ padding: '20px', textAlign: 'center', color: t.textMuted, fontSize: 12 }}>
+                      Aucune position dans cette enveloppe
+                    </div>
+                  ) : (
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+                      <thead>
+                        <tr style={{ background: t.bgSecondary }}>
+                          {['Ticker', 'Prix actuel', 'Position', 'Valeur EUR', '% Actuel', '% Cible', 'Achat/Vente'].map(h => (
+                            <th key={h} style={{ padding: '7px 12px', textAlign: 'left', fontSize: 10, color: t.textMuted, fontWeight: 500, borderBottom: `0.5px solid ${t.border}`, whiteSpace: 'nowrap' }}>{h}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {lignes.map((inv, idx) => {
+                          const valAct = calcValeurActuelle(inv)
+                          const pctActuel = totalEnv > 0 ? Math.round((valAct / totalEnv) * 100) : 0
+                          const cibleKey = `${env}-${inv.ticker}`
+                          const pctCible = cibles[cibleKey] || 0
+                          const diff = Math.round((pctCible - pctActuel) / 100 * totalEnv / parseFloat(inv.prix_actuel || inv.prix_achat_unitaire))
+                          return (
+                            <tr key={inv.id} style={{ borderBottom: `0.5px solid ${t.border}` }}>
+                              <td style={{ padding: '8px 12px', fontWeight: 500, color: bleu }}>{inv.ticker}</td>
+                              <td style={{ padding: '8px 12px', color: t.text }}>{parseFloat(inv.prix_actuel || inv.prix_achat_unitaire).toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €</td>
+                              <td style={{ padding: '8px 12px', color: t.text }}>{inv.quantite}</td>
+                              <td style={{ padding: '8px 12px', fontWeight: 500, color: t.text }}>{Math.round(valAct).toLocaleString('fr-FR')} €</td>
+                              <td style={{ padding: '8px 12px', color: t.text }}>{pctActuel}%</td>
+                              <td style={{ padding: '8px 12px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                                  <input
+                                    type="number"
+                                    min="0"
+                                    max="100"
+                                    placeholder="0"
+                                    value={cibles[cibleKey] || ''}
+                                    onChange={e => setCibles(prev => ({ ...prev, [cibleKey]: parseFloat(e.target.value) || 0 }))}
+                                    style={{ width: 55, padding: '4px 6px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text, textAlign: 'right' }}
+                                  />
+                                  <span style={{ fontSize: 11, color: t.textMuted }}>%</span>
+                                </div>
+                              </td>
+                              <td style={{ padding: '8px 12px', fontWeight: 500, color: diff > 0 ? '#4CAF2E' : diff < 0 ? '#E24B4A' : t.textMuted }}>
+                                {pctCible > 0 ? (diff > 0 ? `+${diff}` : diff === 0 ? '✓' : diff) : '—'}
+                                {pctCible > 0 && diff !== 0 ? ' titres' : ''}
+                              </td>
+                            </tr>
+                          )
+                        })}
+                        <tr style={{ background: t.bgSecondary, borderTop: `0.5px solid ${t.border}` }}>
+                          <td colSpan={3} style={{ padding: '8px 12px', fontWeight: 500, color: t.text, fontSize: 11 }}>TOTAL</td>
+                          <td style={{ padding: '8px 12px', fontWeight: 500, color: t.text }}>{Math.round(totalEnv).toLocaleString('fr-FR')} €</td>
+                          <td style={{ padding: '8px 12px', fontWeight: 500, color: t.text }}>100%</td>
+                          <td style={{ padding: '8px 12px', fontWeight: 500, color: Object.entries(cibles).filter(([k]) => k.startsWith(env)).reduce((a, [,v]) => a + v, 0) === 100 ? '#4CAF2E' : '#E24B4A' }}>
+                            {Object.entries(cibles).filter(([k]) => k.startsWith(env)).reduce((a, [,v]) => a + v, 0)}%
+                          </td>
+                          <td></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        )}
 
         {/* EN-TÊTE JOURNAL */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -212,7 +308,7 @@ export default function Investissement() {
           </div>
         )}
 
-        {/* TABLEAU */}
+        {/* TABLEAU JOURNAL */}
         {investissements.length === 0 ? (
           <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: '40px', textAlign: 'center', color: t.textMuted, fontSize: 12 }}>
             Aucun investissement enregistré — cliquez sur "+ Ajouter" pour enregistrer votre premier achat
@@ -260,9 +356,9 @@ export default function Investissement() {
                           <td style={{ padding: '6px 8px' }}><input type="number" value={editForm.prix_actuel} onChange={e => setEditForm({ ...editForm, prix_actuel: e.target.value })} style={{ ...inputStyle, width: 80 }} /></td>
                           <td style={{ padding: '6px 8px' }}><input type="number" value={editForm.ter} onChange={e => setEditForm({ ...editForm, ter: e.target.value })} style={{ ...inputStyle, width: 60 }} /></td>
                           <td style={{ padding: '6px 8px' }}><input type="number" value={editForm.frais_courtage} onChange={e => setEditForm({ ...editForm, frais_courtage: e.target.value })} style={{ ...inputStyle, width: 70 }} /></td>
-                          <td style={{ padding: '6px 8px', color: t.textMuted, fontSize: 11 }}>—</td>
-                          <td style={{ padding: '6px 8px', color: t.textMuted, fontSize: 11 }}>—</td>
-                          <td style={{ padding: '6px 8px', color: t.textMuted, fontSize: 11 }}>—</td>
+                          <td style={{ padding: '6px 8px', color: t.textMuted }}>—</td>
+                          <td style={{ padding: '6px 8px', color: t.textMuted }}>—</td>
+                          <td style={{ padding: '6px 8px', color: t.textMuted }}>—</td>
                           <td style={{ padding: '6px 8px' }}>
                             <div style={{ display: 'flex', gap: 4 }}>
                               <button onClick={handleEditSave} style={{ background: '#EAF6E4', color: '#2E7D1E', border: 'none', borderRadius: 5, padding: '2px 7px', fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>✓</button>
