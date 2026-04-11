@@ -112,7 +112,7 @@ export default function Investissement() {
           {[
             ['Total investi', `${Math.round(totalInvesti).toLocaleString('fr-FR')} €`, t.text],
             ['Valeur actuelle', `${Math.round(valeurActuelle).toLocaleString('fr-FR')} €`, '#4CAF2E'],
-            ['Plus-value (l\'attente)', `${plusValue >= 0 ? '+' : ''}${Math.round(plusValue).toLocaleString('fr-FR')} €`, plusValue >= 0 ? '#4CAF2E' : '#E24B4A'],
+            ["Plus-value (l'attente)", `${plusValue >= 0 ? '+' : ''}${Math.round(plusValue).toLocaleString('fr-FR')} €`, plusValue >= 0 ? '#4CAF2E' : '#E24B4A'],
             ['Nb positions', nbPositions.toString(), bleu],
           ].map(([l, v, c]) => (
             <div key={l} style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: 16 }}>
@@ -269,26 +269,35 @@ export default function Investissement() {
                 return (
                   <div key={env} style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, overflow: 'hidden' }}>
 
-                    {/* HEADER : INFOS GAUCHE + CARTES 2x2 DROITE */}
-                    <div style={{ padding: '12px 16px', borderBottom: `0.5px solid ${t.border}`, background: t.bgSecondary, display: 'grid', gridTemplateColumns: '1fr auto', gap: 16, alignItems: 'center' }}>
+                    {/* HEADER : INFOS + CARTES CÔTE À CÔTE */}
+                    <div style={{ padding: '14px 16px', borderBottom: `0.5px solid ${t.border}`, background: t.bgSecondary, display: 'flex', alignItems: 'center', gap: 16, justifyContent: 'space-between' }}>
 
-                      {/* GAUCHE : titre + mini tableau récap */}
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                        <div style={{ fontSize: 13, fontWeight: 500, color: t.text }}>{ENVELOPPE_LABELS[env] || env}</div>
-                        {totalCible > 0 && (
-                          <div style={{ fontSize: 11, color: totalCible === 100 ? '#4CAF2E' : '#E24B4A' }}>
-                            % Cible total : {totalCible}%
-                          </div>
-                        )}
-                        <div style={{ display: 'flex', gap: 20, marginTop: 2 }}>
-                          <div style={{ fontSize: 11, color: t.textMuted }}>Valeur totale : <span style={{ fontWeight: 500, color: '#4CAF2E' }}>{Math.round(totalEnv).toLocaleString('fr-FR')} €</span></div>
-                          <div style={{ fontSize: 11, color: t.textMuted }}>Total investi : <span style={{ fontWeight: 500, color: t.text }}>{Math.round(totalInvestiEnv).toLocaleString('fr-FR')} €</span></div>
-                          <div style={{ fontSize: 11, color: t.textMuted }}>Positions : <span style={{ fontWeight: 500, color: bleu }}>{nbPositionsEnv}</span></div>
+                      {/* GAUCHE : titre + stats inline */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 24, flex: 1 }}>
+                        <div>
+                          <div style={{ fontSize: 13, fontWeight: 500, color: t.text }}>{ENVELOPPE_LABELS[env] || env}</div>
+                          {totalCible > 0 && (
+                            <div style={{ fontSize: 10, color: totalCible === 100 ? '#4CAF2E' : '#E24B4A', marginTop: 2 }}>
+                              % Cible total : {totalCible}%
+                            </div>
+                          )}
+                        </div>
+                        <div style={{ display: 'flex', gap: 0, border: `0.5px solid ${t.border}`, borderRadius: 8, overflow: 'hidden' }}>
+                          {[
+                            ['Valeur totale', `${Math.round(totalEnv).toLocaleString('fr-FR')} €`, '#4CAF2E'],
+                            ['Total investi', `${Math.round(totalInvestiEnv).toLocaleString('fr-FR')} €`, t.text],
+                            ['Positions', nbPositionsEnv.toString(), bleu],
+                          ].map(([l, v, c], idx, arr) => (
+                            <div key={l} style={{ padding: '6px 14px', borderRight: idx < arr.length - 1 ? `0.5px solid ${t.border}` : 'none', background: t.bgCard }}>
+                              <div style={{ fontSize: 9, color: t.textMuted, textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 2 }}>{l}</div>
+                              <div style={{ fontSize: 13, fontWeight: 500, color: c }}>{v}</div>
+                            </div>
+                          ))}
                         </div>
                       </div>
 
                       {/* DROITE : 4 cartes 2x2 */}
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, flexShrink: 0 }}>
                         {[
                           ['Total investi', `${Math.round(totalInvestiEnv).toLocaleString('fr-FR')} €`, t.text],
                           ['Valeur actuelle', `${Math.round(totalEnv).toLocaleString('fr-FR')} €`, '#4CAF2E'],
@@ -297,7 +306,7 @@ export default function Investissement() {
                         ].map(([l, v, c]) => (
                           <div key={l} style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 7, padding: '6px 12px', minWidth: 120 }}>
                             <div style={{ fontSize: 9, color: t.textMuted, textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 3 }}>{l}</div>
-                            <div style={{ fontSize: 14, fontWeight: 500, color: c }}>{v}</div>
+                            <div style={{ fontSize: 13, fontWeight: 500, color: c }}>{v}</div>
                           </div>
                         ))}
                       </div>
