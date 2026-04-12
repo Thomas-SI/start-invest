@@ -12,6 +12,7 @@ export default function Navbar({ page, initiale }) {
     ['Investissement', '/investissement'],
     ['Croissance', '/croissance'],
     ['Concentration', '/concentration'],
+    ['Guide', '/guide'],
     ['Abonnement', '/abonnement'],
     ['Compte', '/compte'],
   ]

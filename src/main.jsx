@@ -10,6 +10,7 @@ import Portefeuille from './pages/Portefeuille'
 import Investissement from './pages/Investissement'
 import Croissance from './pages/Croissance'
 import Concentration from './pages/Concentration'
+import Guide from './pages/Guide'
 import Abonnement from './pages/Abonnement'
 import Compte from './pages/Compte'
 import './index.css'
@@ -27,6 +28,7 @@ createRoot(document.getElementById('root')).render(
           <Route path="/investissement" element={<Investissement />} />
           <Route path="/croissance" element={<Croissance />} />
           <Route path="/concentration" element={<Concentration />} />
+          <Route path="/guide" element={<Guide />} />
           <Route path="/abonnement" element={<Abonnement />} />
           <Route path="/compte" element={<Compte />} />
         </Routes>
