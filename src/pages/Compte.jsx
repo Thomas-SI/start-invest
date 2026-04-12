@@ -13,6 +13,7 @@ export default function Compte() {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [succes, setSucces] = useState(false)
+  const [showAPropos, setShowAPropos] = useState(false)
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -58,6 +59,7 @@ export default function Compte() {
             </div>
           </div>
 
+          {/* INFORMATIONS PERSONNELLES */}
           <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 14, padding: 20, marginBottom: 12 }}>
             <div style={{ fontSize: 13, fontWeight: 500, color: t.text, marginBottom: 16 }}>Informations personnelles</div>
             <div style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
@@ -80,6 +82,7 @@ export default function Compte() {
             </button>
           </div>
 
+          {/* APPARENCE */}
           <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 14, padding: 20, marginBottom: 12 }}>
             <div style={{ fontSize: 13, fontWeight: 500, color: t.text, marginBottom: 16 }}>Apparence</div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', background: t.bgSecondary, borderRadius: 10 }}>
@@ -93,6 +96,7 @@ export default function Compte() {
             </div>
           </div>
 
+          {/* ABONNEMENT */}
           <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 14, padding: 20, marginBottom: 12 }}>
             <div style={{ fontSize: 13, fontWeight: 500, color: t.text, marginBottom: 16 }}>Mon abonnement</div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: t.bgSecondary, borderRadius: 10, padding: '12px 16px', marginBottom: 12 }}>
@@ -107,6 +111,64 @@ export default function Compte() {
             </button>
           </div>
 
+          {/* À PROPOS */}
+          <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 14, padding: 20, marginBottom: 12 }}>
+            <div
+              onClick={() => setShowAPropos(v => !v)}
+              style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
+            >
+              <div style={{ fontSize: 13, fontWeight: 500, color: t.text }}>À propos & Mentions légales</div>
+              <div style={{ fontSize: 16, color: t.textMuted }}>{showAPropos ? '−' : '+'}</div>
+            </div>
+
+            {showAPropos && (
+              <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+                <div>
+                  <div style={{ fontSize: 11, fontWeight: 500, color: t.text, textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 6 }}>À propos de StartInvest</div>
+                  <div style={{ fontSize: 12, color: t.textMuted, lineHeight: 1.6 }}>
+                    StartInvest est une application d'aide à la gestion de portefeuille d'ETF destinée aux particuliers souhaitant suivre et optimiser leurs investissements long terme. Elle est développée et maintenue de manière indépendante.
+                  </div>
+                </div>
+
+                <div style={{ height: 0.5, background: t.border }} />
+
+                <div>
+                  <div style={{ fontSize: 11, fontWeight: 500, color: t.text, textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 6 }}>Avertissement financier</div>
+                  <div style={{ fontSize: 12, color: t.textMuted, lineHeight: 1.6 }}>
+                    Les informations et outils fournis par StartInvest ont un caractère purement informatif et éducatif. Ils ne constituent en aucun cas un conseil en investissement, une recommandation financière ou une incitation à acheter ou vendre des instruments financiers. Investir comporte des risques de perte en capital. Consultez un conseiller financier agréé avant toute décision d'investissement.
+                  </div>
+                </div>
+
+                <div style={{ height: 0.5, background: t.border }} />
+
+                <div>
+                  <div style={{ fontSize: 11, fontWeight: 500, color: t.text, textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 6 }}>Données personnelles</div>
+                  <div style={{ fontSize: 12, color: t.textMuted, lineHeight: 1.6 }}>
+                    Vos données sont stockées de manière sécurisée via Supabase et ne sont jamais partagées avec des tiers. Vous pouvez demander la suppression de votre compte et de vos données à tout moment en nous contactant.
+                  </div>
+                </div>
+
+                <div style={{ height: 0.5, background: t.border }} />
+
+                <div>
+                  <div style={{ fontSize: 11, fontWeight: 500, color: t.text, textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 6 }}>Contact</div>
+                  <div style={{ fontSize: 12, color: t.textMuted, lineHeight: 1.6 }}>
+                    Pour toute question ou demande, contactez-nous à : <span style={{ color: t.text }}>contact@startinvest.fr</span>
+                  </div>
+                </div>
+
+                <div style={{ height: 0.5, background: t.border }} />
+
+                <div style={{ fontSize: 11, color: t.textMuted, textAlign: 'center' }}>
+                  StartInvest · v1.0 · © {new Date().getFullYear()} Tous droits réservés
+                </div>
+
+              </div>
+            )}
+          </div>
+
+          {/* DANGER ZONE */}
           <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 14, padding: 20 }}>
             <div style={{ fontSize: 13, fontWeight: 500, color: t.text, marginBottom: 16 }}>Danger zone</div>
             <button onClick={handleLogout} style={{ background: '#FCEBEB', color: '#E24B4A', fontSize: 13, fontWeight: 500, padding: '10px 20px', borderRadius: 9, border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
