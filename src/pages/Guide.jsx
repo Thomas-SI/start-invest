@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { useTheme } from '../lib/ThemeContext'
 import Navbar from '../components/Navbar'
 
@@ -56,9 +56,12 @@ export default function Guide() {
   const t = useTheme()
   const [recherche, setRecherche] = useState('')
   const [resultats, setResultats] = useState([])
+  const rechercheRef = React.useRef(null)
 
-  const handleRecherche = (val) => {
+  const lancerRecherche = (val) => {
     setRecherche(val)
+    rechercheRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+
     if (val.trim().length < 3) { setResultats([]); return }
 
     const mots = val.toLowerCase().trim().split(/\s+/).filter(m => m.length > 2)
@@ -116,18 +119,21 @@ export default function Guide() {
         </div>
 
         {/* RECHERCHE */}
-        <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: 16 }}>
+        <div ref={rechercheRef} style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: 16 }}>
           <div style={{ fontSize: 12, fontWeight: 500, color: t.text, marginBottom: 8 }}>🔍 Recherche dans le guide</div>
           <input
             placeholder="ex: comment diversifier mon portefeuille, qu'est-ce qu'un ETF, fiscalité PEA..."
             value={recherche}
-            onChange={e => handleRecherche(e.target.value)}
+            onChange={e => lancerRecherche(e.target.value)}
             style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: `0.5px solid ${t.border}`, fontSize: 13, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text, boxSizing: 'border-box' }}
           />
 
           {resultats.length > 0 && (
             <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <div style={{ fontSize: 11, color: t.textMuted }}>{resultats.length} résultat{resultats.length > 1 ? 's' : ''} trouvé{resultats.length > 1 ? 's' : ''}</div>
+              <div style={{ fontSize: 11, color: t.textMuted, display: 'flex', justifyContent: 'space-between' }}>
+                <span>{resultats.length} résultat{resultats.length > 1 ? 's' : ''} trouvé{resultats.length > 1 ? 's' : ''} pour "{recherche}"</span>
+                <span onClick={() => { setResultats([]); setRecherche('') }} style={{ cursor: 'pointer', color: '#E24B4A' }}>✕ Effacer</span>
+              </div>
               {resultats.map((r, i) => (
                 <div key={i} style={{ background: t.bgSecondary, borderRadius: 8, padding: 12, border: `0.5px solid ${t.border}` }}>
                   <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 6 }}>Page {r.page}</div>
@@ -156,7 +162,13 @@ export default function Guide() {
               <div style={{ fontSize: 12, color: t.textMuted, lineHeight: 1.5 }}>{ch.resume}</div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                 {ch.sujets.map(s => (
-                  <span key={s} style={{ fontSize: 10, padding: '3px 8px', borderRadius: 20, background: ch.couleur + '15', color: ch.couleur, fontWeight: 500 }}>{s}</span>
+                  <span
+                    key={s}
+                    onClick={() => lancerRecherche(s)}
+                    style={{ fontSize: 10, padding: '3px 8px', borderRadius: 20, background: recherche === s ? ch.couleur : ch.couleur + '15', color: recherche === s ? '#fff' : ch.couleur, fontWeight: 500, cursor: 'pointer', transition: 'all 0.15s' }}
+                  >
+                    {s}
+                  </span>
                 ))}
               </div>
             </div>
