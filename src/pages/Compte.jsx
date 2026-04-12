@@ -4,6 +4,36 @@ import { supabase } from '../lib/supabase'
 import Navbar from '../components/Navbar'
 import { useTheme } from '../lib/ThemeContext'
 
+const POLICES = ['Inter', 'Georgia', 'Courier New', 'Arial', 'Verdana']
+const LANGUES = ['Français', 'English', 'Español', 'Deutsch']
+
+const ComingSoon = ({ t }) => (
+  <span style={{ fontSize: 9, background: '#FFF8E6', color: '#BA7517', padding: '2px 7px', borderRadius: 20, fontWeight: 500, marginLeft: 8 }}>Bientôt</span>
+)
+
+const Section = ({ titre, children, t }) => (
+  <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 14, padding: 20, marginBottom: 12 }}>
+    <div style={{ fontSize: 13, fontWeight: 500, color: t.text, marginBottom: 16 }}>{titre}</div>
+    {children}
+  </div>
+)
+
+const Row = ({ label, desc, children, t }) => (
+  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', background: t.bgSecondary, borderRadius: 10, marginBottom: 8 }}>
+    <div>
+      <div style={{ fontSize: 13, fontWeight: 500, color: t.text }}>{label}</div>
+      {desc && <div style={{ fontSize: 11, color: t.textMuted, marginTop: 2 }}>{desc}</div>}
+    </div>
+    {children}
+  </div>
+)
+
+const Toggle = ({ active, onToggle, disabled }) => (
+  <div onClick={disabled ? undefined : onToggle} style={{ width: 44, height: 24, borderRadius: 12, background: active ? '#4CAF2E' : '#E0EAE3', cursor: disabled ? 'default' : 'pointer', position: 'relative', transition: 'background 0.2s', opacity: disabled ? 0.4 : 1 }}>
+    <div style={{ position: 'absolute', top: 2, left: active ? 22 : 2, width: 20, height: 20, borderRadius: '50%', background: '#fff', transition: 'left 0.2s' }} />
+  </div>
+)
+
 export default function Compte() {
   const navigate = useNavigate()
   const t = useTheme()
@@ -11,9 +41,17 @@ export default function Compte() {
   const [prenom, setPrenom] = useState('')
   const [nom, setNom] = useState('')
   const [email, setEmail] = useState('')
+  const [metier, setMetier] = useState('')
+  const [police, setPolice] = useState('Inter')
+  const [langue, setLangue] = useState('Français')
   const [loading, setLoading] = useState(false)
   const [succes, setSucces] = useState(false)
   const [showAPropos, setShowAPropos] = useState(false)
+  const [showParametres, setShowParametres] = useState(false)
+  const [showSupprimer, setShowSupprimer] = useState(false)
+  const [confirmSupprimer, setConfirmSupprimer] = useState('')
+  const [photoUrl, setPhotoUrl] = useState(null)
+  const [uploadingPhoto, setUploadingPhoto] = useState(false)
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -23,6 +61,8 @@ export default function Compte() {
         setPrenom(user.user_metadata?.prenom || '')
         setNom(user.user_metadata?.nom || '')
         setEmail(user.email || '')
+        setMetier(user.user_metadata?.metier || '')
+        setPhotoUrl(user.user_metadata?.photo_url || null)
       }
     }
     fetchUser()
@@ -30,10 +70,31 @@ export default function Compte() {
 
   const handleSave = async () => {
     setLoading(true)
-    await supabase.auth.updateUser({ data: { prenom, nom } })
+    await supabase.auth.updateUser({ data: { prenom, nom, metier } })
     setSucces(true)
     setTimeout(() => setSucces(false), 3000)
     setLoading(false)
+  }
+
+  const handlePhotoUpload = async (e) => {
+    const file = e.target.files[0]
+    if (!file || !user) return
+    setUploadingPhoto(true)
+    const ext = file.name.split('.').pop()
+    const path = `${user.id}/avatar.${ext}`
+    const { error } = await supabase.storage.from('avatars').upload(path, file, { upsert: true })
+    if (!error) {
+      const { data } = supabase.storage.from('avatars').getPublicUrl(path)
+      setPhotoUrl(data.publicUrl)
+      await supabase.auth.updateUser({ data: { photo_url: data.publicUrl } })
+    }
+    setUploadingPhoto(false)
+  }
+
+  const handleDeleteAccount = async () => {
+    if (confirmSupprimer !== email) return
+    await supabase.auth.signOut()
+    navigate('/')
   }
 
   const handleLogout = async () => {
@@ -42,128 +103,188 @@ export default function Compte() {
   }
 
   const initiale = user?.user_metadata?.prenom?.[0]?.toUpperCase() || '?'
+  const inputStyle = { width: '100%', padding: '9px 12px', borderRadius: 8, border: `0.5px solid ${t.border}`, fontSize: 13, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text, boxSizing: 'border-box' }
 
   return (
-    <div style={{ background: t.bg, height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+    <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar page="Compte" initiale={initiale} />
 
       <div style={{ padding: '24px 20px', flex: 1, overflow: 'auto', display: 'flex', justifyContent: 'center' }}>
-        <div style={{ width: '100%', maxWidth: 600 }}>
+        <div style={{ width: '100%', maxWidth: 620 }}>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24 }}>
-            <div style={{ width: 60, height: 60, borderRadius: '50%', background: '#E8F5E1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, fontWeight: 500, color: '#2E7D1E' }}>{initiale}</div>
-            <div>
-              <div style={{ fontSize: 16, fontWeight: 500, color: t.text }}>{prenom} {nom}</div>
-              <div style={{ fontSize: 12, color: t.textMuted }}>{email}</div>
-              <div style={{ fontSize: 11, background: '#EAF6E4', color: '#2E7D1E', padding: '2px 10px', borderRadius: 20, display: 'inline-block', marginTop: 4 }}>Plan gratuit</div>
+          {/* HEADER PROFIL */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+              <label style={{ cursor: 'pointer', position: 'relative' }}>
+                <div style={{ width: 60, height: 60, borderRadius: '50%', background: '#E8F5E1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, fontWeight: 500, color: '#2E7D1E', overflow: 'hidden' }}>
+                  {photoUrl ? <img src={photoUrl} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : initiale}
+                </div>
+                {uploadingPhoto && <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: '#fff' }}>...</div>}
+                <input type="file" accept="image/*" onChange={handlePhotoUpload} style={{ display: 'none' }} />
+              </label>
+              <div>
+                <div style={{ fontSize: 16, fontWeight: 500, color: t.text }}>{prenom} {nom}</div>
+                <div style={{ fontSize: 12, color: t.textMuted }}>{email}</div>
+                <div style={{ fontSize: 11, background: '#EAF6E4', color: '#2E7D1E', padding: '2px 10px', borderRadius: 20, display: 'inline-block', marginTop: 4 }}>Plan gratuit</div>
+              </div>
             </div>
+            <button
+              onClick={() => setShowParametres(v => !v)}
+              style={{ background: t.bgSecondary, color: t.text, fontSize: 12, fontWeight: 500, padding: '8px 16px', borderRadius: 9, border: `0.5px solid ${t.border}`, cursor: 'pointer', fontFamily: 'inherit' }}
+            >
+              ⚙️ Paramètres
+            </button>
           </div>
 
+          {/* PARAMÈTRES */}
+          {showParametres && (
+            <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 14, padding: 20, marginBottom: 12 }}>
+              <div style={{ fontSize: 13, fontWeight: 500, color: t.text, marginBottom: 16 }}>Paramètres</div>
+
+              {/* APPARENCE */}
+              <div style={{ fontSize: 11, fontWeight: 500, color: t.textMuted, textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 8 }}>Apparence</div>
+              <Row label={`Mode ${t.dark ? 'sombre' : 'clair'}`} desc={t.dark ? 'Interface sombre activée' : 'Interface claire activée'} t={t}>
+                <Toggle active={t.dark} onToggle={t.toggle} />
+              </Row>
+              <Row label={<span>Mode Night Shift<ComingSoon t={t} /></span>} desc="Réduit la lumière bleue le soir" t={t}>
+                <Toggle active={false} disabled />
+              </Row>
+
+              {/* LANGUE */}
+              <div style={{ fontSize: 11, fontWeight: 500, color: t.textMuted, textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 8, marginTop: 16 }}>Langue</div>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 8 }}>
+                {LANGUES.map(l => (
+                  <button key={l} onClick={() => l === 'Français' && setLangue(l)} style={{ padding: '6px 14px', borderRadius: 20, border: `0.5px solid ${langue === l ? '#4CAF2E' : t.border}`, background: langue === l ? '#EAF6E4' : t.bgSecondary, color: langue === l ? '#2E7D1E' : l === 'Français' ? t.text : t.textMuted, fontSize: 12, cursor: l === 'Français' ? 'pointer' : 'default', fontFamily: 'inherit', opacity: l === 'Français' ? 1 : 0.5 }}>
+                    {l}{l !== 'Français' && ' 🔒'}
+                  </button>
+                ))}
+              </div>
+
+              {/* POLICE */}
+              <div style={{ fontSize: 11, fontWeight: 500, color: t.textMuted, textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 8, marginTop: 16 }}>Police d'écriture</div>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 8 }}>
+                {POLICES.map(p => (
+                  <button key={p} onClick={() => p === 'Inter' && setPolice(p)} style={{ padding: '6px 14px', borderRadius: 20, border: `0.5px solid ${police === p ? '#4CAF2E' : t.border}`, background: police === p ? '#EAF6E4' : t.bgSecondary, color: police === p ? '#2E7D1E' : p === 'Inter' ? t.text : t.textMuted, fontSize: 12, fontFamily: p, cursor: p === 'Inter' ? 'pointer' : 'default', opacity: p === 'Inter' ? 1 : 0.5 }}>
+                    {p}{p !== 'Inter' && ' 🔒'}
+                  </button>
+                ))}
+              </div>
+
+              {/* NOTIFICATIONS */}
+              <div style={{ fontSize: 11, fontWeight: 500, color: t.textMuted, textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 8, marginTop: 16 }}>
+                Notifications<ComingSoon t={t} />
+              </div>
+              <Row label="Notifications par email" desc="Recevoir les mises à jour par email" t={t}>
+                <Toggle active={false} disabled />
+              </Row>
+              <Row label="Notifications par message" desc="Recevoir les alertes par SMS" t={t}>
+                <Toggle active={false} disabled />
+              </Row>
+
+              {/* FACTURATION */}
+              <div style={{ fontSize: 11, fontWeight: 500, color: t.textMuted, textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 8, marginTop: 16 }}>
+                Facturation<ComingSoon t={t} />
+              </div>
+              {['Forfait', 'Paiement', 'Factures', 'Annulation'].map(item => (
+                <Row key={item} label={item} desc="Disponible avec un plan Premium" t={t}>
+                  <span style={{ fontSize: 11, color: t.textMuted }}>→</span>
+                </Row>
+              ))}
+
+              {/* CONNECTEURS */}
+              <div style={{ fontSize: 11, fontWeight: 500, color: t.textMuted, textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 8, marginTop: 16 }}>
+                Connecteurs<ComingSoon t={t} />
+              </div>
+              <Row label="Compte bancaire" desc="Synchronisez votre banque" t={t}>
+                <span style={{ fontSize: 11, color: t.textMuted }}>→</span>
+              </Row>
+              <Row label="App de gestion du patrimoine" desc="Connectez vos outils" t={t}>
+                <span style={{ fontSize: 11, color: t.textMuted }}>→</span>
+              </Row>
+
+              {/* IA AGENT */}
+              <div style={{ fontSize: 11, fontWeight: 500, color: t.textMuted, textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 8, marginTop: 16 }}>
+                IA Agent<ComingSoon t={t} />
+              </div>
+              <Row label="Personnalisation de l'agent" desc="Disponible avec un plan Premium" t={t}>
+                <span style={{ fontSize: 11, color: t.textMuted }}>→</span>
+              </Row>
+
+              {/* DON */}
+              <div style={{ fontSize: 11, fontWeight: 500, color: t.textMuted, textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 8, marginTop: 16 }}>
+                Soutenir StartInvest<ComingSoon t={t} />
+              </div>
+              <Row label="Faire un don" desc="Soutenez le développement de l'app" t={t}>
+                <span style={{ fontSize: 11, color: '#4CAF2E' }}>💚</span>
+              </Row>
+
+            </div>
+          )}
+
           {/* INFORMATIONS PERSONNELLES */}
-          <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 14, padding: 20, marginBottom: 12 }}>
-            <div style={{ fontSize: 13, fontWeight: 500, color: t.text, marginBottom: 16 }}>Informations personnelles</div>
+          <Section titre="Informations personnelles" t={t}>
             <div style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 11, color: t.textMuted, marginBottom: 4 }}>Prénom</div>
-                <input value={prenom} onChange={e => setPrenom(e.target.value)} style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `0.5px solid ${t.border}`, fontSize: 14, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }} />
+                <input value={prenom} onChange={e => setPrenom(e.target.value)} style={inputStyle} />
               </div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 11, color: t.textMuted, marginBottom: 4 }}>Nom</div>
-                <input value={nom} onChange={e => setNom(e.target.value)} style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `0.5px solid ${t.border}`, fontSize: 14, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }} />
+                <input value={nom} onChange={e => setNom(e.target.value)} style={inputStyle} />
               </div>
             </div>
-            <div style={{ marginBottom: 16 }}>
+            <div style={{ marginBottom: 12 }}>
               <div style={{ fontSize: 11, color: t.textMuted, marginBottom: 4 }}>Email</div>
-              <input value={email} disabled style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `0.5px solid ${t.border}`, fontSize: 14, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.textMuted }} />
+              <input value={email} disabled style={{ ...inputStyle, color: t.textMuted }} />
+            </div>
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ fontSize: 11, color: t.textMuted, marginBottom: 4 }}>Description / Métier</div>
+              <input value={metier} onChange={e => setMetier(e.target.value)} placeholder="ex: Ingénieur, Étudiant, Entrepreneur..." style={inputStyle} />
             </div>
             {succes && <div style={{ fontSize: 12, color: '#4CAF2E', marginBottom: 12 }}>✓ Informations sauvegardées !</div>}
             <button onClick={handleSave} disabled={loading} style={{ background: '#4CAF2E', color: '#fff', fontSize: 13, fontWeight: 500, padding: '10px 20px', borderRadius: 9, border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
               {loading ? 'Sauvegarde...' : 'Sauvegarder'}
             </button>
-          </div>
-
-          {/* APPARENCE */}
-          <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 14, padding: 20, marginBottom: 12 }}>
-            <div style={{ fontSize: 13, fontWeight: 500, color: t.text, marginBottom: 16 }}>Apparence</div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', background: t.bgSecondary, borderRadius: 10 }}>
-              <div>
-                <div style={{ fontSize: 13, fontWeight: 500, color: t.text }}>Mode {t.dark ? 'sombre' : 'clair'}</div>
-                <div style={{ fontSize: 11, color: t.textMuted, marginTop: 2 }}>{t.dark ? 'Interface sombre activée' : 'Interface claire activée'}</div>
-              </div>
-              <div onClick={t.toggle} style={{ width: 44, height: 24, borderRadius: 12, background: t.dark ? '#4CAF2E' : '#E0EAE3', cursor: 'pointer', position: 'relative', transition: 'background 0.2s' }}>
-                <div style={{ position: 'absolute', top: 2, left: t.dark ? 22 : 2, width: 20, height: 20, borderRadius: '50%', background: '#fff', transition: 'left 0.2s' }} />
-              </div>
-            </div>
-          </div>
+          </Section>
 
           {/* ABONNEMENT */}
-          <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 14, padding: 20, marginBottom: 12 }}>
-            <div style={{ fontSize: 13, fontWeight: 500, color: t.text, marginBottom: 16 }}>Mon abonnement</div>
+          <Section titre="Mon abonnement" t={t}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: t.bgSecondary, borderRadius: 10, padding: '12px 16px', marginBottom: 12 }}>
               <div>
                 <div style={{ fontSize: 13, fontWeight: 500, color: t.text }}>Plan gratuit</div>
-                <div style={{ fontSize: 11, color: t.textMuted }}>3 ETF · Finances de base</div>
+                <div style={{ fontSize: 11, color: t.textMuted }}>Finances de base · ETF actualisés 1x/jour</div>
               </div>
               <span style={{ fontSize: 10, background: '#EAF6E4', color: '#2E7D1E', padding: '3px 10px', borderRadius: 20, fontWeight: 500 }}>Actif</span>
             </div>
             <button onClick={() => navigate('/abonnement')} style={{ background: '#1B2E4B', color: '#fff', fontSize: 13, fontWeight: 500, padding: '10px 20px', borderRadius: 9, border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
               Passer à Premium →
             </button>
-          </div>
+          </Section>
 
           {/* À PROPOS */}
           <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 14, padding: 20, marginBottom: 12 }}>
-            <div
-              onClick={() => setShowAPropos(v => !v)}
-              style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
-            >
+            <div onClick={() => setShowAPropos(v => !v)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}>
               <div style={{ fontSize: 13, fontWeight: 500, color: t.text }}>À propos & Mentions légales</div>
               <div style={{ fontSize: 16, color: t.textMuted }}>{showAPropos ? '−' : '+'}</div>
             </div>
-
             {showAPropos && (
               <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 16 }}>
-
                 <div>
                   <div style={{ fontSize: 11, fontWeight: 500, color: t.text, textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 6 }}>À propos de StartInvest</div>
-                  <div style={{ fontSize: 12, color: t.textMuted, lineHeight: 1.6 }}>
-                    StartInvest est une application d'aide à la gestion de portefeuille d'ETF destinée aux particuliers souhaitant suivre et optimiser leurs investissements long terme. Elle est développée et maintenue de manière indépendante.
-                  </div>
+                  <div style={{ fontSize: 12, color: t.textMuted, lineHeight: 1.6 }}>StartInvest est une application d'aide à la gestion de portefeuille d'ETF destinée aux particuliers souhaitant suivre et optimiser leurs investissements long terme.</div>
                 </div>
-
                 <div style={{ height: 0.5, background: t.border }} />
-
                 <div>
                   <div style={{ fontSize: 11, fontWeight: 500, color: t.text, textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 6 }}>Avertissement financier</div>
-                  <div style={{ fontSize: 12, color: t.textMuted, lineHeight: 1.6 }}>
-                    Les informations et outils fournis par StartInvest ont un caractère purement informatif et éducatif. Ils ne constituent en aucun cas un conseil en investissement, une recommandation financière ou une incitation à acheter ou vendre des instruments financiers. Investir comporte des risques de perte en capital. Consultez un conseiller financier agréé avant toute décision d'investissement.
-                  </div>
+                  <div style={{ fontSize: 12, color: t.textMuted, lineHeight: 1.6 }}>Les informations fournies ont un caractère purement informatif. Elles ne constituent pas un conseil en investissement. Investir comporte des risques de perte en capital.</div>
                 </div>
-
                 <div style={{ height: 0.5, background: t.border }} />
-
-                <div>
-                  <div style={{ fontSize: 11, fontWeight: 500, color: t.text, textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 6 }}>Données personnelles</div>
-                  <div style={{ fontSize: 12, color: t.textMuted, lineHeight: 1.6 }}>
-                    Vos données sont stockées de manière sécurisée via Supabase et ne sont jamais partagées avec des tiers. Vous pouvez demander la suppression de votre compte et de vos données à tout moment en nous contactant.
-                  </div>
-                </div>
-
-                <div style={{ height: 0.5, background: t.border }} />
-
                 <div>
                   <div style={{ fontSize: 11, fontWeight: 500, color: t.text, textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 6 }}>Contact</div>
-                  <div style={{ fontSize: 12, color: t.textMuted, lineHeight: 1.6 }}>
-                    Pour toute question ou demande, contactez-nous à : <span style={{ color: t.text }}>contact@startinvest.fr</span>
-                  </div>
+                  <div style={{ fontSize: 12, color: t.textMuted, lineHeight: 1.6 }}>contact@startinvest.fr</div>
                 </div>
-
                 <div style={{ height: 0.5, background: t.border }} />
-
-                <div style={{ fontSize: 11, color: t.textMuted, textAlign: 'center' }}>
-                  StartInvest · v1.0 · © {new Date().getFullYear()} Tous droits réservés
-                </div>
-
+                <div style={{ fontSize: 11, color: t.textMuted, textAlign: 'center' }}>StartInvest · v1.0 · © {new Date().getFullYear()} Tous droits réservés</div>
               </div>
             )}
           </div>
@@ -171,9 +292,23 @@ export default function Compte() {
           {/* DANGER ZONE */}
           <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 14, padding: 20 }}>
             <div style={{ fontSize: 13, fontWeight: 500, color: t.text, marginBottom: 16 }}>Danger zone</div>
-            <button onClick={handleLogout} style={{ background: '#FCEBEB', color: '#E24B4A', fontSize: 13, fontWeight: 500, padding: '10px 20px', borderRadius: 9, border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
-              Se déconnecter
-            </button>
+            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+              <button onClick={handleLogout} style={{ background: '#FCEBEB', color: '#E24B4A', fontSize: 13, fontWeight: 500, padding: '10px 20px', borderRadius: 9, border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
+                Se déconnecter
+              </button>
+              <button onClick={() => setShowSupprimer(v => !v)} style={{ background: 'transparent', color: '#E24B4A', fontSize: 13, fontWeight: 500, padding: '10px 20px', borderRadius: 9, border: `0.5px solid #E24B4A`, cursor: 'pointer', fontFamily: 'inherit' }}>
+                Supprimer le compte
+              </button>
+            </div>
+            {showSupprimer && (
+              <div style={{ marginTop: 16, padding: 16, background: '#FCEBEB', borderRadius: 10 }}>
+                <div style={{ fontSize: 12, color: '#E24B4A', marginBottom: 10 }}>⚠️ Cette action est irréversible. Tapez votre email pour confirmer.</div>
+                <input value={confirmSupprimer} onChange={e => setConfirmSupprimer(e.target.value)} placeholder={email} style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `0.5px solid #E24B4A`, fontSize: 13, fontFamily: 'inherit', outline: 'none', background: '#fff', color: '#E24B4A', marginBottom: 10, boxSizing: 'border-box' }} />
+                <button onClick={handleDeleteAccount} disabled={confirmSupprimer !== email} style={{ background: confirmSupprimer === email ? '#E24B4A' : '#ccc', color: '#fff', fontSize: 13, fontWeight: 500, padding: '10px 20px', borderRadius: 9, border: 'none', cursor: confirmSupprimer === email ? 'pointer' : 'default', fontFamily: 'inherit' }}>
+                  Confirmer la suppression
+                </button>
+              </div>
+            )}
           </div>
 
         </div>
