@@ -95,14 +95,12 @@ export default function Investissement() {
     const prixUnitaire = parseFloat(form.prix_achat_unitaire)
     const frais = parseFloat(form.frais_courtage) || 0
 
-    // Insérer dans transactions
     await supabase.from('transactions').insert({
       user_id: user.id, date: form.date, ticker,
       enveloppe: form.enveloppe, type: form.type,
       quantite, prix_unitaire: prixUnitaire, frais_courtage: frais,
     })
 
-    // Mettre à jour ou créer la position dans investissements
     const { data: existingPositions } = await supabase
       .from('investissements').select('*')
       .eq('user_id', user.id).eq('ticker', ticker).eq('enveloppe', form.enveloppe)
@@ -141,8 +139,33 @@ export default function Investissement() {
   }
 
   const handleDeleteTransaction = async (id) => {
+    const tx = transactions.find(t => t.id === id)
+    if (!tx) return
+
     await supabase.from('transactions').delete().eq('id', id)
     setTransactions(prev => prev.filter(t => t.id !== id))
+
+    const transactionsRestantes = transactions.filter(t => t.id !== id && t.ticker === tx.ticker && t.enveloppe === tx.enveloppe)
+
+    if (transactionsRestantes.length === 0) {
+      await supabase.from('investissements').delete().eq('user_id', user.id).eq('ticker', tx.ticker).eq('enveloppe', tx.enveloppe)
+      setInvestissements(prev => prev.filter(i => !(i.ticker === tx.ticker && i.enveloppe === tx.enveloppe)))
+    } else {
+      let quantiteTotale = 0
+      let coutTotal = 0
+      for (const t of transactionsRestantes) {
+        if (t.type === 'Achat') {
+          quantiteTotale += parseFloat(t.quantite)
+          coutTotal += parseFloat(t.quantite) * parseFloat(t.prix_unitaire)
+        } else {
+          quantiteTotale -= parseFloat(t.quantite)
+        }
+      }
+      const nouveauPru = quantiteTotale > 0 ? Math.round((coutTotal / quantiteTotale) * 10000) / 10000 : 0
+      const updatePayload = { quantite: quantiteTotale, pru: nouveauPru }
+      await supabase.from('investissements').update(updatePayload).eq('user_id', user.id).eq('ticker', tx.ticker).eq('enveloppe', tx.enveloppe)
+      setInvestissements(prev => prev.map(i => i.ticker === tx.ticker && i.enveloppe === tx.enveloppe ? { ...i, ...updatePayload } : i))
+    }
   }
 
   const inputStyle = { padding: '5px 8px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgCard, color: t.text, width: '100%' }
