@@ -61,20 +61,37 @@ export default function Investissement() {
   const calcValeurActuelle = (inv) => parseFloat(inv.quantite) * parseFloat(inv.prix_actuel || inv.pru || inv.prix_achat_unitaire || 0)
   const calcPlusValue = (inv) => calcValeurActuelle(inv) - (parseFloat(inv.quantite) * parseFloat(inv.pru || inv.prix_achat_unitaire || 0))
 
-  const handleTickerChange = (val) => {
+  const handleTickerChange = async (val) => {
     const upper = val.toUpperCase()
-    const existing = investissements.find(i => i.ticker === upper)
-    if (existing) {
+    setForm(prev => ({ ...prev, ticker: val }))
+
+    if (upper.length < 2) return
+
+    const existingPos = investissements.find(i => i.ticker === upper)
+    if (existingPos) {
       setForm(prev => ({
         ...prev,
         ticker: upper,
-        actif: existing.actif || prev.actif,
-        enveloppe: existing.enveloppe || prev.enveloppe,
-        type_etf: existing.type_etf || prev.type_etf,
-        ter: existing.ter?.toString() || prev.ter,
+        actif: existingPos.actif || prev.actif,
+        enveloppe: existingPos.enveloppe || prev.enveloppe,
+        type_etf: existingPos.type_etf || prev.type_etf,
+        ter: existingPos.ter?.toString() || prev.ter,
       }))
-    } else {
-      setForm(prev => ({ ...prev, ticker: val }))
+      return
+    }
+
+    const { data: ref } = await supabase
+      .from('etf_reference')
+      .select('*')
+      .eq('ticker', upper)
+      .single()
+
+    if (ref) {
+      setForm(prev => ({
+        ...prev,
+        ticker: upper,
+        actif: ref.nom || prev.actif,
+      }))
     }
   }
 
