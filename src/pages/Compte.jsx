@@ -4,36 +4,6 @@ import { supabase } from '../lib/supabase'
 import Navbar from '../components/Navbar'
 import { useTheme } from '../lib/ThemeContext'
 
-const POLICES = ['Inter', 'Georgia', 'Courier New', 'Arial', 'Verdana']
-const LANGUES = ['Français', 'English', 'Español', 'Deutsch']
-
-const ComingSoon = ({ t }) => (
-  <span style={{ fontSize: 9, background: '#FFF8E6', color: '#BA7517', padding: '2px 7px', borderRadius: 20, fontWeight: 500, marginLeft: 8 }}>Bientôt</span>
-)
-
-const Section = ({ titre, children, t }) => (
-  <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 14, padding: 20, marginBottom: 12 }}>
-    <div style={{ fontSize: 13, fontWeight: 500, color: t.text, marginBottom: 16 }}>{titre}</div>
-    {children}
-  </div>
-)
-
-const Row = ({ label, desc, children, t }) => (
-  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', background: t.bgSecondary, borderRadius: 10, marginBottom: 8 }}>
-    <div>
-      <div style={{ fontSize: 13, fontWeight: 500, color: t.text }}>{label}</div>
-      {desc && <div style={{ fontSize: 11, color: t.textMuted, marginTop: 2 }}>{desc}</div>}
-    </div>
-    {children}
-  </div>
-)
-
-const Toggle = ({ active, onToggle, disabled }) => (
-  <div onClick={disabled ? undefined : onToggle} style={{ width: 44, height: 24, borderRadius: 12, background: active ? '#4CAF2E' : '#E0EAE3', cursor: disabled ? 'default' : 'pointer', position: 'relative', transition: 'background 0.2s', opacity: disabled ? 0.4 : 1 }}>
-    <div style={{ position: 'absolute', top: 2, left: active ? 22 : 2, width: 20, height: 20, borderRadius: '50%', background: '#fff', transition: 'left 0.2s' }} />
-  </div>
-)
-
 export default function Compte() {
   const navigate = useNavigate()
   const t = useTheme()
@@ -42,12 +12,9 @@ export default function Compte() {
   const [nom, setNom] = useState('')
   const [email, setEmail] = useState('')
   const [metier, setMetier] = useState('')
-  const [police, setPolice] = useState('Inter')
-  const [langue, setLangue] = useState('Français')
   const [loading, setLoading] = useState(false)
   const [succes, setSucces] = useState(false)
   const [showAPropos, setShowAPropos] = useState(false)
-  const [showParametres, setShowParametres] = useState(false)
   const [showSupprimer, setShowSupprimer] = useState(false)
   const [confirmSupprimer, setConfirmSupprimer] = useState('')
   const [photoUrl, setPhotoUrl] = useState(null)
@@ -128,101 +95,14 @@ export default function Compte() {
                 <div style={{ fontSize: 11, background: '#EAF6E4', color: '#2E7D1E', padding: '2px 10px', borderRadius: 20, display: 'inline-block', marginTop: 4 }}>Plan gratuit</div>
               </div>
             </div>
-            <button
-              onClick={() => setShowParametres(v => !v)}
-              style={{ background: t.bgSecondary, color: t.text, fontSize: 12, fontWeight: 500, padding: '8px 16px', borderRadius: 9, border: `0.5px solid ${t.border}`, cursor: 'pointer', fontFamily: 'inherit' }}
-            >
+            <button onClick={() => navigate('/parametres')} style={{ background: t.bgSecondary, color: t.text, fontSize: 12, fontWeight: 500, padding: '8px 16px', borderRadius: 9, border: `0.5px solid ${t.border}`, cursor: 'pointer', fontFamily: 'inherit' }}>
               ⚙️ Paramètres
             </button>
           </div>
 
-          {/* PARAMÈTRES */}
-          {showParametres && (
-            <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 14, padding: 20, marginBottom: 12 }}>
-              <div style={{ fontSize: 13, fontWeight: 500, color: t.text, marginBottom: 16 }}>Paramètres</div>
-
-              {/* APPARENCE */}
-              <div style={{ fontSize: 11, fontWeight: 500, color: t.textMuted, textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 8 }}>Apparence</div>
-              <Row label={`Mode ${t.dark ? 'sombre' : 'clair'}`} desc={t.dark ? 'Interface sombre activée' : 'Interface claire activée'} t={t}>
-                <Toggle active={t.dark} onToggle={t.toggle} />
-              </Row>
-              <Row label={<span>Mode Night Shift<ComingSoon t={t} /></span>} desc="Réduit la lumière bleue le soir" t={t}>
-                <Toggle active={false} disabled />
-              </Row>
-
-              {/* LANGUE */}
-              <div style={{ fontSize: 11, fontWeight: 500, color: t.textMuted, textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 8, marginTop: 16 }}>Langue</div>
-              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 8 }}>
-                {LANGUES.map(l => (
-                  <button key={l} onClick={() => l === 'Français' && setLangue(l)} style={{ padding: '6px 14px', borderRadius: 20, border: `0.5px solid ${langue === l ? '#4CAF2E' : t.border}`, background: langue === l ? '#EAF6E4' : t.bgSecondary, color: langue === l ? '#2E7D1E' : l === 'Français' ? t.text : t.textMuted, fontSize: 12, cursor: l === 'Français' ? 'pointer' : 'default', fontFamily: 'inherit', opacity: l === 'Français' ? 1 : 0.5 }}>
-                    {l}{l !== 'Français' && ' 🔒'}
-                  </button>
-                ))}
-              </div>
-
-              {/* POLICE */}
-              <div style={{ fontSize: 11, fontWeight: 500, color: t.textMuted, textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 8, marginTop: 16 }}>Police d'écriture</div>
-              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 8 }}>
-                {POLICES.map(p => (
-                  <button key={p} onClick={() => p === 'Inter' && setPolice(p)} style={{ padding: '6px 14px', borderRadius: 20, border: `0.5px solid ${police === p ? '#4CAF2E' : t.border}`, background: police === p ? '#EAF6E4' : t.bgSecondary, color: police === p ? '#2E7D1E' : p === 'Inter' ? t.text : t.textMuted, fontSize: 12, fontFamily: p, cursor: p === 'Inter' ? 'pointer' : 'default', opacity: p === 'Inter' ? 1 : 0.5 }}>
-                    {p}{p !== 'Inter' && ' 🔒'}
-                  </button>
-                ))}
-              </div>
-
-              {/* NOTIFICATIONS */}
-              <div style={{ fontSize: 11, fontWeight: 500, color: t.textMuted, textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 8, marginTop: 16 }}>
-                Notifications<ComingSoon t={t} />
-              </div>
-              <Row label="Notifications par email" desc="Recevoir les mises à jour par email" t={t}>
-                <Toggle active={false} disabled />
-              </Row>
-              <Row label="Notifications par message" desc="Recevoir les alertes par SMS" t={t}>
-                <Toggle active={false} disabled />
-              </Row>
-
-              {/* FACTURATION */}
-              <div style={{ fontSize: 11, fontWeight: 500, color: t.textMuted, textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 8, marginTop: 16 }}>
-                Facturation<ComingSoon t={t} />
-              </div>
-              {['Forfait', 'Paiement', 'Factures', 'Annulation'].map(item => (
-                <Row key={item} label={item} desc="Disponible avec un plan Premium" t={t}>
-                  <span style={{ fontSize: 11, color: t.textMuted }}>→</span>
-                </Row>
-              ))}
-
-              {/* CONNECTEURS */}
-              <div style={{ fontSize: 11, fontWeight: 500, color: t.textMuted, textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 8, marginTop: 16 }}>
-                Connecteurs<ComingSoon t={t} />
-              </div>
-              <Row label="Compte bancaire" desc="Synchronisez votre banque" t={t}>
-                <span style={{ fontSize: 11, color: t.textMuted }}>→</span>
-              </Row>
-              <Row label="App de gestion du patrimoine" desc="Connectez vos outils" t={t}>
-                <span style={{ fontSize: 11, color: t.textMuted }}>→</span>
-              </Row>
-
-              {/* IA AGENT */}
-              <div style={{ fontSize: 11, fontWeight: 500, color: t.textMuted, textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 8, marginTop: 16 }}>
-                IA Agent<ComingSoon t={t} />
-              </div>
-              <Row label="Personnalisation de l'agent" desc="Disponible avec un plan Premium" t={t}>
-                <span style={{ fontSize: 11, color: t.textMuted }}>→</span>
-              </Row>
-
-              {/* DON */}
-              <div style={{ fontSize: 11, fontWeight: 500, color: t.textMuted, textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 8, marginTop: 16 }}>
-                Soutenir StartInvest<ComingSoon t={t} />
-              </div>
-              <Row label="Faire un don" desc="Soutenez le développement de l'app" t={t}>
-                <span style={{ fontSize: 11, color: '#4CAF2E' }}>💚</span>
-              </Row>
-
-            </div>
-          )}
-
           {/* INFORMATIONS PERSONNELLES */}
-          <Section titre="Informations personnelles" t={t}>
+          <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 14, padding: 20, marginBottom: 12 }}>
+            <div style={{ fontSize: 13, fontWeight: 500, color: t.text, marginBottom: 16 }}>Informations personnelles</div>
             <div style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 11, color: t.textMuted, marginBottom: 4 }}>Prénom</div>
@@ -245,10 +125,11 @@ export default function Compte() {
             <button onClick={handleSave} disabled={loading} style={{ background: '#4CAF2E', color: '#fff', fontSize: 13, fontWeight: 500, padding: '10px 20px', borderRadius: 9, border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
               {loading ? 'Sauvegarde...' : 'Sauvegarder'}
             </button>
-          </Section>
+          </div>
 
           {/* ABONNEMENT */}
-          <Section titre="Mon abonnement" t={t}>
+          <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 14, padding: 20, marginBottom: 12 }}>
+            <div style={{ fontSize: 13, fontWeight: 500, color: t.text, marginBottom: 16 }}>Mon abonnement</div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: t.bgSecondary, borderRadius: 10, padding: '12px 16px', marginBottom: 12 }}>
               <div>
                 <div style={{ fontSize: 13, fontWeight: 500, color: t.text }}>Plan gratuit</div>
@@ -259,7 +140,7 @@ export default function Compte() {
             <button onClick={() => navigate('/abonnement')} style={{ background: '#1B2E4B', color: '#fff', fontSize: 13, fontWeight: 500, padding: '10px 20px', borderRadius: 9, border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
               Passer à Premium →
             </button>
-          </Section>
+          </div>
 
           {/* À PROPOS */}
           <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 14, padding: 20, marginBottom: 12 }}>

@@ -13,6 +13,7 @@ import Concentration from './pages/Concentration'
 import Guide from './pages/Guide'
 import Abonnement from './pages/Abonnement'
 import Compte from './pages/Compte'
+import Parametres from './pages/Parametres'
 import './index.css'
 
 createRoot(document.getElementById('root')).render(
@@ -31,6 +32,7 @@ createRoot(document.getElementById('root')).render(
           <Route path="/guide" element={<Guide />} />
           <Route path="/abonnement" element={<Abonnement />} />
           <Route path="/compte" element={<Compte />} />
+          <Route path="/parametres" element={<Parametres />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>
