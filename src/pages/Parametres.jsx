@@ -4,7 +4,6 @@ import { supabase } from '../lib/supabase'
 import Navbar from '../components/Navbar'
 import { useTheme } from '../lib/ThemeContext'
 
-const POLICES = ['Inter', 'Georgia', 'Courier New', 'Arial', 'Verdana']
 const LANGUES = ['Français', 'English', 'Español', 'Deutsch']
 
 const ComingSoon = () => (
@@ -35,8 +34,8 @@ export default function Parametres() {
   const navigate = useNavigate()
   const t = useTheme()
   const [user, setUser] = useState(null)
-  const [police, setPolice] = useState('Inter')
   const [langue, setLangue] = useState('Français')
+  const [tailleTexte, setTailleTexte] = useState(14)
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -64,7 +63,9 @@ export default function Parametres() {
 
           {/* APPARENCE */}
           <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 14, padding: 20, marginBottom: 12 }}>
-            <SectionTitle t={t}>Apparence</SectionTitle>
+            <div style={{ fontSize: 13, fontWeight: 500, color: t.text, marginBottom: 4 }}>Apparence</div>
+
+            <SectionTitle t={t}>Thème</SectionTitle>
             <Row label={`Mode ${t.dark ? 'sombre' : 'clair'}`} desc={t.dark ? 'Interface sombre activée' : 'Interface claire activée'} t={t}>
               <Toggle active={t.dark} onToggle={t.toggle} />
             </Row>
@@ -72,19 +73,29 @@ export default function Parametres() {
               <Toggle active={false} disabled />
             </Row>
 
-            <SectionTitle t={t}>Police d'écriture</SectionTitle>
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              {POLICES.map(p => (
-                <button key={p} onClick={() => p === 'Inter' && setPolice(p)} style={{ padding: '6px 14px', borderRadius: 20, border: `0.5px solid ${police === p ? '#4CAF2E' : t.border}`, background: police === p ? '#EAF6E4' : t.bgSecondary, color: police === p ? '#2E7D1E' : p === 'Inter' ? t.text : t.textMuted, fontSize: 12, fontFamily: p, cursor: p === 'Inter' ? 'pointer' : 'default', opacity: p === 'Inter' ? 1 : 0.5, fontFamily: 'inherit' }}>
-                  {p}{p !== 'Inter' && ' 🔒'}
-                </button>
-              ))}
+            <SectionTitle t={t}>Taille du texte <ComingSoon /></SectionTitle>
+            <div style={{ padding: '12px 16px', background: t.bgSecondary, borderRadius: 10, marginBottom: 8 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                <span style={{ fontSize: 11, color: t.textMuted }}>Petit</span>
+                <span style={{ fontSize: tailleTexte, color: t.text, fontWeight: 500 }}>Aa — {tailleTexte}px</span>
+                <span style={{ fontSize: 11, color: t.textMuted }}>Grand</span>
+              </div>
+              <input
+                type="range"
+                min="11"
+                max="18"
+                value={tailleTexte}
+                onChange={e => setTailleTexte(parseInt(e.target.value))}
+                style={{ width: '100%', accentColor: '#4CAF2E', cursor: 'not-allowed', opacity: 0.5 }}
+                disabled
+              />
             </div>
           </div>
 
           {/* LANGUE */}
           <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 14, padding: 20, marginBottom: 12 }}>
-            <SectionTitle t={t}>Langue</SectionTitle>
+            <div style={{ fontSize: 13, fontWeight: 500, color: t.text, marginBottom: 4 }}>Langue</div>
+            <SectionTitle t={t}>Langue de l'application</SectionTitle>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               {LANGUES.map(l => (
                 <button key={l} onClick={() => l === 'Français' && setLangue(l)} style={{ padding: '6px 14px', borderRadius: 20, border: `0.5px solid ${langue === l ? '#4CAF2E' : t.border}`, background: langue === l ? '#EAF6E4' : t.bgSecondary, color: langue === l ? '#2E7D1E' : l === 'Français' ? t.text : t.textMuted, fontSize: 12, cursor: l === 'Français' ? 'pointer' : 'default', fontFamily: 'inherit', opacity: l === 'Français' ? 1 : 0.5 }}>
@@ -96,7 +107,8 @@ export default function Parametres() {
 
           {/* NOTIFICATIONS */}
           <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 14, padding: 20, marginBottom: 12 }}>
-            <SectionTitle t={t}>Notifications <ComingSoon /></SectionTitle>
+            <div style={{ fontSize: 13, fontWeight: 500, color: t.text, marginBottom: 4 }}>Notifications <ComingSoon /></div>
+            <SectionTitle t={t}>Canaux</SectionTitle>
             <Row label="Notifications par email" desc="Recevoir les mises à jour par email" t={t}>
               <Toggle active={false} disabled />
             </Row>
@@ -107,7 +119,8 @@ export default function Parametres() {
 
           {/* FACTURATION */}
           <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 14, padding: 20, marginBottom: 12 }}>
-            <SectionTitle t={t}>Facturation <ComingSoon /></SectionTitle>
+            <div style={{ fontSize: 13, fontWeight: 500, color: t.text, marginBottom: 4 }}>Facturation <ComingSoon /></div>
+            <SectionTitle t={t}>Gestion</SectionTitle>
             {['Forfait', 'Paiement', 'Factures', 'Annulation'].map(item => (
               <Row key={item} label={item} desc="Disponible avec un plan Premium" t={t}>
                 <span style={{ fontSize: 11, color: t.textMuted }}>→</span>
@@ -117,7 +130,8 @@ export default function Parametres() {
 
           {/* DON */}
           <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 14, padding: 20, marginBottom: 12 }}>
-            <SectionTitle t={t}>Soutenir StartInvest <ComingSoon /></SectionTitle>
+            <div style={{ fontSize: 13, fontWeight: 500, color: t.text, marginBottom: 4 }}>Soutenir StartInvest <ComingSoon /></div>
+            <SectionTitle t={t}>Don</SectionTitle>
             <Row label="Faire un don" desc="Soutenez le développement de l'application" t={t}>
               <span style={{ fontSize: 16 }}>💚</span>
             </Row>
@@ -125,7 +139,8 @@ export default function Parametres() {
 
           {/* CONNECTEURS */}
           <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 14, padding: 20, marginBottom: 12 }}>
-            <SectionTitle t={t}>Connecteurs <ComingSoon /></SectionTitle>
+            <div style={{ fontSize: 13, fontWeight: 500, color: t.text, marginBottom: 4 }}>Connecteurs <ComingSoon /></div>
+            <SectionTitle t={t}>Intégrations</SectionTitle>
             <Row label="Compte bancaire" desc="Synchronisez votre banque" t={t}>
               <span style={{ fontSize: 11, color: t.textMuted }}>→</span>
             </Row>
@@ -136,7 +151,8 @@ export default function Parametres() {
 
           {/* IA AGENT */}
           <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 14, padding: 20, marginBottom: 12 }}>
-            <SectionTitle t={t}>IA Agent <ComingSoon /></SectionTitle>
+            <div style={{ fontSize: 13, fontWeight: 500, color: t.text, marginBottom: 4 }}>IA Agent <ComingSoon /></div>
+            <SectionTitle t={t}>Personnalisation</SectionTitle>
             <Row label="Personnalisation de l'agent" desc="Disponible avec un plan Premium" t={t}>
               <span style={{ fontSize: 11, color: t.textMuted }}>→</span>
             </Row>
