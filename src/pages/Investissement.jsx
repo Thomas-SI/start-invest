@@ -67,6 +67,7 @@ export default function Investissement() {
 
     if (upper.length < 2) return
 
+    // Chercher d'abord dans les positions existantes
     const existingPos = investissements.find(i => i.ticker === upper)
     if (existingPos) {
       setForm(prev => ({
@@ -80,6 +81,7 @@ export default function Investissement() {
       return
     }
 
+    // Sinon chercher dans etf_reference
     const { data: ref } = await supabase
       .from('etf_reference')
       .select('*')
@@ -91,6 +93,7 @@ export default function Investissement() {
         ...prev,
         ticker: upper,
         actif: ref.nom || prev.actif,
+        enveloppe: ref.enveloppe_defaut || prev.enveloppe,
       }))
     }
   }
