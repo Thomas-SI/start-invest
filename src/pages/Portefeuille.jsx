@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 import Navbar from '../components/Navbar'
 import { useTheme } from '../lib/ThemeContext'
@@ -35,12 +36,41 @@ const TYPES_DISPONIBILITE = {
 
 const COULEURS = ['#1B2E4B', '#4CAF2E', '#BA7517', '#3B82F6', '#E24B4A', '#8B5CF6', '#06B6D4', '#F59E0B', '#10B981', '#EC4899']
 
+const fetchPortefeuilleData = async () => {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Non connecté')
+  const [finRes, depRes, echRes, comptesRes, virementsRes] = await Promise.all([
+    supabase.from('finances').select('*').eq('user_id', user.id).single(),
+    supabase.from('depenses').select('*').eq('user_id', user.id),
+    supabase.from('echeances').select('*').eq('user_id', user.id),
+    supabase.from('comptes').select('*').eq('user_id', user.id).order('created_at', { ascending: true }),
+    supabase.from('virements').select('*').eq('user_id', user.id).order('ordre', { ascending: true }),
+  ])
+  const fin = finRes.data
+  let depensesFixes = 0, investissable = 0
+  if (fin) {
+    const dep = depRes.data || []
+    const totalDepFixes = dep.filter(d => d.type === 'fixes').reduce((acc, d) => acc + (parseFloat(d.montant) || 0), 0)
+    const totalDep = dep.reduce((acc, d) => acc + (parseFloat(d.montant) || 0), 0)
+    const totalEch = (echRes.data || []).reduce((acc, e) => acc + (parseFloat(e.montant_annuel) || 0) / 12, 0)
+    const totalRev = (fin.revenus || 0) + (fin.autre_revenu || 0)
+    depensesFixes = Math.round(totalDepFixes)
+    investissable = Math.round(totalRev - totalDep - totalEch)
+  }
+  return {
+    user,
+    comptes: comptesRes.data?.length > 0 ? comptesRes.data : COMPTES_DEFAULT,
+    virements: virementsRes.data?.length > 0 ? virementsRes.data : VIREMENTS_DEFAULT,
+    depensesFixes,
+    investissable,
+  }
+}
+
 export default function Portefeuille() {
   const t = useTheme()
+  const queryClient = useQueryClient()
   const canvasRef = useRef(null)
   const chartRef = useRef(null)
-  const [comptes, setComptes] = useState([])
-  const [virements, setVirements] = useState([])
   const [editingIdx, setEditingIdx] = useState(null)
   const [editForm, setEditForm] = useState({})
   const [showAdd, setShowAdd] = useState(false)
@@ -50,17 +80,24 @@ export default function Portefeuille() {
   const [newDispoCustom, setNewDispoCustom] = useState('Immédiate')
   const [newSolde, setNewSolde] = useState('')
   const [newObjectif, setNewObjectif] = useState('')
-  const [depensesFixes, setDepensesFixes] = useState(0)
-  const [investissable, setInvestissable] = useState(0)
   const [chartReady, setChartReady] = useState(false)
-  const [user, setUser] = useState(null)
   const [saving, setSaving] = useState(false)
-  const [loaded, setLoaded] = useState(false)
   const [nbMoisMatelas, setNbMoisMatelas] = useState(6)
   const [erreurAdd, setErreurAdd] = useState(null)
   const [erreurEdit, setErreurEdit] = useState(null)
   const [succesEdit, setSuccesEdit] = useState(false)
   const [confirmDeleteIdx, setConfirmDeleteIdx] = useState(null)
+
+  const { data, isLoading } = useQuery({
+    queryKey: ['portefeuille'],
+    queryFn: fetchPortefeuilleData,
+  })
+
+  const user = data?.user || null
+  const comptes = data?.comptes || COMPTES_DEFAULT
+  const virements = data?.virements || VIREMENTS_DEFAULT
+  const depensesFixes = data?.depensesFixes || 0
+  const investissable = data?.investissable || 0
 
   const total = comptes.reduce((acc, c) => acc + (parseFloat(c.solde) || 0), 0)
   const totalSecurite = comptes.filter(c => c.type === 'sécurité').reduce((acc, c) => acc + (parseFloat(c.solde) || 0), 0)
@@ -70,54 +107,16 @@ export default function Portefeuille() {
   const totalPourcentage = virements.reduce((acc, v) => acc + (parseFloat(v.pourcentage) || 0), 0)
   const predefiniSelectionne = COMPTES_PREDEFINIS.find(c => c.nom === selectedPredefini)
 
-  const moisActuelStr = () => {
-    const now = new Date()
-    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
-  }
-
-  const isCheckedCeMois = (v) => {
-    if (!v.checked || !v.checked_date) return false
-    return v.checked_date.substring(0, 7) === moisActuelStr()
-  }
+  const moisActuelStr = () => { const now = new Date(); return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}` }
+  const isCheckedCeMois = (v) => { if (!v.checked || !v.checked_date) return false; return v.checked_date.substring(0, 7) === moisActuelStr() }
 
   useEffect(() => {
-    const fetchData = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
-      setUser(user)
-
-      const { data: fin } = await supabase.from('finances').select('*').eq('user_id', user.id).single()
-      if (fin) {
-        const { data: dep } = await supabase.from('depenses').select('*').eq('user_id', user.id)
-        const totalDepFixes = dep ? dep.filter(d => d.type === 'fixes').reduce((acc, d) => acc + (parseFloat(d.montant) || 0), 0) : 0
-        const totalDep = dep ? dep.reduce((acc, d) => acc + (parseFloat(d.montant) || 0), 0) : 0
-        const { data: ech } = await supabase.from('echeances').select('*').eq('user_id', user.id)
-        const totalEch = ech ? ech.reduce((acc, e) => acc + (parseFloat(e.montant_annuel) || 0) / 12, 0) : 0
-        const totalRev = (fin.revenus || 0) + (fin.autre_revenu || 0)
-        setDepensesFixes(Math.round(totalDepFixes))
-        setInvestissable(Math.round(totalRev - totalDep - totalEch))
-      }
-
-      const { data: comptesData } = await supabase.from('comptes').select('*').eq('user_id', user.id).order('created_at', { ascending: true })
-      if (comptesData && comptesData.length > 0) setComptes(comptesData)
-      else setComptes(COMPTES_DEFAULT)
-
-      const { data: virementsData } = await supabase.from('virements').select('*').eq('user_id', user.id).order('ordre', { ascending: true })
-      if (virementsData && virementsData.length > 0) setVirements(virementsData)
-      else setVirements(VIREMENTS_DEFAULT)
-
-      setLoaded(true)
-    }
-    fetchData()
-
     if (!window.Chart) {
       const script = document.createElement('script')
       script.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js'
       script.onload = () => setChartReady(true)
       document.head.appendChild(script)
-    } else {
-      setChartReady(true)
-    }
+    } else setChartReady(true)
   }, [])
 
   useEffect(() => {
@@ -128,42 +127,22 @@ export default function Portefeuille() {
     const ctx = canvasRef.current.getContext('2d')
     chartRef.current = new window.Chart(ctx, {
       type: 'doughnut',
-      data: {
-        labels: comptesAvecSolde.map(c => c.nom),
-        datasets: [{
-          data: comptesAvecSolde.map(c => parseFloat(c.solde)),
-          backgroundColor: COULEURS.slice(0, comptesAvecSolde.length),
-          borderWidth: 0,
-          hoverOffset: 4,
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        cutout: '65%',
-        plugins: {
-          legend: { display: false },
-          tooltip: { callbacks: { label: ctx => ` ${ctx.label} : ${Math.round(ctx.raw).toLocaleString('fr-FR')} € (${Math.round(ctx.raw / total * 100)}%)` } }
-        }
-      }
+      data: { labels: comptesAvecSolde.map(c => c.nom), datasets: [{ data: comptesAvecSolde.map(c => parseFloat(c.solde)), backgroundColor: COULEURS.slice(0, comptesAvecSolde.length), borderWidth: 0, hoverOffset: 4 }] },
+      options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.label} : ${Math.round(ctx.raw).toLocaleString('fr-FR')} € (${Math.round(ctx.raw / total * 100)}%)` } } } }
     })
     return () => { if (chartRef.current) chartRef.current.destroy() }
   }, [chartReady, comptes, total])
 
   const saveComptes = async (newComptes) => {
-    if (!user || !loaded) return
+    if (!user) return
     setSaving(true)
     try {
       await supabase.from('comptes').delete().eq('user_id', user.id)
       if (newComptes.length > 0) {
-        const { error } = await supabase.from('comptes').insert(newComptes.map(c => ({
-          user_id: user.id,
-          nom: c.nom, type: c.type, disponibilite: c.disponibilite,
-          solde: parseFloat(c.solde) || 0,
-          objectif: parseFloat(c.objectif) || 0,
-        })))
+        const { error } = await supabase.from('comptes').insert(newComptes.map(c => ({ user_id: user.id, nom: c.nom, type: c.type, disponibilite: c.disponibilite, solde: parseFloat(c.solde) || 0, objectif: parseFloat(c.objectif) || 0 })))
         if (error) throw new Error('Erreur lors de la sauvegarde.')
       }
+      queryClient.invalidateQueries({ queryKey: ['portefeuille'] })
     } catch (e) {
       setErreurEdit(e.message)
     } finally {
@@ -172,18 +151,13 @@ export default function Portefeuille() {
   }
 
   const saveVirements = async (newVirements) => {
-    if (!user || !loaded) return
+    if (!user) return
     try {
       await supabase.from('virements').delete().eq('user_id', user.id)
       if (newVirements.length > 0) {
-        await supabase.from('virements').insert(newVirements.map((v, i) => ({
-          user_id: user.id,
-          destination: v.destination, compte: v.compte,
-          pourcentage: parseFloat(v.pourcentage) || 0,
-          ordre: i, checked: v.checked || false,
-          checked_date: v.checked_date || null,
-        })))
+        await supabase.from('virements').insert(newVirements.map((v, i) => ({ user_id: user.id, destination: v.destination, compte: v.compte, pourcentage: parseFloat(v.pourcentage) || 0, ordre: i, checked: v.checked || false, checked_date: v.checked_date || null })))
       }
+      queryClient.invalidateQueries({ queryKey: ['portefeuille'] })
     } catch (e) {
       console.error('Erreur sauvegarde virements:', e)
     }
@@ -191,22 +165,14 @@ export default function Portefeuille() {
 
   const couleurType = (type) => TYPES_DISPONIBILITE[type]?.color || '#9CA3AF'
 
-  const handleEditStart = (i) => {
-    setEditingIdx(i)
-    setEditForm({ solde: comptes[i].solde, objectif: comptes[i].objectif })
-    setErreurEdit(null)
-  }
+  const handleEditStart = (i) => { setEditingIdx(i); setEditForm({ solde: comptes[i].solde, objectif: comptes[i].objectif }); setErreurEdit(null) }
 
   const handleEditSave = async (i) => {
     if (saving) return
-    if (parseFloat(editForm.solde) < 0) {
-      setErreurEdit('Le solde ne peut pas être négatif.')
-      return
-    }
+    if (parseFloat(editForm.solde) < 0) { setErreurEdit('Le solde ne peut pas être négatif.'); return }
     setErreurEdit(null)
     const updated = [...comptes]
     updated[i] = { ...updated[i], solde: parseFloat(editForm.solde) || 0, objectif: parseFloat(editForm.objectif) || 0 }
-    setComptes(updated)
     setEditingIdx(null)
     setSuccesEdit(true)
     setTimeout(() => setSuccesEdit(false), 2000)
@@ -217,7 +183,6 @@ export default function Portefeuille() {
     if (saving) return
     if (confirmDeleteIdx === i) {
       const updated = comptes.filter((_, j) => j !== i)
-      setComptes(updated)
       setConfirmDeleteIdx(null)
       await saveComptes(updated)
     } else {
@@ -231,34 +196,19 @@ export default function Portefeuille() {
     setErreurAdd(null)
     const isAutre = selectedPredefini === 'Autre'
     const nom = isAutre ? newNomCustom.trim() : selectedPredefini
-    if (!nom) {
-      setErreurAdd('Veuillez saisir un nom pour le compte.')
-      return
-    }
-    if (comptes.find(c => c.nom.toLowerCase() === nom.toLowerCase())) {
-      setErreurAdd(`Le compte "${nom}" existe déjà.`)
-      return
-    }
-    if (parseFloat(newSolde) < 0) {
-      setErreurAdd('Le solde ne peut pas être négatif.')
-      return
-    }
+    if (!nom) { setErreurAdd('Veuillez saisir un nom pour le compte.'); return }
+    if (comptes.find(c => c.nom.toLowerCase() === nom.toLowerCase())) { setErreurAdd(`Le compte "${nom}" existe déjà.`); return }
+    if (parseFloat(newSolde) < 0) { setErreurAdd('Le solde ne peut pas être négatif.'); return }
     const type = isAutre ? newTypeCustom : predefiniSelectionne.type
     const disponibilite = isAutre ? newDispoCustom : predefiniSelectionne.disponibilite
     const updated = [...comptes, { nom, type, disponibilite, solde: parseFloat(newSolde) || 0, objectif: parseFloat(newObjectif) || 0 }]
-    setComptes(updated)
-    setSelectedPredefini('Livret A')
-    setNewNomCustom('')
-    setNewSolde('')
-    setNewObjectif('')
-    setShowAdd(false)
+    setSelectedPredefini('Livret A'); setNewNomCustom(''); setNewSolde(''); setNewObjectif(''); setShowAdd(false)
     await saveComptes(updated)
   }
 
   const handleVirementChange = async (i, field, value) => {
     const updated = [...virements]
     updated[i] = { ...updated[i], [field]: value }
-    setVirements(updated)
     await saveVirements(updated)
   }
 
@@ -266,24 +216,25 @@ export default function Portefeuille() {
     const updated = [...virements]
     const nowChecked = !isCheckedCeMois(updated[i])
     updated[i] = { ...updated[i], checked: nowChecked, checked_date: nowChecked ? new Date().toISOString().split('T')[0] : null }
-    setVirements(updated)
     await saveVirements(updated)
   }
 
   const inputStyle = { padding: '5px 8px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgCard, color: t.text, width: '100%' }
   const tousCoches = virements.length > 0 && virements.every(v => isCheckedCeMois(v))
 
+  if (isLoading) return (
+    <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <Navbar page="Portefeuille" />
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: t.textMuted, fontSize: 13 }}>Chargement...</div>
+    </div>
+  )
+
   return (
     <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar page="Portefeuille" />
-
       <div style={{ padding: '16px 20px', flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
 
-        {succesEdit && (
-          <div style={{ background: '#EAF6E4', border: '0.5px solid #4CAF2E', borderRadius: 8, padding: '8px 14px', fontSize: 12, color: '#2E7D1E', fontWeight: 500 }}>
-            ✓ Compte mis à jour avec succès !
-          </div>
-        )}
+        {succesEdit && <div style={{ background: '#EAF6E4', border: '0.5px solid #4CAF2E', borderRadius: 8, padding: '8px 14px', fontSize: 12, color: '#2E7D1E', fontWeight: 500 }}>✓ Compte mis à jour avec succès !</div>}
 
         {/* 1. MATELAS DE SÉCURITÉ */}
         <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: 16 }}>
@@ -310,16 +261,8 @@ export default function Portefeuille() {
             <div style={{ fontSize: 11, color: t.textMuted }}>Dépenses fixes : <span style={{ fontWeight: 500, color: t.text }}>{depensesFixes.toLocaleString('fr-FR')} €/mois</span></div>
             <div style={{ fontSize: 13, fontWeight: 500, color: remplissageMatelas >= 100 ? '#4CAF2E' : '#E24B4A' }}>{remplissageMatelas}%{remplissageMatelas >= 100 && ' ✓'}</div>
           </div>
-          {remplissageMatelas < 100 && objectifMatelas > 0 && (
-            <div style={{ marginTop: 8, fontSize: 11, color: bleu, background: bleu + '15', padding: '6px 10px', borderRadius: 7, border: `0.5px solid ${bleu}30` }}>
-              Il vous manque <strong>{(objectifMatelas - totalSecurite).toLocaleString('fr-FR')} €</strong> pour atteindre votre objectif de {nbMoisMatelas} mois
-            </div>
-          )}
-          {remplissageMatelas >= 100 && (
-            <div style={{ marginTop: 8, fontSize: 11, color: '#2E7D1E', background: '#EAF6E4', padding: '6px 10px', borderRadius: 7 }}>
-              🎉 Votre matelas de sécurité est complet !
-            </div>
-          )}
+          {remplissageMatelas < 100 && objectifMatelas > 0 && <div style={{ marginTop: 8, fontSize: 11, color: bleu, background: bleu + '15', padding: '6px 10px', borderRadius: 7, border: `0.5px solid ${bleu}30` }}>Il vous manque <strong>{(objectifMatelas - totalSecurite).toLocaleString('fr-FR')} €</strong> pour atteindre votre objectif de {nbMoisMatelas} mois</div>}
+          {remplissageMatelas >= 100 && <div style={{ marginTop: 8, fontSize: 11, color: '#2E7D1E', background: '#EAF6E4', padding: '6px 10px', borderRadius: 7 }}>🎉 Votre matelas de sécurité est complet !</div>}
         </div>
 
         {/* 2. MES COMPTES */}
@@ -336,40 +279,26 @@ export default function Portefeuille() {
         {showAdd && (
           <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: 16 }}>
             <div style={{ fontSize: 12, fontWeight: 500, color: t.text, marginBottom: 12 }}>Nouveau compte</div>
-            {erreurAdd && (
-              <div style={{ background: '#FCEBEB', border: '0.5px solid #E24B4A', borderRadius: 8, padding: '8px 12px', fontSize: 12, color: '#E24B4A', marginBottom: 12 }}>
-                ⚠️ {erreurAdd}
-              </div>
-            )}
+            {erreurAdd && <div style={{ background: '#FCEBEB', border: '0.5px solid #E24B4A', borderRadius: 8, padding: '8px 12px', fontSize: 12, color: '#E24B4A', marginBottom: 12 }}>⚠️ {erreurAdd}</div>}
             <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1fr 1fr auto', gap: 10, alignItems: 'end' }}>
               <div>
                 <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Compte / Support</div>
                 <select value={selectedPredefini} onChange={e => setSelectedPredefini(e.target.value)} style={inputStyle}>
                   {COMPTES_PREDEFINIS.map(c => <option key={c.nom} value={c.nom}>{c.nom}</option>)}
                 </select>
-                {selectedPredefini === 'Autre' && (
-                  <input placeholder="Nom du compte *" value={newNomCustom} onChange={e => setNewNomCustom(e.target.value)} style={{ ...inputStyle, marginTop: 6 }} />
-                )}
+                {selectedPredefini === 'Autre' && <input placeholder="Nom du compte *" value={newNomCustom} onChange={e => setNewNomCustom(e.target.value)} style={{ ...inputStyle, marginTop: 6 }} />}
               </div>
               <div>
                 <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Type</div>
                 {selectedPredefini === 'Autre' ? (
-                  <select value={newTypeCustom} onChange={e => setNewTypeCustom(e.target.value)} style={inputStyle}>
-                    {Object.keys(TYPES_DISPONIBILITE).map(ty => <option key={ty} value={ty}>{ty}</option>)}
-                  </select>
-                ) : (
-                  <div style={{ padding: '6px 8px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, background: t.bgSecondary, color: t.textMuted }}>{predefiniSelectionne?.type}</div>
-                )}
+                  <select value={newTypeCustom} onChange={e => setNewTypeCustom(e.target.value)} style={inputStyle}>{Object.keys(TYPES_DISPONIBILITE).map(ty => <option key={ty} value={ty}>{ty}</option>)}</select>
+                ) : <div style={{ padding: '6px 8px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, background: t.bgSecondary, color: t.textMuted }}>{predefiniSelectionne?.type}</div>}
               </div>
               <div>
                 <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Disponibilité</div>
                 {selectedPredefini === 'Autre' ? (
-                  <select value={newDispoCustom} onChange={e => setNewDispoCustom(e.target.value)} style={inputStyle}>
-                    {['Immédiate', 'Quelques jours', 'Bloqué (5 ans)'].map(d => <option key={d} value={d}>{d}</option>)}
-                  </select>
-                ) : (
-                  <div style={{ padding: '6px 8px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, background: t.bgSecondary, color: t.textMuted }}>{predefiniSelectionne?.disponibilite}</div>
-                )}
+                  <select value={newDispoCustom} onChange={e => setNewDispoCustom(e.target.value)} style={inputStyle}>{['Immédiate', 'Quelques jours', 'Bloqué (5 ans)'].map(d => <option key={d} value={d}>{d}</option>)}</select>
+                ) : <div style={{ padding: '6px 8px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, background: t.bgSecondary, color: t.textMuted }}>{predefiniSelectionne?.disponibilite}</div>}
               </div>
               <div>
                 <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Solde actuel (€)</div>
@@ -387,11 +316,7 @@ export default function Portefeuille() {
         )}
 
         <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12 }}>
-          {erreurEdit && (
-            <div style={{ padding: '8px 14px', background: '#FCEBEB', borderBottom: '0.5px solid #E24B4A', fontSize: 12, color: '#E24B4A', borderRadius: '12px 12px 0 0' }}>
-              ⚠️ {erreurEdit}
-            </div>
-          )}
+          {erreurEdit && <div style={{ padding: '8px 14px', background: '#FCEBEB', borderBottom: '0.5px solid #E24B4A', fontSize: 12, color: '#E24B4A', borderRadius: '12px 12px 0 0' }}>⚠️ {erreurEdit}</div>}
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
             <thead>
               <tr style={{ background: t.bgSecondary }}>
@@ -408,16 +333,10 @@ export default function Portefeuille() {
                     {editingIdx === i ? (
                       <>
                         <td style={{ padding: '10px 14px', fontWeight: 500, color: t.text }}>{c.nom}</td>
-                        <td style={{ padding: '10px 14px' }}>
-                          <span style={{ fontSize: 10, fontWeight: 500, padding: '2px 8px', borderRadius: 20, background: couleurType(c.type) + '20', color: couleurType(c.type) }}>{c.type}</span>
-                        </td>
+                        <td style={{ padding: '10px 14px' }}><span style={{ fontSize: 10, fontWeight: 500, padding: '2px 8px', borderRadius: 20, background: couleurType(c.type) + '20', color: couleurType(c.type) }}>{c.type}</span></td>
                         <td style={{ padding: '10px 14px', color: t.textSecondary, fontSize: 11 }}>{c.disponibilite}</td>
-                        <td style={{ padding: '6px 8px' }}>
-                          <input type="number" min="0" value={editForm.solde} onChange={e => setEditForm({ ...editForm, solde: e.target.value })} style={{ ...inputStyle, width: 90 }} />
-                        </td>
-                        <td style={{ padding: '6px 8px' }}>
-                          <input type="number" min="0" value={editForm.objectif} onChange={e => setEditForm({ ...editForm, objectif: e.target.value })} style={{ ...inputStyle, width: 90 }} />
-                        </td>
+                        <td style={{ padding: '6px 8px' }}><input type="number" min="0" value={editForm.solde} onChange={e => setEditForm({ ...editForm, solde: e.target.value })} style={{ ...inputStyle, width: 90 }} /></td>
+                        <td style={{ padding: '6px 8px' }}><input type="number" min="0" value={editForm.objectif} onChange={e => setEditForm({ ...editForm, objectif: e.target.value })} style={{ ...inputStyle, width: 90 }} /></td>
                         <td style={{ padding: '6px 8px', color: t.textMuted }}>—</td>
                         <td style={{ padding: '6px 8px', color: t.textMuted }}>—</td>
                         <td style={{ padding: '6px 8px' }}>
@@ -430,33 +349,18 @@ export default function Portefeuille() {
                     ) : (
                       <>
                         <td style={{ padding: '10px 14px', fontWeight: 500, color: t.text }}>{c.nom}</td>
-                        <td style={{ padding: '10px 14px' }}>
-                          <span style={{ fontSize: 10, fontWeight: 500, padding: '2px 8px', borderRadius: 20, background: couleurType(c.type) + '20', color: couleurType(c.type) }}>{c.type}</span>
-                        </td>
+                        <td style={{ padding: '10px 14px' }}><span style={{ fontSize: 10, fontWeight: 500, padding: '2px 8px', borderRadius: 20, background: couleurType(c.type) + '20', color: couleurType(c.type) }}>{c.type}</span></td>
                         <td style={{ padding: '10px 14px', color: t.textSecondary, fontSize: 11 }}>{c.disponibilite}</td>
                         <td style={{ padding: '10px 14px', fontWeight: 500, color: t.text }}>{(parseFloat(c.solde) || 0).toLocaleString('fr-FR')} €</td>
                         <td style={{ padding: '10px 14px', color: t.textSecondary }}>{c.objectif > 0 ? (parseFloat(c.objectif) || 0).toLocaleString('fr-FR') + ' €' : '—'}</td>
                         <td style={{ padding: '10px 14px', fontWeight: 500, color: remplissage >= 100 ? '#4CAF2E' : t.text }}>{c.objectif > 0 ? remplissage + '%' : '—'}</td>
                         <td style={{ padding: '10px 14px', minWidth: 100 }}>
-                          {c.objectif > 0 ? (
-                            <div style={{ background: t.bgSecondary, borderRadius: 3, height: 6, overflow: 'hidden' }}>
-                              <div style={{ height: '100%', borderRadius: 3, background: remplissage >= 100 ? '#4CAF2E' : bleu, width: `${remplissage}%`, transition: 'width 0.3s' }} />
-                            </div>
-                          ) : '—'}
+                          {c.objectif > 0 ? <div style={{ background: t.bgSecondary, borderRadius: 3, height: 6, overflow: 'hidden' }}><div style={{ height: '100%', borderRadius: 3, background: remplissage >= 100 ? '#4CAF2E' : bleu, width: `${remplissage}%`, transition: 'width 0.3s' }} /></div> : '—'}
                         </td>
                         <td style={{ padding: '10px 14px' }}>
                           <div style={{ display: 'flex', gap: 4 }}>
                             <button onClick={() => handleEditStart(i)} style={{ background: t.bgSecondary, color: t.textMuted, border: `0.5px solid ${t.border}`, borderRadius: 5, padding: '2px 7px', fontSize: 10, cursor: 'pointer', fontFamily: 'inherit' }}>✏️</button>
-                            <button
-                              onClick={() => handleDelete(i)}
-                              style={{
-                                background: confirmDeleteIdx === i ? '#E24B4A' : '#FCEBEB',
-                                color: confirmDeleteIdx === i ? '#fff' : '#E24B4A',
-                                border: 'none', borderRadius: 5, padding: '2px 7px',
-                                fontSize: 10, cursor: 'pointer', fontFamily: 'inherit',
-                                whiteSpace: 'nowrap', transition: 'all 0.15s'
-                              }}
-                            >
+                            <button onClick={() => handleDelete(i)} style={{ background: confirmDeleteIdx === i ? '#E24B4A' : '#FCEBEB', color: confirmDeleteIdx === i ? '#fff' : '#E24B4A', border: 'none', borderRadius: 5, padding: '2px 7px', fontSize: 10, cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap', transition: 'all 0.15s' }}>
                               {confirmDeleteIdx === i ? 'Confirmer ?' : '×'}
                             </button>
                           </div>
@@ -475,7 +379,7 @@ export default function Portefeuille() {
           </table>
         </div>
 
-        {/* 3. RÉPARTITION DU PORTEFEUILLE */}
+        {/* 3. RÉPARTITION */}
         <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: 16 }}>
           <div style={{ fontSize: 13, fontWeight: 500, color: t.text, marginBottom: 4 }}>Répartition du portefeuille</div>
           <div style={{ fontSize: 11, color: t.textMuted, marginBottom: 16 }}>Total : {total.toLocaleString('fr-FR')} €</div>
@@ -508,25 +412,17 @@ export default function Portefeuille() {
                 ))}
               </div>
             </div>
-          ) : (
-            <div style={{ textAlign: 'center', color: t.textMuted, fontSize: 12, padding: '40px 0' }}>Ajoutez des soldes pour voir la répartition</div>
-          )}
+          ) : <div style={{ textAlign: 'center', color: t.textMuted, fontSize: 12, padding: '40px 0' }}>Ajoutez des soldes pour voir la répartition</div>}
         </div>
 
-        {/* 4. PLAN DE VIREMENT MENSUEL */}
+        {/* 4. PLAN DE VIREMENT */}
         <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, marginBottom: 20 }}>
           <div style={{ padding: '12px 16px', borderBottom: `0.5px solid ${t.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
               <div style={{ fontSize: 13, fontWeight: 500, color: t.text }}>Plan de virement mensuel</div>
-              <div style={{ fontSize: 11, color: t.textMuted, marginTop: 2 }}>
-                Basé sur votre investissable : <span style={{ fontWeight: 500, color: '#4CAF2E' }}>{investissable.toLocaleString('fr-FR')} €/mois</span>
-              </div>
+              <div style={{ fontSize: 11, color: t.textMuted, marginTop: 2 }}>Basé sur votre investissable : <span style={{ fontWeight: 500, color: '#4CAF2E' }}>{investissable.toLocaleString('fr-FR')} €/mois</span></div>
             </div>
-            {tousCoches && (
-              <div style={{ fontSize: 11, color: '#2E7D1E', background: '#EAF6E4', padding: '5px 10px', borderRadius: 7, fontWeight: 500 }}>
-                ✓ Tous les virements effectués ce mois !
-              </div>
-            )}
+            {tousCoches && <div style={{ fontSize: 11, color: '#2E7D1E', background: '#EAF6E4', padding: '5px 10px', borderRadius: 7, fontWeight: 500 }}>✓ Tous les virements effectués ce mois !</div>}
           </div>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
             <thead>
@@ -541,9 +437,7 @@ export default function Portefeuille() {
                 const coche = isCheckedCeMois(v)
                 return (
                   <tr key={i} style={{ borderBottom: `0.5px solid ${t.border}`, background: coche ? (t.dark ? 'rgba(76,175,46,0.08)' : '#F6FFF3') : 'transparent' }}>
-                    <td style={{ padding: '10px 14px' }}>
-                      <input type="checkbox" checked={coche} onChange={() => handleCheck(i)} style={{ accentColor: bleu, cursor: 'pointer', width: 14, height: 14 }} />
-                    </td>
+                    <td style={{ padding: '10px 14px' }}><input type="checkbox" checked={coche} onChange={() => handleCheck(i)} style={{ accentColor: bleu, cursor: 'pointer', width: 14, height: 14 }} /></td>
                     <td style={{ padding: '10px 14px', color: coche ? '#4CAF2E' : t.text, fontWeight: 500, textDecoration: coche ? 'line-through' : 'none' }}>{v.destination}</td>
                     <td style={{ padding: '8px 14px' }}>
                       <select value={v.compte} onChange={e => handleVirementChange(i, 'compte', e.target.value)} style={{ padding: '5px 8px', borderRadius: 6, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }}>

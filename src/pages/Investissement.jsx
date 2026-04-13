@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 import Navbar from '../components/Navbar'
 import { useTheme } from '../lib/ThemeContext'
@@ -13,13 +14,26 @@ const ENVELOPPE_LABELS = {
   'Assurance-vie': 'Assurance-vie',
 }
 
+const fetchInvestissementData = async () => {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Non connecté')
+  const [invRes, txRes, compRes] = await Promise.all([
+    supabase.from('investissements').select('*').eq('user_id', user.id).order('ticker', { ascending: true }),
+    supabase.from('transactions').select('*').eq('user_id', user.id).order('date', { ascending: false }),
+    supabase.from('comptes').select('*').eq('user_id', user.id),
+  ])
+  return {
+    user,
+    investissements: invRes.data || [],
+    transactions: txRes.data || [],
+    comptes: compRes.data || [],
+  }
+}
+
 export default function Investissement() {
   const t = useTheme()
-  const [investissements, setInvestissements] = useState([])
-  const [transactions, setTransactions] = useState([])
-  const [comptes, setComptes] = useState([])
+  const queryClient = useQueryClient()
   const [cibles, setCibles] = useState({})
-  const [user, setUser] = useState(null)
   const [showAdd, setShowAdd] = useState(false)
   const [showJournal, setShowJournal] = useState(true)
   const [loading, setLoading] = useState(false)
@@ -31,8 +45,17 @@ export default function Investissement() {
     type: 'Achat', quantite: '', prix_achat_unitaire: '', ter: '', frais_courtage: '',
   })
 
-  const bleu = t.dark ? '#3B82F6' : '#1B2E4B'
+  const { data, isLoading } = useQuery({
+    queryKey: ['investissement'],
+    queryFn: fetchInvestissementData,
+  })
 
+  const user = data?.user || null
+  const investissements = data?.investissements || []
+  const transactions = data?.transactions || []
+  const comptes = data?.comptes || []
+
+  const bleu = t.dark ? '#3B82F6' : '#1B2E4B'
   const totalInvesti = investissements.reduce((acc, i) => acc + (parseFloat(i.quantite) * parseFloat(i.pru || i.prix_achat_unitaire || 0)), 0)
   const valeurActuelle = investissements.reduce((acc, i) => acc + (parseFloat(i.quantite) * parseFloat(i.prix_actuel || i.pru || i.prix_achat_unitaire || 0)), 0)
   const plusValue = valeurActuelle - totalInvesti
@@ -43,23 +66,7 @@ export default function Investissement() {
     ...investissements.map(i => i.enveloppe)
   ])].filter(e => ENVELOPPES.includes(e))
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
-      setUser(user)
-      const { data: inv } = await supabase.from('investissements').select('*').eq('user_id', user.id).order('ticker', { ascending: true })
-      if (inv) setInvestissements(inv)
-      const { data: tx } = await supabase.from('transactions').select('*').eq('user_id', user.id).order('date', { ascending: false })
-      if (tx) setTransactions(tx)
-      const { data: comp } = await supabase.from('comptes').select('*').eq('user_id', user.id)
-      if (comp) setComptes(comp)
-    }
-    fetchData()
-  }, [])
-
   const calcValeurActuelle = (inv) => parseFloat(inv.quantite) * parseFloat(inv.prix_actuel || inv.pru || inv.prix_achat_unitaire || 0)
-  const calcPlusValue = (inv) => calcValeurActuelle(inv) - (parseFloat(inv.quantite) * parseFloat(inv.pru || inv.prix_achat_unitaire || 0))
 
   const handleTickerChange = async (val) => {
     const upper = val.toUpperCase()
@@ -67,62 +74,31 @@ export default function Investissement() {
     if (upper.length < 2) return
     const existingPos = investissements.find(i => i.ticker === upper)
     if (existingPos) {
-      setForm(prev => ({
-        ...prev, ticker: upper,
-        actif: existingPos.actif || prev.actif,
-        enveloppe: existingPos.enveloppe || prev.enveloppe,
-        type_etf: existingPos.type_etf || prev.type_etf,
-        ter: existingPos.ter?.toString() || prev.ter,
-      }))
+      setForm(prev => ({ ...prev, ticker: upper, actif: existingPos.actif || prev.actif, enveloppe: existingPos.enveloppe || prev.enveloppe, type_etf: existingPos.type_etf || prev.type_etf, ter: existingPos.ter?.toString() || prev.ter }))
       return
     }
     const { data: ref } = await supabase.from('etf_reference').select('*').eq('ticker', upper).single()
-    if (ref) {
-      setForm(prev => ({
-        ...prev, ticker: upper,
-        actif: ref.nom || prev.actif,
-        enveloppe: ref.enveloppe_defaut || prev.enveloppe,
-        ter: ref.ter?.toString() || prev.ter,
-      }))
-    }
+    if (ref) setForm(prev => ({ ...prev, ticker: upper, actif: ref.nom || prev.actif, enveloppe: ref.enveloppe_defaut || prev.enveloppe, ter: ref.ter?.toString() || prev.ter }))
   }
 
   const handleAdd = async () => {
-    if (loading) return // anti-double clic
-    if (!form.ticker || !form.quantite || !form.prix_achat_unitaire) {
-      setErreur('Veuillez remplir le ticker, la quantité et le prix unitaire.')
-      return
-    }
-    if (parseFloat(form.quantite) <= 0) {
-      setErreur('La quantité doit être supérieure à 0.')
-      return
-    }
-    if (parseFloat(form.prix_achat_unitaire) <= 0) {
-      setErreur('Le prix unitaire doit être supérieur à 0.')
-      return
-    }
-
-    setLoading(true)
-    setErreur(null)
-
+    if (loading) return
+    if (!form.ticker || !form.quantite || !form.prix_achat_unitaire) { setErreur('Veuillez remplir le ticker, la quantité et le prix unitaire.'); return }
+    if (parseFloat(form.quantite) <= 0) { setErreur('La quantité doit être supérieure à 0.'); return }
+    if (parseFloat(form.prix_achat_unitaire) <= 0) { setErreur('Le prix unitaire doit être supérieur à 0.'); return }
+    setLoading(true); setErreur(null)
     try {
       const ticker = form.ticker.toUpperCase()
       const quantite = parseFloat(form.quantite)
       const prixUnitaire = parseFloat(form.prix_achat_unitaire)
       const frais = parseFloat(form.frais_courtage) || 0
 
-      const { error: txError } = await supabase.from('transactions').insert({
-        user_id: user.id, date: form.date, ticker,
-        enveloppe: form.enveloppe, type: form.type,
-        quantite, prix_unitaire: prixUnitaire, frais_courtage: frais,
-      })
+      const { error: txError } = await supabase.from('transactions').insert({ user_id: user.id, date: form.date, ticker, enveloppe: form.enveloppe, type: form.type, quantite, prix_unitaire: prixUnitaire, frais_courtage: frais })
       if (txError) throw new Error('Erreur lors de l\'enregistrement de la transaction.')
 
-      const { data: existingPositions } = await supabase
-        .from('investissements').select('*')
-        .eq('user_id', user.id).eq('ticker', ticker).eq('enveloppe', form.enveloppe)
-
+      const { data: existingPositions } = await supabase.from('investissements').select('*').eq('user_id', user.id).eq('ticker', ticker).eq('enveloppe', form.enveloppe)
       const existing = existingPositions?.[0]
+
       if (existing) {
         const ancienneQuantite = parseFloat(existing.quantite)
         const ancienPru = parseFloat(existing.pru || existing.prix_achat_unitaire || 0)
@@ -134,31 +110,20 @@ export default function Investissement() {
           nouvelleQuantite = ancienneQuantite - quantite
           nouveauPru = ancienPru
         }
-        const updatePayload = { quantite: nouvelleQuantite, pru: Math.round(nouveauPru * 10000) / 10000 }
-        const { error: updateError } = await supabase.from('investissements').update(updatePayload).eq('id', existing.id)
-        if (updateError) throw new Error('Erreur lors de la mise à jour de la position.')
-        setInvestissements(prev => prev.map(i => i.id === existing.id ? { ...i, ...updatePayload } : i))
+        const { error } = await supabase.from('investissements').update({ quantite: nouvelleQuantite, pru: Math.round(nouveauPru * 10000) / 10000 }).eq('id', existing.id)
+        if (error) throw new Error('Erreur lors de la mise à jour de la position.')
       } else {
-        const { data: newInv, error: insertError } = await supabase.from('investissements').insert({
-          user_id: user.id, date: form.date, ticker,
-          actif: form.actif, enveloppe: form.enveloppe, type_etf: form.type_etf, type: form.type,
-          quantite, prix_achat_unitaire: prixUnitaire, pru: prixUnitaire, prix_actuel: prixUnitaire,
-          ter: parseFloat(form.ter) || 0, frais_courtage: frais,
-        }).select().single()
-        if (insertError) throw new Error('Erreur lors de la création de la position.')
-        if (newInv) setInvestissements(prev => [...prev, newInv])
+        const { error } = await supabase.from('investissements').insert({ user_id: user.id, date: form.date, ticker, actif: form.actif, enveloppe: form.enveloppe, type_etf: form.type_etf, type: form.type, quantite, prix_achat_unitaire: prixUnitaire, pru: prixUnitaire, prix_actuel: prixUnitaire, ter: parseFloat(form.ter) || 0, frais_courtage: frais })
+        if (error) throw new Error('Erreur lors de la création de la position.')
       }
 
-      const { data: tx } = await supabase.from('transactions').select('*').eq('user_id', user.id).order('date', { ascending: false })
-      if (tx) setTransactions(tx)
-
+      queryClient.invalidateQueries({ queryKey: ['investissement'] })
       setForm({ date: new Date().toISOString().split('T')[0], ticker: '', actif: '', enveloppe: 'PEA', type_etf: 'Capitalisant', type: 'Achat', quantite: '', prix_achat_unitaire: '', ter: '', frais_courtage: '' })
       setShowAdd(false)
       setSucces(true)
       setTimeout(() => setSucces(false), 3000)
-
     } catch (e) {
-      setErreur(e.message || 'Une erreur est survenue. Veuillez réessayer.')
+      setErreur(e.message || 'Une erreur est survenue.')
     } finally {
       setLoading(false)
     }
@@ -168,54 +133,44 @@ export default function Investissement() {
     try {
       const tx = transactions.find(t => t.id === id)
       if (!tx) return
-
       const { error } = await supabase.from('transactions').delete().eq('id', id)
       if (error) throw new Error('Erreur lors de la suppression.')
-
-      setTransactions(prev => prev.filter(t => t.id !== id))
 
       const transactionsRestantes = transactions.filter(t => t.id !== id && t.ticker === tx.ticker && t.enveloppe === tx.enveloppe)
 
       if (transactionsRestantes.length === 0) {
         await supabase.from('investissements').delete().eq('user_id', user.id).eq('ticker', tx.ticker).eq('enveloppe', tx.enveloppe)
-        setInvestissements(prev => prev.filter(i => !(i.ticker === tx.ticker && i.enveloppe === tx.enveloppe)))
       } else {
-        let quantiteTotale = 0
-        let coutTotal = 0
+        let quantiteTotale = 0, coutTotal = 0
         for (const t of transactionsRestantes) {
-          if (t.type === 'Achat') {
-            quantiteTotale += parseFloat(t.quantite)
-            coutTotal += parseFloat(t.quantite) * parseFloat(t.prix_unitaire)
-          } else {
-            quantiteTotale -= parseFloat(t.quantite)
-          }
+          if (t.type === 'Achat') { quantiteTotale += parseFloat(t.quantite); coutTotal += parseFloat(t.quantite) * parseFloat(t.prix_unitaire) }
+          else quantiteTotale -= parseFloat(t.quantite)
         }
         const nouveauPru = quantiteTotale > 0 ? Math.round((coutTotal / quantiteTotale) * 10000) / 10000 : 0
-        const updatePayload = { quantite: quantiteTotale, pru: nouveauPru }
-        await supabase.from('investissements').update(updatePayload).eq('user_id', user.id).eq('ticker', tx.ticker).eq('enveloppe', tx.enveloppe)
-        setInvestissements(prev => prev.map(i => i.ticker === tx.ticker && i.enveloppe === tx.enveloppe ? { ...i, ...updatePayload } : i))
+        await supabase.from('investissements').update({ quantite: quantiteTotale, pru: nouveauPru }).eq('user_id', user.id).eq('ticker', tx.ticker).eq('enveloppe', tx.enveloppe)
       }
+      queryClient.invalidateQueries({ queryKey: ['investissement'] })
     } catch (e) {
       setErreur('Erreur lors de la suppression. Veuillez réessayer.')
     }
   }
 
   const inputStyle = { padding: '5px 8px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgCard, color: t.text, width: '100%' }
-  const selectStyle = { ...inputStyle }
+
+  if (isLoading) return (
+    <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <Navbar page="Investissement" />
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: t.textMuted, fontSize: 13 }}>Chargement...</div>
+    </div>
+  )
 
   return (
     <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar page="Investissement" />
       <div style={{ padding: '16px 20px', flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
 
-        {/* MESSAGE SUCCÈS GLOBAL */}
-        {succes && (
-          <div style={{ background: '#EAF6E4', border: '0.5px solid #4CAF2E', borderRadius: 8, padding: '10px 14px', fontSize: 12, color: '#2E7D1E', fontWeight: 500 }}>
-            ✓ Transaction enregistrée avec succès !
-          </div>
-        )}
+        {succes && <div style={{ background: '#EAF6E4', border: '0.5px solid #4CAF2E', borderRadius: 8, padding: '10px 14px', fontSize: 12, color: '#2E7D1E', fontWeight: 500 }}>✓ Transaction enregistrée avec succès !</div>}
 
-        {/* 1. ALLOCATIONS PAR ENVELOPPE */}
         {enveloppesActives.length > 0 && (
           <>
             <div style={{ fontSize: 14, fontWeight: 500, color: t.text }}>Allocations par enveloppe</div>
@@ -306,7 +261,6 @@ export default function Investissement() {
           </>
         )}
 
-        {/* 2. CARTES RÉSUMÉ */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0,1fr))', gap: 10 }}>
           {[
             ['Total investi', `${Math.round(totalInvesti).toLocaleString('fr-FR')} €`, t.text],
@@ -321,7 +275,6 @@ export default function Investissement() {
           ))}
         </div>
 
-        {/* 3. JOURNAL D'INVESTISSEMENT */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ fontSize: 14, fontWeight: 500, color: t.text }}>Journal d'investissement</div>
           <div style={{ display: 'flex', gap: 8 }}>
@@ -337,26 +290,20 @@ export default function Investissement() {
         {showAdd && (
           <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: 16 }}>
             <div style={{ fontSize: 12, fontWeight: 500, color: t.text, marginBottom: 12 }}>Nouvel achat / vente</div>
-
-            {erreur && (
-              <div style={{ background: '#FCEBEB', border: '0.5px solid #E24B4A', borderRadius: 8, padding: '8px 12px', fontSize: 12, color: '#E24B4A', marginBottom: 12 }}>
-                ⚠️ {erreur}
-              </div>
-            )}
-
+            {erreur && <div style={{ background: '#FCEBEB', border: '0.5px solid #E24B4A', borderRadius: 8, padding: '8px 12px', fontSize: 12, color: '#E24B4A', marginBottom: 12 }}>⚠️ {erreur}</div>}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, minmax(0,1fr))', gap: 10, marginBottom: 10 }}>
               <div><div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Date</div><input type="date" value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} style={inputStyle} /></div>
               <div><div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Ticker *</div><input placeholder="ex: PE500" value={form.ticker} onChange={e => handleTickerChange(e.target.value)} style={inputStyle} /></div>
               <div><div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Actif</div><input placeholder="ex: Amundi PEA S&P 500" value={form.actif} onChange={e => setForm({ ...form, actif: e.target.value })} style={inputStyle} /></div>
               <div>
                 <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Enveloppe</div>
-                <select value={form.enveloppe} onChange={e => setForm({ ...form, enveloppe: e.target.value })} style={selectStyle}>
+                <select value={form.enveloppe} onChange={e => setForm({ ...form, enveloppe: e.target.value })} style={inputStyle}>
                   {ENVELOPPES.map(e => <option key={e} value={e}>{e}</option>)}
                 </select>
               </div>
               <div>
                 <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Type d'ETF</div>
-                <select value={form.type_etf} onChange={e => setForm({ ...form, type_etf: e.target.value })} style={selectStyle}>
+                <select value={form.type_etf} onChange={e => setForm({ ...form, type_etf: e.target.value })} style={inputStyle}>
                   {TYPES_ETF.map(e => <option key={e} value={e}>{e}</option>)}
                 </select>
               </div>
@@ -364,7 +311,7 @@ export default function Investissement() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, minmax(0,1fr))', gap: 10, marginBottom: 12 }}>
               <div>
                 <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Type</div>
-                <select value={form.type} onChange={e => setForm({ ...form, type: e.target.value })} style={selectStyle}>
+                <select value={form.type} onChange={e => setForm({ ...form, type: e.target.value })} style={inputStyle}>
                   {TYPES.map(e => <option key={e} value={e}>{e}</option>)}
                 </select>
               </div>
@@ -428,7 +375,6 @@ export default function Investissement() {
             </div>
           )
         )}
-
       </div>
     </div>
   )
