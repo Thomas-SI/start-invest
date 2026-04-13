@@ -60,6 +60,7 @@ export default function Portefeuille() {
   const [erreurAdd, setErreurAdd] = useState(null)
   const [erreurEdit, setErreurEdit] = useState(null)
   const [succesEdit, setSuccesEdit] = useState(false)
+  const [confirmDeleteIdx, setConfirmDeleteIdx] = useState(null)
 
   const total = comptes.reduce((acc, c) => acc + (parseFloat(c.solde) || 0), 0)
   const totalSecurite = comptes.filter(c => c.type === 'sécurité').reduce((acc, c) => acc + (parseFloat(c.solde) || 0), 0)
@@ -214,18 +215,22 @@ export default function Portefeuille() {
 
   const handleDelete = async (i) => {
     if (saving) return
-    const updated = comptes.filter((_, j) => j !== i)
-    setComptes(updated)
-    await saveComptes(updated)
+    if (confirmDeleteIdx === i) {
+      const updated = comptes.filter((_, j) => j !== i)
+      setComptes(updated)
+      setConfirmDeleteIdx(null)
+      await saveComptes(updated)
+    } else {
+      setConfirmDeleteIdx(i)
+      setTimeout(() => setConfirmDeleteIdx(null), 3000)
+    }
   }
 
   const handleAdd = async () => {
     if (saving) return
     setErreurAdd(null)
-
     const isAutre = selectedPredefini === 'Autre'
     const nom = isAutre ? newNomCustom.trim() : selectedPredefini
-
     if (!nom) {
       setErreurAdd('Veuillez saisir un nom pour le compte.')
       return
@@ -238,7 +243,6 @@ export default function Portefeuille() {
       setErreurAdd('Le solde ne peut pas être négatif.')
       return
     }
-
     const type = isAutre ? newTypeCustom : predefiniSelectionne.type
     const disponibilite = isAutre ? newDispoCustom : predefiniSelectionne.disponibilite
     const updated = [...comptes, { nom, type, disponibilite, solde: parseFloat(newSolde) || 0, objectif: parseFloat(newObjectif) || 0 }]
@@ -275,7 +279,6 @@ export default function Portefeuille() {
 
       <div style={{ padding: '16px 20px', flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
 
-        {/* MESSAGE SUCCÈS */}
         {succesEdit && (
           <div style={{ background: '#EAF6E4', border: '0.5px solid #4CAF2E', borderRadius: 8, padding: '8px 14px', fontSize: 12, color: '#2E7D1E', fontWeight: 500 }}>
             ✓ Compte mis à jour avec succès !
@@ -333,13 +336,11 @@ export default function Portefeuille() {
         {showAdd && (
           <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: 16 }}>
             <div style={{ fontSize: 12, fontWeight: 500, color: t.text, marginBottom: 12 }}>Nouveau compte</div>
-
             {erreurAdd && (
               <div style={{ background: '#FCEBEB', border: '0.5px solid #E24B4A', borderRadius: 8, padding: '8px 12px', fontSize: 12, color: '#E24B4A', marginBottom: 12 }}>
                 ⚠️ {erreurAdd}
               </div>
             )}
-
             <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1fr 1fr auto', gap: 10, alignItems: 'end' }}>
               <div>
                 <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Compte / Support</div>
@@ -446,7 +447,18 @@ export default function Portefeuille() {
                         <td style={{ padding: '10px 14px' }}>
                           <div style={{ display: 'flex', gap: 4 }}>
                             <button onClick={() => handleEditStart(i)} style={{ background: t.bgSecondary, color: t.textMuted, border: `0.5px solid ${t.border}`, borderRadius: 5, padding: '2px 7px', fontSize: 10, cursor: 'pointer', fontFamily: 'inherit' }}>✏️</button>
-                            <button onClick={() => handleDelete(i)} style={{ background: '#FCEBEB', color: '#E24B4A', border: 'none', borderRadius: 5, padding: '2px 7px', fontSize: 10, cursor: 'pointer', fontFamily: 'inherit' }}>×</button>
+                            <button
+                              onClick={() => handleDelete(i)}
+                              style={{
+                                background: confirmDeleteIdx === i ? '#E24B4A' : '#FCEBEB',
+                                color: confirmDeleteIdx === i ? '#fff' : '#E24B4A',
+                                border: 'none', borderRadius: 5, padding: '2px 7px',
+                                fontSize: 10, cursor: 'pointer', fontFamily: 'inherit',
+                                whiteSpace: 'nowrap', transition: 'all 0.15s'
+                              }}
+                            >
+                              {confirmDeleteIdx === i ? 'Confirmer ?' : '×'}
+                            </button>
                           </div>
                         </td>
                       </>
