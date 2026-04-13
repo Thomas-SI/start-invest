@@ -33,7 +33,6 @@ const fetchInvestissementData = async () => {
 export default function Investissement() {
   const t = useTheme()
   const queryClient = useQueryClient()
-  const [cibles, setCibles] = useState({})
   const [showAdd, setShowAdd] = useState(false)
   const [showJournal, setShowJournal] = useState(true)
   const [loading, setLoading] = useState(false)
@@ -81,6 +80,12 @@ export default function Investissement() {
     if (ref) setForm(prev => ({ ...prev, ticker: upper, actif: ref.nom || prev.actif, enveloppe: ref.enveloppe_defaut || prev.enveloppe, ter: ref.ter?.toString() || prev.ter }))
   }
 
+  const handleCibleChange = async (inv, value) => {
+    const cible = parseFloat(value) || 0
+    await supabase.from('investissements').update({ cible }).eq('id', inv.id)
+    queryClient.invalidateQueries({ queryKey: ['investissement'] })
+  }
+
   const handleAdd = async () => {
     if (loading) return
     if (!form.ticker || !form.quantite || !form.prix_achat_unitaire) { setErreur('Veuillez remplir le ticker, la quantité et le prix unitaire.'); return }
@@ -113,7 +118,7 @@ export default function Investissement() {
         const { error } = await supabase.from('investissements').update({ quantite: nouvelleQuantite, pru: Math.round(nouveauPru * 10000) / 10000 }).eq('id', existing.id)
         if (error) throw new Error('Erreur lors de la mise à jour de la position.')
       } else {
-        const { error } = await supabase.from('investissements').insert({ user_id: user.id, date: form.date, ticker, actif: form.actif, enveloppe: form.enveloppe, type_etf: form.type_etf, type: form.type, quantite, prix_achat_unitaire: prixUnitaire, pru: prixUnitaire, prix_actuel: prixUnitaire, ter: parseFloat(form.ter) || 0, frais_courtage: frais })
+        const { error } = await supabase.from('investissements').insert({ user_id: user.id, date: form.date, ticker, actif: form.actif, enveloppe: form.enveloppe, type_etf: form.type_etf, type: form.type, quantite, prix_achat_unitaire: prixUnitaire, pru: prixUnitaire, prix_actuel: prixUnitaire, ter: parseFloat(form.ter) || 0, frais_courtage: frais, cible: 0 })
         if (error) throw new Error('Erreur lors de la création de la position.')
       }
 
@@ -135,9 +140,7 @@ export default function Investissement() {
       if (!tx) return
       const { error } = await supabase.from('transactions').delete().eq('id', id)
       if (error) throw new Error('Erreur lors de la suppression.')
-
       const transactionsRestantes = transactions.filter(t => t.id !== id && t.ticker === tx.ticker && t.enveloppe === tx.enveloppe)
-
       if (transactionsRestantes.length === 0) {
         await supabase.from('investissements').delete().eq('user_id', user.id).eq('ticker', tx.ticker).eq('enveloppe', tx.enveloppe)
       } else {
@@ -171,6 +174,7 @@ export default function Investissement() {
 
         {succes && <div style={{ background: '#EAF6E4', border: '0.5px solid #4CAF2E', borderRadius: 8, padding: '10px 14px', fontSize: 12, color: '#2E7D1E', fontWeight: 500 }}>✓ Transaction enregistrée avec succès !</div>}
 
+        {/* ALLOCATIONS PAR ENVELOPPE */}
         {enveloppesActives.length > 0 && (
           <>
             <div style={{ fontSize: 14, fontWeight: 500, color: t.text }}>Allocations par enveloppe</div>
@@ -181,7 +185,7 @@ export default function Investissement() {
                 const totalInvestiEnv = lignes.reduce((acc, i) => acc + parseFloat(i.quantite) * parseFloat(i.pru || i.prix_achat_unitaire || 0), 0)
                 const plusValueEnv = totalEnv - totalInvestiEnv
                 const nbPositionsEnv = lignes.length
-                const totalCible = Object.entries(cibles).filter(([k]) => k.startsWith(env + '-')).reduce((a, [, v]) => a + v, 0)
+                const totalCible = lignes.reduce((a, i) => a + (parseFloat(i.cible) || 0), 0)
                 return (
                   <div key={env} style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, overflow: 'hidden' }}>
                     <div style={{ padding: '10px 16px', borderBottom: `0.5px solid ${t.border}`, background: t.bgSecondary, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -205,8 +209,7 @@ export default function Investissement() {
                               {lignes.map((inv) => {
                                 const valAct = calcValeurActuelle(inv)
                                 const pctActuel = totalEnv > 0 ? Math.round((valAct / totalEnv) * 100) : 0
-                                const cibleKey = `${env}-${inv.ticker}`
-                                const pctCible = cibles[cibleKey] || 0
+                                const pctCible = parseFloat(inv.cible) || 0
                                 const prixActuel = parseFloat(inv.prix_actuel) || parseFloat(inv.pru || inv.prix_achat_unitaire || 0)
                                 const diff = pctCible > 0 ? Math.round((pctCible - pctActuel) / 100 * totalEnv / prixActuel) : 0
                                 return (
@@ -219,7 +222,12 @@ export default function Investissement() {
                                     <td style={{ padding: '10px 14px', color: t.text }}>{pctActuel}%</td>
                                     <td style={{ padding: '10px 14px' }}>
                                       <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                                        <input type="number" min="0" max="100" placeholder="0" value={cibles[cibleKey] || ''} onChange={e => setCibles(prev => ({ ...prev, [cibleKey]: parseFloat(e.target.value) || 0 }))} style={{ width: 60, padding: '4px 6px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text, textAlign: 'right' }} />
+                                        <input
+                                          type="number" min="0" max="100" placeholder="0"
+                                          defaultValue={pctCible || ''}
+                                          onBlur={e => handleCibleChange(inv, e.target.value)}
+                                          style={{ width: 60, padding: '4px 6px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text, textAlign: 'right' }}
+                                        />
                                         <span style={{ fontSize: 11, color: t.textMuted }}>%</span>
                                       </div>
                                     </td>
@@ -244,7 +252,7 @@ export default function Investissement() {
                         {[
                           ['Total investi', `${Math.round(totalInvestiEnv).toLocaleString('fr-FR')} €`, t.text],
                           ['Valeur actuelle', `${Math.round(totalEnv).toLocaleString('fr-FR')} €`, '#4CAF2E'],
-                          ["Plus-value (l'attente)", `${plusValueEnv >= 0 ? '+' : ''}${Math.round(plusValueEnv).toLocaleString('fr-FR')} €`, plusValueEnv >= 0 ? '#4CAF2E' : '#E24B4A'],
+                          ["Plus-value", `${plusValueEnv >= 0 ? '+' : ''}${Math.round(plusValueEnv).toLocaleString('fr-FR')} €`, plusValueEnv >= 0 ? '#4CAF2E' : '#E24B4A'],
                           ['Nb positions', nbPositionsEnv.toString(), bleu],
                         ].map(([l, v, c], idx) => (
                           <div key={l} style={{ padding: '16px', borderBottom: idx < 2 ? `0.5px solid ${t.border}` : 'none', borderRight: idx % 2 === 0 ? `0.5px solid ${t.border}` : 'none', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
@@ -261,11 +269,12 @@ export default function Investissement() {
           </>
         )}
 
+        {/* CARTES RÉSUMÉ */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0,1fr))', gap: 10 }}>
           {[
             ['Total investi', `${Math.round(totalInvesti).toLocaleString('fr-FR')} €`, t.text],
             ['Valeur actuelle', `${Math.round(valeurActuelle).toLocaleString('fr-FR')} €`, '#4CAF2E'],
-            ["Plus-value (l'attente)", `${plusValue >= 0 ? '+' : ''}${Math.round(plusValue).toLocaleString('fr-FR')} €`, plusValue >= 0 ? '#4CAF2E' : '#E24B4A'],
+            ["Plus-value", `${plusValue >= 0 ? '+' : ''}${Math.round(plusValue).toLocaleString('fr-FR')} €`, plusValue >= 0 ? '#4CAF2E' : '#E24B4A'],
             ['Nb positions', nbPositions.toString(), bleu],
           ].map(([l, v, c]) => (
             <div key={l} style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: 16 }}>
@@ -275,6 +284,7 @@ export default function Investissement() {
           ))}
         </div>
 
+        {/* JOURNAL */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ fontSize: 14, fontWeight: 500, color: t.text }}>Journal d'investissement</div>
           <div style={{ display: 'flex', gap: 8 }}>
@@ -339,17 +349,21 @@ export default function Investissement() {
             </div>
           ) : (
             <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, overflow: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, minWidth: 800 }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, minWidth: 1000 }}>
                 <thead>
                   <tr style={{ background: t.bgSecondary }}>
-                    {['Date', 'Ticker', 'Enveloppe', 'Type', 'Quantité', 'Prix unitaire', 'Frais', 'Total', ''].map(h => (
+                    {['Date', 'Ticker', 'Enveloppe', 'Type', 'Quantité', 'Prix achat', 'Prix actuel', 'Frais', 'Coût total', 'Valeur actuelle', ''].map(h => (
                       <th key={h} style={{ padding: '8px 12px', textAlign: 'left', fontSize: 10, color: t.textMuted, fontWeight: 500, borderBottom: `0.5px solid ${t.border}`, whiteSpace: 'nowrap' }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {transactions.map((tx) => {
-                    const total = parseFloat(tx.quantite) * parseFloat(tx.prix_unitaire) + parseFloat(tx.frais_courtage || 0)
+                    const coutTotal = parseFloat(tx.quantite) * parseFloat(tx.prix_unitaire) + parseFloat(tx.frais_courtage || 0)
+                    const invPosition = investissements.find(i => i.ticker === tx.ticker && i.enveloppe === tx.enveloppe)
+                    const prixActuel = parseFloat(invPosition?.prix_actuel || tx.prix_unitaire)
+                    const valeurActuelleTx = parseFloat(tx.quantite) * prixActuel
+                    const plusValueTx = valeurActuelleTx - (parseFloat(tx.quantite) * parseFloat(tx.prix_unitaire))
                     return (
                       <tr key={tx.id} style={{ borderBottom: `0.5px solid ${t.border}` }}>
                         <td style={{ padding: '8px 12px', color: t.textSecondary, whiteSpace: 'nowrap' }}>{new Date(tx.date).toLocaleDateString('fr-FR')}</td>
@@ -362,8 +376,15 @@ export default function Investissement() {
                         </td>
                         <td style={{ padding: '8px 12px', color: t.text }}>{tx.quantite}</td>
                         <td style={{ padding: '8px 12px', color: t.text }}>{parseFloat(tx.prix_unitaire).toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €</td>
+                        <td style={{ padding: '8px 12px', color: t.text }}>{prixActuel.toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €</td>
                         <td style={{ padding: '8px 12px', color: t.textSecondary }}>{parseFloat(tx.frais_courtage || 0).toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €</td>
-                        <td style={{ padding: '8px 12px', fontWeight: 500, color: t.text }}>{Math.round(total).toLocaleString('fr-FR')} €</td>
+                        <td style={{ padding: '8px 12px', fontWeight: 500, color: t.text }}>{Math.round(coutTotal).toLocaleString('fr-FR')} €</td>
+                        <td style={{ padding: '8px 12px', fontWeight: 500, color: plusValueTx >= 0 ? '#4CAF2E' : '#E24B4A' }}>
+                          {Math.round(valeurActuelleTx).toLocaleString('fr-FR')} €
+                          <span style={{ fontSize: 10, marginLeft: 4, color: plusValueTx >= 0 ? '#4CAF2E' : '#E24B4A' }}>
+                            ({plusValueTx >= 0 ? '+' : ''}{Math.round(plusValueTx).toLocaleString('fr-FR')} €)
+                          </span>
+                        </td>
                         <td style={{ padding: '8px 12px' }}>
                           <button onClick={() => handleDeleteTransaction(tx.id)} style={{ background: '#FCEBEB', color: '#E24B4A', border: 'none', borderRadius: 5, padding: '2px 7px', fontSize: 10, cursor: 'pointer', fontFamily: 'inherit' }}>×</button>
                         </td>
