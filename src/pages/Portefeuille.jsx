@@ -57,6 +57,9 @@ export default function Portefeuille() {
   const [saving, setSaving] = useState(false)
   const [loaded, setLoaded] = useState(false)
   const [nbMoisMatelas, setNbMoisMatelas] = useState(6)
+  const [erreurAdd, setErreurAdd] = useState(null)
+  const [erreurEdit, setErreurEdit] = useState(null)
+  const [succesEdit, setSuccesEdit] = useState(false)
 
   const total = comptes.reduce((acc, c) => acc + (parseFloat(c.solde) || 0), 0)
   const totalSecurite = comptes.filter(c => c.type === 'sécurité').reduce((acc, c) => acc + (parseFloat(c.solde) || 0), 0)
@@ -73,8 +76,7 @@ export default function Portefeuille() {
 
   const isCheckedCeMois = (v) => {
     if (!v.checked || !v.checked_date) return false
-    const dateStr = v.checked_date.substring(0, 7)
-    return dateStr === moisActuelStr()
+    return v.checked_date.substring(0, 7) === moisActuelStr()
   }
 
   useEffect(() => {
@@ -140,11 +142,7 @@ export default function Portefeuille() {
         cutout: '65%',
         plugins: {
           legend: { display: false },
-          tooltip: {
-            callbacks: {
-              label: ctx => ` ${ctx.label} : ${Math.round(ctx.raw).toLocaleString('fr-FR')} € (${Math.round(ctx.raw / total * 100)}%)`
-            }
-          }
+          tooltip: { callbacks: { label: ctx => ` ${ctx.label} : ${Math.round(ctx.raw).toLocaleString('fr-FR')} € (${Math.round(ctx.raw / total * 100)}%)` } }
         }
       }
     })
@@ -154,33 +152,39 @@ export default function Portefeuille() {
   const saveComptes = async (newComptes) => {
     if (!user || !loaded) return
     setSaving(true)
-    await supabase.from('comptes').delete().eq('user_id', user.id)
-    if (newComptes.length > 0) {
-      await supabase.from('comptes').insert(newComptes.map(c => ({
-        user_id: user.id,
-        nom: c.nom,
-        type: c.type,
-        disponibilite: c.disponibilite,
-        solde: parseFloat(c.solde) || 0,
-        objectif: parseFloat(c.objectif) || 0,
-      })))
+    try {
+      await supabase.from('comptes').delete().eq('user_id', user.id)
+      if (newComptes.length > 0) {
+        const { error } = await supabase.from('comptes').insert(newComptes.map(c => ({
+          user_id: user.id,
+          nom: c.nom, type: c.type, disponibilite: c.disponibilite,
+          solde: parseFloat(c.solde) || 0,
+          objectif: parseFloat(c.objectif) || 0,
+        })))
+        if (error) throw new Error('Erreur lors de la sauvegarde.')
+      }
+    } catch (e) {
+      setErreurEdit(e.message)
+    } finally {
+      setSaving(false)
     }
-    setSaving(false)
   }
 
   const saveVirements = async (newVirements) => {
     if (!user || !loaded) return
-    await supabase.from('virements').delete().eq('user_id', user.id)
-    if (newVirements.length > 0) {
-      await supabase.from('virements').insert(newVirements.map((v, i) => ({
-        user_id: user.id,
-        destination: v.destination,
-        compte: v.compte,
-        pourcentage: parseFloat(v.pourcentage) || 0,
-        ordre: i,
-        checked: v.checked || false,
-        checked_date: v.checked_date || null,
-      })))
+    try {
+      await supabase.from('virements').delete().eq('user_id', user.id)
+      if (newVirements.length > 0) {
+        await supabase.from('virements').insert(newVirements.map((v, i) => ({
+          user_id: user.id,
+          destination: v.destination, compte: v.compte,
+          pourcentage: parseFloat(v.pourcentage) || 0,
+          ordre: i, checked: v.checked || false,
+          checked_date: v.checked_date || null,
+        })))
+      }
+    } catch (e) {
+      console.error('Erreur sauvegarde virements:', e)
     }
   }
 
@@ -189,26 +193,52 @@ export default function Portefeuille() {
   const handleEditStart = (i) => {
     setEditingIdx(i)
     setEditForm({ solde: comptes[i].solde, objectif: comptes[i].objectif })
+    setErreurEdit(null)
   }
 
   const handleEditSave = async (i) => {
+    if (saving) return
+    if (parseFloat(editForm.solde) < 0) {
+      setErreurEdit('Le solde ne peut pas être négatif.')
+      return
+    }
+    setErreurEdit(null)
     const updated = [...comptes]
     updated[i] = { ...updated[i], solde: parseFloat(editForm.solde) || 0, objectif: parseFloat(editForm.objectif) || 0 }
     setComptes(updated)
     setEditingIdx(null)
+    setSuccesEdit(true)
+    setTimeout(() => setSuccesEdit(false), 2000)
     await saveComptes(updated)
   }
 
   const handleDelete = async (i) => {
+    if (saving) return
     const updated = comptes.filter((_, j) => j !== i)
     setComptes(updated)
     await saveComptes(updated)
   }
 
   const handleAdd = async () => {
+    if (saving) return
+    setErreurAdd(null)
+
     const isAutre = selectedPredefini === 'Autre'
     const nom = isAutre ? newNomCustom.trim() : selectedPredefini
-    if (!nom) return
+
+    if (!nom) {
+      setErreurAdd('Veuillez saisir un nom pour le compte.')
+      return
+    }
+    if (comptes.find(c => c.nom.toLowerCase() === nom.toLowerCase())) {
+      setErreurAdd(`Le compte "${nom}" existe déjà.`)
+      return
+    }
+    if (parseFloat(newSolde) < 0) {
+      setErreurAdd('Le solde ne peut pas être négatif.')
+      return
+    }
+
     const type = isAutre ? newTypeCustom : predefiniSelectionne.type
     const disponibilite = isAutre ? newDispoCustom : predefiniSelectionne.disponibilite
     const updated = [...comptes, { nom, type, disponibilite, solde: parseFloat(newSolde) || 0, objectif: parseFloat(newObjectif) || 0 }]
@@ -231,11 +261,7 @@ export default function Portefeuille() {
   const handleCheck = async (i) => {
     const updated = [...virements]
     const nowChecked = !isCheckedCeMois(updated[i])
-    updated[i] = {
-      ...updated[i],
-      checked: nowChecked,
-      checked_date: nowChecked ? new Date().toISOString().split('T')[0] : null
-    }
+    updated[i] = { ...updated[i], checked: nowChecked, checked_date: nowChecked ? new Date().toISOString().split('T')[0] : null }
     setVirements(updated)
     await saveVirements(updated)
   }
@@ -249,6 +275,13 @@ export default function Portefeuille() {
 
       <div style={{ padding: '16px 20px', flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
 
+        {/* MESSAGE SUCCÈS */}
+        {succesEdit && (
+          <div style={{ background: '#EAF6E4', border: '0.5px solid #4CAF2E', borderRadius: 8, padding: '8px 14px', fontSize: 12, color: '#2E7D1E', fontWeight: 500 }}>
+            ✓ Compte mis à jour avec succès !
+          </div>
+        )}
+
         {/* 1. MATELAS DE SÉCURITÉ */}
         <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: 16 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
@@ -256,11 +289,7 @@ export default function Portefeuille() {
               <div style={{ fontSize: 13, fontWeight: 500, color: t.text }}>Matelas de sécurité</div>
               <div style={{ fontSize: 11, color: t.textMuted, marginTop: 2 }}>
                 Couvrir{' '}
-                <select
-                  value={nbMoisMatelas}
-                  onChange={e => setNbMoisMatelas(parseInt(e.target.value))}
-                  style={{ padding: '2px 6px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }}
-                >
+                <select value={nbMoisMatelas} onChange={e => setNbMoisMatelas(parseInt(e.target.value))} style={{ padding: '2px 6px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }}>
                   {[3,4,5,6,7,8,9,10,11,12].map(m => <option key={m} value={m}>{m}</option>)}
                 </select>
                 {' '}mois de dépenses fixes
@@ -275,12 +304,8 @@ export default function Portefeuille() {
             <div style={{ height: '100%', borderRadius: 4, background: remplissageMatelas >= 100 ? '#4CAF2E' : bleu, width: `${remplissageMatelas}%`, transition: 'width 0.3s' }} />
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ fontSize: 11, color: t.textMuted }}>
-              Dépenses fixes : <span style={{ fontWeight: 500, color: t.text }}>{depensesFixes.toLocaleString('fr-FR')} €/mois</span>
-            </div>
-            <div style={{ fontSize: 13, fontWeight: 500, color: remplissageMatelas >= 100 ? '#4CAF2E' : '#E24B4A' }}>
-              {remplissageMatelas}%{remplissageMatelas >= 100 && ' ✓'}
-            </div>
+            <div style={{ fontSize: 11, color: t.textMuted }}>Dépenses fixes : <span style={{ fontWeight: 500, color: t.text }}>{depensesFixes.toLocaleString('fr-FR')} €/mois</span></div>
+            <div style={{ fontSize: 13, fontWeight: 500, color: remplissageMatelas >= 100 ? '#4CAF2E' : '#E24B4A' }}>{remplissageMatelas}%{remplissageMatelas >= 100 && ' ✓'}</div>
           </div>
           {remplissageMatelas < 100 && objectifMatelas > 0 && (
             <div style={{ marginTop: 8, fontSize: 11, color: bleu, background: bleu + '15', padding: '6px 10px', borderRadius: 7, border: `0.5px solid ${bleu}30` }}>
@@ -299,7 +324,7 @@ export default function Portefeuille() {
           <div>
             <div style={{ fontSize: 14, fontWeight: 500, color: t.text }}>Mes comptes</div>
             <div style={{ fontSize: 12, color: t.textMuted, marginTop: 2 }}>Total : <span style={{ fontWeight: 500, color: t.text }}>{total.toLocaleString('fr-FR')} €</span></div>
-            <button onClick={() => setShowAdd(v => !v)} style={{ marginTop: 8, background: '#4CAF2E', color: '#fff', fontSize: 12, fontWeight: 500, padding: '7px 14px', borderRadius: 8, border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
+            <button onClick={() => { setShowAdd(v => !v); setErreurAdd(null) }} style={{ marginTop: 8, background: '#4CAF2E', color: '#fff', fontSize: 12, fontWeight: 500, padding: '7px 14px', borderRadius: 8, border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
               {showAdd ? '− Fermer' : '+ Ajouter un compte'}
             </button>
           </div>
@@ -308,6 +333,13 @@ export default function Portefeuille() {
         {showAdd && (
           <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: 16 }}>
             <div style={{ fontSize: 12, fontWeight: 500, color: t.text, marginBottom: 12 }}>Nouveau compte</div>
+
+            {erreurAdd && (
+              <div style={{ background: '#FCEBEB', border: '0.5px solid #E24B4A', borderRadius: 8, padding: '8px 12px', fontSize: 12, color: '#E24B4A', marginBottom: 12 }}>
+                ⚠️ {erreurAdd}
+              </div>
+            )}
+
             <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1fr 1fr auto', gap: 10, alignItems: 'end' }}>
               <div>
                 <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Compte / Support</div>
@@ -315,7 +347,7 @@ export default function Portefeuille() {
                   {COMPTES_PREDEFINIS.map(c => <option key={c.nom} value={c.nom}>{c.nom}</option>)}
                 </select>
                 {selectedPredefini === 'Autre' && (
-                  <input placeholder="Nom du compte" value={newNomCustom} onChange={e => setNewNomCustom(e.target.value)} style={{ ...inputStyle, marginTop: 6 }} />
+                  <input placeholder="Nom du compte *" value={newNomCustom} onChange={e => setNewNomCustom(e.target.value)} style={{ ...inputStyle, marginTop: 6 }} />
                 )}
               </div>
               <div>
@@ -325,9 +357,7 @@ export default function Portefeuille() {
                     {Object.keys(TYPES_DISPONIBILITE).map(ty => <option key={ty} value={ty}>{ty}</option>)}
                   </select>
                 ) : (
-                  <div style={{ padding: '6px 8px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, background: t.bgSecondary, color: t.textMuted }}>
-                    {predefiniSelectionne?.type}
-                  </div>
+                  <div style={{ padding: '6px 8px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, background: t.bgSecondary, color: t.textMuted }}>{predefiniSelectionne?.type}</div>
                 )}
               </div>
               <div>
@@ -337,20 +367,18 @@ export default function Portefeuille() {
                     {['Immédiate', 'Quelques jours', 'Bloqué (5 ans)'].map(d => <option key={d} value={d}>{d}</option>)}
                   </select>
                 ) : (
-                  <div style={{ padding: '6px 8px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, background: t.bgSecondary, color: t.textMuted }}>
-                    {predefiniSelectionne?.disponibilite}
-                  </div>
+                  <div style={{ padding: '6px 8px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, background: t.bgSecondary, color: t.textMuted }}>{predefiniSelectionne?.disponibilite}</div>
                 )}
               </div>
               <div>
                 <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Solde actuel (€)</div>
-                <input type="number" placeholder="0" value={newSolde} onChange={e => setNewSolde(e.target.value)} style={inputStyle} />
+                <input type="number" min="0" placeholder="0" value={newSolde} onChange={e => setNewSolde(e.target.value)} style={inputStyle} />
               </div>
               <div>
                 <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Objectif (€)</div>
-                <input type="number" placeholder="0" value={newObjectif} onChange={e => setNewObjectif(e.target.value)} style={inputStyle} />
+                <input type="number" min="0" placeholder="0" value={newObjectif} onChange={e => setNewObjectif(e.target.value)} style={inputStyle} />
               </div>
-              <button onClick={handleAdd} style={{ background: '#4CAF2E', color: '#fff', fontSize: 11, fontWeight: 500, padding: '7px 12px', borderRadius: 7, border: 'none', cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>
+              <button onClick={handleAdd} disabled={saving} style={{ background: saving ? '#9CA3AF' : '#4CAF2E', color: '#fff', fontSize: 11, fontWeight: 500, padding: '7px 12px', borderRadius: 7, border: 'none', cursor: saving ? 'not-allowed' : 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>
                 {saving ? '...' : 'Ajouter'}
               </button>
             </div>
@@ -358,6 +386,11 @@ export default function Portefeuille() {
         )}
 
         <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12 }}>
+          {erreurEdit && (
+            <div style={{ padding: '8px 14px', background: '#FCEBEB', borderBottom: '0.5px solid #E24B4A', fontSize: 12, color: '#E24B4A', borderRadius: '12px 12px 0 0' }}>
+              ⚠️ {erreurEdit}
+            </div>
+          )}
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
             <thead>
               <tr style={{ background: t.bgSecondary }}>
@@ -379,17 +412,17 @@ export default function Portefeuille() {
                         </td>
                         <td style={{ padding: '10px 14px', color: t.textSecondary, fontSize: 11 }}>{c.disponibilite}</td>
                         <td style={{ padding: '6px 8px' }}>
-                          <input type="number" value={editForm.solde} onChange={e => setEditForm({ ...editForm, solde: e.target.value })} style={{ ...inputStyle, width: 90 }} />
+                          <input type="number" min="0" value={editForm.solde} onChange={e => setEditForm({ ...editForm, solde: e.target.value })} style={{ ...inputStyle, width: 90 }} />
                         </td>
                         <td style={{ padding: '6px 8px' }}>
-                          <input type="number" value={editForm.objectif} onChange={e => setEditForm({ ...editForm, objectif: e.target.value })} style={{ ...inputStyle, width: 90 }} />
+                          <input type="number" min="0" value={editForm.objectif} onChange={e => setEditForm({ ...editForm, objectif: e.target.value })} style={{ ...inputStyle, width: 90 }} />
                         </td>
                         <td style={{ padding: '6px 8px', color: t.textMuted }}>—</td>
                         <td style={{ padding: '6px 8px', color: t.textMuted }}>—</td>
                         <td style={{ padding: '6px 8px' }}>
                           <div style={{ display: 'flex', gap: 4 }}>
-                            <button onClick={() => handleEditSave(i)} style={{ background: '#EAF6E4', color: '#2E7D1E', border: 'none', borderRadius: 5, padding: '2px 7px', fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>✓</button>
-                            <button onClick={() => setEditingIdx(null)} style={{ background: t.bgSecondary, color: t.textMuted, border: `0.5px solid ${t.border}`, borderRadius: 5, padding: '2px 7px', fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>✕</button>
+                            <button onClick={() => handleEditSave(i)} disabled={saving} style={{ background: '#EAF6E4', color: '#2E7D1E', border: 'none', borderRadius: 5, padding: '2px 7px', fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>✓</button>
+                            <button onClick={() => { setEditingIdx(null); setErreurEdit(null) }} style={{ background: t.bgSecondary, color: t.textMuted, border: `0.5px solid ${t.border}`, borderRadius: 5, padding: '2px 7px', fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>✕</button>
                           </div>
                         </td>
                       </>
@@ -464,9 +497,7 @@ export default function Portefeuille() {
               </div>
             </div>
           ) : (
-            <div style={{ textAlign: 'center', color: t.textMuted, fontSize: 12, padding: '40px 0' }}>
-              Ajoutez des soldes pour voir la répartition
-            </div>
+            <div style={{ textAlign: 'center', color: t.textMuted, fontSize: 12, padding: '40px 0' }}>Ajoutez des soldes pour voir la répartition</div>
           )}
         </div>
 
@@ -499,50 +530,28 @@ export default function Portefeuille() {
                 return (
                   <tr key={i} style={{ borderBottom: `0.5px solid ${t.border}`, background: coche ? (t.dark ? 'rgba(76,175,46,0.08)' : '#F6FFF3') : 'transparent' }}>
                     <td style={{ padding: '10px 14px' }}>
-                      <input
-                        type="checkbox"
-                        checked={coche}
-                        onChange={() => handleCheck(i)}
-                        style={{ accentColor: bleu, cursor: 'pointer', width: 14, height: 14 }}
-                      />
+                      <input type="checkbox" checked={coche} onChange={() => handleCheck(i)} style={{ accentColor: bleu, cursor: 'pointer', width: 14, height: 14 }} />
                     </td>
                     <td style={{ padding: '10px 14px', color: coche ? '#4CAF2E' : t.text, fontWeight: 500, textDecoration: coche ? 'line-through' : 'none' }}>{v.destination}</td>
                     <td style={{ padding: '8px 14px' }}>
-                      <select
-                        value={v.compte}
-                        onChange={e => handleVirementChange(i, 'compte', e.target.value)}
-                        style={{ padding: '5px 8px', borderRadius: 6, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }}
-                      >
+                      <select value={v.compte} onChange={e => handleVirementChange(i, 'compte', e.target.value)} style={{ padding: '5px 8px', borderRadius: 6, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }}>
                         {comptes.map(c => <option key={c.nom} value={c.nom}>{c.nom}</option>)}
                       </select>
                     </td>
                     <td style={{ padding: '8px 14px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                        <input
-                          type="number"
-                          min="0"
-                          max="100"
-                          value={v.pourcentage}
-                          onChange={e => handleVirementChange(i, 'pourcentage', parseFloat(e.target.value) || 0)}
-                          style={{ width: 60, padding: '5px 8px', borderRadius: 6, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text, textAlign: 'right' }}
-                        />
+                        <input type="number" min="0" max="100" value={v.pourcentage} onChange={e => handleVirementChange(i, 'pourcentage', parseFloat(e.target.value) || 0)} style={{ width: 60, padding: '5px 8px', borderRadius: 6, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text, textAlign: 'right' }} />
                         <span style={{ fontSize: 11, color: t.textMuted }}>%</span>
                       </div>
                     </td>
-                    <td style={{ padding: '10px 14px', fontWeight: 500, color: '#4CAF2E' }}>
-                      {Math.round(investissable * v.pourcentage / 100).toLocaleString('fr-FR')} €
-                    </td>
+                    <td style={{ padding: '10px 14px', fontWeight: 500, color: '#4CAF2E' }}>{Math.round(investissable * v.pourcentage / 100).toLocaleString('fr-FR')} €</td>
                   </tr>
                 )
               })}
               <tr style={{ background: t.bgSecondary, borderTop: `0.5px solid ${t.border}` }}>
                 <td colSpan={3} style={{ padding: '10px 14px', fontWeight: 500, color: t.text, fontSize: 11 }}>TOTAL</td>
-                <td style={{ padding: '10px 14px', fontWeight: 500, color: totalPourcentage === 100 ? '#4CAF2E' : '#E24B4A' }}>
-                  {totalPourcentage}%
-                </td>
-                <td style={{ padding: '10px 14px', fontWeight: 500, color: t.text }}>
-                  {Math.round(investissable).toLocaleString('fr-FR')} €
-                </td>
+                <td style={{ padding: '10px 14px', fontWeight: 500, color: totalPourcentage === 100 ? '#4CAF2E' : '#E24B4A' }}>{totalPourcentage}%</td>
+                <td style={{ padding: '10px 14px', fontWeight: 500, color: t.text }}>{Math.round(investissable).toLocaleString('fr-FR')} €</td>
               </tr>
             </tbody>
           </table>
