@@ -14,11 +14,13 @@ export default function Compte() {
   const [metier, setMetier] = useState('')
   const [loading, setLoading] = useState(false)
   const [succes, setSucces] = useState(false)
+  const [erreur, setErreur] = useState(null)
   const [showAPropos, setShowAPropos] = useState(false)
   const [showSupprimer, setShowSupprimer] = useState(false)
   const [confirmSupprimer, setConfirmSupprimer] = useState('')
   const [photoUrl, setPhotoUrl] = useState(null)
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
+  const [erreurPhoto, setErreurPhoto] = useState(null)
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -36,26 +38,47 @@ export default function Compte() {
   }, [])
 
   const handleSave = async () => {
+    if (loading) return
+    if (!prenom.trim() && !nom.trim()) {
+      setErreur('Veuillez saisir au moins un prénom ou un nom.')
+      return
+    }
     setLoading(true)
-    await supabase.auth.updateUser({ data: { prenom, nom, metier } })
-    setSucces(true)
-    setTimeout(() => setSucces(false), 3000)
-    setLoading(false)
+    setErreur(null)
+    try {
+      const { error } = await supabase.auth.updateUser({ data: { prenom, nom, metier } })
+      if (error) throw new Error('Erreur lors de la sauvegarde.')
+      setSucces(true)
+      setTimeout(() => setSucces(false), 3000)
+    } catch (e) {
+      setErreur(e.message || 'Une erreur est survenue.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handlePhotoUpload = async (e) => {
     const file = e.target.files[0]
     if (!file || !user) return
+    if (file.size > 2 * 1024 * 1024) {
+      setErreurPhoto('La photo ne doit pas dépasser 2 Mo.')
+      return
+    }
     setUploadingPhoto(true)
-    const ext = file.name.split('.').pop()
-    const path = `${user.id}/avatar.${ext}`
-    const { error } = await supabase.storage.from('avatars').upload(path, file, { upsert: true })
-    if (!error) {
+    setErreurPhoto(null)
+    try {
+      const ext = file.name.split('.').pop()
+      const path = `${user.id}/avatar.${ext}`
+      const { error } = await supabase.storage.from('avatars').upload(path, file, { upsert: true })
+      if (error) throw new Error('Erreur lors de l\'upload de la photo.')
       const { data } = supabase.storage.from('avatars').getPublicUrl(path)
       setPhotoUrl(data.publicUrl)
       await supabase.auth.updateUser({ data: { photo_url: data.publicUrl } })
+    } catch (e) {
+      setErreurPhoto(e.message || 'Erreur lors de l\'upload.')
+    } finally {
+      setUploadingPhoto(false)
     }
-    setUploadingPhoto(false)
   }
 
   const handleDeleteAccount = async () => {
@@ -86,7 +109,9 @@ export default function Compte() {
                 <div style={{ width: 60, height: 60, borderRadius: '50%', background: '#E8F5E1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, fontWeight: 500, color: '#2E7D1E', overflow: 'hidden' }}>
                   {photoUrl ? <img src={photoUrl} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : initiale}
                 </div>
-                {uploadingPhoto && <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: '#fff' }}>...</div>}
+                {uploadingPhoto && (
+                  <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: '#fff' }}>...</div>
+                )}
                 <input type="file" accept="image/*" onChange={handlePhotoUpload} style={{ display: 'none' }} />
               </label>
               <div>
@@ -100,9 +125,22 @@ export default function Compte() {
             </button>
           </div>
 
+          {erreurPhoto && (
+            <div style={{ background: '#FCEBEB', border: '0.5px solid #E24B4A', borderRadius: 8, padding: '8px 12px', fontSize: 12, color: '#E24B4A', marginBottom: 12 }}>
+              ⚠️ {erreurPhoto}
+            </div>
+          )}
+
           {/* INFORMATIONS PERSONNELLES */}
           <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 14, padding: 20, marginBottom: 12 }}>
             <div style={{ fontSize: 13, fontWeight: 500, color: t.text, marginBottom: 16 }}>Informations personnelles</div>
+
+            {erreur && (
+              <div style={{ background: '#FCEBEB', border: '0.5px solid #E24B4A', borderRadius: 8, padding: '8px 12px', fontSize: 12, color: '#E24B4A', marginBottom: 12 }}>
+                ⚠️ {erreur}
+              </div>
+            )}
+
             <div style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 11, color: t.textMuted, marginBottom: 4 }}>Prénom</div>
@@ -121,9 +159,13 @@ export default function Compte() {
               <div style={{ fontSize: 11, color: t.textMuted, marginBottom: 4 }}>Description / Métier</div>
               <input value={metier} onChange={e => setMetier(e.target.value)} placeholder="ex: Ingénieur, Étudiant, Entrepreneur..." style={inputStyle} />
             </div>
-            {succes && <div style={{ fontSize: 12, color: '#4CAF2E', marginBottom: 12 }}>✓ Informations sauvegardées !</div>}
-            <button onClick={handleSave} disabled={loading} style={{ background: '#4CAF2E', color: '#fff', fontSize: 13, fontWeight: 500, padding: '10px 20px', borderRadius: 9, border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
-              {loading ? 'Sauvegarde...' : 'Sauvegarder'}
+            {succes && (
+              <div style={{ fontSize: 12, color: '#2E7D1E', background: '#EAF6E4', padding: '8px 12px', borderRadius: 8, marginBottom: 12 }}>
+                ✓ Informations sauvegardées !
+              </div>
+            )}
+            <button onClick={handleSave} disabled={loading} style={{ background: loading ? '#9CA3AF' : '#4CAF2E', color: '#fff', fontSize: 13, fontWeight: 500, padding: '10px 20px', borderRadius: 9, border: 'none', cursor: loading ? 'not-allowed' : 'pointer', fontFamily: 'inherit' }}>
+              {loading ? '⏳ Sauvegarde...' : 'Sauvegarder'}
             </button>
           </div>
 
