@@ -20,22 +20,6 @@ const GRADES_METRONOME = [
   { slug: 'metronome-platine', mois: 18, niveau: 'Platine', niveauColor: '#185FA5', niveauBg: '#E6F1FB' },
 ]
 
-const MetronomeIcon = ({ size = 28, color = '#854F0B' }) => (
-  <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
-    <circle cx="16" cy="4.5" r="2.5" fill={color}/>
-    <rect x="13" y="8" width="5" height="6" rx="1.5" fill={color} opacity="0.5"/>
-    <line x1="16" y1="8" x2="16" y2="17" stroke={color} strokeWidth="2" strokeLinecap="round"/>
-    <line x1="16" y1="10" x2="11" y2="14" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
-    <line x1="16" y1="10" x2="20" y2="13" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
-    <line x1="16" y1="17" x2="20" y2="24" stroke={color} strokeWidth="2" strokeLinecap="round"/>
-    <line x1="16" y1="17" x2="12" y2="23" stroke={color} strokeWidth="2" strokeLinecap="round"/>
-    <line x1="20" y1="24" x2="23" y2="24" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
-    <line x1="12" y1="23" x2="9" y2="24" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
-    <line x1="11" y1="14" x2="8" y2="27" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
-    <line x1="9" y1="13" x2="12" y2="13" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
-  </svg>
-)
-
 const ACCOMPLISSEMENTS = [
   {
     slug: 'premier-pas',
@@ -54,7 +38,7 @@ const ACCOMPLISSEMENTS = [
   {
     slug: 'metronome',
     nom: 'Le Métronome',
-    svgIcon: true,
+    emoji: '🧗',
     message: 'La magie des intérêts composés adore ta régularité. Continue !',
     quete: 'Investir régulièrement chaque mois',
     evolutif: true,
@@ -253,23 +237,17 @@ export default function Challenge() {
     </div>
   )
 
-  const BadgeIcon = ({ acc, size = 28, color }) => {
-    if (acc.svgIcon) return <MetronomeIcon size={size} color={color || '#854F0B'} />
-    return <span style={{ fontSize: size }}>{acc.emoji}</span>
-  }
-
   const BadgeCard = ({ acc, obtenu }) => {
     const gradeActuel = obtenu ? getGradeActuel(acc) : null
     const prochain = getProchainGrade(acc)
     const prog = getProgression(acc)
     const pct = prog ? Math.min(Math.round((prog.current / prog.total) * 100), 100) : 0
     const estMaxLevel = obtenu && acc.evolutif && !prochain
-    const iconColor = gradeActuel ? gradeActuel.niveauColor : '#4CAF2E'
 
     return (
       <div style={{ background: obtenu ? (t.dark ? '#0F1F0F' : '#F6FFF3') : t.bgCard, border: `0.5px solid ${obtenu ? '#4CAF2E' : t.border}`, borderRadius: 12, padding: 14, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 6 }}>
-        <div style={{ width: 60, height: 60, borderRadius: '50%', background: obtenu ? (gradeActuel ? gradeActuel.niveauBg : '#EAF6E4') : t.bgSecondary, display: 'flex', alignItems: 'center', justifyContent: 'center', border: obtenu ? `2px solid ${gradeActuel ? gradeActuel.niveauColor : '#4CAF2E'}` : `1.5px dashed ${t.border}` }}>
-          {obtenu ? <BadgeIcon acc={acc} size={28} color={iconColor} /> : <span style={{ fontSize: 22, color: t.textMuted }}>?</span>}
+        <div style={{ width: 60, height: 60, borderRadius: '50%', background: obtenu ? (gradeActuel ? gradeActuel.niveauBg : '#EAF6E4') : t.bgSecondary, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, border: obtenu ? `2px solid ${gradeActuel ? gradeActuel.niveauColor : '#4CAF2E'}` : `1.5px dashed ${t.border}` }}>
+          {obtenu ? acc.emoji : <span style={{ fontSize: 22, color: t.textMuted }}>?</span>}
         </div>
         <div style={{ fontSize: 12, fontWeight: 500, color: obtenu ? t.text : t.textMuted, lineHeight: 1.3 }}>{acc.nom}</div>
         {obtenu && gradeActuel && <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 20, fontWeight: 500, background: gradeActuel.niveauBg, color: gradeActuel.niveauColor }}>{gradeActuel.niveau}</span>}
