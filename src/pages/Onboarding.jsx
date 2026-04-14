@@ -56,11 +56,11 @@ function AnimationWelcome() {
         @keyframes float { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-10px) } }
         @keyframes fadeIn { from { opacity:0; transform:translateY(10px) } to { opacity:1; transform:translateY(0) } }
       `}</style>
-      <div style={{ textAlign: 'center', animation: 'float 3s ease-in-out infinite' }}>
-        <div style={{ fontSize: 64, marginBottom: 16, animation: 'pulse 2s ease-in-out infinite' }}>📊</div>
+      <div style={{ textAlign: 'center', animationName: 'float', animationDuration: '3s', animationTimingFunction: 'ease-in-out', animationIterationCount: 'infinite' }}>
+        <div style={{ fontSize: 64, marginBottom: 16, animationName: 'pulse', animationDuration: '2s', animationTimingFunction: 'ease-in-out', animationIterationCount: 'infinite' }}>📊</div>
         <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
           {['Finances', 'ETF', 'Croissance', 'DCA'].map((l, i) => (
-            <div key={l} style={{ background: i % 2 === 0 ? '#EAF6E4' : '#E8EEF6', color: i % 2 === 0 ? '#2E7D1E' : '#1B2E4B', fontSize: 11, fontWeight: 500, padding: '4px 10px', borderRadius: 20, animation: `fadeIn 0.5s ease ${i * 0.15}s both` }}>
+            <div key={l} style={{ background: i % 2 === 0 ? '#EAF6E4' : '#E8EEF6', color: i % 2 === 0 ? '#2E7D1E' : '#1B2E4B', fontSize: 11, fontWeight: 500, padding: '4px 10px', borderRadius: 20, animationName: 'fadeIn', animationDuration: '0.5s', animationTimingFunction: 'ease', animationDelay: `${i * 0.15}s`, animationFillMode: 'both' }}>
               {l}
             </div>
           ))}
@@ -74,8 +74,7 @@ function AnimationFinances() {
   return (
     <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
       <style>{`
-        @keyframes growBar { from { width: 0 } to { width: var(--w) } }
-        @keyframes countUp { from { opacity:0 } to { opacity:1 } }
+        @keyframes growBar { from { width: 0 } to { width: 100% } }
       `}</style>
       <div style={{ width: '100%', maxWidth: 280 }}>
         <div style={{ fontSize: 11, fontWeight: 500, color: '#9CA3AF', marginBottom: 12, textAlign: 'center' }}>Règle 50 / 30 / 20</div>
@@ -90,7 +89,7 @@ function AnimationFinances() {
               <span style={{ fontWeight: 600, color }}>{pct}%</span>
             </div>
             <div style={{ background: '#F0F0F0', borderRadius: 4, height: 8, overflow: 'hidden' }}>
-              <div style={{ height: '100%', borderRadius: 4, background: color, '--w': w, animation: `growBar 1s ease ${i * 0.3}s both` } as any} />
+              <div style={{ height: '100%', borderRadius: 4, background: color, width: w, animationName: 'growBar', animationDuration: '1s', animationTimingFunction: 'ease', animationDelay: `${i * 0.3}s`, animationFillMode: 'both' }} />
             </div>
           </div>
         ))}
@@ -107,22 +106,22 @@ function AnimationPortefeuille() {
   return (
     <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
       <style>{`
-        @keyframes fillBar { from { width:0 } to { width: var(--w) } }
+        @keyframes fillBar { from { width: 0 } to { width: 100% } }
         @keyframes slideIn { from { opacity:0; transform:translateX(-10px) } to { opacity:1; transform:translateX(0) } }
       `}</style>
       <div style={{ width: '100%', maxWidth: 280 }}>
         {[
-          { nom: 'Livret A', solde: '8 200 €', pct: 82, color: '#4CAF2E', w: '82%', delay: '0s' },
-          { nom: 'PEA', solde: '15 400 €', pct: 100, color: '#1B2E4B', w: '100%', delay: '0.2s' },
-          { nom: 'CTO', solde: '6 800 €', pct: 68, color: '#3B82F6', w: '68%', delay: '0.4s' },
-        ].map(({ nom, solde, pct, color, w, delay }) => (
-          <div key={nom} style={{ marginBottom: 12, animation: `slideIn 0.5s ease ${delay} both` }}>
+          { nom: 'Livret A', solde: '8 200 €', color: '#4CAF2E', w: '82%', delay: '0s' },
+          { nom: 'PEA', solde: '15 400 €', color: '#1B2E4B', w: '100%', delay: '0.2s' },
+          { nom: 'CTO', solde: '6 800 €', color: '#3B82F6', w: '68%', delay: '0.4s' },
+        ].map(({ nom, solde, color, w, delay }) => (
+          <div key={nom} style={{ marginBottom: 12, animationName: 'slideIn', animationDuration: '0.5s', animationTimingFunction: 'ease', animationDelay: delay, animationFillMode: 'both' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 4 }}>
               <span style={{ fontWeight: 500, color: '#1B2E4B' }}>{nom}</span>
               <span style={{ color: '#6B7280' }}>{solde}</span>
             </div>
             <div style={{ background: '#F0F0F0', borderRadius: 4, height: 6, overflow: 'hidden' }}>
-              <div style={{ height: '100%', borderRadius: 4, background: color, '--w': w, animation: `fillBar 1s ease ${delay} both` } as any} />
+              <div style={{ height: '100%', borderRadius: 4, background: color, width: w, animationName: 'fillBar', animationDuration: '1s', animationTimingFunction: 'ease', animationDelay: delay, animationFillMode: 'both' }} />
             </div>
           </div>
         ))}
@@ -150,7 +149,7 @@ function AnimationInvestissement() {
             { label: 'Plus-value', val: '+2 420 €', color: '#4CAF2E' },
             { label: 'Positions', val: '4', color: '#3B82F6' },
           ].map(({ label, val, color }, i) => (
-            <div key={label} style={{ background: '#F4F7F5', borderRadius: 8, padding: '8px 10px', animation: `popIn 0.4s ease ${i * 0.1}s both` }}>
+            <div key={label} style={{ background: '#F4F7F5', borderRadius: 8, padding: '8px 10px', animationName: 'popIn', animationDuration: '0.4s', animationTimingFunction: 'ease', animationDelay: `${i * 0.1}s`, animationFillMode: 'both' }}>
               <div style={{ fontSize: 9, color: '#9CA3AF', marginBottom: 4 }}>{label}</div>
               <div style={{ fontSize: 13, fontWeight: 700, color }}>{val}</div>
             </div>
@@ -162,7 +161,7 @@ function AnimationInvestissement() {
             { ticker: 'VUAA', enveloppe: 'CTO', val: '4 180 €', pv: '+12.1%', color: '#4CAF2E' },
             { ticker: 'VFEA', enveloppe: 'CTO', val: '2 400 €', pv: '-2.3%', color: '#E24B4A' },
           ].map(({ ticker, enveloppe, val, pv, color }, i) => (
-            <div key={ticker} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '7px 10px', borderBottom: '0.5px solid #E0EAE3', animation: `slideUp 0.4s ease ${0.4 + i * 0.1}s both` }}>
+            <div key={ticker} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '7px 10px', borderBottom: '0.5px solid #E0EAE3', animationName: 'slideUp', animationDuration: '0.4s', animationTimingFunction: 'ease', animationDelay: `${0.4 + i * 0.1}s`, animationFillMode: 'both' }}>
               <div>
                 <div style={{ fontSize: 11, fontWeight: 600, color: '#1B2E4B' }}>{ticker}</div>
                 <div style={{ fontSize: 9, color: '#9CA3AF' }}>{enveloppe}</div>
@@ -191,7 +190,7 @@ function AnimationConcentration() {
           { titre: 'Ne timer jamais le marché', cat: 'Mindset', color: '#EAF6E4', text: '#2E7D1E', delay: '0.2s' },
           { titre: 'Les frais, l\'ennemi silencieux', cat: 'Technique', color: '#EBE9FC', text: '#3C3489', delay: '0.4s' },
         ].map(({ titre, cat, color, text, delay }) => (
-          <div key={titre} style={{ background: '#F4F7F5', borderRadius: 10, padding: '10px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', animation: `fadeSlide 0.5s ease ${delay} both` }}>
+          <div key={titre} style={{ background: '#F4F7F5', borderRadius: 10, padding: '10px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', animationName: 'fadeSlide', animationDuration: '0.5s', animationTimingFunction: 'ease', animationDelay: delay, animationFillMode: 'both' }}>
             <span style={{ fontSize: 11, fontWeight: 500, color: '#1B2E4B', flex: 1, marginRight: 8 }}>{titre}</span>
             <span style={{ fontSize: 9, padding: '2px 7px', borderRadius: 20, background: color, color: text, whiteSpace: 'nowrap' }}>{cat}</span>
           </div>
@@ -208,10 +207,10 @@ function AnimationReady() {
         @keyframes rocket { 0% { transform: translateY(0) rotate(-45deg) } 50% { transform: translateY(-20px) rotate(-45deg) } 100% { transform: translateY(0) rotate(-45deg) } }
         @keyframes sparkle { 0%,100% { opacity:0; transform:scale(0) } 50% { opacity:1; transform:scale(1) } }
       `}</style>
-      <div style={{ fontSize: 64, animation: 'rocket 1.5s ease-in-out infinite' }}>🚀</div>
+      <div style={{ fontSize: 64, animationName: 'rocket', animationDuration: '1.5s', animationTimingFunction: 'ease-in-out', animationIterationCount: 'infinite' }}>🚀</div>
       <div style={{ display: 'flex', gap: 12 }}>
         {['⭐', '✨', '🌟'].map((s, i) => (
-          <div key={i} style={{ fontSize: 24, animation: `sparkle 1.5s ease ${i * 0.3}s infinite` }}>{s}</div>
+          <div key={i} style={{ fontSize: 24, animationName: 'sparkle', animationDuration: '1.5s', animationTimingFunction: 'ease', animationDelay: `${i * 0.3}s`, animationIterationCount: 'infinite' }}>{s}</div>
         ))}
       </div>
     </div>
@@ -261,25 +260,16 @@ function TourApp({ onTerminer }) {
 
           {/* BOUTONS */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <button
-              onClick={onTerminer}
-              style={{ fontSize: 12, color: '#9CA3AF', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}
-            >
+            <button onClick={onTerminer} style={{ fontSize: 12, color: '#9CA3AF', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
               Passer le tour
             </button>
             <div style={{ display: 'flex', gap: 8 }}>
               {etape > 0 && (
-                <button
-                  onClick={() => setEtape(e => e - 1)}
-                  style={{ padding: '9px 18px', borderRadius: 9, border: '0.5px solid #E0EAE3', background: '#F4F7F5', fontSize: 13, color: '#6B7280', cursor: 'pointer', fontFamily: 'inherit' }}
-                >
+                <button onClick={() => setEtape(e => e - 1)} style={{ padding: '9px 18px', borderRadius: 9, border: '0.5px solid #E0EAE3', background: '#F4F7F5', fontSize: 13, color: '#6B7280', cursor: 'pointer', fontFamily: 'inherit' }}>
                   ← Retour
                 </button>
               )}
-              <button
-                onClick={() => etape < ETAPES.length - 1 ? setEtape(e => e + 1) : onTerminer()}
-                style={{ padding: '9px 22px', borderRadius: 9, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}
-              >
+              <button onClick={() => etape < ETAPES.length - 1 ? setEtape(e => e + 1) : onTerminer()} style={{ padding: '9px 22px', borderRadius: 9, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
                 {etape < ETAPES.length - 1 ? 'Suivant →' : 'Commencer !'}
               </button>
             </div>
@@ -326,7 +316,7 @@ export default function Onboarding() {
     navigate('/dashboard')
   }
 
-  const inputStyle = { width: '100%', padding: '12px 14px', borderRadius: 10, border: `0.5px solid ${t.border}`, fontSize: 14, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text, boxSizing: 'border-box' as 'border-box' }
+  const inputStyle = { width: '100%', padding: '12px 14px', borderRadius: 10, border: `0.5px solid ${t.border}`, fontSize: 14, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text, boxSizing: 'border-box' }
 
   return (
     <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
