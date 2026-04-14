@@ -1,5 +1,22 @@
 import { useNavigate } from 'react-router-dom'
 
+const MetronomeIcon = ({ size = 28, color = '#854F0B' }) => (
+  <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
+    <circle cx="13" cy="6" r="2.5" fill={color}/>
+    <line x1="13" y1="8.5" x2="11" y2="14" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
+    <line x1="11" y1="14" x2="14" y2="19" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
+    <line x1="14" y1="19" x2="12" y2="25" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
+    <line x1="11" y1="14" x2="7" y2="16" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
+    <line x1="7" y1="16" x2="5" y2="14" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
+    <line x1="14" y1="19" x2="18" y2="22" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
+    <line x1="9" y1="12" x2="13" y2="11" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
+    <line x1="5" y1="14" x2="3" y2="18" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
+    <line x1="18" y1="22" x2="17" y2="26" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
+    <line x1="22" y1="10" x2="26" y2="6" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
+    <line x1="24" y1="8" x2="27" y2="11" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
+  </svg>
+)
+
 export default function Accueil() {
   const navigate = useNavigate()
 
@@ -83,7 +100,7 @@ export default function Accueil() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
 
           <div style={{ background: '#fff', borderRadius: 16, border: '0.5px solid #E0EAE3', overflow: 'hidden' }}>
-            <div style={{ background: '#F4F7F5', padding: '28px 24px', height: 200, display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div style={{ background: '#F4F7F5', padding: '28px 24px', minHeight: 200, display: 'flex', flexDirection: 'column', gap: 8 }}>
               {[
                 { label: 'Revenus', val: '3 200 €', color: '#4CAF2E', w: '80%' },
                 { label: 'Dépenses fixes', val: '1 100 €', color: '#1B2E4B', w: '45%' },
@@ -111,7 +128,7 @@ export default function Accueil() {
           </div>
 
           <div style={{ background: '#fff', borderRadius: 16, border: '0.5px solid #E0EAE3', overflow: 'hidden' }}>
-            <div style={{ background: '#F4F7F5', padding: '28px 24px', height: 200, display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div style={{ background: '#F4F7F5', padding: '28px 24px', minHeight: 200, display: 'flex', flexDirection: 'column', gap: 8 }}>
               {[
                 { ticker: 'PE500', enveloppe: 'PEA', pv: '+18.4%', color: '#4CAF2E' },
                 { ticker: 'VUAA', enveloppe: 'CTO', pv: '+22.1%', color: '#4CAF2E' },
@@ -134,7 +151,7 @@ export default function Accueil() {
           </div>
 
           <div style={{ background: '#fff', borderRadius: 16, border: '0.5px solid #E0EAE3', overflow: 'hidden' }}>
-            <div style={{ background: '#F4F7F5', padding: '28px 24px', height: 200, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <div style={{ background: '#F4F7F5', padding: '28px 24px', minHeight: 200, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               <svg width="100%" height="130" viewBox="0 0 260 130">
                 <defs>
                   <linearGradient id="pfill" x1="0" y1="0" x2="0" y2="1">
@@ -164,6 +181,7 @@ export default function Accueil() {
               <div style={{ fontSize: 13, color: '#9CA3AF', lineHeight: 1.6 }}>Découvrez les performances atteignables selon vos données.</div>
             </div>
           </div>
+
         </div>
 
         {/* BOUTON GO */}
@@ -189,7 +207,6 @@ export default function Accueil() {
             </p>
           </div>
 
-          {/* 3 BADGES CHALLENGES */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
 
             <div style={{ background: 'rgba(255,255,255,0.06)', border: '0.5px solid rgba(255,255,255,0.1)', borderRadius: 16, padding: '24px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 12 }}>
@@ -200,6 +217,18 @@ export default function Accueil() {
             </div>
 
             <div style={{ background: 'rgba(255,255,255,0.06)', border: '0.5px solid rgba(255,255,255,0.1)', borderRadius: 16, padding: '24px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 12 }}>
+              <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#FFF8DC', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #854F0B' }}>
+                <MetronomeIcon size={32} color="#854F0B" />
+              </div>
+              <div style={{ fontSize: 15, fontWeight: 600, color: '#fff' }}>Le Métronome</div>
+              <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, background: '#FFF0DC', color: '#854F0B', fontWeight: 500 }}>Bronze — 3 mois</span>
+              <div style={{ width: '100%', background: 'rgba(255,255,255,0.1)', borderRadius: 4, height: 5, overflow: 'hidden' }}>
+                <div style={{ height: '100%', borderRadius: 4, background: '#854F0B', width: '50%' }} />
+              </div>
+              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>3 / 6 mois → Argent</div>
+            </div>
+
+            <div style={{ background: 'rgba(255,255,255,0.06)', border: '0.5px solid rgba(255,255,255,0.1)', borderRadius: 16, padding: '24px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 12 }}>
               <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#FFF8DC', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, border: '2px solid #854F0B' }}>💰</div>
               <div style={{ fontSize: 15, fontWeight: 600, color: '#fff' }}>Cap des X€</div>
               <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, background: '#FFF8DC', color: '#633806', fontWeight: 500 }}>Or — 1 000 €</span>
@@ -207,16 +236,6 @@ export default function Accueil() {
                 <div style={{ height: '100%', borderRadius: 4, background: '#BA7517', width: '60%' }} />
               </div>
               <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>1 200 / 2 000 € → Platine</div>
-            </div>
-
-            <div style={{ background: 'rgba(255,255,255,0.06)', border: '0.5px solid rgba(255,255,255,0.1)', borderRadius: 16, padding: '24px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 12 }}>
-              <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#FFF0DC', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, border: '2px solid #854F0B' }}>🎵</div>
-              <div style={{ fontSize: 15, fontWeight: 600, color: '#fff' }}>Le Métronome</div>
-              <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, background: '#FFF0DC', color: '#854F0B', fontWeight: 500 }}>Bronze — 3 mois</span>
-              <div style={{ width: '100%', background: 'rgba(255,255,255,0.1)', borderRadius: 4, height: 5, overflow: 'hidden' }}>
-                <div style={{ height: '100%', borderRadius: 4, background: '#854F0B', width: '50%' }} />
-              </div>
-              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>3 / 6 mois → Argent</div>
             </div>
 
           </div>
@@ -245,15 +264,11 @@ export default function Accueil() {
         <div style={{ maxWidth: 400, margin: '0 auto' }}>
           <div style={{ fontSize: 14, fontWeight: 500, color: '#1B2E4B', marginBottom: 28 }}>Vous pouvez me rejoindre sur :</div>
           <div style={{ width: 100, height: 100, borderRadius: '50%', overflow: 'hidden', margin: '0 auto 24px', border: '3px solid #E0EAE3' }}>
-            <img
-              src="https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/IMG_2914.jpeg"
-              alt="StartInvest"
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            />
+            <img src="https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/IMG_2914.jpeg" alt="StartInvest" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center' }}>
             <a href="https://instagram.com/startinvest.fr" target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 20px', borderRadius: 10, border: '0.5px solid #E0EAE3', background: '#F4F7F5', textDecoration: 'none', width: 240 }}>
-              <div style={{ width: 28, height: 28, borderRadius: 8, background: 'linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ width: 28, height: 28, borderRadius: 8, background: 'linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
                   <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
                 </svg>
@@ -264,7 +279,7 @@ export default function Accueil() {
               </div>
             </a>
             <a href="https://tiktok.com/@startinvest.fr" target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 20px', borderRadius: 10, border: '0.5px solid #E0EAE3', background: '#F4F7F5', textDecoration: 'none', width: 240 }}>
-              <div style={{ width: 28, height: 28, borderRadius: 8, background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ width: 28, height: 28, borderRadius: 8, background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
                   <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.75a4.85 4.85 0 01-1.01-.06z"/>
                 </svg>

@@ -20,6 +20,23 @@ const GRADES_METRONOME = [
   { slug: 'metronome-platine', mois: 18, niveau: 'Platine', niveauColor: '#185FA5', niveauBg: '#E6F1FB' },
 ]
 
+const MetronomeIcon = ({ size = 28, color = '#854F0B' }) => (
+  <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
+    <circle cx="13" cy="6" r="2.5" fill={color}/>
+    <line x1="13" y1="8.5" x2="11" y2="14" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
+    <line x1="11" y1="14" x2="14" y2="19" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
+    <line x1="14" y1="19" x2="12" y2="25" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
+    <line x1="11" y1="14" x2="7" y2="16" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
+    <line x1="7" y1="16" x2="5" y2="14" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
+    <line x1="14" y1="19" x2="18" y2="22" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
+    <line x1="9" y1="12" x2="13" y2="11" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
+    <line x1="5" y1="14" x2="3" y2="18" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
+    <line x1="18" y1="22" x2="17" y2="26" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
+    <line x1="22" y1="10" x2="26" y2="6" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
+    <line x1="24" y1="8" x2="27" y2="11" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
+  </svg>
+)
+
 const ACCOMPLISSEMENTS = [
   {
     slug: 'premier-pas',
@@ -38,7 +55,7 @@ const ACCOMPLISSEMENTS = [
   {
     slug: 'metronome',
     nom: 'Le Métronome',
-    emoji: '🎵',
+    svgIcon: true,
     message: 'La magie des intérêts composés adore ta régularité. Continue !',
     quete: 'Investir régulièrement chaque mois',
     evolutif: true,
@@ -118,16 +135,10 @@ const checkAndGrant = async (user, investissements, transactions, accomplissemen
   const ventes = transactions.filter(t => t.type === 'Vente')
   const streak = calcStreak(transactions)
 
-  // Premier Pas
   if (!slugsObtenus.has('premier-pas')) toInsert.push({ user_id: user.id, slug: 'premier-pas' })
-
-  // Le Grand Saut
   if (!slugsObtenus.has('grand-saut') && achats.length > 0) toInsert.push({ user_id: user.id, slug: 'grand-saut' })
-
-  // L'Architecte
   if (!slugsObtenus.has('architecte') && nbEtfDifferents >= 3) toInsert.push({ user_id: user.id, slug: 'architecte' })
 
-  // Main de Fer
   if (!slugsObtenus.has('main-de-fer') && ventes.length === 0 && achats.length > 0) {
     const firstAchat = new Date(achats[0].date)
     const now = new Date()
@@ -135,30 +146,19 @@ const checkAndGrant = async (user, investissements, transactions, accomplissemen
     if (mois >= 6) toInsert.push({ user_id: user.id, slug: 'main-de-fer' })
   }
 
-  // Métronome — badge évolutif (on met à jour le niveau)
   const gradeMetronome = [...GRADES_METRONOME].reverse().find(g => streak >= g.mois)
   if (gradeMetronome) {
     const existing = accomplissements.find(a => a.slug === 'metronome')
-    if (!existing) {
-      toInsert.push({ user_id: user.id, slug: 'metronome', niveau: gradeMetronome.niveau })
-    } else if (existing.niveau !== gradeMetronome.niveau) {
-      toUpdate.push({ id: existing.id, niveau: gradeMetronome.niveau })
-    }
+    if (!existing) toInsert.push({ user_id: user.id, slug: 'metronome', niveau: gradeMetronome.niveau })
+    else if (existing.niveau !== gradeMetronome.niveau) toUpdate.push({ id: existing.id, niveau: gradeMetronome.niveau })
   }
 
-  // Cap des X€ — badge évolutif
   const gradeCap = [...GRADES_CAP].reverse().find(g => totalInvesti >= g.palier)
   if (gradeCap) {
     const existing = accomplissements.find(a => a.slug === 'cap')
-    if (!existing) {
-      toInsert.push({ user_id: user.id, slug: 'cap', niveau: gradeCap.niveau })
-    } else if (existing.niveau !== gradeCap.niveau) {
-      toUpdate.push({ id: existing.id, niveau: gradeCap.niveau })
-    }
+    if (!existing) toInsert.push({ user_id: user.id, slug: 'cap', niveau: gradeCap.niveau })
+    else if (existing.niveau !== gradeCap.niveau) toUpdate.push({ id: existing.id, niveau: gradeCap.niveau })
   }
-
-  // Vroum Vroum — à implémenter côté abonnement
-  // if (!slugsObtenus.has('vroum-vroum') && isPremium) toInsert.push(...)
 
   if (toInsert.length > 0) await supabase.from('accomplissements').insert(toInsert)
   for (const u of toUpdate) await supabase.from('accomplissements').update({ niveau: u.niveau }).eq('id', u.id)
@@ -255,29 +255,28 @@ export default function Challenge() {
     </div>
   )
 
+  const BadgeIcon = ({ acc, size = 28, color }) => {
+    if (acc.svgIcon) return <MetronomeIcon size={size} color={color || '#854F0B'} />
+    return <span style={{ fontSize: size }}>{acc.emoji}</span>
+  }
+
   const BadgeCard = ({ acc, obtenu }) => {
     const gradeActuel = obtenu ? getGradeActuel(acc) : null
     const prochain = getProchainGrade(acc)
     const prog = getProgression(acc)
     const pct = prog ? Math.min(Math.round((prog.current / prog.total) * 100), 100) : 0
     const estMaxLevel = obtenu && acc.evolutif && !prochain
+    const iconColor = gradeActuel ? gradeActuel.niveauColor : '#854F0B'
 
     return (
       <div style={{ background: obtenu ? (t.dark ? '#0F1F0F' : '#F6FFF3') : t.bgCard, border: `0.5px solid ${obtenu ? '#4CAF2E' : t.border}`, borderRadius: 12, padding: 14, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 6 }}>
-        <div style={{ width: 60, height: 60, borderRadius: '50%', background: obtenu ? (gradeActuel ? gradeActuel.niveauBg : '#EAF6E4') : t.bgSecondary, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, border: obtenu ? `2px solid ${gradeActuel ? gradeActuel.niveauColor : '#4CAF2E'}` : `1.5px dashed ${t.border}` }}>
-          {obtenu ? acc.emoji : <span style={{ fontSize: 22, color: t.textMuted }}>?</span>}
+        <div style={{ width: 60, height: 60, borderRadius: '50%', background: obtenu ? (gradeActuel ? gradeActuel.niveauBg : '#EAF6E4') : t.bgSecondary, display: 'flex', alignItems: 'center', justifyContent: 'center', border: obtenu ? `2px solid ${gradeActuel ? gradeActuel.niveauColor : '#4CAF2E'}` : `1.5px dashed ${t.border}` }}>
+          {obtenu ? <BadgeIcon acc={acc} size={28} color={iconColor} /> : <span style={{ fontSize: 22, color: t.textMuted }}>?</span>}
         </div>
         <div style={{ fontSize: 12, fontWeight: 500, color: obtenu ? t.text : t.textMuted, lineHeight: 1.3 }}>{acc.nom}</div>
-
-        {obtenu && gradeActuel && (
-          <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 20, fontWeight: 500, background: gradeActuel.niveauBg, color: gradeActuel.niveauColor }}>{gradeActuel.niveau}</span>
-        )}
-        {obtenu && !gradeActuel && (
-          <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 20, fontWeight: 500, background: '#EAF6E4', color: '#27500A' }}>Obtenu</span>
-        )}
-
+        {obtenu && gradeActuel && <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 20, fontWeight: 500, background: gradeActuel.niveauBg, color: gradeActuel.niveauColor }}>{gradeActuel.niveau}</span>}
+        {obtenu && !gradeActuel && <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 20, fontWeight: 500, background: '#EAF6E4', color: '#27500A' }}>Obtenu</span>}
         {obtenu && <div style={{ fontSize: 11, color: t.textSecondary, lineHeight: 1.4 }}>{acc.message}</div>}
-
         {obtenu && acc.evolutif && prochain && prog && (
           <>
             <div style={{ fontSize: 10, color: t.textMuted, marginTop: 2 }}>Prochain : <span style={{ fontWeight: 500, color: prochain.niveauColor }}>{prochain.niveau}</span></div>
@@ -289,11 +288,7 @@ export default function Challenge() {
             </div>
           </>
         )}
-
-        {obtenu && acc.evolutif && estMaxLevel && (
-          <div style={{ fontSize: 10, color: '#993556', background: '#FBEAF0', padding: '3px 8px', borderRadius: 20, fontWeight: 500 }}>Niveau max !</div>
-        )}
-
+        {obtenu && acc.evolutif && estMaxLevel && <div style={{ fontSize: 10, color: '#993556', background: '#FBEAF0', padding: '3px 8px', borderRadius: 20, fontWeight: 500 }}>Niveau max !</div>}
         {!obtenu && prog && (
           <>
             <div style={{ fontSize: 10, color: t.textMuted }}>{acc.quete}</div>
@@ -305,9 +300,7 @@ export default function Challenge() {
             </div>
           </>
         )}
-        {!obtenu && !prog && (
-          <div style={{ fontSize: 10, color: t.textMuted }}>{acc.quete}</div>
-        )}
+        {!obtenu && !prog && <div style={{ fontSize: 10, color: t.textMuted }}>{acc.quete}</div>}
       </div>
     )
   }
