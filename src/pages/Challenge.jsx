@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 import Navbar from '../components/Navbar'
@@ -11,7 +11,6 @@ const ACCOMPLISSEMENTS = [
     emoji: '🌱',
     message: 'Bienvenue chez Start Invest.',
     quete: 'S\'inscrire sur StartInvest',
-    auto: true,
   },
   {
     slug: 'grand-saut',
@@ -19,7 +18,6 @@ const ACCOMPLISSEMENTS = [
     emoji: '🚀',
     message: 'Tu n\'es plus spectateur, tu es le pilote de ton futur.',
     quete: 'Acheter votre premier ETF',
-    auto: true,
   },
   {
     slug: 'metronome-bronze',
@@ -67,7 +65,6 @@ const ACCOMPLISSEMENTS = [
     emoji: '🗿',
     message: 'Le calme est une compétence.',
     quete: '6 mois sans aucune vente',
-    auto: true,
   },
   {
     slug: 'architecte',
@@ -75,7 +72,6 @@ const ACCOMPLISSEMENTS = [
     emoji: '🏗️',
     message: 'Ton patrimoine est maintenant solide et diversifié. Beau travail !',
     quete: 'Posséder 3 ETF différents',
-    auto: true,
   },
   {
     slug: 'cap-bronze',
@@ -149,7 +145,6 @@ const ACCOMPLISSEMENTS = [
     emoji: '⚡',
     message: 'Je vois déjà l\'avenir.',
     quete: 'S\'abonner à StartInvest Premium',
-    auto: true,
   },
 ]
 
@@ -169,22 +164,107 @@ const fetchChallengeData = async () => {
   }
 }
 
+const checkAndGrant = async (user, investissements, transactions, accomplissements) => {
+  const slugsObtenus = new Set(accomplissements.map(a => a.slug))
+  const toInsert = []
+
+  const totalInvesti = investissements.reduce((acc, i) => acc + parseFloat(i.quantite) * parseFloat(i.pru || i.prix_achat_unitaire || 0), 0)
+  const nbEtfDifferents = [...new Set(investissements.map(i => i.ticker))].length
+  const achats = transactions.filter(t => t.type === 'Achat')
+  const ventes = transactions.filter(t => t.type === 'Vente')
+  const moisAvecAchat = [...new Set(achats.map(t => t.date.substring(0, 7)))].sort()
+
+  // Calcul streak mensuel consécutif
+  let streak = 0
+  if (moisAvecAchat.length > 0) {
+    streak = 1
+    for (let i = moisAvecAchat.length - 1; i > 0; i--) {
+      const curr = new Date(moisAvecAchat[i] + '-01')
+      const prev = new Date(moisAvecAchat[i - 1] + '-01')
+      const diff = (curr.getFullYear() - prev.getFullYear()) * 12 + (curr.getMonth() - prev.getMonth())
+      if (diff === 1) streak++
+      else break
+    }
+  }
+
+  // Premier Pas — toujours accordé
+  if (!slugsObtenus.has('premier-pas')) {
+    toInsert.push({ user_id: user.id, slug: 'premier-pas' })
+  }
+
+  // Le Grand Saut — premier achat ETF
+  if (!slugsObtenus.has('grand-saut') && achats.length > 0) {
+    toInsert.push({ user_id: user.id, slug: 'grand-saut' })
+  }
+
+  // L'Architecte — 3 ETF différents
+  if (!slugsObtenus.has('architecte') && nbEtfDifferents >= 3) {
+    toInsert.push({ user_id: user.id, slug: 'architecte' })
+  }
+
+  // Main de Fer — 6 mois sans vente
+  if (!slugsObtenus.has('main-de-fer') && ventes.length === 0 && achats.length > 0) {
+    const firstAchat = new Date(achats[0].date)
+    const now = new Date()
+    const mois = (now.getFullYear() - firstAchat.getFullYear()) * 12 + (now.getMonth() - firstAchat.getMonth())
+    if (mois >= 6) toInsert.push({ user_id: user.id, slug: 'main-de-fer' })
+  }
+
+  // Métronome — streak consécutif
+  if (!slugsObtenus.has('metronome-bronze') && streak >= 3) toInsert.push({ user_id: user.id, slug: 'metronome-bronze' })
+  if (!slugsObtenus.has('metronome-argent') && streak >= 6) toInsert.push({ user_id: user.id, slug: 'metronome-argent' })
+  if (!slugsObtenus.has('metronome-or') && streak >= 12) toInsert.push({ user_id: user.id, slug: 'metronome-or' })
+  if (!slugsObtenus.has('metronome-platine') && streak >= 18) toInsert.push({ user_id: user.id, slug: 'metronome-platine' })
+
+  // Cap des X€
+  const caps = [
+    { slug: 'cap-bronze', palier: 100 },
+    { slug: 'cap-argent', palier: 500 },
+    { slug: 'cap-or', palier: 1000 },
+    { slug: 'cap-platine', palier: 2000 },
+    { slug: 'cap-epique', palier: 5000 },
+    { slug: 'cap-legendaire', palier: 10000 },
+  ]
+  for (const cap of caps) {
+    if (!slugsObtenus.has(cap.slug) && totalInvesti >= cap.palier) {
+      toInsert.push({ user_id: user.id, slug: cap.slug })
+    }
+  }
+
+  if (toInsert.length > 0) {
+    await supabase.from('accomplissements').insert(toInsert)
+  }
+
+  return toInsert.length
+}
+
 const getProgression = (slug, investissements, transactions) => {
   const totalInvesti = investissements.reduce((acc, i) => acc + parseFloat(i.quantite) * parseFloat(i.pru || i.prix_achat_unitaire || 0), 0)
   const nbEtfDifferents = [...new Set(investissements.map(i => i.ticker))].length
   const achats = transactions.filter(t => t.type === 'Achat')
+  const ventes = transactions.filter(t => t.type === 'Vente')
+  const moisAvecAchat = [...new Set(achats.map(t => t.date.substring(0, 7)))].sort()
+
+  let streak = 0
+  if (moisAvecAchat.length > 0) {
+    streak = 1
+    for (let i = moisAvecAchat.length - 1; i > 0; i--) {
+      const curr = new Date(moisAvecAchat[i] + '-01')
+      const prev = new Date(moisAvecAchat[i - 1] + '-01')
+      const diff = (curr.getFullYear() - prev.getFullYear()) * 12 + (curr.getMonth() - prev.getMonth())
+      if (diff === 1) streak++
+      else break
+    }
+  }
 
   if (slug === 'grand-saut') return { current: achats.length > 0 ? 1 : 0, total: 1 }
   if (slug === 'architecte') return { current: Math.min(nbEtfDifferents, 3), total: 3 }
   if (slug === 'main-de-fer') {
-    const ventes = transactions.filter(t => t.type === 'Vente')
-    if (ventes.length === 0 && transactions.length > 0) {
-      const firstTx = new Date(transactions[0].date)
-      const now = new Date()
-      const mois = Math.floor((now - firstTx) / (1000 * 60 * 60 * 24 * 30))
-      return { current: Math.min(mois, 6), total: 6 }
-    }
-    return { current: 0, total: 6 }
+    if (ventes.length > 0 || achats.length === 0) return { current: 0, total: 6 }
+    const firstAchat = new Date(achats[0].date)
+    const now = new Date()
+    const mois = (now.getFullYear() - firstAchat.getFullYear()) * 12 + (now.getMonth() - firstAchat.getMonth())
+    return { current: Math.min(mois, 6), total: 6 }
   }
   if (slug.startsWith('cap-')) {
     const paliers = { 'cap-bronze': 100, 'cap-argent': 500, 'cap-or': 1000, 'cap-platine': 2000, 'cap-epique': 5000, 'cap-legendaire': 10000 }
@@ -192,17 +272,29 @@ const getProgression = (slug, investissements, transactions) => {
   }
   if (slug.startsWith('metronome-')) {
     const moisRequisMap = { 'metronome-bronze': 3, 'metronome-argent': 6, 'metronome-or': 12, 'metronome-platine': 18 }
-    const moisRequis = moisRequisMap[slug]
-    const moisInvestis = new Set(achats.map(t => t.date.substring(0, 7))).size
-    return { current: Math.min(moisInvestis, moisRequis), total: moisRequis }
+    return { current: Math.min(streak, moisRequisMap[slug]), total: moisRequisMap[slug] }
   }
   return null
 }
 
 export default function Challenge() {
   const t = useTheme()
+  const queryClient = useQueryClient()
   const [onglet, setOnglet] = useState('obtenus')
+  const [checking, setChecking] = useState(true)
+
   const { data, isLoading } = useQuery({ queryKey: ['challenge'], queryFn: fetchChallengeData })
+
+  useEffect(() => {
+    if (!data) return
+    const run = async () => {
+      setChecking(true)
+      const nb = await checkAndGrant(data.user, data.investissements, data.transactions, data.accomplissements)
+      if (nb > 0) queryClient.invalidateQueries({ queryKey: ['challenge'] })
+      setChecking(false)
+    }
+    run()
+  }, [data?.user?.id])
 
   const user = data?.user || null
   const accomplissements = data?.accomplissements || []
@@ -215,10 +307,10 @@ export default function Challenge() {
 
   const bleu = t.dark ? '#3B82F6' : '#1B2E4B'
 
-  if (isLoading) return (
+  if (isLoading || checking) return (
     <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar page="Challenge" />
-      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: t.textMuted, fontSize: 13 }}>Chargement...</div>
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: t.textMuted, fontSize: 13 }}>Vérification des accomplissements...</div>
     </div>
   )
 
@@ -258,20 +350,18 @@ export default function Challenge() {
       <Navbar page="Challenge" />
       <div style={{ padding: '16px 20px', flex: 1, display: 'flex', flexDirection: 'column', gap: 14 }}>
 
-        {/* HEADER LIVRET */}
         <div style={{ background: bleu, borderRadius: 14, padding: '18px 20px', display: 'flex', alignItems: 'center', gap: 14 }}>
           <div style={{ width: 48, height: 48, background: 'rgba(255,255,255,0.12)', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>📖</div>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 15, fontWeight: 500, color: '#fff', marginBottom: 2 }}>Livret d'accomplissements</div>
             <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)' }}>{obtenus.length} / {ACCOMPLISSEMENTS.length} débloqués</div>
           </div>
-          <div style={{ background: 'rgba(255,255,255,0.12)', borderRadius: 8, padding: '6px 12px' }}>
+          <div style={{ background: 'rgba(255,255,255,0.12)', borderRadius: 8, padding: '6px 12px', textAlign: 'center' }}>
             <div style={{ fontSize: 18, fontWeight: 500, color: '#fff' }}>{obtenus.length}</div>
             <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)' }}>badges</div>
           </div>
         </div>
 
-        {/* BARRE PROGRESSION GLOBALE */}
         <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: '12px 16px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 12, color: t.textMuted }}>
             <span>Progression globale</span>
@@ -282,7 +372,6 @@ export default function Challenge() {
           </div>
         </div>
 
-        {/* ONGLETS */}
         <div style={{ display: 'flex', gap: 8 }}>
           {[['obtenus', `Mes badges (${obtenus.length})`], ['avenirs', `À débloquer (${aDebloquer.length})`]].map(([key, label]) => (
             <button key={key} onClick={() => setOnglet(key)} style={{ flex: 1, padding: '9px', borderRadius: 9, border: `0.5px solid ${onglet === key ? bleu : t.border}`, background: onglet === key ? bleu : t.bgCard, color: onglet === key ? '#fff' : t.textMuted, fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' }}>
@@ -291,7 +380,6 @@ export default function Challenge() {
           ))}
         </div>
 
-        {/* BADGES OBTENUS */}
         {onglet === 'obtenus' && (
           obtenus.length === 0 ? (
             <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: '40px', textAlign: 'center', color: t.textMuted, fontSize: 12 }}>
@@ -304,7 +392,6 @@ export default function Challenge() {
           )
         )}
 
-        {/* BADGES À DÉBLOQUER */}
         {onglet === 'avenirs' && (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 12 }}>
             {aDebloquer.map(acc => <BadgeCard key={acc.slug} acc={acc} obtenu={false} />)}
