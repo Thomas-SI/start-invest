@@ -4,6 +4,22 @@ import { supabase } from '../lib/supabase'
 import Navbar from '../components/Navbar'
 import { useTheme } from '../lib/ThemeContext'
 
+const GRADES_CAP = [
+  { slug: 'cap-bronze', palier: 100, niveau: 'Bronze', niveauColor: '#854F0B', niveauBg: '#FFF0DC' },
+  { slug: 'cap-argent', palier: 500, niveau: 'Argent', niveauColor: '#444441', niveauBg: '#F0F0F0' },
+  { slug: 'cap-or', palier: 1000, niveau: 'Or', niveauColor: '#633806', niveauBg: '#FFF8DC' },
+  { slug: 'cap-platine', palier: 2000, niveau: 'Platine', niveauColor: '#185FA5', niveauBg: '#E6F1FB' },
+  { slug: 'cap-epique', palier: 5000, niveau: 'Épique', niveauColor: '#534AB7', niveauBg: '#EEEDFE' },
+  { slug: 'cap-legendaire', palier: 10000, niveau: 'Légendaire', niveauColor: '#993556', niveauBg: '#FBEAF0' },
+]
+
+const GRADES_METRONOME = [
+  { slug: 'metronome-bronze', mois: 3, niveau: 'Bronze', niveauColor: '#854F0B', niveauBg: '#FFF0DC' },
+  { slug: 'metronome-argent', mois: 6, niveau: 'Argent', niveauColor: '#444441', niveauBg: '#F0F0F0' },
+  { slug: 'metronome-or', mois: 12, niveau: 'Or', niveauColor: '#633806', niveauBg: '#FFF8DC' },
+  { slug: 'metronome-platine', mois: 18, niveau: 'Platine', niveauColor: '#185FA5', niveauBg: '#E6F1FB' },
+]
+
 const ACCOMPLISSEMENTS = [
   {
     slug: 'premier-pas',
@@ -20,44 +36,13 @@ const ACCOMPLISSEMENTS = [
     quete: 'Acheter votre premier ETF',
   },
   {
-    slug: 'metronome-bronze',
+    slug: 'metronome',
     nom: 'Le Métronome',
     emoji: '🎵',
     message: 'La magie des intérêts composés adore ta régularité. Continue !',
-    quete: 'Investir régulièrement pendant 3 mois',
-    niveau: 'Bronze',
-    niveauColor: '#854F0B',
-    niveauBg: '#FFF0DC',
-  },
-  {
-    slug: 'metronome-argent',
-    nom: 'Le Métronome',
-    emoji: '🎵',
-    message: 'La magie des intérêts composés adore ta régularité. Continue !',
-    quete: 'Investir régulièrement pendant 6 mois',
-    niveau: 'Argent',
-    niveauColor: '#444441',
-    niveauBg: '#F0F0F0',
-  },
-  {
-    slug: 'metronome-or',
-    nom: 'Le Métronome',
-    emoji: '🎵',
-    message: 'La magie des intérêts composés adore ta régularité. Continue !',
-    quete: 'Investir régulièrement pendant 12 mois',
-    niveau: 'Or',
-    niveauColor: '#633806',
-    niveauBg: '#FFF8DC',
-  },
-  {
-    slug: 'metronome-platine',
-    nom: 'Le Métronome',
-    emoji: '🎵',
-    message: 'La magie des intérêts composés adore ta régularité. Continue !',
-    quete: 'Investir régulièrement pendant 18 mois',
-    niveau: 'Platine',
-    niveauColor: '#185FA5',
-    niveauBg: '#E6F1FB',
+    quete: 'Investir régulièrement chaque mois',
+    evolutif: true,
+    grades: GRADES_METRONOME,
   },
   {
     slug: 'main-de-fer',
@@ -74,70 +59,13 @@ const ACCOMPLISSEMENTS = [
     quete: 'Posséder 3 ETF différents',
   },
   {
-    slug: 'cap-bronze',
-    nom: 'Cap des 100 €',
+    slug: 'cap',
+    nom: 'Cap des X€',
     emoji: '💰',
     message: 'Le premier palier est le plus dur. La machine est lancée.',
-    quete: 'Investir 100 €',
-    niveau: 'Bronze',
-    niveauColor: '#854F0B',
-    niveauBg: '#FFF0DC',
-    palier: 100,
-  },
-  {
-    slug: 'cap-argent',
-    nom: 'Cap des 500 €',
-    emoji: '💰',
-    message: 'Le premier palier est le plus dur. La machine est lancée.',
-    quete: 'Investir 500 €',
-    niveau: 'Argent',
-    niveauColor: '#444441',
-    niveauBg: '#F0F0F0',
-    palier: 500,
-  },
-  {
-    slug: 'cap-or',
-    nom: 'Cap des 1 000 €',
-    emoji: '💰',
-    message: 'Le premier palier est le plus dur. La machine est lancée.',
-    quete: 'Investir 1 000 €',
-    niveau: 'Or',
-    niveauColor: '#633806',
-    niveauBg: '#FFF8DC',
-    palier: 1000,
-  },
-  {
-    slug: 'cap-platine',
-    nom: 'Cap des 2 000 €',
-    emoji: '💰',
-    message: 'Le premier palier est le plus dur. La machine est lancée.',
-    quete: 'Investir 2 000 €',
-    niveau: 'Platine',
-    niveauColor: '#185FA5',
-    niveauBg: '#E6F1FB',
-    palier: 2000,
-  },
-  {
-    slug: 'cap-epique',
-    nom: 'Cap des 5 000 €',
-    emoji: '💰',
-    message: 'Le premier palier est le plus dur. La machine est lancée.',
-    quete: 'Investir 5 000 €',
-    niveau: 'Épique',
-    niveauColor: '#534AB7',
-    niveauBg: '#EEEDFE',
-    palier: 5000,
-  },
-  {
-    slug: 'cap-legendaire',
-    nom: 'Cap des 10 000 €',
-    emoji: '💰',
-    message: 'Le premier palier est le plus dur. La machine est lancée.',
-    quete: 'Investir 10 000 €',
-    niveau: 'Légendaire',
-    niveauColor: '#993556',
-    niveauBg: '#FBEAF0',
-    palier: 10000,
+    quete: 'Atteindre un palier d\'investissement',
+    evolutif: true,
+    grades: GRADES_CAP,
   },
   {
     slug: 'vroum-vroum',
@@ -164,45 +92,42 @@ const fetchChallengeData = async () => {
   }
 }
 
+const calcStreak = (transactions) => {
+  const achats = transactions.filter(t => t.type === 'Achat')
+  const moisAvecAchat = [...new Set(achats.map(t => t.date.substring(0, 7)))].sort()
+  if (moisAvecAchat.length === 0) return 0
+  let streak = 1
+  for (let i = moisAvecAchat.length - 1; i > 0; i--) {
+    const curr = new Date(moisAvecAchat[i] + '-01')
+    const prev = new Date(moisAvecAchat[i - 1] + '-01')
+    const diff = (curr.getFullYear() - prev.getFullYear()) * 12 + (curr.getMonth() - prev.getMonth())
+    if (diff === 1) streak++
+    else break
+  }
+  return streak
+}
+
 const checkAndGrant = async (user, investissements, transactions, accomplissements) => {
   const slugsObtenus = new Set(accomplissements.map(a => a.slug))
   const toInsert = []
+  const toUpdate = []
 
   const totalInvesti = investissements.reduce((acc, i) => acc + parseFloat(i.quantite) * parseFloat(i.pru || i.prix_achat_unitaire || 0), 0)
   const nbEtfDifferents = [...new Set(investissements.map(i => i.ticker))].length
   const achats = transactions.filter(t => t.type === 'Achat')
   const ventes = transactions.filter(t => t.type === 'Vente')
-  const moisAvecAchat = [...new Set(achats.map(t => t.date.substring(0, 7)))].sort()
+  const streak = calcStreak(transactions)
 
-  // Calcul streak mensuel consécutif
-  let streak = 0
-  if (moisAvecAchat.length > 0) {
-    streak = 1
-    for (let i = moisAvecAchat.length - 1; i > 0; i--) {
-      const curr = new Date(moisAvecAchat[i] + '-01')
-      const prev = new Date(moisAvecAchat[i - 1] + '-01')
-      const diff = (curr.getFullYear() - prev.getFullYear()) * 12 + (curr.getMonth() - prev.getMonth())
-      if (diff === 1) streak++
-      else break
-    }
-  }
+  // Premier Pas
+  if (!slugsObtenus.has('premier-pas')) toInsert.push({ user_id: user.id, slug: 'premier-pas' })
 
-  // Premier Pas — toujours accordé
-  if (!slugsObtenus.has('premier-pas')) {
-    toInsert.push({ user_id: user.id, slug: 'premier-pas' })
-  }
+  // Le Grand Saut
+  if (!slugsObtenus.has('grand-saut') && achats.length > 0) toInsert.push({ user_id: user.id, slug: 'grand-saut' })
 
-  // Le Grand Saut — premier achat ETF
-  if (!slugsObtenus.has('grand-saut') && achats.length > 0) {
-    toInsert.push({ user_id: user.id, slug: 'grand-saut' })
-  }
+  // L'Architecte
+  if (!slugsObtenus.has('architecte') && nbEtfDifferents >= 3) toInsert.push({ user_id: user.id, slug: 'architecte' })
 
-  // L'Architecte — 3 ETF différents
-  if (!slugsObtenus.has('architecte') && nbEtfDifferents >= 3) {
-    toInsert.push({ user_id: user.id, slug: 'architecte' })
-  }
-
-  // Main de Fer — 6 mois sans vente
+  // Main de Fer
   if (!slugsObtenus.has('main-de-fer') && ventes.length === 0 && achats.length > 0) {
     const firstAchat = new Date(achats[0].date)
     const now = new Date()
@@ -210,71 +135,35 @@ const checkAndGrant = async (user, investissements, transactions, accomplissemen
     if (mois >= 6) toInsert.push({ user_id: user.id, slug: 'main-de-fer' })
   }
 
-  // Métronome — streak consécutif
-  if (!slugsObtenus.has('metronome-bronze') && streak >= 3) toInsert.push({ user_id: user.id, slug: 'metronome-bronze' })
-  if (!slugsObtenus.has('metronome-argent') && streak >= 6) toInsert.push({ user_id: user.id, slug: 'metronome-argent' })
-  if (!slugsObtenus.has('metronome-or') && streak >= 12) toInsert.push({ user_id: user.id, slug: 'metronome-or' })
-  if (!slugsObtenus.has('metronome-platine') && streak >= 18) toInsert.push({ user_id: user.id, slug: 'metronome-platine' })
-
-  // Cap des X€
-  const caps = [
-    { slug: 'cap-bronze', palier: 100 },
-    { slug: 'cap-argent', palier: 500 },
-    { slug: 'cap-or', palier: 1000 },
-    { slug: 'cap-platine', palier: 2000 },
-    { slug: 'cap-epique', palier: 5000 },
-    { slug: 'cap-legendaire', palier: 10000 },
-  ]
-  for (const cap of caps) {
-    if (!slugsObtenus.has(cap.slug) && totalInvesti >= cap.palier) {
-      toInsert.push({ user_id: user.id, slug: cap.slug })
+  // Métronome — badge évolutif (on met à jour le niveau)
+  const gradeMetronome = [...GRADES_METRONOME].reverse().find(g => streak >= g.mois)
+  if (gradeMetronome) {
+    const existing = accomplissements.find(a => a.slug === 'metronome')
+    if (!existing) {
+      toInsert.push({ user_id: user.id, slug: 'metronome', niveau: gradeMetronome.niveau })
+    } else if (existing.niveau !== gradeMetronome.niveau) {
+      toUpdate.push({ id: existing.id, niveau: gradeMetronome.niveau })
     }
   }
 
-  if (toInsert.length > 0) {
-    await supabase.from('accomplissements').insert(toInsert)
-  }
-
-  return toInsert.length
-}
-
-const getProgression = (slug, investissements, transactions) => {
-  const totalInvesti = investissements.reduce((acc, i) => acc + parseFloat(i.quantite) * parseFloat(i.pru || i.prix_achat_unitaire || 0), 0)
-  const nbEtfDifferents = [...new Set(investissements.map(i => i.ticker))].length
-  const achats = transactions.filter(t => t.type === 'Achat')
-  const ventes = transactions.filter(t => t.type === 'Vente')
-  const moisAvecAchat = [...new Set(achats.map(t => t.date.substring(0, 7)))].sort()
-
-  let streak = 0
-  if (moisAvecAchat.length > 0) {
-    streak = 1
-    for (let i = moisAvecAchat.length - 1; i > 0; i--) {
-      const curr = new Date(moisAvecAchat[i] + '-01')
-      const prev = new Date(moisAvecAchat[i - 1] + '-01')
-      const diff = (curr.getFullYear() - prev.getFullYear()) * 12 + (curr.getMonth() - prev.getMonth())
-      if (diff === 1) streak++
-      else break
+  // Cap des X€ — badge évolutif
+  const gradeCap = [...GRADES_CAP].reverse().find(g => totalInvesti >= g.palier)
+  if (gradeCap) {
+    const existing = accomplissements.find(a => a.slug === 'cap')
+    if (!existing) {
+      toInsert.push({ user_id: user.id, slug: 'cap', niveau: gradeCap.niveau })
+    } else if (existing.niveau !== gradeCap.niveau) {
+      toUpdate.push({ id: existing.id, niveau: gradeCap.niveau })
     }
   }
 
-  if (slug === 'grand-saut') return { current: achats.length > 0 ? 1 : 0, total: 1 }
-  if (slug === 'architecte') return { current: Math.min(nbEtfDifferents, 3), total: 3 }
-  if (slug === 'main-de-fer') {
-    if (ventes.length > 0 || achats.length === 0) return { current: 0, total: 6 }
-    const firstAchat = new Date(achats[0].date)
-    const now = new Date()
-    const mois = (now.getFullYear() - firstAchat.getFullYear()) * 12 + (now.getMonth() - firstAchat.getMonth())
-    return { current: Math.min(mois, 6), total: 6 }
-  }
-  if (slug.startsWith('cap-')) {
-    const paliers = { 'cap-bronze': 100, 'cap-argent': 500, 'cap-or': 1000, 'cap-platine': 2000, 'cap-epique': 5000, 'cap-legendaire': 10000 }
-    return { current: Math.round(totalInvesti), total: paliers[slug], currency: true }
-  }
-  if (slug.startsWith('metronome-')) {
-    const moisRequisMap = { 'metronome-bronze': 3, 'metronome-argent': 6, 'metronome-or': 12, 'metronome-platine': 18 }
-    return { current: Math.min(streak, moisRequisMap[slug]), total: moisRequisMap[slug] }
-  }
-  return null
+  // Vroum Vroum — à implémenter côté abonnement
+  // if (!slugsObtenus.has('vroum-vroum') && isPremium) toInsert.push(...)
+
+  if (toInsert.length > 0) await supabase.from('accomplissements').insert(toInsert)
+  for (const u of toUpdate) await supabase.from('accomplissements').update({ niveau: u.niveau }).eq('id', u.id)
+
+  return toInsert.length + toUpdate.length
 }
 
 export default function Challenge() {
@@ -301,11 +190,63 @@ export default function Challenge() {
   const investissements = data?.investissements || []
   const transactions = data?.transactions || []
 
+  const bleu = t.dark ? '#3B82F6' : '#1B2E4B'
+  const streak = calcStreak(transactions)
+  const totalInvesti = investissements.reduce((acc, i) => acc + parseFloat(i.quantite) * parseFloat(i.pru || i.prix_achat_unitaire || 0), 0)
+
   const slugsObtenus = new Set(accomplissements.map(a => a.slug))
+
+  const getGradeActuel = (acc) => {
+    if (!acc.evolutif) return null
+    const dbAcc = accomplissements.find(a => a.slug === acc.slug)
+    if (!dbAcc) return null
+    if (acc.slug === 'metronome') return GRADES_METRONOME.find(g => g.niveau === dbAcc.niveau) || null
+    if (acc.slug === 'cap') return GRADES_CAP.find(g => g.niveau === dbAcc.niveau) || null
+    return null
+  }
+
+  const getProchainGrade = (acc) => {
+    if (!acc.evolutif) return null
+    const gradeActuel = getGradeActuel(acc)
+    const grades = acc.grades
+    if (!gradeActuel) return grades[0]
+    const idx = grades.findIndex(g => g.niveau === gradeActuel.niveau)
+    return idx < grades.length - 1 ? grades[idx + 1] : null
+  }
+
+  const getProgression = (acc) => {
+    if (acc.slug === 'grand-saut') {
+      const achats = transactions.filter(t => t.type === 'Achat')
+      return { current: achats.length > 0 ? 1 : 0, total: 1 }
+    }
+    if (acc.slug === 'architecte') {
+      const nb = [...new Set(investissements.map(i => i.ticker))].length
+      return { current: Math.min(nb, 3), total: 3 }
+    }
+    if (acc.slug === 'main-de-fer') {
+      const achats = transactions.filter(t => t.type === 'Achat')
+      const ventes = transactions.filter(t => t.type === 'Vente')
+      if (ventes.length > 0 || achats.length === 0) return { current: 0, total: 6 }
+      const firstAchat = new Date(achats[0].date)
+      const now = new Date()
+      const mois = (now.getFullYear() - firstAchat.getFullYear()) * 12 + (now.getMonth() - firstAchat.getMonth())
+      return { current: Math.min(mois, 6), total: 6 }
+    }
+    if (acc.slug === 'metronome') {
+      const prochain = getProchainGrade(acc)
+      if (!prochain) return null
+      return { current: Math.min(streak, prochain.mois), total: prochain.mois }
+    }
+    if (acc.slug === 'cap') {
+      const prochain = getProchainGrade(acc)
+      if (!prochain) return null
+      return { current: Math.round(totalInvesti), total: prochain.palier, currency: true }
+    }
+    return null
+  }
+
   const obtenus = ACCOMPLISSEMENTS.filter(a => slugsObtenus.has(a.slug))
   const aDebloquer = ACCOMPLISSEMENTS.filter(a => !slugsObtenus.has(a.slug))
-
-  const bleu = t.dark ? '#3B82F6' : '#1B2E4B'
 
   if (isLoading || checking) return (
     <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -315,18 +256,44 @@ export default function Challenge() {
   )
 
   const BadgeCard = ({ acc, obtenu }) => {
-    const prog = !obtenu ? getProgression(acc.slug, investissements, transactions) : null
+    const gradeActuel = obtenu ? getGradeActuel(acc) : null
+    const prochain = getProchainGrade(acc)
+    const prog = getProgression(acc)
     const pct = prog ? Math.min(Math.round((prog.current / prog.total) * 100), 100) : 0
+    const estMaxLevel = obtenu && acc.evolutif && !prochain
+
     return (
       <div style={{ background: obtenu ? (t.dark ? '#0F1F0F' : '#F6FFF3') : t.bgCard, border: `0.5px solid ${obtenu ? '#4CAF2E' : t.border}`, borderRadius: 12, padding: 14, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 6 }}>
-        <div style={{ width: 60, height: 60, borderRadius: '50%', background: obtenu ? '#EAF6E4' : t.bgSecondary, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: obtenu ? 28 : 26, border: obtenu ? '2px solid #4CAF2E' : `1.5px dashed ${t.border}` }}>
+        <div style={{ width: 60, height: 60, borderRadius: '50%', background: obtenu ? (gradeActuel ? gradeActuel.niveauBg : '#EAF6E4') : t.bgSecondary, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, border: obtenu ? `2px solid ${gradeActuel ? gradeActuel.niveauColor : '#4CAF2E'}` : `1.5px dashed ${t.border}` }}>
           {obtenu ? acc.emoji : <span style={{ fontSize: 22, color: t.textMuted }}>?</span>}
         </div>
         <div style={{ fontSize: 12, fontWeight: 500, color: obtenu ? t.text : t.textMuted, lineHeight: 1.3 }}>{acc.nom}</div>
-        {acc.niveau && (
-          <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 20, fontWeight: 500, background: acc.niveauBg, color: acc.niveauColor }}>{acc.niveau}</span>
+
+        {obtenu && gradeActuel && (
+          <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 20, fontWeight: 500, background: gradeActuel.niveauBg, color: gradeActuel.niveauColor }}>{gradeActuel.niveau}</span>
         )}
+        {obtenu && !gradeActuel && (
+          <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 20, fontWeight: 500, background: '#EAF6E4', color: '#27500A' }}>Obtenu</span>
+        )}
+
         {obtenu && <div style={{ fontSize: 11, color: t.textSecondary, lineHeight: 1.4 }}>{acc.message}</div>}
+
+        {obtenu && acc.evolutif && prochain && prog && (
+          <>
+            <div style={{ fontSize: 10, color: t.textMuted, marginTop: 2 }}>Prochain : <span style={{ fontWeight: 500, color: prochain.niveauColor }}>{prochain.niveau}</span></div>
+            <div style={{ width: '100%', background: t.bgSecondary, borderRadius: 4, height: 5, overflow: 'hidden' }}>
+              <div style={{ height: '100%', borderRadius: 4, background: prochain.niveauColor, width: `${pct}%`, transition: 'width 0.5s' }} />
+            </div>
+            <div style={{ fontSize: 10, color: t.textMuted }}>
+              {prog.currency ? `${prog.current.toLocaleString('fr-FR')} / ${prog.total.toLocaleString('fr-FR')} €` : `${prog.current} / ${prog.total} mois`}
+            </div>
+          </>
+        )}
+
+        {obtenu && acc.evolutif && estMaxLevel && (
+          <div style={{ fontSize: 10, color: '#993556', background: '#FBEAF0', padding: '3px 8px', borderRadius: 20, fontWeight: 500 }}>Niveau max !</div>
+        )}
+
         {!obtenu && prog && (
           <>
             <div style={{ fontSize: 10, color: t.textMuted }}>{acc.quete}</div>
