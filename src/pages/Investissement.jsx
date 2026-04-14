@@ -68,16 +68,39 @@ export default function Investissement() {
   const calcValeurActuelle = (inv) => parseFloat(inv.quantite) * parseFloat(inv.prix_actuel || inv.pru || inv.prix_achat_unitaire || 0)
 
   const handleTickerChange = async (val) => {
-    const upper = val.toUpperCase()
+    const upper = val.toUpperCase().trim()
     setForm(prev => ({ ...prev, ticker: val }))
     if (upper.length < 2) return
+
     const existingPos = investissements.find(i => i.ticker === upper)
     if (existingPos) {
-      setForm(prev => ({ ...prev, ticker: upper, actif: existingPos.actif || prev.actif, enveloppe: existingPos.enveloppe || prev.enveloppe, type_etf: existingPos.type_etf || prev.type_etf, ter: existingPos.ter?.toString() || prev.ter }))
+      setForm(prev => ({
+        ...prev, ticker: upper,
+        actif: existingPos.actif || prev.actif,
+        enveloppe: existingPos.enveloppe || prev.enveloppe,
+        type_etf: existingPos.type_etf || prev.type_etf,
+        ter: existingPos.ter?.toString() || prev.ter,
+      }))
       return
     }
-    const { data: ref } = await supabase.from('etf_reference').select('*').eq('ticker', upper).single()
-    if (ref) setForm(prev => ({ ...prev, ticker: upper, actif: ref.nom || prev.actif, enveloppe: ref.enveloppe_defaut || prev.enveloppe, ter: ref.ter?.toString() || prev.ter }))
+
+    const tickerBase = upper.split('.')[0]
+    const { data: ref } = await supabase
+      .from('etf_reference')
+      .select('*')
+      .or(`ticker.eq.${upper},ticker.eq.${tickerBase}`)
+      .single()
+
+    if (ref) {
+      setForm(prev => ({
+        ...prev,
+        ticker: upper,
+        actif: ref.nom || prev.actif,
+        enveloppe: ref.enveloppe_defaut || prev.enveloppe,
+        ter: ref.ter?.toString() || prev.ter,
+        type_etf: ref.type_etf || prev.type_etf || 'Capitalisant',
+      }))
+    }
   }
 
   const handleCibleChange = async (inv, value) => {
@@ -98,7 +121,11 @@ export default function Investissement() {
       const prixUnitaire = parseFloat(form.prix_achat_unitaire)
       const frais = parseFloat(form.frais_courtage) || 0
 
-      const { error: txError } = await supabase.from('transactions').insert({ user_id: user.id, date: form.date, ticker, enveloppe: form.enveloppe, type: form.type, quantite, prix_unitaire: prixUnitaire, frais_courtage: frais })
+      const { error: txError } = await supabase.from('transactions').insert({
+        user_id: user.id, date: form.date, ticker,
+        enveloppe: form.enveloppe, type: form.type,
+        quantite, prix_unitaire: prixUnitaire, frais_courtage: frais,
+      })
       if (txError) throw new Error('Erreur lors de l\'enregistrement de la transaction.')
 
       const { data: existingPositions } = await supabase.from('investissements').select('*').eq('user_id', user.id).eq('ticker', ticker).eq('enveloppe', form.enveloppe)
@@ -118,7 +145,12 @@ export default function Investissement() {
         const { error } = await supabase.from('investissements').update({ quantite: nouvelleQuantite, pru: Math.round(nouveauPru * 10000) / 10000 }).eq('id', existing.id)
         if (error) throw new Error('Erreur lors de la mise à jour de la position.')
       } else {
-        const { error } = await supabase.from('investissements').insert({ user_id: user.id, date: form.date, ticker, actif: form.actif, enveloppe: form.enveloppe, type_etf: form.type_etf, type: form.type, quantite, prix_achat_unitaire: prixUnitaire, pru: prixUnitaire, prix_actuel: prixUnitaire, ter: parseFloat(form.ter) || 0, frais_courtage: frais, cible: 0 })
+        const { error } = await supabase.from('investissements').insert({
+          user_id: user.id, date: form.date, ticker,
+          actif: form.actif, enveloppe: form.enveloppe, type_etf: form.type_etf, type: form.type,
+          quantite, prix_achat_unitaire: prixUnitaire, pru: prixUnitaire, prix_actuel: prixUnitaire,
+          ter: parseFloat(form.ter) || 0, frais_courtage: frais, cible: 0,
+        })
         if (error) throw new Error('Erreur lors de la création de la position.')
       }
 
@@ -252,7 +284,7 @@ export default function Investissement() {
                         {[
                           ['Total investi', `${Math.round(totalInvestiEnv).toLocaleString('fr-FR')} €`, t.text],
                           ['Valeur actuelle', `${Math.round(totalEnv).toLocaleString('fr-FR')} €`, '#4CAF2E'],
-                          ["Plus-value", `${plusValueEnv >= 0 ? '+' : ''}${Math.round(plusValueEnv).toLocaleString('fr-FR')} €`, plusValueEnv >= 0 ? '#4CAF2E' : '#E24B4A'],
+                          ['Plus-value', `${plusValueEnv >= 0 ? '+' : ''}${Math.round(plusValueEnv).toLocaleString('fr-FR')} €`, plusValueEnv >= 0 ? '#4CAF2E' : '#E24B4A'],
                           ['Nb positions', nbPositionsEnv.toString(), bleu],
                         ].map(([l, v, c], idx) => (
                           <div key={l} style={{ padding: '16px', borderBottom: idx < 2 ? `0.5px solid ${t.border}` : 'none', borderRight: idx % 2 === 0 ? `0.5px solid ${t.border}` : 'none', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
@@ -274,7 +306,7 @@ export default function Investissement() {
           {[
             ['Total investi', `${Math.round(totalInvesti).toLocaleString('fr-FR')} €`, t.text],
             ['Valeur actuelle', `${Math.round(valeurActuelle).toLocaleString('fr-FR')} €`, '#4CAF2E'],
-            ["Plus-value", `${plusValue >= 0 ? '+' : ''}${Math.round(plusValue).toLocaleString('fr-FR')} €`, plusValue >= 0 ? '#4CAF2E' : '#E24B4A'],
+            ['Plus-value', `${plusValue >= 0 ? '+' : ''}${Math.round(plusValue).toLocaleString('fr-FR')} €`, plusValue >= 0 ? '#4CAF2E' : '#E24B4A'],
             ['Nb positions', nbPositions.toString(), bleu],
           ].map(([l, v, c]) => (
             <div key={l} style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: 16 }}>
@@ -381,7 +413,7 @@ export default function Investissement() {
                         <td style={{ padding: '8px 12px', fontWeight: 500, color: t.text }}>{Math.round(coutTotal).toLocaleString('fr-FR')} €</td>
                         <td style={{ padding: '8px 12px', fontWeight: 500, color: plusValueTx >= 0 ? '#4CAF2E' : '#E24B4A' }}>
                           {Math.round(valeurActuelleTx).toLocaleString('fr-FR')} €
-                          <span style={{ fontSize: 10, marginLeft: 4, color: plusValueTx >= 0 ? '#4CAF2E' : '#E24B4A' }}>
+                          <span style={{ fontSize: 10, marginLeft: 4 }}>
                             ({plusValueTx >= 0 ? '+' : ''}{Math.round(plusValueTx).toLocaleString('fr-FR')} €)
                           </span>
                         </td>
