@@ -46,7 +46,6 @@ export default function Accueil() {
           </div>
         </div>
 
-        {/* GRAPHIQUE + BADGE */}
         <div style={{ position: 'relative' }}>
           <div style={{ background: '#fff', borderRadius: 16, border: '0.5px solid #E0EAE3', padding: '20px 24px', boxShadow: '0 4px 24px rgba(27,46,75,0.06)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
@@ -69,8 +68,6 @@ export default function Accueil() {
               {['Jan', 'Mar', 'Mai', 'Juil', 'Sep', 'Nov'].map(m => <span key={m}>{m}</span>)}
             </div>
           </div>
-
-          {/* BADGE Le Grand Saut */}
           <div style={{ position: 'absolute', bottom: -20, right: -20, background: '#fff', border: '0.5px solid #4CAF2E', borderRadius: 14, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10, boxShadow: '0 4px 16px rgba(76,175,46,0.12)' }}>
             <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#EAF6E4', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, border: '2px solid #4CAF2E' }}>🚀</div>
             <div>
@@ -85,7 +82,6 @@ export default function Accueil() {
       <section style={{ padding: '80px 40px', maxWidth: 1100, margin: '0 auto' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
 
-          {/* Card 1 — Mes Finances */}
           <div style={{ background: '#fff', borderRadius: 16, border: '0.5px solid #E0EAE3', overflow: 'hidden' }}>
             <div style={{ background: '#F4F7F5', padding: '28px 24px', height: 200, display: 'flex', flexDirection: 'column', gap: 8 }}>
               {[
@@ -114,7 +110,6 @@ export default function Accueil() {
             </div>
           </div>
 
-          {/* Card 2 — ETF */}
           <div style={{ background: '#fff', borderRadius: 16, border: '0.5px solid #E0EAE3', overflow: 'hidden' }}>
             <div style={{ background: '#F4F7F5', padding: '28px 24px', height: 200, display: 'flex', flexDirection: 'column', gap: 8 }}>
               {[
@@ -138,7 +133,6 @@ export default function Accueil() {
             </div>
           </div>
 
-          {/* Card 3 — Performance */}
           <div style={{ background: '#fff', borderRadius: 16, border: '0.5px solid #E0EAE3', overflow: 'hidden' }}>
             <div style={{ background: '#F4F7F5', padding: '28px 24px', height: 200, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               <svg width="100%" height="130" viewBox="0 0 260 130">
@@ -160,7 +154,7 @@ export default function Accueil() {
                   <span style={{ fontSize: 10, color: '#6B7280' }}>Avec DCA</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                  <div style={{ width: 10, height: 2, background: '#4CAF2E', borderRadius: 1, borderTop: '1px dashed #4CAF2E' }} />
+                  <div style={{ width: 10, height: 2, background: '#4CAF2E', borderRadius: 1 }} />
                   <span style={{ fontSize: 10, color: '#6B7280' }}>Sans DCA</span>
                 </div>
               </div>
@@ -174,16 +168,84 @@ export default function Accueil() {
         </div>
       </section>
 
-      {/* CTA FINAL */}
-      <section style={{ padding: '60px 40px 100px', textAlign: 'center' }}>
-        <div style={{ maxWidth: 520, margin: '0 auto' }}>
-          <div style={{ fontSize: 28, fontWeight: 700, color: '#1B2E4B', marginBottom: 14, lineHeight: 1.3 }}>
-            Prêt à construire<br />votre avenir financier ?
+      {/* MINDSET */}
+      <section style={{ background: '#1B2E4B', padding: '80px 40px' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, alignItems: 'center' }}>
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 16, background: 'rgba(76,175,46,0.15)', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Mindset</div>
+            <h2 style={{ fontSize: 34, fontWeight: 700, color: '#fff', lineHeight: 1.3, margin: '0 0 20px' }}>
+              Pensez à 5 ans,<br />
+              <span style={{ color: '#4CAF2E' }}>pas à 5 mois.</span>
+            </h2>
+            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.55)', lineHeight: 1.8, margin: 0, maxWidth: 400 }}>
+              Apprenez à investir et créez-vous une fortune solide et diversifiée au fil du temps.
+            </p>
           </div>
-          <p style={{ fontSize: 14, color: '#9CA3AF', marginBottom: 32, lineHeight: 1.7 }}>
-            Rejoignez StartInvest et commencez à investir intelligemment dès aujourd'hui.
+
+          {/* BADGES CHALLENGE */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+
+            {/* Le Grand Saut */}
+            <div style={{ background: 'rgba(255,255,255,0.06)', border: '0.5px solid rgba(255,255,255,0.1)', borderRadius: 14, padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div style={{ width: 52, height: 52, borderRadius: '50%', background: '#EAF6E4', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, border: '2px solid #4CAF2E', flexShrink: 0 }}>🚀</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>Le Grand Saut</div>
+                  <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 20, background: '#EAF6E4', color: '#2E7D1E', fontWeight: 500 }}>Obtenu</span>
+                </div>
+                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>Tu n'es plus spectateur, tu es le pilote de ton futur.</div>
+              </div>
+            </div>
+
+            {/* Cap des X€ */}
+            <div style={{ background: 'rgba(255,255,255,0.06)', border: '0.5px solid rgba(255,255,255,0.1)', borderRadius: 14, padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div style={{ width: 52, height: 52, borderRadius: '50%', background: '#FFF8DC', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, border: '2px solid #854F0B', flexShrink: 0 }}>💰</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>Cap des X€</div>
+                  <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 20, background: '#FFF8DC', color: '#633806', fontWeight: 500 }}>Or — 1 000 €</span>
+                </div>
+                <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 4, height: 5, overflow: 'hidden' }}>
+                  <div style={{ height: '100%', borderRadius: 4, background: '#BA7517', width: '60%' }} />
+                </div>
+                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', marginTop: 4 }}>1 200 / 2 000 € → Platine</div>
+              </div>
+            </div>
+
+            {/* Le Métronome */}
+            <div style={{ background: 'rgba(255,255,255,0.06)', border: '0.5px solid rgba(255,255,255,0.1)', borderRadius: 14, padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div style={{ width: 52, height: 52, borderRadius: '50%', background: '#FFF0DC', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, border: '2px solid #854F0B', flexShrink: 0 }}>🎵</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>Le Métronome</div>
+                  <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 20, background: '#FFF0DC', color: '#854F0B', fontWeight: 500 }}>Bronze — 3 mois</span>
+                </div>
+                <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 4, height: 5, overflow: 'hidden' }}>
+                  <div style={{ height: '100%', borderRadius: 4, background: '#854F0B', width: '50%' }} />
+                </div>
+                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', marginTop: 4 }}>3 / 6 mois → Argent</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* CTA FINAL */}
+      <section style={{ padding: '100px 40px', background: '#F4F7F5', textAlign: 'center' }}>
+        <div style={{ maxWidth: 580, margin: '0 auto' }}>
+          <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 16, background: '#EAF6E4', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Rejoignez-nous</div>
+          <h2 style={{ fontSize: 34, fontWeight: 700, color: '#1B2E4B', lineHeight: 1.3, margin: '0 0 16px' }}>
+            Ne laissez plus jamais<br />
+            <span style={{ color: '#4CAF2E' }}>votre argent dormir.</span>
+          </h2>
+          <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.8, margin: '0 0 10px' }}>
+            Rejoignez Start Invest et ses utilisateurs.
           </p>
-          <button onClick={() => navigate('/signup')} style={{ padding: '14px 40px', borderRadius: 12, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 16, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', letterSpacing: '.02em' }}>
+          <p style={{ fontSize: 14, color: '#9CA3AF', lineHeight: 1.8, margin: '0 0 40px' }}>
+            Trouvez votre façon de faire de l'argent en dormant.
+          </p>
+          <button onClick={() => navigate('/signup')} style={{ padding: '14px 48px', borderRadius: 12, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 16, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', letterSpacing: '.02em' }}>
             Go →
           </button>
           <div style={{ marginTop: 16, fontSize: 12, color: '#9CA3AF' }}>Gratuit · Sans carte bancaire · En 2 minutes</div>
