@@ -38,6 +38,9 @@ export default function Investissement() {
   const [loading, setLoading] = useState(false)
   const [erreur, setErreur] = useState(null)
   const [succes, setSucces] = useState(false)
+  const [editingTxId, setEditingTxId] = useState(null)
+  const [editTxForm, setEditTxForm] = useState({})
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null)
   const [form, setForm] = useState({
     date: new Date().toISOString().split('T')[0],
     ticker: '', actif: '', enveloppe: 'PEA', type_etf: 'Capitalisant',
@@ -71,35 +74,15 @@ export default function Investissement() {
     const upper = val.toUpperCase().trim()
     setForm(prev => ({ ...prev, ticker: val }))
     if (upper.length < 2) return
-
     const existingPos = investissements.find(i => i.ticker === upper)
     if (existingPos) {
-      setForm(prev => ({
-        ...prev, ticker: upper,
-        actif: existingPos.actif || prev.actif,
-        enveloppe: existingPos.enveloppe || prev.enveloppe,
-        type_etf: existingPos.type_etf || prev.type_etf,
-        ter: existingPos.ter?.toString() || prev.ter,
-      }))
+      setForm(prev => ({ ...prev, ticker: upper, actif: existingPos.actif || prev.actif, enveloppe: existingPos.enveloppe || prev.enveloppe, type_etf: existingPos.type_etf || prev.type_etf, ter: existingPos.ter?.toString() || prev.ter }))
       return
     }
-
     const tickerBase = upper.split('.')[0]
-    const { data: ref } = await supabase
-      .from('etf_reference')
-      .select('*')
-      .or(`ticker.eq.${upper},ticker.eq.${tickerBase}`)
-      .single()
-
+    const { data: ref } = await supabase.from('etf_reference').select('*').or(`ticker.eq.${upper},ticker.eq.${tickerBase}`).single()
     if (ref) {
-      setForm(prev => ({
-        ...prev,
-        ticker: upper,
-        actif: ref.nom || prev.actif,
-        enveloppe: ref.enveloppe_defaut || prev.enveloppe,
-        ter: ref.ter?.toString() || prev.ter,
-        type_etf: ref.type_etf || prev.type_etf || 'Capitalisant',
-      }))
+      setForm(prev => ({ ...prev, ticker: upper, actif: ref.nom || prev.actif, enveloppe: ref.enveloppe_defaut || prev.enveloppe, ter: ref.ter?.toString() || prev.ter, type_etf: ref.type_etf || prev.type_etf || 'Capitalisant' }))
     }
   }
 
@@ -120,44 +103,25 @@ export default function Investissement() {
       const quantite = parseFloat(form.quantite)
       const prixUnitaire = parseFloat(form.prix_achat_unitaire)
       const frais = parseFloat(form.frais_courtage) || 0
-
-      const { error: txError } = await supabase.from('transactions').insert({
-        user_id: user.id, date: form.date, ticker,
-        enveloppe: form.enveloppe, type: form.type,
-        quantite, prix_unitaire: prixUnitaire, frais_courtage: frais,
-      })
+      const { error: txError } = await supabase.from('transactions').insert({ user_id: user.id, date: form.date, ticker, enveloppe: form.enveloppe, type: form.type, quantite, prix_unitaire: prixUnitaire, frais_courtage: frais })
       if (txError) throw new Error('Erreur lors de l\'enregistrement de la transaction.')
-
       const { data: existingPositions } = await supabase.from('investissements').select('*').eq('user_id', user.id).eq('ticker', ticker).eq('enveloppe', form.enveloppe)
       const existing = existingPositions?.[0]
-
       if (existing) {
         const ancienneQuantite = parseFloat(existing.quantite)
         const ancienPru = parseFloat(existing.pru || existing.prix_achat_unitaire || 0)
         let nouvelleQuantite, nouveauPru
-        if (form.type === 'Achat') {
-          nouvelleQuantite = ancienneQuantite + quantite
-          nouveauPru = ((ancienneQuantite * ancienPru) + (quantite * prixUnitaire)) / nouvelleQuantite
-        } else {
-          nouvelleQuantite = ancienneQuantite - quantite
-          nouveauPru = ancienPru
-        }
+        if (form.type === 'Achat') { nouvelleQuantite = ancienneQuantite + quantite; nouveauPru = ((ancienneQuantite * ancienPru) + (quantite * prixUnitaire)) / nouvelleQuantite }
+        else { nouvelleQuantite = ancienneQuantite - quantite; nouveauPru = ancienPru }
         const { error } = await supabase.from('investissements').update({ quantite: nouvelleQuantite, pru: Math.round(nouveauPru * 10000) / 10000 }).eq('id', existing.id)
         if (error) throw new Error('Erreur lors de la mise à jour de la position.')
       } else {
-        const { error } = await supabase.from('investissements').insert({
-          user_id: user.id, date: form.date, ticker,
-          actif: form.actif, enveloppe: form.enveloppe, type_etf: form.type_etf, type: form.type,
-          quantite, prix_achat_unitaire: prixUnitaire, pru: prixUnitaire, prix_actuel: prixUnitaire,
-          ter: parseFloat(form.ter) || 0, frais_courtage: frais, cible: 0,
-        })
+        const { error } = await supabase.from('investissements').insert({ user_id: user.id, date: form.date, ticker, actif: form.actif, enveloppe: form.enveloppe, type_etf: form.type_etf, type: form.type, quantite, prix_achat_unitaire: prixUnitaire, pru: prixUnitaire, prix_actuel: prixUnitaire, ter: parseFloat(form.ter) || 0, frais_courtage: frais, cible: 0 })
         if (error) throw new Error('Erreur lors de la création de la position.')
       }
-
       queryClient.invalidateQueries({ queryKey: ['investissement'] })
       setForm({ date: new Date().toISOString().split('T')[0], ticker: '', actif: '', enveloppe: 'PEA', type_etf: 'Capitalisant', type: 'Achat', quantite: '', prix_achat_unitaire: '', ter: '', frais_courtage: '' })
-      setShowAdd(false)
-      setSucces(true)
+      setShowAdd(false); setSucces(true)
       setTimeout(() => setSucces(false), 3000)
     } catch (e) {
       setErreur(e.message || 'Une erreur est survenue.')
@@ -166,31 +130,75 @@ export default function Investissement() {
     }
   }
 
-  const handleDeleteTransaction = async (id) => {
+  const handleEditTxStart = (tx) => {
+    setEditingTxId(tx.id)
+    setEditTxForm({ date: tx.date, quantite: tx.quantite, prix_unitaire: tx.prix_unitaire, frais_courtage: tx.frais_courtage || 0 })
+  }
+
+  const handleEditTxSave = async (tx) => {
+    if (loading) return
+    setLoading(true)
     try {
-      const tx = transactions.find(t => t.id === id)
-      if (!tx) return
-      const { error } = await supabase.from('transactions').delete().eq('id', id)
-      if (error) throw new Error('Erreur lors de la suppression.')
-      const transactionsRestantes = transactions.filter(t => t.id !== id && t.ticker === tx.ticker && t.enveloppe === tx.enveloppe)
-      if (transactionsRestantes.length === 0) {
-        await supabase.from('investissements').delete().eq('user_id', user.id).eq('ticker', tx.ticker).eq('enveloppe', tx.enveloppe)
-      } else {
-        let quantiteTotale = 0, coutTotal = 0
-        for (const t of transactionsRestantes) {
-          if (t.type === 'Achat') { quantiteTotale += parseFloat(t.quantite); coutTotal += parseFloat(t.quantite) * parseFloat(t.prix_unitaire) }
-          else quantiteTotale -= parseFloat(t.quantite)
-        }
-        const nouveauPru = quantiteTotale > 0 ? Math.round((coutTotal / quantiteTotale) * 10000) / 10000 : 0
-        await supabase.from('investissements').update({ quantite: quantiteTotale, pru: nouveauPru }).eq('user_id', user.id).eq('ticker', tx.ticker).eq('enveloppe', tx.enveloppe)
+      const { error } = await supabase.from('transactions').update({
+        date: editTxForm.date,
+        quantite: parseFloat(editTxForm.quantite),
+        prix_unitaire: parseFloat(editTxForm.prix_unitaire),
+        frais_courtage: parseFloat(editTxForm.frais_courtage) || 0,
+      }).eq('id', tx.id)
+      if (error) throw new Error('Erreur lors de la modification.')
+
+      // Recalcul PRU
+      const allTx = transactions.map(t => t.id === tx.id ? { ...t, ...editTxForm, quantite: parseFloat(editTxForm.quantite), prix_unitaire: parseFloat(editTxForm.prix_unitaire) } : t)
+      const txMemePos = allTx.filter(t => t.ticker === tx.ticker && t.enveloppe === tx.enveloppe)
+      let quantiteTotale = 0, coutTotal = 0
+      for (const t of txMemePos) {
+        if (t.type === 'Achat') { quantiteTotale += parseFloat(t.quantite); coutTotal += parseFloat(t.quantite) * parseFloat(t.prix_unitaire) }
+        else quantiteTotale -= parseFloat(t.quantite)
       }
+      const nouveauPru = quantiteTotale > 0 ? Math.round((coutTotal / quantiteTotale) * 10000) / 10000 : 0
+      await supabase.from('investissements').update({ quantite: quantiteTotale, pru: nouveauPru }).eq('user_id', user.id).eq('ticker', tx.ticker).eq('enveloppe', tx.enveloppe)
+
       queryClient.invalidateQueries({ queryKey: ['investissement'] })
+      setEditingTxId(null)
     } catch (e) {
-      setErreur('Erreur lors de la suppression. Veuillez réessayer.')
+      setErreur(e.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleDeleteTransaction = async (id) => {
+    if (confirmDeleteId === id) {
+      try {
+        const tx = transactions.find(t => t.id === id)
+        if (!tx) return
+        const { error } = await supabase.from('transactions').delete().eq('id', id)
+        if (error) throw new Error('Erreur lors de la suppression.')
+        const transactionsRestantes = transactions.filter(t => t.id !== id && t.ticker === tx.ticker && t.enveloppe === tx.enveloppe)
+        if (transactionsRestantes.length === 0) {
+          await supabase.from('investissements').delete().eq('user_id', user.id).eq('ticker', tx.ticker).eq('enveloppe', tx.enveloppe)
+        } else {
+          let quantiteTotale = 0, coutTotal = 0
+          for (const t of transactionsRestantes) {
+            if (t.type === 'Achat') { quantiteTotale += parseFloat(t.quantite); coutTotal += parseFloat(t.quantite) * parseFloat(t.prix_unitaire) }
+            else quantiteTotale -= parseFloat(t.quantite)
+          }
+          const nouveauPru = quantiteTotale > 0 ? Math.round((coutTotal / quantiteTotale) * 10000) / 10000 : 0
+          await supabase.from('investissements').update({ quantite: quantiteTotale, pru: nouveauPru }).eq('user_id', user.id).eq('ticker', tx.ticker).eq('enveloppe', tx.enveloppe)
+        }
+        queryClient.invalidateQueries({ queryKey: ['investissement'] })
+        setConfirmDeleteId(null)
+      } catch (e) {
+        setErreur('Erreur lors de la suppression. Veuillez réessayer.')
+      }
+    } else {
+      setConfirmDeleteId(id)
+      setTimeout(() => setConfirmDeleteId(null), 3000)
     }
   }
 
   const inputStyle = { padding: '5px 8px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgCard, color: t.text, width: '100%' }
+  const inputEditStyle = { padding: '4px 6px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }
 
   if (isLoading) return (
     <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -255,12 +263,7 @@ export default function Investissement() {
                                     <td style={{ padding: '10px 14px', color: t.text }}>{pctActuel}%</td>
                                     <td style={{ padding: '10px 14px' }}>
                                       <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                                        <input
-                                          type="number" min="0" max="100" placeholder="0"
-                                          defaultValue={pctCible || ''}
-                                          onBlur={e => handleCibleChange(inv, e.target.value)}
-                                          style={{ width: 60, padding: '4px 6px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text, textAlign: 'right' }}
-                                        />
+                                        <input type="number" min="0" max="100" placeholder="0" defaultValue={pctCible || ''} onBlur={e => handleCibleChange(inv, e.target.value)} style={{ width: 60, padding: '4px 6px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text, textAlign: 'right' }} />
                                         <span style={{ fontSize: 11, color: t.textMuted }}>%</span>
                                       </div>
                                     </td>
@@ -399,30 +402,73 @@ export default function Investissement() {
                     const plusValueTx = valeurActuelleTx - (parseFloat(tx.quantite) * parseFloat(tx.prix_unitaire))
                     const txEnvIndex = enveloppesActives.indexOf(tx.enveloppe)
                     const txEnvColor = txEnvIndex % 2 === 0 ? 'rgba(76,175,46,0.06)' : 'rgba(27,46,75,0.06)'
+                    const isEditing = editingTxId === tx.id
+
                     return (
-                      <tr key={tx.id} style={{ borderBottom: `0.5px solid ${t.border}`, background: txEnvColor }}>
-                        <td style={{ padding: '8px 12px', color: t.textSecondary, whiteSpace: 'nowrap' }}>{new Date(tx.date).toLocaleDateString('fr-FR')}</td>
-                        <td style={{ padding: '8px 12px', fontWeight: 500, color: bleu }}>{tx.ticker}</td>
-                        <td style={{ padding: '8px 12px' }}>
-                          <span style={{ fontSize: 10, fontWeight: 500, padding: '2px 8px', borderRadius: 20, background: tx.enveloppe === 'PEA' ? '#EAF6E4' : tx.enveloppe === 'CTO' ? '#E8EEF6' : '#FFF8E6', color: tx.enveloppe === 'PEA' ? '#2E7D1E' : tx.enveloppe === 'CTO' ? bleu : '#BA7517' }}>{tx.enveloppe}</span>
-                        </td>
-                        <td style={{ padding: '8px 12px' }}>
-                          <span style={{ fontSize: 10, fontWeight: 500, padding: '2px 8px', borderRadius: 20, background: tx.type === 'Achat' ? '#EAF6E4' : '#FCEBEB', color: tx.type === 'Achat' ? '#2E7D1E' : '#E24B4A' }}>{tx.type}</span>
-                        </td>
-                        <td style={{ padding: '8px 12px', color: t.text }}>{tx.quantite}</td>
-                        <td style={{ padding: '8px 12px', color: t.text }}>{parseFloat(tx.prix_unitaire).toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €</td>
-                        <td style={{ padding: '8px 12px', color: t.text }}>{prixActuel.toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €</td>
-                        <td style={{ padding: '8px 12px', color: t.textSecondary }}>{parseFloat(tx.frais_courtage || 0).toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €</td>
-                        <td style={{ padding: '8px 12px', fontWeight: 500, color: t.text }}>{Math.round(coutTotal).toLocaleString('fr-FR')} €</td>
-                        <td style={{ padding: '8px 12px', fontWeight: 500, color: plusValueTx >= 0 ? '#4CAF2E' : '#E24B4A' }}>
-                          {Math.round(valeurActuelleTx).toLocaleString('fr-FR')} €
-                          <span style={{ fontSize: 10, marginLeft: 4 }}>
-                            ({plusValueTx >= 0 ? '+' : ''}{Math.round(plusValueTx).toLocaleString('fr-FR')} €)
-                          </span>
-                        </td>
-                        <td style={{ padding: '8px 12px' }}>
-                          <button onClick={() => handleDeleteTransaction(tx.id)} style={{ background: '#FCEBEB', color: '#E24B4A', border: 'none', borderRadius: 5, padding: '2px 7px', fontSize: 10, cursor: 'pointer', fontFamily: 'inherit' }}>×</button>
-                        </td>
+                      <tr key={tx.id} style={{ borderBottom: `0.5px solid ${t.border}`, background: isEditing ? t.bgSecondary : txEnvColor }}>
+                        {isEditing ? (
+                          <>
+                            <td style={{ padding: '6px 8px' }}>
+                              <input type="date" value={editTxForm.date} onChange={e => setEditTxForm({ ...editTxForm, date: e.target.value })} style={{ ...inputEditStyle, width: 110 }} />
+                            </td>
+                            <td style={{ padding: '8px 12px', fontWeight: 500, color: bleu }}>{tx.ticker}</td>
+                            <td style={{ padding: '8px 12px' }}>
+                              <span style={{ fontSize: 10, fontWeight: 500, padding: '2px 8px', borderRadius: 20, background: tx.enveloppe === 'PEA' ? '#EAF6E4' : tx.enveloppe === 'CTO' ? '#E8EEF6' : '#FFF8E6', color: tx.enveloppe === 'PEA' ? '#2E7D1E' : tx.enveloppe === 'CTO' ? bleu : '#BA7517' }}>{tx.enveloppe}</span>
+                            </td>
+                            <td style={{ padding: '8px 12px' }}>
+                              <span style={{ fontSize: 10, fontWeight: 500, padding: '2px 8px', borderRadius: 20, background: tx.type === 'Achat' ? '#EAF6E4' : '#FCEBEB', color: tx.type === 'Achat' ? '#2E7D1E' : '#E24B4A' }}>{tx.type}</span>
+                            </td>
+                            <td style={{ padding: '6px 8px' }}>
+                              <input type="number" min="0" value={editTxForm.quantite} onChange={e => setEditTxForm({ ...editTxForm, quantite: e.target.value })} style={{ ...inputEditStyle, width: 70 }} />
+                            </td>
+                            <td style={{ padding: '6px 8px' }}>
+                              <input type="number" min="0" value={editTxForm.prix_unitaire} onChange={e => setEditTxForm({ ...editTxForm, prix_unitaire: e.target.value })} style={{ ...inputEditStyle, width: 80 }} />
+                            </td>
+                            <td style={{ padding: '8px 12px', color: t.textMuted, fontSize: 11 }}>—</td>
+                            <td style={{ padding: '6px 8px' }}>
+                              <input type="number" min="0" value={editTxForm.frais_courtage} onChange={e => setEditTxForm({ ...editTxForm, frais_courtage: e.target.value })} style={{ ...inputEditStyle, width: 60 }} />
+                            </td>
+                            <td style={{ padding: '8px 12px', color: t.textMuted, fontSize: 11 }}>—</td>
+                            <td style={{ padding: '8px 12px', color: t.textMuted, fontSize: 11 }}>—</td>
+                            <td style={{ padding: '6px 8px' }}>
+                              <div style={{ display: 'flex', gap: 4 }}>
+                                <button onClick={() => handleEditTxSave(tx)} disabled={loading} style={{ background: '#EAF6E4', color: '#2E7D1E', border: 'none', borderRadius: 5, padding: '2px 7px', fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>✓</button>
+                                <button onClick={() => setEditingTxId(null)} style={{ background: t.bgSecondary, color: t.textMuted, border: `0.5px solid ${t.border}`, borderRadius: 5, padding: '2px 7px', fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>✕</button>
+                              </div>
+                            </td>
+                          </>
+                        ) : (
+                          <>
+                            <td style={{ padding: '8px 12px', color: t.textSecondary, whiteSpace: 'nowrap' }}>{new Date(tx.date).toLocaleDateString('fr-FR')}</td>
+                            <td style={{ padding: '8px 12px', fontWeight: 500, color: bleu }}>{tx.ticker}</td>
+                            <td style={{ padding: '8px 12px' }}>
+                              <span style={{ fontSize: 10, fontWeight: 500, padding: '2px 8px', borderRadius: 20, background: tx.enveloppe === 'PEA' ? '#EAF6E4' : tx.enveloppe === 'CTO' ? '#E8EEF6' : '#FFF8E6', color: tx.enveloppe === 'PEA' ? '#2E7D1E' : tx.enveloppe === 'CTO' ? bleu : '#BA7517' }}>{tx.enveloppe}</span>
+                            </td>
+                            <td style={{ padding: '8px 12px' }}>
+                              <span style={{ fontSize: 10, fontWeight: 500, padding: '2px 8px', borderRadius: 20, background: tx.type === 'Achat' ? '#EAF6E4' : '#FCEBEB', color: tx.type === 'Achat' ? '#2E7D1E' : '#E24B4A' }}>{tx.type}</span>
+                            </td>
+                            <td style={{ padding: '8px 12px', color: t.text }}>{tx.quantite}</td>
+                            <td style={{ padding: '8px 12px', color: t.text }}>{parseFloat(tx.prix_unitaire).toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €</td>
+                            <td style={{ padding: '8px 12px', color: t.text }}>{prixActuel.toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €</td>
+                            <td style={{ padding: '8px 12px', color: t.textSecondary }}>{parseFloat(tx.frais_courtage || 0).toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €</td>
+                            <td style={{ padding: '8px 12px', fontWeight: 500, color: t.text }}>{Math.round(coutTotal).toLocaleString('fr-FR')} €</td>
+                            <td style={{ padding: '8px 12px', fontWeight: 500, color: plusValueTx >= 0 ? '#4CAF2E' : '#E24B4A' }}>
+                              {Math.round(valeurActuelleTx).toLocaleString('fr-FR')} €
+                              <span style={{ fontSize: 10, marginLeft: 4 }}>({plusValueTx >= 0 ? '+' : ''}{Math.round(plusValueTx).toLocaleString('fr-FR')} €)</span>
+                            </td>
+                            <td style={{ padding: '8px 12px' }}>
+                              <div style={{ display: 'flex', gap: 4 }}>
+                                <button onClick={() => handleEditTxStart(tx)} style={{ background: t.bgSecondary, color: t.textMuted, border: `0.5px solid ${t.border}`, borderRadius: 5, padding: '2px 7px', fontSize: 10, cursor: 'pointer', fontFamily: 'inherit' }}>✏️</button>
+                                <button
+                                  onClick={() => handleDeleteTransaction(tx.id)}
+                                  style={{ background: confirmDeleteId === tx.id ? '#E24B4A' : '#FCEBEB', color: confirmDeleteId === tx.id ? '#fff' : '#E24B4A', border: 'none', borderRadius: 5, padding: '2px 7px', fontSize: 10, cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap', transition: 'all 0.15s' }}
+                                >
+                                  {confirmDeleteId === tx.id ? 'Confirmer ?' : '×'}
+                                </button>
+                              </div>
+                            </td>
+                          </>
+                        )}
                       </tr>
                     )
                   })}
