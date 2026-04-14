@@ -11,10 +11,6 @@ export function ThemeProvider({ children }) {
     return localStorage.getItem('nightShift') === 'true'
   })
 
-  const [fontSize, setFontSize] = useState(() => {
-    return parseInt(localStorage.getItem('fontSize')) || 14
-  })
-
   useEffect(() => {
     localStorage.setItem('theme', dark ? 'dark' : 'light')
     document.body.style.background = dark ? '#0C0F14' : '#fff'
@@ -31,24 +27,14 @@ export function ThemeProvider({ children }) {
     }
   }, [nightShift])
 
-  useEffect(() => {
-    localStorage.setItem('fontSize', fontSize)
-    document.body.style.fontSize = `${fontSize}px`
-  }, [fontSize])
-
   const toggle = () => setDark(d => !d)
   const toggleNightShift = () => setNightShift(n => !n)
-  const toggleFontSize = (size) => setFontSize(size)
-  const resetFontSize = () => setFontSize(14)
 
   const t = {
     dark,
     toggle,
     nightShift,
     toggleNightShift,
-    fontSize,
-    toggleFontSize,
-    resetFontSize,
     bg: dark ? '#0C0F14' : '#F4F7F5',
     bgCard: dark ? '#131820' : '#fff',
     bgSecondary: dark ? '#0F1319' : '#F4F7F5',
