@@ -11,7 +11,7 @@ export default function Navbar({ page, initiale }) {
     ['Portefeuille', '/portefeuille'],
     ['Investissement', '/investissement'],
     ['Croissance', '/croissance'],
-    ['Concentration', '/concentration'],
+    ['Challenge', '/challenge'],
     ['Guide', '/guide'],
     ['Abonnement', '/abonnement'],
     ['Compte', '/compte'],
