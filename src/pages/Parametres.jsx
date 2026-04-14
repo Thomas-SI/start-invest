@@ -52,7 +52,7 @@ export default function Parametres() {
   const t = useTheme()
   const [user, setUser] = useState(null)
   const [langue, setLangue] = useState('fr')
-  const [tailleTexte, setTailleTexte] = useState(14)
+  const [tailleTexte, setTailleTexte] = useState(t.fontSize)
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -63,6 +63,16 @@ export default function Parametres() {
   }, [])
 
   const initiale = user?.user_metadata?.prenom?.[0]?.toUpperCase() || '?'
+
+  const handleFontSize = (val) => {
+    setTailleTexte(val)
+    t.toggleFontSize(val)
+  }
+
+  const handleResetFont = () => {
+    setTailleTexte(14)
+    t.resetFontSize()
+  }
 
   return (
     <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -90,7 +100,7 @@ export default function Parametres() {
               <Toggle active={t.nightShift} onToggle={t.toggleNightShift} />
             </Row>
 
-            <SectionTitle t={t}>Taille du texte <ComingSoon /></SectionTitle>
+            <SectionTitle t={t}>Taille du texte</SectionTitle>
             <div style={{ padding: '12px 16px', background: t.bgSecondary, borderRadius: 10, marginBottom: 8 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
                 <span style={{ fontSize: 11, color: t.textMuted }}>Petit</span>
@@ -99,10 +109,22 @@ export default function Parametres() {
               </div>
               <input
                 type="range" min="11" max="18" value={tailleTexte}
-                onChange={e => setTailleTexte(parseInt(e.target.value))}
-                style={{ width: '100%', accentColor: '#4CAF2E', cursor: 'not-allowed', opacity: 0.5 }}
-                disabled
+                onChange={e => handleFontSize(parseInt(e.target.value))}
+                style={{ width: '100%', accentColor: '#4CAF2E', cursor: 'pointer' }}
               />
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 10 }}>
+                <span style={{ fontSize: 11, color: t.textMuted }}>
+                  {tailleTexte === 14 ? '✓ Taille par défaut' : `Taille modifiée (défaut : 14px)`}
+                </span>
+                {tailleTexte !== 14 && (
+                  <button
+                    onClick={handleResetFont}
+                    style={{ fontSize: 11, padding: '4px 10px', borderRadius: 7, border: `0.5px solid ${t.border}`, background: t.bgCard, color: t.text, cursor: 'pointer', fontFamily: 'inherit' }}
+                  >
+                    Remettre par défaut
+                  </button>
+                )}
+              </div>
             </div>
           </div>
 
