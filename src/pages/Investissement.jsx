@@ -146,8 +146,6 @@ export default function Investissement() {
         frais_courtage: parseFloat(editTxForm.frais_courtage) || 0,
       }).eq('id', tx.id)
       if (error) throw new Error('Erreur lors de la modification.')
-
-      // Recalcul PRU
       const allTx = transactions.map(t => t.id === tx.id ? { ...t, ...editTxForm, quantite: parseFloat(editTxForm.quantite), prix_unitaire: parseFloat(editTxForm.prix_unitaire) } : t)
       const txMemePos = allTx.filter(t => t.ticker === tx.ticker && t.enveloppe === tx.enveloppe)
       let quantiteTotale = 0, coutTotal = 0
@@ -157,7 +155,6 @@ export default function Investissement() {
       }
       const nouveauPru = quantiteTotale > 0 ? Math.round((coutTotal / quantiteTotale) * 10000) / 10000 : 0
       await supabase.from('investissements').update({ quantite: quantiteTotale, pru: nouveauPru }).eq('user_id', user.id).eq('ticker', tx.ticker).eq('enveloppe', tx.enveloppe)
-
       queryClient.invalidateQueries({ queryKey: ['investissement'] })
       setEditingTxId(null)
     } catch (e) {
@@ -219,16 +216,15 @@ export default function Investissement() {
           <>
             <div style={{ fontSize: 14, fontWeight: 500, color: t.text }}>Allocations par enveloppe</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {enveloppesActives.map((env, envIndex) => {
+              {enveloppesActives.map((env) => {
                 const lignes = investissements.filter(i => i.enveloppe === env)
                 const totalEnv = lignes.reduce((acc, i) => acc + calcValeurActuelle(i), 0)
                 const totalInvestiEnv = lignes.reduce((acc, i) => acc + parseFloat(i.quantite) * parseFloat(i.pru || i.prix_achat_unitaire || 0), 0)
                 const plusValueEnv = totalEnv - totalInvestiEnv
                 const nbPositionsEnv = lignes.length
                 const totalCible = lignes.reduce((a, i) => a + (parseFloat(i.cible) || 0), 0)
-                const envColor = envIndex % 2 === 0 ? 'rgba(76,175,46,0.06)' : 'rgba(27,46,75,0.06)'
                 return (
-                  <div key={env} style={{ background: envColor, border: `0.5px solid ${t.border}`, borderRadius: 12, overflow: 'hidden' }}>
+                  <div key={env} style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, overflow: 'hidden' }}>
                     <div style={{ padding: '10px 16px', borderBottom: `0.5px solid ${t.border}`, background: t.bgSecondary, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <div style={{ fontSize: 13, fontWeight: 500, color: t.text }}>{ENVELOPPE_LABELS[env] || env}</div>
                       {totalCible > 0 && <div style={{ fontSize: 11, fontWeight: 500, color: totalCible === 100 ? '#4CAF2E' : '#E24B4A' }}>% Cible total : {totalCible}%</div>}
@@ -254,7 +250,7 @@ export default function Investissement() {
                                 const prixActuel = parseFloat(inv.prix_actuel) || parseFloat(inv.pru || inv.prix_achat_unitaire || 0)
                                 const diff = pctCible > 0 ? Math.round((pctCible - pctActuel) / 100 * totalEnv / prixActuel) : 0
                                 return (
-                                  <tr key={inv.id} style={{ borderBottom: `0.5px solid ${t.border}`, background: envColor }}>
+                                  <tr key={inv.id} style={{ borderBottom: `0.5px solid ${t.border}`, background: 'transparent' }}>
                                     <td style={{ padding: '10px 14px', fontWeight: 500, color: bleu }}>{inv.ticker}</td>
                                     <td style={{ padding: '10px 14px', color: t.text, maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{inv.actif}</td>
                                     <td style={{ padding: '10px 14px', color: t.text }}>{prixActuel.toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €</td>
@@ -291,7 +287,7 @@ export default function Investissement() {
                           ['Plus-value', `${plusValueEnv >= 0 ? '+' : ''}${Math.round(plusValueEnv).toLocaleString('fr-FR')} €`, plusValueEnv >= 0 ? '#4CAF2E' : '#E24B4A'],
                           ['Nb positions', nbPositionsEnv.toString(), bleu],
                         ].map(([l, v, c], idx) => (
-                          <div key={l} style={{ padding: '16px', background: envColor, borderBottom: idx < 2 ? `0.5px solid ${t.border}` : 'none', borderRight: idx % 2 === 0 ? `0.5px solid ${t.border}` : 'none', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                          <div key={l} style={{ padding: '16px', background: 'transparent', borderBottom: idx < 2 ? `0.5px solid ${t.border}` : 'none', borderRight: idx % 2 === 0 ? `0.5px solid ${t.border}` : 'none', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                             <div style={{ fontSize: 9, color: t.textMuted, textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 6 }}>{l}</div>
                             <div style={{ fontSize: 16, fontWeight: 500, color: c }}>{v}</div>
                           </div>
@@ -400,12 +396,10 @@ export default function Investissement() {
                     const prixActuel = parseFloat(invPosition?.prix_actuel || tx.prix_unitaire)
                     const valeurActuelleTx = parseFloat(tx.quantite) * prixActuel
                     const plusValueTx = valeurActuelleTx - (parseFloat(tx.quantite) * parseFloat(tx.prix_unitaire))
-                    const txEnvIndex = enveloppesActives.indexOf(tx.enveloppe)
-                    const txEnvColor = txEnvIndex % 2 === 0 ? 'rgba(76,175,46,0.06)' : 'rgba(27,46,75,0.06)'
                     const isEditing = editingTxId === tx.id
 
                     return (
-                      <tr key={tx.id} style={{ borderBottom: `0.5px solid ${t.border}`, background: isEditing ? t.bgSecondary : txEnvColor }}>
+                      <tr key={tx.id} style={{ borderBottom: `0.5px solid ${t.border}`, background: isEditing ? t.bgSecondary : 'transparent' }}>
                         {isEditing ? (
                           <>
                             <td style={{ padding: '6px 8px' }}>
@@ -459,10 +453,7 @@ export default function Investissement() {
                             <td style={{ padding: '8px 12px' }}>
                               <div style={{ display: 'flex', gap: 4 }}>
                                 <button onClick={() => handleEditTxStart(tx)} style={{ background: t.bgSecondary, color: t.textMuted, border: `0.5px solid ${t.border}`, borderRadius: 5, padding: '2px 7px', fontSize: 10, cursor: 'pointer', fontFamily: 'inherit' }}>✏️</button>
-                                <button
-                                  onClick={() => handleDeleteTransaction(tx.id)}
-                                  style={{ background: confirmDeleteId === tx.id ? '#E24B4A' : '#FCEBEB', color: confirmDeleteId === tx.id ? '#fff' : '#E24B4A', border: 'none', borderRadius: 5, padding: '2px 7px', fontSize: 10, cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap', transition: 'all 0.15s' }}
-                                >
+                                <button onClick={() => handleDeleteTransaction(tx.id)} style={{ background: confirmDeleteId === tx.id ? '#E24B4A' : '#FCEBEB', color: confirmDeleteId === tx.id ? '#fff' : '#E24B4A', border: 'none', borderRadius: 5, padding: '2px 7px', fontSize: 10, cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap', transition: 'all 0.15s' }}>
                                   {confirmDeleteId === tx.id ? 'Confirmer ?' : '×'}
                                 </button>
                               </div>
