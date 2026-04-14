@@ -15,15 +15,16 @@ import Guide from './pages/Guide'
 import Abonnement from './pages/Abonnement'
 import Compte from './pages/Compte'
 import Parametres from './pages/Parametres'
+import Onboarding from './pages/Onboarding'
 import './index.css'
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 5, // données fraîches pendant 5 minutes
-      cacheTime: 1000 * 60 * 10, // cache gardé 10 minutes
-      retry: 2, // retry 2 fois si erreur réseau
-      refetchOnWindowFocus: false, // pas de refetch quand on change d'onglet
+      staleTime: 1000 * 60 * 5,
+      cacheTime: 1000 * 60 * 10,
+      retry: 2,
+      refetchOnWindowFocus: false,
     },
   },
 })
@@ -37,6 +38,7 @@ createRoot(document.getElementById('root')).render(
             <Route path="/" element={<Accueil />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/onboarding" element={<Onboarding />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/portefeuille" element={<Portefeuille />} />
             <Route path="/investissement" element={<Investissement />} />
