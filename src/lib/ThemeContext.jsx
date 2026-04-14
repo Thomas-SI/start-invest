@@ -7,16 +7,34 @@ export function ThemeProvider({ children }) {
     return localStorage.getItem('theme') === 'dark'
   })
 
+  const [nightShift, setNightShift] = useState(() => {
+    return localStorage.getItem('nightShift') === 'true'
+  })
+
   useEffect(() => {
     localStorage.setItem('theme', dark ? 'dark' : 'light')
     document.body.style.background = dark ? '#0C0F14' : '#fff'
   }, [dark])
 
+  useEffect(() => {
+    localStorage.setItem('nightShift', nightShift ? 'true' : 'false')
+    if (nightShift) {
+      document.body.style.filter = 'sepia(0.3) brightness(0.95)'
+      document.body.style.transition = 'filter 0.5s ease'
+    } else {
+      document.body.style.filter = 'none'
+      document.body.style.transition = 'filter 0.5s ease'
+    }
+  }, [nightShift])
+
   const toggle = () => setDark(d => !d)
+  const toggleNightShift = () => setNightShift(n => !n)
 
   const t = {
     dark,
     toggle,
+    nightShift,
+    toggleNightShift,
     bg: dark ? '#0C0F14' : '#F4F7F5',
     bgCard: dark ? '#131820' : '#fff',
     bgSecondary: dark ? '#0F1319' : '#F4F7F5',

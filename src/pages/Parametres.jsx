@@ -69,8 +69,8 @@ export default function Parametres() {
             <Row label={`Mode ${t.dark ? 'sombre' : 'clair'}`} desc={t.dark ? 'Interface sombre activée' : 'Interface claire activée'} t={t}>
               <Toggle active={t.dark} onToggle={t.toggle} />
             </Row>
-            <Row label={<span>Mode Night Shift<ComingSoon /></span>} desc="Réduit la lumière bleue le soir" t={t}>
-              <Toggle active={false} disabled />
+            <Row label="Mode Night Shift" desc="Réduit la lumière bleue de l'écran" t={t}>
+              <Toggle active={t.nightShift} onToggle={t.toggleNightShift} />
             </Row>
 
             <SectionTitle t={t}>Taille du texte <ComingSoon /></SectionTitle>
@@ -81,10 +81,7 @@ export default function Parametres() {
                 <span style={{ fontSize: 11, color: t.textMuted }}>Grand</span>
               </div>
               <input
-                type="range"
-                min="11"
-                max="18"
-                value={tailleTexte}
+                type="range" min="11" max="18" value={tailleTexte}
                 onChange={e => setTailleTexte(parseInt(e.target.value))}
                 style={{ width: '100%', accentColor: '#4CAF2E', cursor: 'not-allowed', opacity: 0.5 }}
                 disabled
