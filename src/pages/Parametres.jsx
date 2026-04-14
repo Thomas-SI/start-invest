@@ -4,7 +4,24 @@ import { supabase } from '../lib/supabase'
 import Navbar from '../components/Navbar'
 import { useTheme } from '../lib/ThemeContext'
 
-const LANGUES = ['Français', 'English', 'Español', 'Deutsch']
+const LANGUES = [
+  { code: 'fr', label: 'Français', flag: '🇫🇷', dispo: true },
+  { code: 'en', label: 'English', flag: '🇬🇧', dispo: false },
+  { code: 'es', label: 'Español', flag: '🇪🇸', dispo: false },
+  { code: 'de', label: 'Deutsch', flag: '🇩🇪', dispo: false },
+  { code: 'it', label: 'Italiano', flag: '🇮🇹', dispo: false },
+  { code: 'pt', label: 'Português', flag: '🇵🇹', dispo: false },
+  { code: 'nl', label: 'Nederlands', flag: '🇳🇱', dispo: false },
+  { code: 'pl', label: 'Polski', flag: '🇵🇱', dispo: false },
+  { code: 'sv', label: 'Svenska', flag: '🇸🇪', dispo: false },
+  { code: 'da', label: 'Dansk', flag: '🇩🇰', dispo: false },
+  { code: 'fi', label: 'Suomi', flag: '🇫🇮', dispo: false },
+  { code: 'nb', label: 'Norsk', flag: '🇳🇴', dispo: false },
+  { code: 'ro', label: 'Română', flag: '🇷🇴', dispo: false },
+  { code: 'cs', label: 'Čeština', flag: '🇨🇿', dispo: false },
+  { code: 'hu', label: 'Magyar', flag: '🇭🇺', dispo: false },
+  { code: 'el', label: 'Ελληνικά', flag: '🇬🇷', dispo: false },
+]
 
 const ComingSoon = () => (
   <span style={{ fontSize: 9, background: '#FFF8E6', color: '#BA7517', padding: '2px 7px', borderRadius: 20, fontWeight: 500, marginLeft: 8 }}>Bientôt</span>
@@ -34,7 +51,7 @@ export default function Parametres() {
   const navigate = useNavigate()
   const t = useTheme()
   const [user, setUser] = useState(null)
-  const [langue, setLangue] = useState('Français')
+  const [langue, setLangue] = useState('fr')
   const [tailleTexte, setTailleTexte] = useState(14)
 
   useEffect(() => {
@@ -93,13 +110,28 @@ export default function Parametres() {
           <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 14, padding: 20, marginBottom: 12 }}>
             <div style={{ fontSize: 13, fontWeight: 500, color: t.text, marginBottom: 4 }}>Langue</div>
             <SectionTitle t={t}>Langue de l'application</SectionTitle>
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              {LANGUES.map(l => (
-                <button key={l} onClick={() => l === 'Français' && setLangue(l)} style={{ padding: '6px 14px', borderRadius: 20, border: `0.5px solid ${langue === l ? '#4CAF2E' : t.border}`, background: langue === l ? '#EAF6E4' : t.bgSecondary, color: langue === l ? '#2E7D1E' : l === 'Français' ? t.text : t.textMuted, fontSize: 12, cursor: l === 'Français' ? 'pointer' : 'default', fontFamily: 'inherit', opacity: l === 'Français' ? 1 : 0.5 }}>
-                  {l}{l !== 'Français' && ' 🔒'}
-                </button>
-              ))}
+            <div style={{ position: 'relative' }}>
+              <select
+                value={langue}
+                onChange={e => {
+                  const selected = LANGUES.find(l => l.code === e.target.value)
+                  if (selected?.dispo) setLangue(e.target.value)
+                }}
+                style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: `0.5px solid ${t.border}`, fontSize: 13, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text, cursor: 'pointer', appearance: 'none' }}
+              >
+                {LANGUES.map(l => (
+                  <option key={l.code} value={l.code} disabled={!l.dispo}>
+                    {l.flag} {l.label}{!l.dispo ? ' 🔒' : ''}
+                  </option>
+                ))}
+              </select>
+              <div style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: t.textMuted, fontSize: 10 }}>▼</div>
             </div>
+            {langue !== 'fr' && (
+              <div style={{ fontSize: 11, color: '#BA7517', background: '#FFF8E6', padding: '6px 10px', borderRadius: 7, marginTop: 8 }}>
+                Cette langue sera disponible prochainement.
+              </div>
+            )}
           </div>
 
           {/* NOTIFICATIONS */}
