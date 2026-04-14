@@ -14,12 +14,6 @@ const ENVELOPPE_LABELS = {
   'Assurance-vie': 'Assurance-vie',
 }
 
-const ENVELOPPE_COLORS = {
-  'PEA': 'rgba(76,175,46,0.06)',
-  'CTO': 'rgba(27,46,75,0.06)',
-  'Assurance-vie': 'rgba(186,117,23,0.06)',
-}
-
 const fetchInvestissementData = async () => {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Non connecté')
@@ -217,14 +211,14 @@ export default function Investissement() {
           <>
             <div style={{ fontSize: 14, fontWeight: 500, color: t.text }}>Allocations par enveloppe</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {enveloppesActives.map(env => {
+              {enveloppesActives.map((env, envIndex) => {
                 const lignes = investissements.filter(i => i.enveloppe === env)
                 const totalEnv = lignes.reduce((acc, i) => acc + calcValeurActuelle(i), 0)
                 const totalInvestiEnv = lignes.reduce((acc, i) => acc + parseFloat(i.quantite) * parseFloat(i.pru || i.prix_achat_unitaire || 0), 0)
                 const plusValueEnv = totalEnv - totalInvestiEnv
                 const nbPositionsEnv = lignes.length
                 const totalCible = lignes.reduce((a, i) => a + (parseFloat(i.cible) || 0), 0)
-                const envColor = ENVELOPPE_COLORS[env] || t.bgCard
+                const envColor = envIndex % 2 === 0 ? 'rgba(76,175,46,0.06)' : 'rgba(27,46,75,0.06)'
                 return (
                   <div key={env} style={{ background: envColor, border: `0.5px solid ${t.border}`, borderRadius: 12, overflow: 'hidden' }}>
                     <div style={{ padding: '10px 16px', borderBottom: `0.5px solid ${t.border}`, background: t.bgSecondary, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -403,7 +397,8 @@ export default function Investissement() {
                     const prixActuel = parseFloat(invPosition?.prix_actuel || tx.prix_unitaire)
                     const valeurActuelleTx = parseFloat(tx.quantite) * prixActuel
                     const plusValueTx = valeurActuelleTx - (parseFloat(tx.quantite) * parseFloat(tx.prix_unitaire))
-                    const txEnvColor = ENVELOPPE_COLORS[tx.enveloppe] || 'transparent'
+                    const txEnvIndex = enveloppesActives.indexOf(tx.enveloppe)
+                    const txEnvColor = txEnvIndex % 2 === 0 ? 'rgba(76,175,46,0.06)' : 'rgba(27,46,75,0.06)'
                     return (
                       <tr key={tx.id} style={{ borderBottom: `0.5px solid ${t.border}`, background: txEnvColor }}>
                         <td style={{ padding: '8px 12px', color: t.textSecondary, whiteSpace: 'nowrap' }}>{new Date(tx.date).toLocaleDateString('fr-FR')}</td>
