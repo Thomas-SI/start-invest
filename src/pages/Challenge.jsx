@@ -22,18 +22,17 @@ const GRADES_METRONOME = [
 
 const MetronomeIcon = ({ size = 28, color = '#854F0B' }) => (
   <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
-    <circle cx="13" cy="6" r="2.5" fill={color}/>
-    <line x1="13" y1="8.5" x2="11" y2="14" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
-    <line x1="11" y1="14" x2="14" y2="19" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
-    <line x1="14" y1="19" x2="12" y2="25" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
-    <line x1="11" y1="14" x2="7" y2="16" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
-    <line x1="7" y1="16" x2="5" y2="14" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
-    <line x1="14" y1="19" x2="18" y2="22" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
-    <line x1="9" y1="12" x2="13" y2="11" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
-    <line x1="5" y1="14" x2="3" y2="18" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
-    <line x1="18" y1="22" x2="17" y2="26" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
-    <line x1="22" y1="10" x2="26" y2="6" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
-    <line x1="24" y1="8" x2="27" y2="11" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
+    <circle cx="16" cy="4.5" r="2.5" fill={color}/>
+    <rect x="13" y="8" width="5" height="6" rx="1.5" fill={color} opacity="0.5"/>
+    <line x1="16" y1="8" x2="16" y2="17" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+    <line x1="16" y1="10" x2="11" y2="14" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
+    <line x1="16" y1="10" x2="20" y2="13" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
+    <line x1="16" y1="17" x2="20" y2="24" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+    <line x1="16" y1="17" x2="12" y2="23" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+    <line x1="20" y1="24" x2="23" y2="24" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
+    <line x1="12" y1="23" x2="9" y2="24" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
+    <line x1="11" y1="14" x2="8" y2="27" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
+    <line x1="9" y1="13" x2="12" y2="13" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
   </svg>
 )
 
@@ -193,7 +192,6 @@ export default function Challenge() {
   const bleu = t.dark ? '#3B82F6' : '#1B2E4B'
   const streak = calcStreak(transactions)
   const totalInvesti = investissements.reduce((acc, i) => acc + parseFloat(i.quantite) * parseFloat(i.pru || i.prix_achat_unitaire || 0), 0)
-
   const slugsObtenus = new Set(accomplissements.map(a => a.slug))
 
   const getGradeActuel = (acc) => {
@@ -266,7 +264,7 @@ export default function Challenge() {
     const prog = getProgression(acc)
     const pct = prog ? Math.min(Math.round((prog.current / prog.total) * 100), 100) : 0
     const estMaxLevel = obtenu && acc.evolutif && !prochain
-    const iconColor = gradeActuel ? gradeActuel.niveauColor : '#854F0B'
+    const iconColor = gradeActuel ? gradeActuel.niveauColor : '#4CAF2E'
 
     return (
       <div style={{ background: obtenu ? (t.dark ? '#0F1F0F' : '#F6FFF3') : t.bgCard, border: `0.5px solid ${obtenu ? '#4CAF2E' : t.border}`, borderRadius: 12, padding: 14, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 6 }}>

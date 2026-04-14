@@ -2,18 +2,17 @@ import { useNavigate } from 'react-router-dom'
 
 const MetronomeIcon = ({ size = 28, color = '#854F0B' }) => (
   <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
-    <circle cx="13" cy="6" r="2.5" fill={color}/>
-    <line x1="13" y1="8.5" x2="11" y2="14" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
-    <line x1="11" y1="14" x2="14" y2="19" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
-    <line x1="14" y1="19" x2="12" y2="25" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
-    <line x1="11" y1="14" x2="7" y2="16" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
-    <line x1="7" y1="16" x2="5" y2="14" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
-    <line x1="14" y1="19" x2="18" y2="22" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
-    <line x1="9" y1="12" x2="13" y2="11" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
-    <line x1="5" y1="14" x2="3" y2="18" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
-    <line x1="18" y1="22" x2="17" y2="26" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
-    <line x1="22" y1="10" x2="26" y2="6" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
-    <line x1="24" y1="8" x2="27" y2="11" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
+    <circle cx="16" cy="4.5" r="2.5" fill={color}/>
+    <rect x="13" y="8" width="5" height="6" rx="1.5" fill={color} opacity="0.5"/>
+    <line x1="16" y1="8" x2="16" y2="17" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+    <line x1="16" y1="10" x2="11" y2="14" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
+    <line x1="16" y1="10" x2="20" y2="13" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
+    <line x1="16" y1="17" x2="20" y2="24" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+    <line x1="16" y1="17" x2="12" y2="23" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+    <line x1="20" y1="24" x2="23" y2="24" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
+    <line x1="12" y1="23" x2="9" y2="24" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
+    <line x1="11" y1="14" x2="8" y2="27" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
+    <line x1="9" y1="13" x2="12" y2="13" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
   </svg>
 )
 
@@ -217,7 +216,7 @@ export default function Accueil() {
             </div>
 
             <div style={{ background: 'rgba(255,255,255,0.06)', border: '0.5px solid rgba(255,255,255,0.1)', borderRadius: 16, padding: '24px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 12 }}>
-              <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#FFF8DC', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #854F0B' }}>
+              <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#FFF0DC', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #854F0B' }}>
                 <MetronomeIcon size={32} color="#854F0B" />
               </div>
               <div style={{ fontSize: 15, fontWeight: 600, color: '#fff' }}>Le Métronome</div>
