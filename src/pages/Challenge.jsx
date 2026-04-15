@@ -34,6 +34,7 @@ const ACCOMPLISSEMENTS = [
 
 // Données INSEE 2024 — patrimoine financier hors immobilier
 // (livrets, PEA, assurance-vie, valeurs mobilières, épargne retraite)
+// Du moins rare au plus rare — cercles du plus petit au plus grand
 const PALIERS_FINANCIERS = [
   { label: 'Médiane', pct: 50, montant: 22000, couleur: '#6B7280', desc: 'La moitié des Français a moins de 22 000 € de patrimoine financier (hors immobilier). Source : INSEE 2024' },
   { label: 'Top 30%', pct: 30, montant: 45000, couleur: '#3B82F6', desc: 'Vous faites partie des 30% les mieux dotés en épargne financière en France. Source : INSEE 2024' },
@@ -108,22 +109,27 @@ const checkAndGrant = async (user, investissements, transactions, accomplissemen
 function MaPosition({ totalInvesti, comptes, accomplissements }) {
   const t = useTheme()
   const [palierActif, setPalierActif] = useState(null)
+  const [zoom, setZoom] = useState(0)
 
-  // Patrimoine financier = total investi + soldes comptes (livret, PEA, CTO, ass-vie)
   const soldeComptes = comptes.reduce((acc, c) => acc + parseFloat(c.solde_actuel || c.solde || 0), 0)
   const patrimoineFinancier = Math.round(totalInvesti + soldeComptes)
 
-  // Trouver le palier atteint
-  const palierAtteint = [...PALIERS_FINANCIERS].reverse().find(p => patrimoineFinancier >= p.montant)
-  const indexAtteint = palierAtteint ? PALIERS_FINANCIERS.findIndex(p => p.label === palierAtteint.label) : -1
-
-  // Badges débloqués
   const slugsObtenus = new Set(accomplissements.map(a => a.slug))
   const badgesObtenus = ACCOMPLISSEMENTS.filter(a => slugsObtenus.has(a.slug))
 
-  // Taille du cercle utilisateur selon patrimoine (min 60, max 120)
-  const maxMontant = PALIERS_FINANCIERS[PALIERS_FINANCIERS.length - 1].montant
-  const tailleUser = Math.max(60, Math.min(110, 60 + (patrimoineFinancier / maxMontant) * 50))
+  const indexAtteint = [...PALIERS_FINANCIERS].reduce((best, p, i) => patrimoineFinancier >= p.montant ? i : best, -1)
+  const palierAtteint = indexAtteint >= 0 ? PALIERS_FINANCIERS[indexAtteint] : null
+  const indexCentre = Math.min(indexAtteint + 1, PALIERS_FINANCIERS.length - 1)
+  const indexFocus = Math.max(0, Math.min(PALIERS_FINANCIERS.length - 1, indexCentre + zoom))
+
+  const paliersPossibles = PALIERS_FINANCIERS.map((p, i) => ({ ...p, index: i }))
+  const visibles = paliersPossibles.filter(p => Math.abs(p.index - indexFocus) <= 2)
+
+  // Top 1% = index 5 = taille 280, Médiane = index 0 = taille 80
+  const getTaille = (index) => {
+    const sizes = [80, 120, 160, 200, 240, 280]
+    return sizes[index] || 80
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -133,26 +139,49 @@ function MaPosition({ totalInvesti, comptes, accomplissements }) {
         <div style={{ fontSize: 12, color: t.textMuted, marginBottom: 4 }}>Ton patrimoine financier estimé</div>
         <div style={{ fontSize: 26, fontWeight: 700, color: t.text }}>{patrimoineFinancier.toLocaleString('fr-FR')} €</div>
         <div style={{ fontSize: 11, color: t.textMuted, marginTop: 2 }}>Investissements + soldes comptes (hors immobilier)</div>
-        {palierAtteint && (
+        {palierAtteint ? (
           <div style={{ marginTop: 10, display: 'inline-flex', alignItems: 'center', gap: 6, background: palierAtteint.couleur + '18', border: `0.5px solid ${palierAtteint.couleur}`, borderRadius: 20, padding: '4px 12px' }}>
             <div style={{ width: 6, height: 6, borderRadius: '50%', background: palierAtteint.couleur }} />
             <span style={{ fontSize: 11, fontWeight: 600, color: palierAtteint.couleur }}>{palierAtteint.label} des épargnants français</span>
           </div>
+        ) : (
+          <div style={{ marginTop: 10, display: 'inline-flex', alignItems: 'center', gap: 6, background: t.bgSecondary, borderRadius: 20, padding: '4px 12px' }}>
+            <span style={{ fontSize: 11, color: t.textMuted }}>En dessous de la médiane nationale</span>
+          </div>
         )}
       </div>
 
-      {/* VISUALISATION BULLES */}
-      <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 14, padding: '20px 16px' }}>
-        <div style={{ fontSize: 13, fontWeight: 500, color: t.text, marginBottom: 4 }}>Ta position parmi les épargnants français</div>
-        <div style={{ fontSize: 11, color: t.textMuted, marginBottom: 16 }}>Patrimoine financier hors immobilier · Source : INSEE 2024</div>
+      {/* VISUALISATION ZOOM */}
+      <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 14, padding: '16px 16px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 500, color: t.text }}>Ta position parmi les épargnants français</div>
+            <div style={{ fontSize: 11, color: t.textMuted, marginTop: 2 }}>Patrimoine financier hors immobilier · INSEE 2024</div>
+          </div>
+          <div style={{ display: 'flex', gap: 6 }}>
+            <button
+              onClick={() => setZoom(z => Math.max(z - 1, -indexFocus))}
+              style={{ width: 30, height: 30, borderRadius: 8, border: `0.5px solid ${t.border}`, background: t.bgSecondary, color: t.text, fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'inherit' }}>
+              −
+            </button>
+            <button
+              onClick={() => setZoom(z => Math.min(z + 1, PALIERS_FINANCIERS.length - 1 - indexFocus))}
+              style={{ width: 30, height: 30, borderRadius: 8, border: `0.5px solid ${t.border}`, background: t.bgSecondary, color: t.text, fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'inherit' }}>
+              +
+            </button>
+          </div>
+        </div>
 
-        <div style={{ position: 'relative', height: 280, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 14, textAlign: 'center' }}>
+          − voir paliers communs · + voir paliers rares
+        </div>
 
-          {/* CERCLES PALIERS — du plus grand au plus petit */}
-          {[...PALIERS_FINANCIERS].reverse().map((palier, i) => {
-            const idx = PALIERS_FINANCIERS.length - 1 - i
-            const taille = 260 - idx * 36
+        {/* BULLES CONCENTRIQUES */}
+        <div style={{ position: 'relative', height: 300, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+          {[...visibles].reverse().map((palier) => {
+            const taille = getTaille(palier.index)
             const atteint = patrimoineFinancier >= palier.montant
+            const estFocus = palier.index === indexFocus
             const estActif = palierActif?.label === palier.label
             return (
               <div
@@ -163,20 +192,18 @@ function MaPosition({ totalInvesti, comptes, accomplissements }) {
                   width: taille,
                   height: taille,
                   borderRadius: '50%',
-                  border: `1.5px ${atteint ? 'solid' : 'dashed'} ${atteint ? palier.couleur : t.border}`,
-                  background: atteint ? palier.couleur + '08' : 'transparent',
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  justifyContent: 'flex-end',
+                  border: `${estFocus ? 2 : 1.5}px ${atteint ? 'solid' : 'dashed'} ${atteint ? palier.couleur : t.border}`,
+                  background: atteint ? palier.couleur + '10' : 'transparent',
                   cursor: 'pointer',
-                  transition: 'all 0.2s',
-                  boxShadow: estActif ? `0 0 0 2px ${palier.couleur}` : 'none',
+                  transition: 'all 0.3s',
+                  boxShadow: estActif ? `0 0 0 2px ${palier.couleur}` : estFocus ? `0 0 0 1px ${palier.couleur}40` : 'none',
                 }}
               >
                 <div style={{
                   position: 'absolute',
-                  top: 8,
-                  right: 8,
+                  top: taille > 150 ? 12 : 6,
+                  left: '50%',
+                  transform: 'translateX(-50%)',
                   fontSize: 9,
                   fontWeight: 600,
                   color: atteint ? palier.couleur : t.textMuted,
@@ -188,15 +215,29 @@ function MaPosition({ totalInvesti, comptes, accomplissements }) {
                 }}>
                   {palier.label}
                 </div>
+                <div style={{
+                  position: 'absolute',
+                  bottom: taille > 150 ? 12 : 6,
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  fontSize: 9,
+                  color: atteint ? palier.couleur : t.textMuted,
+                  background: t.bgCard,
+                  padding: '2px 6px',
+                  borderRadius: 10,
+                  whiteSpace: 'nowrap',
+                }}>
+                  {palier.montant.toLocaleString('fr-FR')} €
+                </div>
               </div>
             )
           })}
 
-          {/* CERCLE UTILISATEUR AU CENTRE */}
+          {/* CERCLE UTILISATEUR */}
           <div style={{
             position: 'absolute',
-            width: tailleUser,
-            height: tailleUser,
+            width: 64,
+            height: 64,
             borderRadius: '50%',
             background: palierAtteint ? palierAtteint.couleur + '20' : t.bgSecondary,
             border: `3px solid ${palierAtteint ? palierAtteint.couleur : '#4CAF2E'}`,
@@ -205,28 +246,21 @@ function MaPosition({ totalInvesti, comptes, accomplissements }) {
             alignItems: 'center',
             justifyContent: 'center',
             gap: 2,
-            zIndex: 10,
-            boxShadow: `0 4px 16px ${palierAtteint ? palierAtteint.couleur + '30' : 'rgba(76,175,46,0.2)'}`,
+            zIndex: 20,
+            boxShadow: `0 4px 20px ${palierAtteint ? palierAtteint.couleur + '40' : 'rgba(76,175,46,0.3)'}`,
           }}>
-            <div style={{ fontSize: tailleUser > 80 ? 22 : 16 }}>👤</div>
+            <div style={{ fontSize: 18 }}>👤</div>
             {badgesObtenus.length > 0 && (
-              <div style={{ display: 'flex', gap: 2, flexWrap: 'wrap', justifyContent: 'center', maxWidth: tailleUser - 16 }}>
-                {badgesObtenus.slice(0, 3).map(b => (
-                  <span key={b.slug} style={{ fontSize: tailleUser > 80 ? 12 : 9 }}>
-                    {b.svgIcon ? '🎵' : b.emoji}
-                  </span>
-                ))}
+              <div style={{ fontSize: 9 }}>
+                {badgesObtenus.slice(0, 2).map(b => b.svgIcon ? '🎵' : b.emoji).join('')}
               </div>
             )}
-            <div style={{ fontSize: 9, color: t.textMuted, fontWeight: 500 }}>
-              {patrimoineFinancier.toLocaleString('fr-FR')} €
-            </div>
           </div>
         </div>
 
-        {/* POPUP INFO PALIER */}
+        {/* POPUP PALIER CLIQUÉ */}
         {palierActif && (
-          <div style={{ background: palierActif.couleur + '12', border: `0.5px solid ${palierActif.couleur}`, borderRadius: 10, padding: '12px 14px', marginTop: 8 }}>
+          <div style={{ background: palierActif.couleur + '12', border: `0.5px solid ${palierActif.couleur}`, borderRadius: 10, padding: '12px 14px', marginTop: 4 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
               <span style={{ fontSize: 13, fontWeight: 600, color: palierActif.couleur }}>{palierActif.label}</span>
               <span style={{ fontSize: 13, fontWeight: 700, color: t.text }}>≥ {palierActif.montant.toLocaleString('fr-FR')} €</span>
@@ -235,24 +269,40 @@ function MaPosition({ totalInvesti, comptes, accomplissements }) {
             <button onClick={() => setPalierActif(null)} style={{ marginTop: 8, background: 'none', border: 'none', color: t.textMuted, fontSize: 11, cursor: 'pointer', fontFamily: 'inherit', padding: 0 }}>Fermer ✕</button>
           </div>
         )}
+
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginTop: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+            <div style={{ width: 12, height: 2, background: '#4CAF2E', borderRadius: 1 }} />
+            <span style={{ fontSize: 10, color: t.textMuted }}>Palier atteint</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+            <div style={{ width: 12, height: 0, borderTop: '2px dashed', borderColor: t.border }} />
+            <span style={{ fontSize: 10, color: t.textMuted }}>Non atteint</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <span style={{ fontSize: 12 }}>👤</span>
+            <span style={{ fontSize: 10, color: t.textMuted }}>Ta position</span>
+          </div>
+        </div>
       </div>
 
       {/* LISTE PALIERS */}
       <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 14, padding: '16px 18px' }}>
-        <div style={{ fontSize: 13, fontWeight: 500, color: t.text, marginBottom: 12 }}>Les paliers</div>
+        <div style={{ fontSize: 13, fontWeight: 500, color: t.text, marginBottom: 12 }}>Tous les paliers</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {PALIERS_FINANCIERS.map((palier, idx) => {
+          {[...PALIERS_FINANCIERS].reverse().map((palier) => {
             const atteint = patrimoineFinancier >= palier.montant
-            const estSuivant = !atteint && (idx === 0 || patrimoineFinancier >= PALIERS_FINANCIERS[idx - 1].montant)
+            const realIndex = PALIERS_FINANCIERS.findIndex(p => p.label === palier.label)
+            const estSuivant = !atteint && (realIndex === 0 || patrimoineFinancier >= PALIERS_FINANCIERS[realIndex - 1]?.montant)
             return (
-              <div key={palier.label} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 9, background: atteint ? palier.couleur + '10' : 'transparent', border: `0.5px solid ${atteint ? palier.couleur : estSuivant ? t.border : t.border}`, opacity: atteint || estSuivant ? 1 : 0.5 }}>
+              <div key={palier.label} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 9, background: atteint ? palier.couleur + '10' : 'transparent', border: `0.5px solid ${atteint ? palier.couleur : t.border}`, opacity: atteint || estSuivant ? 1 : 0.5 }}>
                 <div style={{ width: 10, height: 10, borderRadius: '50%', background: atteint ? palier.couleur : 'transparent', border: `2px solid ${atteint ? palier.couleur : t.border}`, flexShrink: 0 }} />
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span style={{ fontSize: 12, fontWeight: atteint ? 600 : 400, color: atteint ? palier.couleur : t.textMuted }}>{palier.label}</span>
-                    <span style={{ fontSize: 12, fontWeight: 500, color: atteint ? palier.couleur : t.textMuted }}>{palier.montant.toLocaleString('fr-FR')} €</span>
+                    <span style={{ fontSize: 12, fontWeight: 500, color: atteint ? palier.couleur : t.textMuted }}>≥ {palier.montant.toLocaleString('fr-FR')} €</span>
                   </div>
-                  {estSuivant && !atteint && (
+                  {estSuivant && (
                     <div style={{ marginTop: 4 }}>
                       <div style={{ background: t.bgSecondary, borderRadius: 3, height: 4, overflow: 'hidden' }}>
                         <div style={{ height: '100%', borderRadius: 3, background: palier.couleur, width: `${Math.min(Math.round((patrimoineFinancier / palier.montant) * 100), 100)}%`, transition: 'width 0.5s' }} />
@@ -263,8 +313,8 @@ function MaPosition({ totalInvesti, comptes, accomplissements }) {
                     </div>
                   )}
                 </div>
-                {atteint && <span style={{ fontSize: 14 }}>✓</span>}
-                {estSuivant && !atteint && <span style={{ fontSize: 11, color: t.textMuted }}>→</span>}
+                {atteint && <span style={{ fontSize: 12, color: palier.couleur }}>✓</span>}
+                {estSuivant && <span style={{ fontSize: 11, color: t.textMuted }}>→</span>}
               </div>
             )
           })}
@@ -439,7 +489,6 @@ export default function Challenge() {
           </div>
         </div>
 
-        {/* ONGLETS */}
         <div style={{ display: 'flex', gap: 8 }}>
           {[
             ['obtenus', `Mes badges (${obtenus.length})`],
