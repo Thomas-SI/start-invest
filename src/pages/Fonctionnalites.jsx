@@ -1,5 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 
+const METRONOME_URL = 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/AB94501C-5932-4B4C-93F1-D1CD5A4BAA25.png'
+
 export default function Fonctionnalites() {
   const navigate = useNavigate()
 
@@ -255,14 +257,14 @@ export default function Fonctionnalites() {
         </div>
         <div style={{ background: '#1B2E4B', borderRadius: 16, padding: '28px 24px' }}>
           {[
-            { emoji: '🚀', nom: 'Le Grand Saut', tag: 'Obtenu', tagColor: '#2E7D1E', tagBg: '#EAF6E4', desc: 'Tu n\'es plus spectateur.', progress: null, locked: false },
-            { emoji: '🧗', nom: 'Le Métronome', tag: 'Bronze — 3 mois', tagColor: '#854F0B', tagBg: '#FFF0DC', desc: '3 / 6 mois → Argent', progress: 50, locked: false },
-            { emoji: '💰', nom: 'Cap des X€', tag: 'Or — 1 000 €', tagColor: '#633806', tagBg: '#FFF8DC', desc: '1 200 / 2 000 € → Platine', progress: 60, locked: false },
-            { emoji: '🗿', nom: 'Main de Fer', tag: '?', tagColor: '#9CA3AF', tagBg: 'rgba(255,255,255,0.08)', desc: '6 mois sans vente', progress: null, locked: true },
-          ].map(({ emoji, nom, tag, tagColor, tagBg, desc, progress, locked }) => (
+            { img: null, emoji: '🚀', nom: 'Le Grand Saut', tag: 'Obtenu', tagColor: '#2E7D1E', tagBg: '#EAF6E4', desc: 'Tu n\'es plus spectateur.', progress: null, locked: false },
+            { img: METRONOME_URL, emoji: null, nom: 'Le Métronome', tag: 'Bronze — 3 mois', tagColor: '#854F0B', tagBg: '#FFF0DC', desc: '3 / 6 mois → Argent', progress: 50, locked: false },
+            { img: null, emoji: '💰', nom: 'Cap des X€', tag: 'Or — 1 000 €', tagColor: '#633806', tagBg: '#FFF8DC', desc: '1 200 / 2 000 € → Platine', progress: 60, locked: false },
+            { img: null, emoji: '🗿', nom: 'Main de Fer', tag: '?', tagColor: '#9CA3AF', tagBg: 'rgba(255,255,255,0.08)', desc: '6 mois sans vente', progress: null, locked: true },
+          ].map(({ img, emoji, nom, tag, tagColor, tagBg, desc, progress, locked }) => (
             <div key={nom} style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14, background: 'rgba(255,255,255,0.05)', borderRadius: 12, padding: '12px 14px', border: '0.5px solid rgba(255,255,255,0.08)' }}>
-              <div style={{ width: 44, height: 44, borderRadius: '50%', background: locked ? 'rgba(255,255,255,0.06)' : tagBg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, border: `2px solid ${locked ? 'rgba(255,255,255,0.15)' : tagColor}`, flexShrink: 0 }}>
-                {locked ? '?' : emoji}
+              <div style={{ width: 44, height: 44, borderRadius: '50%', background: locked ? 'rgba(255,255,255,0.06)' : tagBg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, border: `2px solid ${locked ? 'rgba(255,255,255,0.15)' : tagColor}`, flexShrink: 0, overflow: 'hidden' }}>
+                {locked ? '?' : img ? <img src={img} alt={nom} style={{ width: 34, height: 34, objectFit: 'contain' }} /> : emoji}
               </div>
               <div style={{ flex: 1 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
