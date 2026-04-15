@@ -35,6 +35,7 @@ export default function Fonctionnalites() {
         </div>
       </nav>
 
+      {/* HERO */}
       <section style={{ padding: '60px 40px 40px', maxWidth: 1100, margin: '0 auto', textAlign: 'center' }}>
         <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 16, background: '#EAF6E4', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Fonctionnalités</div>
         <h1 style={{ fontSize: 38, fontWeight: 700, color: '#1B2E4B', lineHeight: 1.2, margin: '0 0 16px' }}>
@@ -46,14 +47,15 @@ export default function Fonctionnalites() {
         </p>
       </section>
 
+      {/* FINANCES */}
       <section style={{ padding: '40px 40px', maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, alignItems: 'center', marginBottom: 40 }}>
         <div style={{ background: '#fff', borderRadius: 16, border: '0.5px solid #E0EAE3', padding: '28px 24px' }}>
           <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', marginBottom: 12 }}>Mes Finances</div>
           {[
-            { label: 'Revenus', val: '3 200 €', color: '#4CAF2E', w: '80%' },
-            { label: 'Dépenses fixes', val: '1 100 €', color: '#1B2E4B', w: '45%' },
-            { label: 'Envies', val: '460 €', color: '#BA7517', w: '20%' },
-            { label: 'Investissable', val: '640 €', color: '#3B82F6', w: '26%' },
+            { label: 'Revenus', val: '2 000 €', color: '#4CAF2E', w: '80%' },
+            { label: 'Dépenses fixes', val: '1 000 €', color: '#1B2E4B', w: '50%' },
+            { label: 'Envies', val: '600 €', color: '#BA7517', w: '30%' },
+            { label: 'Investissable', val: '400 €', color: '#3B82F6', w: '20%' },
           ].map(({ label, val, color, w }) => (
             <div key={label} style={{ marginBottom: 12 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 5 }}>
@@ -74,7 +76,7 @@ export default function Fonctionnalites() {
           <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 12, background: '#EAF6E4', display: 'inline-block', padding: '3px 10px', borderRadius: 20 }}>Budget</div>
           <h2 style={{ fontSize: 28, fontWeight: 700, color: '#1B2E4B', lineHeight: 1.3, margin: '0 0 14px' }}>Analysez vos finances en un coup d'œil</h2>
           <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.8, margin: '0 0 20px' }}>Saisissez vos revenus et dépenses. StartInvest calcule automatiquement combien vous pouvez investir chaque mois selon la règle 50/30/20.</p>
-          {['Suivi revenus et dépenses', 'Règle 50/30/20 automatique', 'Calcul de l\'investissable mensuel', 'Échéances et charges annuelles'].map(f => (
+          {['Suivi revenus et dépenses', 'Règle 50/30/20 automatique', 'Calcul capacité d\'épargne', 'Échéances et charges annuelles'].map(f => (
             <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, fontSize: 13, color: '#6B7280' }}>
               <span style={{ color: '#4CAF2E' }}>✓</span>{f}
             </div>
@@ -82,6 +84,7 @@ export default function Fonctionnalites() {
         </div>
       </section>
 
+      {/* PORTEFEUILLE */}
       <section style={{ background: '#fff', padding: '60px 40px' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, alignItems: 'center' }}>
           <div>
@@ -93,10 +96,6 @@ export default function Fonctionnalites() {
                 <span style={{ color: '#4CAF2E' }}>✓</span>{f}
               </div>
             ))}
-            <div style={{ marginTop: 16, background: '#F4F7F5', borderRadius: 10, padding: '12px 14px', border: '0.5px solid #E0EAE3' }}>
-              <div style={{ fontSize: 12, fontWeight: 500, color: '#1B2E4B', marginBottom: 4 }}>Plan de versement mensuel</div>
-              <div style={{ fontSize: 12, color: '#6B7280', lineHeight: 1.6 }}>Définissez vos pourcentages d'allocation et StartInvest calcule exactement combien virer sur chaque compte chaque mois.</div>
-            </div>
           </div>
           <div style={{ background: '#F4F7F5', borderRadius: 16, border: '0.5px solid #E0EAE3', padding: '24px' }}>
             {[
@@ -122,25 +121,11 @@ export default function Fonctionnalites() {
               <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)' }}>Total patrimoine</span>
               <span style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>34 600 €</span>
             </div>
-            <div style={{ marginTop: 10, background: '#EAF6E4', borderRadius: 10, padding: '10px 14px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-                <span style={{ fontSize: 11, color: '#2E7D1E' }}>Virement ce mois</span>
-                <span style={{ fontSize: 11, fontWeight: 600, color: '#4CAF2E' }}>440 €</span>
-              </div>
-              {[
-                { dest: 'Livret A', pct: '30%', val: '132 €' },
-                { dest: 'PEA', pct: '50%', val: '220 €' },
-                { dest: 'CTO', pct: '20%', val: '88 €' },
-              ].map(({ dest, pct, val }) => (
-                <div key={dest} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: '#6B7280', marginBottom: 3 }}>
-                  <span>{dest}</span><span>{pct} — {val}</span>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
       </section>
 
+      {/* INVESTISSEMENT */}
       <section style={{ padding: '60px 40px', maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, alignItems: 'center' }}>
         <div style={{ background: '#F4F7F5', borderRadius: 16, border: '0.5px solid #E0EAE3', padding: '24px' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 14 }}>
@@ -179,8 +164,7 @@ export default function Fonctionnalites() {
         <div>
           <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 12, background: '#EAF6E4', display: 'inline-block', padding: '3px 10px', borderRadius: 20 }}>Investissement</div>
           <h2 style={{ fontSize: 28, fontWeight: 700, color: '#1B2E4B', lineHeight: 1.3, margin: '0 0 14px' }}>Suivez vos ETF et plus-values en temps réel</h2>
-          <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.8, margin: '0 0 12px' }}>Gardez une trace de chaque mouvement. Notez vos décisions, apprenez de vos investissements.</p>
-          <p style={{ fontSize: 13, color: '#4CAF2E', fontWeight: 500, fontStyle: 'italic', margin: '0 0 20px', lineHeight: 1.6, borderLeft: '3px solid #4CAF2E', paddingLeft: 12 }}>"Le journal qui vous transforme en investisseur pro."</p>
+          <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.8, margin: '0 0 20px' }}>Gardez une trace de chaque mouvement. Notez vos décisions, apprenez de vos investissements.</p>
           {['Journal d\'achat ETF', 'Calcul PRU automatique', 'Suivi par enveloppe', '+140 ETF européens référencés', 'Mise à jour prix quotidienne'].map(f => (
             <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, fontSize: 13, color: '#6B7280' }}>
               <span style={{ color: '#4CAF2E' }}>✓</span>{f}
@@ -189,57 +173,71 @@ export default function Fonctionnalites() {
         </div>
       </section>
 
+      {/* CROISSANCE */}
       <section style={{ background: '#fff', padding: '60px 40px' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, alignItems: 'center' }}>
           <div>
             <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 12, background: '#EAF6E4', display: 'inline-block', padding: '3px 10px', borderRadius: 20 }}>Croissance</div>
             <h2 style={{ fontSize: 28, fontWeight: 700, color: '#1B2E4B', lineHeight: 1.3, margin: '0 0 14px' }}>Simulez votre croissance avec le DCA</h2>
             <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.8, margin: '0 0 20px' }}>Découvrez combien votre investissement peut valoir dans 5, 10 ou 20 ans grâce au simulateur DCA.</p>
-            {['Simulateur DCA', 'Projection sur 1 à 30 ans', 'Comparaison avec/sans DCA', 'Calcul des intérêts composés'].map(f => (
+            {['Simulateur DCA', 'Projection sur 1 à 30 ans', 'Calcul des intérêts composés', 'Basé sur votre capacité d\'épargne réelle'].map(f => (
               <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, fontSize: 13, color: '#6B7280' }}>
                 <span style={{ color: '#4CAF2E' }}>✓</span>{f}
               </div>
             ))}
           </div>
           <div style={{ background: '#F4F7F5', borderRadius: 16, border: '0.5px solid #E0EAE3', padding: '24px' }}>
-            <svg width="100%" height="160" viewBox="0 0 300 160">
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
+              <div>
+                <div style={{ fontSize: 10, color: '#9CA3AF', marginBottom: 2 }}>Versement mensuel</div>
+                <div style={{ fontSize: 16, fontWeight: 700, color: '#1B2E4B' }}>400 €/mois</div>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontSize: 10, color: '#9CA3AF', marginBottom: 2 }}>Sur 10 ans</div>
+                <div style={{ fontSize: 16, fontWeight: 700, color: '#4CAF2E' }}>+127%</div>
+              </div>
+            </div>
+            <svg width="100%" height="120" viewBox="0 0 260 120">
               <defs>
-                <linearGradient id="gf1" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#1B2E4B" stopOpacity="0.12"/>
-                  <stop offset="100%" stopColor="#1B2E4B" stopOpacity="0"/>
-                </linearGradient>
-                <linearGradient id="gf2" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#4CAF2E" stopOpacity="0.12"/>
+                <linearGradient id="dcafill2" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#4CAF2E" stopOpacity="0.2"/>
                   <stop offset="100%" stopColor="#4CAF2E" stopOpacity="0"/>
                 </linearGradient>
+                <linearGradient id="savefill2" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#1B2E4B" stopOpacity="0.1"/>
+                  <stop offset="100%" stopColor="#1B2E4B" stopOpacity="0"/>
+                </linearGradient>
               </defs>
-              <path d="M0 140 C40 138, 70 130, 100 115 C130 100, 150 105, 180 85 C210 65, 240 55, 300 20 L300 160 L0 160 Z" fill="url(#gf1)"/>
-              <path d="M0 140 C40 138, 70 130, 100 115 C130 100, 150 105, 180 85 C210 65, 240 55, 300 20" fill="none" stroke="#1B2E4B" strokeWidth="2.5" strokeLinecap="round"/>
-              <path d="M0 140 C40 140, 70 138, 100 133 C130 128, 150 130, 180 120 C210 110, 240 105, 300 88 L300 160 L0 160 Z" fill="url(#gf2)"/>
-              <path d="M0 140 C40 140, 70 138, 100 133 C130 128, 150 130, 180 120 C210 110, 240 105, 300 88" fill="none" stroke="#4CAF2E" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="5 4"/>
-              <text x="248" y="16" fill="#1B2E4B" fontSize="11" fontWeight="700">+127%</text>
-              <text x="248" y="84" fill="#4CAF2E" fontSize="11">+68%</text>
+              <path d="M0 110 C60 108, 120 100, 180 90 C220 83, 240 80, 260 76 L260 120 L0 120 Z" fill="url(#savefill2)"/>
+              <path d="M0 110 C60 108, 120 100, 180 90 C220 83, 240 80, 260 76" fill="none" stroke="#1B2E4B" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="4 3"/>
+              <path d="M0 110 C40 100, 80 85, 120 65 C160 45, 200 28, 260 8 L260 120 L0 120 Z" fill="url(#dcafill2)"/>
+              <path d="M0 110 C40 100, 80 85, 120 65 C160 45, 200 28, 260 8" fill="none" stroke="#4CAF2E" strokeWidth="2.5" strokeLinecap="round"/>
+              <circle cx="260" cy="8" r="4" fill="#4CAF2E"/>
+              <text x="195" y="6" fill="#4CAF2E" fontSize="10" fontWeight="700">DCA +127%</text>
+              <text x="185" y="73" fill="#1B2E4B" fontSize="10">Épargne +30%</text>
             </svg>
-            <div style={{ display: 'flex', gap: 20, justifyContent: 'center', marginTop: 8 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <div style={{ width: 12, height: 2.5, background: '#1B2E4B', borderRadius: 1 }} />
-                <span style={{ fontSize: 11, color: '#6B7280' }}>Avec DCA mensuel</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <div style={{ width: 12, height: 2, background: '#4CAF2E', borderRadius: 1 }} />
-                <span style={{ fontSize: 11, color: '#6B7280' }}>Sans DCA</span>
-              </div>
+            <div style={{ marginTop: 16, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+              {[
+                { label: 'Investi', val: '48 000 €', color: '#1B2E4B' },
+                { label: 'Valeur finale', val: '108 960 €', color: '#4CAF2E' },
+                { label: 'Gain net', val: '+60 960 €', color: '#4CAF2E' },
+              ].map(({ label, val, color }) => (
+                <div key={label} style={{ background: '#fff', borderRadius: 8, padding: '8px 10px', textAlign: 'center' }}>
+                  <div style={{ fontSize: 9, color: '#9CA3AF', marginBottom: 3 }}>{label}</div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color }}>{val}</div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
+      {/* CHALLENGE */}
       <section style={{ padding: '60px 40px', maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, alignItems: 'center' }}>
         <div>
           <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 12, background: '#EAF6E4', display: 'inline-block', padding: '3px 10px', borderRadius: 20 }}>Challenge</div>
           <h2 style={{ fontSize: 28, fontWeight: 700, color: '#1B2E4B', lineHeight: 1.3, margin: '0 0 14px' }}>Apprendre et rester motivé</h2>
-          <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.8, margin: '0 0 12px' }}>Collectionnez les badges, maintenez vos efforts et regardez votre empire grandir sans stress.</p>
-          <p style={{ fontSize: 13, color: '#4CAF2E', fontWeight: 500, fontStyle: 'italic', margin: '0 0 20px', lineHeight: 1.6, borderLeft: '3px solid #4CAF2E', paddingLeft: 12 }}>"Chaque investissement régulier est un badge de plus dans votre livret."</p>
+          <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.8, margin: '0 0 20px' }}>Collectionnez les badges, maintenez vos efforts et regardez votre empire grandir sans stress.</p>
           {['Livret d\'accomplissements', 'Badges évolutifs (Bronze → Légendaire)', 'Suivi de progression en temps réel', 'Défis basés sur vos actions réelles'].map(f => (
             <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, fontSize: 13, color: '#6B7280' }}>
               <span style={{ color: '#4CAF2E' }}>✓</span>{f}
@@ -248,9 +246,9 @@ export default function Fonctionnalites() {
         </div>
         <div style={{ background: '#1B2E4B', borderRadius: 16, padding: '28px 24px' }}>
           {[
-            { img: null, emoji: '🚀', nom: 'Le Grand Saut', tag: 'Obtenu', tagColor: '#2E7D1E', tagBg: '#EAF6E4', desc: 'Tu n\'es plus spectateur.', progress: null, locked: false },
-            { img: METRONOME_URL, emoji: null, nom: 'Le Métronome', tag: 'Bronze — 3 mois', tagColor: '#854F0B', tagBg: '#FFF0DC', desc: '3 / 6 mois → Argent', progress: 50, locked: false },
-            { img: null, emoji: '💰', nom: 'Cap des X€', tag: 'Or — 1 000 €', tagColor: '#633806', tagBg: '#FFF8DC', desc: '1 200 / 2 000 € → Platine', progress: 60, locked: false },
+            { img: null, emoji: '🚀', nom: 'Le Grand Saut', tag: 'Obtenu', tagColor: '#2E7D1E', tagBg: '#EAF6E4', desc: 'Tu n\'es plus spectateur.', progress: null },
+            { img: METRONOME_URL, emoji: null, nom: 'Le Métronome', tag: 'Bronze — 3 mois', tagColor: '#854F0B', tagBg: '#FFF0DC', desc: '3 / 6 mois → Argent', progress: 50 },
+            { img: null, emoji: '💰', nom: 'Cap des X€', tag: 'Or — 1 000 €', tagColor: '#633806', tagBg: '#FFF8DC', desc: '1 200 / 2 000 € → Platine', progress: 60 },
             { img: null, emoji: '🗿', nom: 'Main de Fer', tag: '?', tagColor: '#9CA3AF', tagBg: 'rgba(255,255,255,0.08)', desc: '6 mois sans vente', progress: null, locked: true },
           ].map(({ img, emoji, nom, tag, tagColor, tagBg, desc, progress, locked }) => (
             <div key={nom} style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14, background: 'rgba(255,255,255,0.05)', borderRadius: 12, padding: '12px 14px', border: '0.5px solid rgba(255,255,255,0.08)' }}>
@@ -276,9 +274,10 @@ export default function Fonctionnalites() {
         </div>
       </section>
 
+      {/* CTA FINAL */}
       <section style={{ padding: '80px 40px', textAlign: 'center', background: '#F4F7F5' }}>
-        <h2 style={{ fontSize: 30, fontWeight: 700, color: '#1B2E4B', margin: '0 0 16px' }}>Prêt à commencer ?</h2>
-        <p style={{ fontSize: 14, color: '#9CA3AF', margin: '0 0 32px' }}>Toutes ces fonctionnalités disponibles gratuitement.</p>
+        <h2 style={{ fontSize: 30, fontWeight: 700, color: '#1B2E4B', margin: '0 0 16px' }}>Prêt à bâtir votre futur ?</h2>
+        <p style={{ fontSize: 14, color: '#9CA3AF', margin: '0 0 32px' }}>Commencer l'aventure Start Invest.</p>
         <button onClick={openSignup} style={{ padding: '14px 40px', borderRadius: 12, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>S'inscrire gratuitement →</button>
       </section>
 
