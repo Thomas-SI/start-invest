@@ -12,6 +12,15 @@ export default function Accueil() {
           <span style={{ fontSize: 18, fontWeight: 800, color: '#1B2E4B', fontStyle: 'italic' }}>START</span>
           <span style={{ fontSize: 18, fontWeight: 800, color: '#4CAF2E', fontStyle: 'italic' }}>INVEST</span>
         </div>
+        <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+          {[['Accueil', '#hero'], ['Fonctionnalités', '#features'], ['Challenge', '#challenge'], ['Abonnement', '#abonnement']].map(([label, anchor]) => (
+            <a key={label} href={anchor} style={{ fontSize: 13, color: '#6B7280', padding: '5px 12px', borderRadius: 6, cursor: 'pointer', textDecoration: 'none' }}
+              onMouseEnter={e => e.currentTarget.style.color = '#1B2E4B'}
+              onMouseLeave={e => e.currentTarget.style.color = '#6B7280'}>
+              {label}
+            </a>
+          ))}
+        </div>
         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
           <button onClick={() => navigate('/login')} style={{ padding: '7px 16px', borderRadius: 8, border: '0.5px solid #1B2E4B', background: 'transparent', color: '#1B2E4B', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>
             Se connecter
@@ -23,7 +32,7 @@ export default function Accueil() {
       </nav>
 
       {/* HERO */}
-      <section style={{ padding: '80px 40px 60px', maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, alignItems: 'center' }}>
+      <section id="hero" style={{ padding: '80px 40px 60px', maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, alignItems: 'center' }}>
         <div>
           <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 16, background: '#EAF6E4', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Nouvelle façon d'investir</div>
           <h1 style={{ fontSize: 42, fontWeight: 700, color: '#1B2E4B', lineHeight: 1.2, margin: '0 0 20px' }}>
@@ -79,7 +88,7 @@ export default function Accueil() {
       </section>
 
       {/* FEATURES */}
-      <section style={{ padding: '80px 40px 40px', maxWidth: 1100, margin: '0 auto' }}>
+      <section id="features" style={{ padding: '80px 40px 40px', maxWidth: 1100, margin: '0 auto' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
 
           <div style={{ background: '#fff', borderRadius: 16, border: '0.5px solid #E0EAE3', overflow: 'hidden' }}>
@@ -176,8 +185,8 @@ export default function Accueil() {
         </div>
       </section>
 
-      {/* MINDSET */}
-      <section style={{ background: '#1B2E4B', padding: '80px 40px', marginTop: 60 }}>
+      {/* CHALLENGE / MINDSET */}
+      <section id="challenge" style={{ background: '#1B2E4B', padding: '80px 40px', marginTop: 60 }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 52 }}>
             <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 16, background: 'rgba(76,175,46,0.15)', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Mindset</div>
@@ -223,8 +232,8 @@ export default function Accueil() {
         </div>
       </section>
 
-      {/* CTA FINAL */}
-      <section style={{ padding: '100px 40px 80px', background: '#F4F7F5', textAlign: 'center' }}>
+      {/* ABONNEMENT */}
+      <section id="abonnement" style={{ padding: '100px 40px 80px', background: '#F4F7F5', textAlign: 'center' }}>
         <div style={{ maxWidth: 580, margin: '0 auto' }}>
           <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 16, background: '#EAF6E4', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Rejoignez-nous</div>
           <h2 style={{ fontSize: 34, fontWeight: 700, color: '#1B2E4B', lineHeight: 1.3, margin: '0 0 16px' }}>
@@ -233,6 +242,36 @@ export default function Accueil() {
           </h2>
           <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.8, margin: '0 0 8px' }}>Rejoignez Start Invest et ses utilisateurs.</p>
           <p style={{ fontSize: 14, color: '#9CA3AF', lineHeight: 1.8, margin: '0 0 40px' }}>Trouvez votre façon de faire de l'argent en dormant.</p>
+
+          {/* PLANS */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 40, textAlign: 'left' }}>
+            <div style={{ background: '#fff', border: '0.5px solid #E0EAE3', borderRadius: 16, padding: '24px 20px' }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: '#1B2E4B', marginBottom: 4 }}>Gratuit</div>
+              <div style={{ fontSize: 28, fontWeight: 700, color: '#1B2E4B', marginBottom: 16 }}>0 €<span style={{ fontSize: 13, fontWeight: 400, color: '#9CA3AF' }}>/mois</span></div>
+              {['Mes Finances', 'Portefeuille', 'Journal ETF', 'Accomplissements'].map(f => (
+                <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, fontSize: 13, color: '#6B7280' }}>
+                  <span style={{ color: '#4CAF2E', fontSize: 14 }}>✓</span>{f}
+                </div>
+              ))}
+              <button onClick={() => navigate('/signup')} style={{ width: '100%', marginTop: 16, padding: '10px', borderRadius: 9, border: '0.5px solid #E0EAE3', background: '#F4F7F5', color: '#1B2E4B', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>
+                Commencer
+              </button>
+            </div>
+            <div style={{ background: '#1B2E4B', border: '2px solid #4CAF2E', borderRadius: 16, padding: '24px 20px', position: 'relative' }}>
+              <div style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: '#4CAF2E', color: '#fff', fontSize: 10, fontWeight: 600, padding: '3px 12px', borderRadius: 20 }}>POPULAIRE</div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: '#fff', marginBottom: 4 }}>Premium</div>
+              <div style={{ fontSize: 28, fontWeight: 700, color: '#fff', marginBottom: 16 }}>7.99 €<span style={{ fontSize: 13, fontWeight: 400, color: 'rgba(255,255,255,0.5)' }}>/mois</span></div>
+              {['Tout le plan Gratuit', 'Simulateur DCA', 'Concentration', 'Vroum Vroum 🏎️', 'Support prioritaire'].map(f => (
+                <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, fontSize: 13, color: 'rgba(255,255,255,0.7)' }}>
+                  <span style={{ color: '#4CAF2E', fontSize: 14 }}>✓</span>{f}
+                </div>
+              ))}
+              <button onClick={() => navigate('/signup')} style={{ width: '100%', marginTop: 16, padding: '10px', borderRadius: 9, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
+                Commencer
+              </button>
+            </div>
+          </div>
+
           <button onClick={() => navigate('/signup')} style={{ padding: '14px 48px', borderRadius: 12, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 16, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
             Go →
           </button>
