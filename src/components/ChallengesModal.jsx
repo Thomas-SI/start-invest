@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabase'
 const METRONOME_URL = 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/AB94501C-5932-4B4C-93F1-D1CD5A4BAA25.png'
 
 const BADGES_DATA = [
-  { slug: 'premier-pas', nom: 'Premier Pas', emoji: '🌱', desc: "Des l inscription sur StartInvest.", message: 'Bienvenue chez Start Invest.', tag: 'Automatique', tagColor: '#2E7D1E', tagBg: '#EAF6E4' },
+  { slug: 'premier-pas', nom: 'Premier Pas', emoji: '🌱', desc: "Dès l inscription sur StartInvest.", message: 'Bienvenue chez Start Invest.', tag: 'Automatique', tagColor: '#2E7D1E', tagBg: '#EAF6E4' },
   { slug: 'grand-saut', nom: 'Le Grand Saut', emoji: '🚀', desc: 'Acheter son premier ETF.', message: "Tu n es plus spectateur, tu es le pilote de ton futur.", tag: 'Premier achat', tagColor: '#2E7D1E', tagBg: '#EAF6E4' },
   { slug: 'metronome', img: METRONOME_URL, nom: 'Le Metronome', desc: 'Investir regulierement chaque mois.', message: 'La magie des interets composes adore ta regularite.', tag: 'Bronze vers Platine', tagColor: '#854F0B', tagBg: '#FFF0DC' },
   { slug: 'main-de-fer', nom: 'Main de Fer', emoji: '🗿', desc: '6 mois sans aucune vente.', message: 'Le calme est une competence.', tag: 'Discipline', tagColor: '#444441', tagBg: '#F0F0F0' },
@@ -36,7 +36,7 @@ export default function ChallengesModal({ onClose }) {
 
         <div style={{ padding: '24px 28px 20px', borderBottom: '0.5px solid #E0EAE3', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
           <div>
-            <div style={{ fontSize: 16, fontWeight: 700, color: '#1B2E4B' }}>Livret accomplissements</div>
+            <div style={{ fontSize: 16, fontWeight: 700, color: '#1B2E4B' }}>Livret d accomplissements</div>
             <div style={{ fontSize: 12, color: '#9CA3AF', marginTop: 2 }}>
               {loading ? 'Chargement...' : slugsObtenus.size + ' / ' + BADGES_DATA.length + ' debloques'}
             </div>
@@ -60,22 +60,29 @@ export default function ChallengesModal({ onClose }) {
           {BADGES_DATA.map(({ slug, emoji, img, nom, desc, message, tag, tagColor, tagBg }) => {
             const obtenu = slugsObtenus.has(slug)
             return (
-              <div key={slug} style={{ background: obtenu ? '#F6FFF3' : '#F9FAFB', border: '0.5px solid ' + (obtenu ? '#4CAF2E' : '#E0EAE3'), borderRadius: 14, padding: '16px 18px', display: 'flex', gap: 14, alignItems: 'flex-start' }}>
-                <div style={{ width: 52, height: 52, borderRadius: '50%', background: obtenu ? tagBg : '#F0F0F0', border: '2px solid ' + (obtenu ? tagColor : '#E0EAE3'), flexShrink: 0, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  {obtenu
-                    ? img ? <img src={img} alt={nom} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span style={{ fontSize: 24 }}>{emoji}</span>
-                    : <span style={{ fontSize: 20, color: '#C0C0C0' }}>?</span>
+              <div key={slug} style={{ background: obtenu ? '#F6FFF3' : '#fff', border: '0.5px solid ' + (obtenu ? '#4CAF2E' : '#E0EAE3'), borderRadius: 14, padding: '16px 18px', display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+                <div style={{ width: 52, height: 52, borderRadius: '50%', background: tagBg, border: '2px solid ' + tagColor, flexShrink: 0, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {img
+                    ? <img src={img} alt={nom} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    : <span style={{ fontSize: 24 }}>{emoji}</span>
                   }
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: obtenu ? '#1B2E4B' : '#9CA3AF' }}>{nom}</div>
-                    <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 20, background: obtenu ? tagBg : '#F0F0F0', color: obtenu ? tagColor : '#9CA3AF', fontWeight: 500 }}>
-                      {obtenu ? tag : 'Verrouille'}
-                    </span>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: '#1B2E4B' }}>{nom}</div>
+                    <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                      {obtenu && (
+                        <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 20, background: '#EAF6E4', color: '#2E7D1E', fontWeight: 600 }}>
+                          Obtenu
+                        </span>
+                      )}
+                      <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 20, background: tagBg, color: tagColor, fontWeight: 500 }}>
+                        {tag}
+                      </span>
+                    </div>
                   </div>
-                  <div style={{ fontSize: 12, color: '#6B7280', marginBottom: obtenu ? 6 : 0 }}>{desc}</div>
-                  {obtenu && <div style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic', borderLeft: '2px solid ' + tagColor, paddingLeft: 8 }}>{message}</div>}
+                  <div style={{ fontSize: 12, color: '#6B7280', marginBottom: 6 }}>{desc}</div>
+                  <div style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic', borderLeft: '2px solid ' + tagColor, paddingLeft: 8 }}>{message}</div>
                 </div>
               </div>
             )
