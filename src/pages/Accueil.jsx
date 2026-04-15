@@ -42,15 +42,13 @@ export default function Accueil() {
             Prenez une longueur<br />
             <span style={{ color: '#4CAF2E' }}>d'avance.</span>
           </h1>
-          <p style={{ fontSize: 15, color: '#6B7280', lineHeight: 1.7, margin: '0 0 32px', maxWidth: 420 }}>
+          <p style={{ fontSize: 15, color: '#6B7280', lineHeight: 1.7, margin: '0 0 36px', maxWidth: 420 }}>
             Suivez vos finances. Atteignez vos objectifs.<br />Ayez un pas dans le futur.
           </p>
-          <p style={{ fontSize: 13, color: '#9CA3AF', lineHeight: 1.7, margin: '0 0 36px', maxWidth: 400 }}>
-            Développement, investissement, organisation de comptes. Start Invest vous aide à devenir celui de demain.
-          </p>
           <div style={{ display: 'flex', gap: 12 }}>
-            <button onClick={openSignup} style={{ padding: '12px 28px', borderRadius: 10, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Commencer gratuitement →</button>
-            <button onClick={openLogin} style={{ padding: '12px 20px', borderRadius: 10, border: '0.5px solid #E0EAE3', background: '#fff', color: '#6B7280', fontSize: 14, cursor: 'pointer', fontFamily: 'inherit' }}>Se connecter</button>
+            <button onClick={openSignup} style={{ padding: '12px 28px', borderRadius: 10, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
+              Commencer gratuitement →
+            </button>
           </div>
         </div>
 
