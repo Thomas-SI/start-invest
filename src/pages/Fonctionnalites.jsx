@@ -8,7 +8,6 @@ export default function Fonctionnalites() {
   return (
     <div style={{ fontFamily: 'inherit', background: '#F4F7F5', minHeight: '100vh' }}>
 
-      {/* NAVBAR */}
       <nav style={{ background: '#fff', borderBottom: '0.5px solid #E0EAE3', padding: '0 40px', height: 58, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 100 }}>
         <div onClick={() => navigate('/')} style={{ display: 'flex', alignItems: 'baseline', cursor: 'pointer' }}>
           <span style={{ fontSize: 18, fontWeight: 800, color: '#1B2E4B', fontStyle: 'italic' }}>START</span>
@@ -29,7 +28,6 @@ export default function Fonctionnalites() {
         </div>
       </nav>
 
-      {/* HERO */}
       <section style={{ padding: '60px 40px 40px', maxWidth: 1100, margin: '0 auto', textAlign: 'center' }}>
         <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 16, background: '#EAF6E4', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Fonctionnalités</div>
         <h1 style={{ fontSize: 38, fontWeight: 700, color: '#1B2E4B', lineHeight: 1.2, margin: '0 0 16px' }}>
@@ -263,8 +261,11 @@ export default function Fonctionnalites() {
             { img: null, emoji: '🗿', nom: 'Main de Fer', tag: '?', tagColor: '#9CA3AF', tagBg: 'rgba(255,255,255,0.08)', desc: '6 mois sans vente', progress: null, locked: true },
           ].map(({ img, emoji, nom, tag, tagColor, tagBg, desc, progress, locked }) => (
             <div key={nom} style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14, background: 'rgba(255,255,255,0.05)', borderRadius: 12, padding: '12px 14px', border: '0.5px solid rgba(255,255,255,0.08)' }}>
-              <div style={{ width: 44, height: 44, borderRadius: '50%', background: locked ? 'rgba(255,255,255,0.06)' : tagBg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, border: `2px solid ${locked ? 'rgba(255,255,255,0.15)' : tagColor}`, flexShrink: 0, overflow: 'hidden' }}>
-                {locked ? '?' : img ? <img src={img} alt={nom} style={{ width: 34, height: 34, objectFit: 'contain' }} /> : emoji}
+              <div style={{ width: 44, height: 44, borderRadius: '50%', background: locked ? 'rgba(255,255,255,0.06)' : tagBg, border: `2px solid ${locked ? 'rgba(255,255,255,0.15)' : tagColor}`, flexShrink: 0, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {locked ? <span style={{ fontSize: 16, color: 'rgba(255,255,255,0.3)' }}>?</span>
+                  : img ? <img src={img} alt={nom} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  : <span style={{ fontSize: 20 }}>{emoji}</span>
+                }
               </div>
               <div style={{ flex: 1 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
@@ -283,7 +284,6 @@ export default function Fonctionnalites() {
         </div>
       </section>
 
-      {/* CTA */}
       <section style={{ padding: '80px 40px', textAlign: 'center', background: '#F4F7F5' }}>
         <h2 style={{ fontSize: 30, fontWeight: 700, color: '#1B2E4B', margin: '0 0 16px' }}>Prêt à commencer ?</h2>
         <p style={{ fontSize: 14, color: '#9CA3AF', margin: '0 0 32px' }}>Toutes ces fonctionnalités disponibles gratuitement.</p>

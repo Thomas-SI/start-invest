@@ -18,7 +18,6 @@ export default function ChallengePublic() {
   return (
     <div style={{ fontFamily: 'inherit', background: '#F4F7F5', minHeight: '100vh' }}>
 
-      {/* NAVBAR */}
       <nav style={{ background: '#fff', borderBottom: '0.5px solid #E0EAE3', padding: '0 40px', height: 58, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 100 }}>
         <div onClick={() => navigate('/')} style={{ display: 'flex', alignItems: 'baseline', cursor: 'pointer' }}>
           <span style={{ fontSize: 18, fontWeight: 800, color: '#1B2E4B', fontStyle: 'italic' }}>START</span>
@@ -39,7 +38,6 @@ export default function ChallengePublic() {
         </div>
       </nav>
 
-      {/* HERO */}
       <section style={{ background: '#1B2E4B', padding: '80px 40px' }}>
         <div style={{ maxWidth: 700, margin: '0 auto', textAlign: 'center' }}>
           <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 20, background: 'rgba(76,175,46,0.15)', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Challenge</div>
@@ -66,7 +64,6 @@ export default function ChallengePublic() {
         </div>
       </section>
 
-      {/* ACCOMPLISSEMENTS */}
       <section style={{ padding: '80px 40px', maxWidth: 1100, margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: 52 }}>
           <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 12, background: '#EAF6E4', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Accomplissements</div>
@@ -79,9 +76,9 @@ export default function ChallengePublic() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
           {BADGES.map(({ emoji, img, nom, desc, message, tag, tagColor, tagBg }) => (
             <div key={nom} style={{ background: '#fff', border: '0.5px solid #E0EAE3', borderRadius: 16, padding: '20px', display: 'flex', gap: 16, alignItems: 'flex-start' }}>
-              <div style={{ width: 56, height: 56, borderRadius: '50%', background: tagBg, display: 'flex', alignItems: 'center', justifyContent: 'center', border: `2px solid ${tagColor}`, flexShrink: 0, overflow: 'hidden' }}>
+              <div style={{ width: 56, height: 56, borderRadius: '50%', background: tagBg, border: `2px solid ${tagColor}`, flexShrink: 0, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 {img
-                  ? <img src={img} alt={nom} style={{ width: 42, height: 42, objectFit: 'contain' }} />
+                  ? <img src={img} alt={nom} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   : <span style={{ fontSize: 26 }}>{emoji}</span>
                 }
               </div>
@@ -98,7 +95,6 @@ export default function ChallengePublic() {
         </div>
       </section>
 
-      {/* CTA */}
       <section style={{ padding: '80px 40px', textAlign: 'center', background: '#F4F7F5' }}>
         <h2 style={{ fontSize: 30, fontWeight: 700, color: '#1B2E4B', margin: '0 0 16px' }}>Commencez votre parcours</h2>
         <p style={{ fontSize: 14, color: '#9CA3AF', margin: '0 0 32px' }}>Premier Pas vous attend dès l'inscription.</p>
