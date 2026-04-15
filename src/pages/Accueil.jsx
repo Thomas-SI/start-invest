@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AuthModal from '../components/AuthModal'
+import ChallengesModal from '../components/ChallengesModal'
 
 const METRONOME_URL = 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/AB94501C-5932-4B4C-93F1-D1CD5A4BAA25.png'
 const LOGO_URL = 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/IMG_2819.jpeg'
@@ -9,6 +10,7 @@ export default function Accueil() {
   const navigate = useNavigate()
   const [authOpen, setAuthOpen] = useState(false)
   const [authMode, setAuthMode] = useState('login')
+  const [challengesOpen, setChallengesOpen] = useState(false)
 
   const openLogin = () => { setAuthMode('login'); setAuthOpen(true) }
   const openSignup = () => { setAuthMode('signup'); setAuthOpen(true) }
@@ -227,7 +229,7 @@ export default function Accueil() {
             <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.55)', lineHeight: 1.8, margin: '0 auto 32px', maxWidth: 460 }}>
               Fixez-vous des objectifs et atteignez-les avec discipline au fil du temps.
             </p>
-            <button onClick={() => navigate('/challenge-public')} style={{ padding: '11px 28px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.2)', background: 'rgba(255,255,255,0.08)', color: '#fff', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>
+            <button onClick={() => setChallengesOpen(true)} style={{ padding: '11px 28px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.2)', background: 'rgba(255,255,255,0.08)', color: '#fff', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>
               Voir tous les challenges →
             </button>
           </div>
@@ -338,6 +340,7 @@ export default function Accueil() {
       </footer>
 
       {authOpen && <AuthModal defaultMode={authMode} onClose={() => setAuthOpen(false)} />}
+      {challengesOpen && <ChallengesModal onClose={() => setChallengesOpen(false)} />}
     </div>
   )
 }
