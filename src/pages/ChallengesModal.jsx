@@ -34,7 +34,6 @@ export default function ChallengesModal({ onClose }) {
       <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 999, backdropFilter: 'blur(2px)' }} />
       <div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 1000, background: '#fff', borderRadius: 20, width: 680, maxHeight: '80vh', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 20px 60px rgba(27,46,75,0.15)', fontFamily: 'inherit' }}>
 
-        {/* HEADER */}
         <div style={{ padding: '24px 28px 20px', borderBottom: '0.5px solid #E0EAE3', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
           <div>
             <div style={{ fontSize: 16, fontWeight: 700, color: '#1B2E4B' }}>Livret d'accomplissements</div>
@@ -45,7 +44,6 @@ export default function ChallengesModal({ onClose }) {
           <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: '#9CA3AF' }}>✕</button>
         </div>
 
-        {/* BARRE PROGRESSION */}
         {!loading && (
           <div style={{ padding: '12px 28px', borderBottom: '0.5px solid #E0EAE3', flexShrink: 0 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: '#9CA3AF', marginBottom: 6 }}>
@@ -58,7 +56,6 @@ export default function ChallengesModal({ onClose }) {
           </div>
         )}
 
-        {/* LISTE BADGES */}
         <div style={{ overflowY: 'auto', padding: '20px 28px', display: 'flex', flexDirection: 'column', gap: 12 }}>
           {BADGES_DATA.map(({ slug, emoji, img, nom, desc, message, tag, tagColor, tagBg }) => {
             const obtenu = slugsObtenus.has(slug)
