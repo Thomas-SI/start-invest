@@ -11,15 +11,16 @@ export default function AbonnementPublic() {
   return (
     <div style={{ fontFamily: 'inherit', background: '#F4F7F5', minHeight: '100vh' }}>
 
-      {/* NAVBAR */}
       <nav style={{ background: '#fff', borderBottom: '0.5px solid #E0EAE3', padding: '0 40px', height: 58, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 100 }}>
         <div onClick={() => navigate('/')} style={{ display: 'flex', alignItems: 'baseline', cursor: 'pointer' }}>
           <span style={{ fontSize: 18, fontWeight: 800, color: '#1B2E4B', fontStyle: 'italic' }}>START</span>
           <span style={{ fontSize: 18, fontWeight: 800, color: '#4CAF2E', fontStyle: 'italic' }}>INVEST</span>
         </div>
-        <div style={{ display: 'flex', gap: 4 }}>
+        <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
           {[['Accueil', '/'], ['Fonctionnalités', '/fonctionnalites'], ['Challenge', '/challenge-public'], ['Abonnement', '/abonnement-public']].map(([label, path]) => (
-            <span key={label} onClick={() => navigate(path)} style={{ fontSize: 13, color: label === 'Abonnement' ? '#1B2E4B' : '#6B7280', padding: '5px 12px', borderRadius: 6, cursor: 'pointer', fontWeight: label === 'Abonnement' ? 500 : 400 }}>
+            <span key={label} onClick={() => navigate(path)} style={{ fontSize: 13, color: label === 'Abonnement' ? '#1B2E4B' : '#6B7280', padding: '5px 12px', borderRadius: 6, cursor: 'pointer', fontWeight: label === 'Abonnement' ? 500 : 400 }}
+              onMouseEnter={e => e.currentTarget.style.color = '#1B2E4B'}
+              onMouseLeave={e => e.currentTarget.style.color = label === 'Abonnement' ? '#1B2E4B' : '#6B7280'}>
               {label}
             </span>
           ))}
@@ -30,7 +31,6 @@ export default function AbonnementPublic() {
         </div>
       </nav>
 
-      {/* HERO */}
       <section style={{ padding: '60px 40px 40px', textAlign: 'center' }}>
         <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 16, background: '#EAF6E4', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Abonnement</div>
         <h1 style={{ fontSize: 38, fontWeight: 700, color: '#1B2E4B', lineHeight: 1.2, margin: '0 0 16px' }}>
@@ -54,6 +54,7 @@ export default function AbonnementPublic() {
         {/* PLANS */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, maxWidth: 700, margin: '0 auto' }}>
 
+          {/* GRATUIT */}
           <div style={{ background: '#fff', border: '0.5px solid #E0EAE3', borderRadius: 20, padding: '32px 28px', textAlign: 'left' }}>
             <div style={{ fontSize: 13, fontWeight: 600, color: '#6B7280', marginBottom: 8 }}>Gratuit</div>
             <div style={{ fontSize: 36, fontWeight: 700, color: '#1B2E4B', marginBottom: 6 }}>0 €</div>
@@ -70,14 +71,15 @@ export default function AbonnementPublic() {
             </button>
           </div>
 
+          {/* PREMIUM */}
           <div style={{ background: '#1B2E4B', border: '2px solid #4CAF2E', borderRadius: 20, padding: '32px 28px', textAlign: 'left', position: 'relative' }}>
             <div style={{ position: 'absolute', top: -14, left: '50%', transform: 'translateX(-50%)', background: '#4CAF2E', color: '#fff', fontSize: 11, fontWeight: 600, padding: '4px 16px', borderRadius: 20, whiteSpace: 'nowrap' }}>⭐ LE PLUS POPULAIRE</div>
             <div style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.6)', marginBottom: 8 }}>Premium</div>
             <div style={{ fontSize: 36, fontWeight: 700, color: '#fff', marginBottom: 4 }}>
-              {annuel ? '5.58 €' : '7.99 €'}
+              {annuel ? '67 €' : '7.99 €'}
             </div>
             <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', marginBottom: 24 }}>
-              {annuel ? 'par mois, facturé 67 €/an' : 'par mois'}
+              {annuel ? 'facturé en une fois par an' : 'par mois'}
             </div>
             <div style={{ borderTop: '0.5px solid rgba(255,255,255,0.1)', paddingTop: 20, marginBottom: 24 }}>
               {PREMIUM.map(f => (
