@@ -1,9 +1,15 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import AuthModal from '../components/AuthModal'
 
 export default function AbonnementPublic() {
   const navigate = useNavigate()
   const [annuel, setAnnuel] = useState(false)
+  const [authOpen, setAuthOpen] = useState(false)
+  const [authMode, setAuthMode] = useState('login')
+
+  const openLogin = () => { setAuthMode('login'); setAuthOpen(true) }
+  const openSignup = () => { setAuthMode('signup'); setAuthOpen(true) }
 
   const GRATUIT = ['Mes Finances', 'Portefeuille', 'Journal ETF', 'Accomplissements de base', 'Accès communauté']
   const PREMIUM = ['Tout le plan Gratuit', 'Simulateur DCA avancé', 'Concentration & Mindset', 'Accomplissement Vroum Vroum ⚡', 'Mises à jour prix quotidiennes', 'Support prioritaire']
@@ -26,22 +32,20 @@ export default function AbonnementPublic() {
           ))}
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
-          <button onClick={() => navigate('/login')} style={{ padding: '7px 16px', borderRadius: 8, border: '0.5px solid #1B2E4B', background: 'transparent', color: '#1B2E4B', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Se connecter</button>
-          <button onClick={() => navigate('/signup')} style={{ padding: '7px 16px', borderRadius: 8, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>S'inscrire gratuitement</button>
+          <button onClick={openLogin} style={{ padding: '7px 16px', borderRadius: 8, border: '0.5px solid #1B2E4B', background: 'transparent', color: '#1B2E4B', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Se connecter</button>
+          <button onClick={openSignup} style={{ padding: '7px 16px', borderRadius: 8, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>S'inscrire gratuitement</button>
         </div>
       </nav>
 
       <section style={{ padding: '60px 40px 40px', textAlign: 'center' }}>
         <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 16, background: '#EAF6E4', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Abonnement</div>
         <h1 style={{ fontSize: 38, fontWeight: 700, color: '#1B2E4B', lineHeight: 1.2, margin: '0 0 16px' }}>
-          Simple, transparent,<br />
-          <span style={{ color: '#4CAF2E' }}>sans surprise.</span>
+          Simple, transparent,<br /><span style={{ color: '#4CAF2E' }}>sans surprise.</span>
         </h1>
         <p style={{ fontSize: 15, color: '#6B7280', maxWidth: 440, margin: '0 auto 36px' }}>
           Commencez gratuitement. Passez à Premium quand vous êtes prêt.
         </p>
 
-        {/* TOGGLE */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 48 }}>
           <span style={{ fontSize: 13, color: !annuel ? '#1B2E4B' : '#9CA3AF', fontWeight: !annuel ? 500 : 400 }}>Mensuel</span>
           <div onClick={() => setAnnuel(a => !a)} style={{ width: 44, height: 24, borderRadius: 12, background: annuel ? '#4CAF2E' : '#E0EAE3', cursor: 'pointer', position: 'relative', transition: 'background 0.2s' }}>
@@ -51,10 +55,7 @@ export default function AbonnementPublic() {
           {annuel && <span style={{ fontSize: 11, background: '#EAF6E4', color: '#2E7D1E', padding: '2px 8px', borderRadius: 20, fontWeight: 500 }}>-29%</span>}
         </div>
 
-        {/* PLANS */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, maxWidth: 700, margin: '0 auto' }}>
-
-          {/* GRATUIT */}
           <div style={{ background: '#fff', border: '0.5px solid #E0EAE3', borderRadius: 20, padding: '32px 28px', textAlign: 'left' }}>
             <div style={{ fontSize: 13, fontWeight: 600, color: '#6B7280', marginBottom: 8 }}>Gratuit</div>
             <div style={{ fontSize: 36, fontWeight: 700, color: '#1B2E4B', marginBottom: 6 }}>0 €</div>
@@ -66,21 +67,14 @@ export default function AbonnementPublic() {
                 </div>
               ))}
             </div>
-            <button onClick={() => navigate('/signup')} style={{ width: '100%', padding: '12px', borderRadius: 10, border: '0.5px solid #E0EAE3', background: '#F4F7F5', color: '#1B2E4B', fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>
-              Commencer gratuitement
-            </button>
+            <button onClick={openSignup} style={{ width: '100%', padding: '12px', borderRadius: 10, border: '0.5px solid #E0EAE3', background: '#F4F7F5', color: '#1B2E4B', fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Commencer gratuitement</button>
           </div>
 
-          {/* PREMIUM */}
           <div style={{ background: '#1B2E4B', border: '2px solid #4CAF2E', borderRadius: 20, padding: '32px 28px', textAlign: 'left', position: 'relative' }}>
             <div style={{ position: 'absolute', top: -14, left: '50%', transform: 'translateX(-50%)', background: '#4CAF2E', color: '#fff', fontSize: 11, fontWeight: 600, padding: '4px 16px', borderRadius: 20, whiteSpace: 'nowrap' }}>⭐ LE PLUS POPULAIRE</div>
             <div style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.6)', marginBottom: 8 }}>Premium</div>
-            <div style={{ fontSize: 36, fontWeight: 700, color: '#fff', marginBottom: 4 }}>
-              {annuel ? '67 €' : '7.99 €'}
-            </div>
-            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', marginBottom: 24 }}>
-              {annuel ? 'facturé en une fois par an' : 'par mois'}
-            </div>
+            <div style={{ fontSize: 36, fontWeight: 700, color: '#fff', marginBottom: 4 }}>{annuel ? '67 €' : '7.99 €'}</div>
+            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', marginBottom: 24 }}>{annuel ? 'facturé en une fois par an' : 'par mois'}</div>
             <div style={{ borderTop: '0.5px solid rgba(255,255,255,0.1)', paddingTop: 20, marginBottom: 24 }}>
               {PREMIUM.map(f => (
                 <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10, fontSize: 13, color: 'rgba(255,255,255,0.7)' }}>
@@ -88,15 +82,11 @@ export default function AbonnementPublic() {
                 </div>
               ))}
             </div>
-            <button onClick={() => navigate('/signup')} style={{ width: '100%', padding: '12px', borderRadius: 10, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
-              Commencer avec Premium
-            </button>
+            <button onClick={openSignup} style={{ width: '100%', padding: '12px', borderRadius: 10, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Commencer avec Premium</button>
           </div>
-
         </div>
       </section>
 
-      {/* FAQ */}
       <section style={{ padding: '80px 40px', maxWidth: 700, margin: '0 auto' }}>
         <h2 style={{ fontSize: 26, fontWeight: 700, color: '#1B2E4B', textAlign: 'center', marginBottom: 40 }}>Questions fréquentes</h2>
         {[
@@ -120,6 +110,7 @@ export default function AbonnementPublic() {
         <div style={{ fontSize: 11, color: '#9CA3AF' }}>© 2026 StartInvest — Bâtir son mental, construire son avenir.</div>
       </footer>
 
+      {authOpen && <AuthModal defaultMode={authMode} onClose={() => setAuthOpen(false)} />}
     </div>
   )
 }

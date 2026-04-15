@@ -1,9 +1,16 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import AuthModal from '../components/AuthModal'
 
 const METRONOME_URL = 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/AB94501C-5932-4B4C-93F1-D1CD5A4BAA25.png'
 
 export default function Fonctionnalites() {
   const navigate = useNavigate()
+  const [authOpen, setAuthOpen] = useState(false)
+  const [authMode, setAuthMode] = useState('login')
+
+  const openLogin = () => { setAuthMode('login'); setAuthOpen(true) }
+  const openSignup = () => { setAuthMode('signup'); setAuthOpen(true) }
 
   return (
     <div style={{ fontFamily: 'inherit', background: '#F4F7F5', minHeight: '100vh' }}>
@@ -23,8 +30,8 @@ export default function Fonctionnalites() {
           ))}
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
-          <button onClick={() => navigate('/login')} style={{ padding: '7px 16px', borderRadius: 8, border: '0.5px solid #1B2E4B', background: 'transparent', color: '#1B2E4B', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Se connecter</button>
-          <button onClick={() => navigate('/signup')} style={{ padding: '7px 16px', borderRadius: 8, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>S'inscrire gratuitement</button>
+          <button onClick={openLogin} style={{ padding: '7px 16px', borderRadius: 8, border: '0.5px solid #1B2E4B', background: 'transparent', color: '#1B2E4B', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Se connecter</button>
+          <button onClick={openSignup} style={{ padding: '7px 16px', borderRadius: 8, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>S'inscrire gratuitement</button>
         </div>
       </nav>
 
@@ -39,7 +46,6 @@ export default function Fonctionnalites() {
         </p>
       </section>
 
-      {/* FEATURE 1 — MES FINANCES */}
       <section style={{ padding: '40px 40px', maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, alignItems: 'center', marginBottom: 40 }}>
         <div style={{ background: '#fff', borderRadius: 16, border: '0.5px solid #E0EAE3', padding: '28px 24px' }}>
           <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', marginBottom: 12 }}>Mes Finances</div>
@@ -76,7 +82,6 @@ export default function Fonctionnalites() {
         </div>
       </section>
 
-      {/* FEATURE 2 — PORTEFEUILLE */}
       <section style={{ background: '#fff', padding: '60px 40px' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, alignItems: 'center' }}>
           <div>
@@ -128,8 +133,7 @@ export default function Fonctionnalites() {
                 { dest: 'CTO', pct: '20%', val: '88 €' },
               ].map(({ dest, pct, val }) => (
                 <div key={dest} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: '#6B7280', marginBottom: 3 }}>
-                  <span>{dest}</span>
-                  <span>{pct} — {val}</span>
+                  <span>{dest}</span><span>{pct} — {val}</span>
                 </div>
               ))}
             </div>
@@ -137,7 +141,6 @@ export default function Fonctionnalites() {
         </div>
       </section>
 
-      {/* FEATURE 3 — INVESTISSEMENT */}
       <section style={{ padding: '60px 40px', maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, alignItems: 'center' }}>
         <div style={{ background: '#F4F7F5', borderRadius: 16, border: '0.5px solid #E0EAE3', padding: '24px' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 14 }}>
@@ -176,12 +179,8 @@ export default function Fonctionnalites() {
         <div>
           <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 12, background: '#EAF6E4', display: 'inline-block', padding: '3px 10px', borderRadius: 20 }}>Investissement</div>
           <h2 style={{ fontSize: 28, fontWeight: 700, color: '#1B2E4B', lineHeight: 1.3, margin: '0 0 14px' }}>Suivez vos ETF et plus-values en temps réel</h2>
-          <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.8, margin: '0 0 12px' }}>
-            Gardez une trace de chaque mouvement. Notez vos décisions, apprenez de vos investissements.
-          </p>
-          <p style={{ fontSize: 13, color: '#4CAF2E', fontWeight: 500, fontStyle: 'italic', margin: '0 0 20px', lineHeight: 1.6, borderLeft: '3px solid #4CAF2E', paddingLeft: 12 }}>
-            "Le journal qui vous transforme en investisseur pro."
-          </p>
+          <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.8, margin: '0 0 12px' }}>Gardez une trace de chaque mouvement. Notez vos décisions, apprenez de vos investissements.</p>
+          <p style={{ fontSize: 13, color: '#4CAF2E', fontWeight: 500, fontStyle: 'italic', margin: '0 0 20px', lineHeight: 1.6, borderLeft: '3px solid #4CAF2E', paddingLeft: 12 }}>"Le journal qui vous transforme en investisseur pro."</p>
           {['Journal d\'achat ETF', 'Calcul PRU automatique', 'Suivi par enveloppe', '+140 ETF européens référencés', 'Mise à jour prix quotidienne'].map(f => (
             <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, fontSize: 13, color: '#6B7280' }}>
               <span style={{ color: '#4CAF2E' }}>✓</span>{f}
@@ -190,13 +189,12 @@ export default function Fonctionnalites() {
         </div>
       </section>
 
-      {/* FEATURE 4 — CROISSANCE */}
       <section style={{ background: '#fff', padding: '60px 40px' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, alignItems: 'center' }}>
           <div>
             <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 12, background: '#EAF6E4', display: 'inline-block', padding: '3px 10px', borderRadius: 20 }}>Croissance</div>
             <h2 style={{ fontSize: 28, fontWeight: 700, color: '#1B2E4B', lineHeight: 1.3, margin: '0 0 14px' }}>Simulez votre croissance avec le DCA</h2>
-            <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.8, margin: '0 0 20px' }}>Découvrez combien votre investissement peut valoir dans 5, 10 ou 20 ans grâce au simulateur DCA. La puissance des intérêts composés visualisée.</p>
+            <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.8, margin: '0 0 20px' }}>Découvrez combien votre investissement peut valoir dans 5, 10 ou 20 ans grâce au simulateur DCA.</p>
             {['Simulateur DCA', 'Projection sur 1 à 30 ans', 'Comparaison avec/sans DCA', 'Calcul des intérêts composés'].map(f => (
               <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, fontSize: 13, color: '#6B7280' }}>
                 <span style={{ color: '#4CAF2E' }}>✓</span>{f}
@@ -236,17 +234,12 @@ export default function Fonctionnalites() {
         </div>
       </section>
 
-      {/* FEATURE 5 — CHALLENGE */}
       <section style={{ padding: '60px 40px', maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, alignItems: 'center' }}>
         <div>
           <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 12, background: '#EAF6E4', display: 'inline-block', padding: '3px 10px', borderRadius: 20 }}>Challenge</div>
           <h2 style={{ fontSize: 28, fontWeight: 700, color: '#1B2E4B', lineHeight: 1.3, margin: '0 0 14px' }}>Apprendre et rester motivé</h2>
-          <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.8, margin: '0 0 12px' }}>
-            Collectionnez les badges, maintenez vos efforts et regardez votre empire grandir sans stress.
-          </p>
-          <p style={{ fontSize: 13, color: '#4CAF2E', fontWeight: 500, fontStyle: 'italic', margin: '0 0 20px', lineHeight: 1.6, borderLeft: '3px solid #4CAF2E', paddingLeft: 12 }}>
-            "Chaque investissement régulier est un badge de plus dans votre livret."
-          </p>
+          <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.8, margin: '0 0 12px' }}>Collectionnez les badges, maintenez vos efforts et regardez votre empire grandir sans stress.</p>
+          <p style={{ fontSize: 13, color: '#4CAF2E', fontWeight: 500, fontStyle: 'italic', margin: '0 0 20px', lineHeight: 1.6, borderLeft: '3px solid #4CAF2E', paddingLeft: 12 }}>"Chaque investissement régulier est un badge de plus dans votre livret."</p>
           {['Livret d\'accomplissements', 'Badges évolutifs (Bronze → Légendaire)', 'Suivi de progression en temps réel', 'Défis basés sur vos actions réelles'].map(f => (
             <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, fontSize: 13, color: '#6B7280' }}>
               <span style={{ color: '#4CAF2E' }}>✓</span>{f}
@@ -264,8 +257,7 @@ export default function Fonctionnalites() {
               <div style={{ width: 44, height: 44, borderRadius: '50%', background: locked ? 'rgba(255,255,255,0.06)' : tagBg, border: `2px solid ${locked ? 'rgba(255,255,255,0.15)' : tagColor}`, flexShrink: 0, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 {locked ? <span style={{ fontSize: 16, color: 'rgba(255,255,255,0.3)' }}>?</span>
                   : img ? <img src={img} alt={nom} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  : <span style={{ fontSize: 20 }}>{emoji}</span>
-                }
+                  : <span style={{ fontSize: 20 }}>{emoji}</span>}
               </div>
               <div style={{ flex: 1 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
@@ -287,9 +279,7 @@ export default function Fonctionnalites() {
       <section style={{ padding: '80px 40px', textAlign: 'center', background: '#F4F7F5' }}>
         <h2 style={{ fontSize: 30, fontWeight: 700, color: '#1B2E4B', margin: '0 0 16px' }}>Prêt à commencer ?</h2>
         <p style={{ fontSize: 14, color: '#9CA3AF', margin: '0 0 32px' }}>Toutes ces fonctionnalités disponibles gratuitement.</p>
-        <button onClick={() => navigate('/signup')} style={{ padding: '14px 40px', borderRadius: 12, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
-          S'inscrire gratuitement →
-        </button>
+        <button onClick={openSignup} style={{ padding: '14px 40px', borderRadius: 12, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>S'inscrire gratuitement →</button>
       </section>
 
       <footer style={{ borderTop: '0.5px solid #E0EAE3', padding: '20px 40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fff' }}>
@@ -300,6 +290,7 @@ export default function Fonctionnalites() {
         <div style={{ fontSize: 11, color: '#9CA3AF' }}>© 2026 StartInvest — Bâtir son mental, construire son avenir.</div>
       </footer>
 
+      {authOpen && <AuthModal defaultMode={authMode} onClose={() => setAuthOpen(false)} />}
     </div>
   )
 }

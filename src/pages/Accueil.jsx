@@ -1,10 +1,17 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import AuthModal from '../components/AuthModal'
 
 const METRONOME_URL = 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/AB94501C-5932-4B4C-93F1-D1CD5A4BAA25.png'
 const LOGO_URL = 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/IMG_2819.jpeg'
 
 export default function Accueil() {
   const navigate = useNavigate()
+  const [authOpen, setAuthOpen] = useState(false)
+  const [authMode, setAuthMode] = useState('login')
+
+  const openLogin = () => { setAuthMode('login'); setAuthOpen(true) }
+  const openSignup = () => { setAuthMode('signup'); setAuthOpen(true) }
 
   return (
     <div style={{ fontFamily: 'inherit', background: '#F4F7F5', minHeight: '100vh' }}>
@@ -23,8 +30,8 @@ export default function Accueil() {
           ))}
         </div>
         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-          <button onClick={() => navigate('/login')} style={{ padding: '7px 16px', borderRadius: 8, border: '0.5px solid #1B2E4B', background: 'transparent', color: '#1B2E4B', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Se connecter</button>
-          <button onClick={() => navigate('/signup')} style={{ padding: '7px 16px', borderRadius: 8, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>S'inscrire gratuitement</button>
+          <button onClick={openLogin} style={{ padding: '7px 16px', borderRadius: 8, border: '0.5px solid #1B2E4B', background: 'transparent', color: '#1B2E4B', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Se connecter</button>
+          <button onClick={openSignup} style={{ padding: '7px 16px', borderRadius: 8, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>S'inscrire gratuitement</button>
         </div>
       </nav>
 
@@ -42,8 +49,8 @@ export default function Accueil() {
             Développement, investissement, organisation de comptes. Start Invest vous aide à devenir celui de demain.
           </p>
           <div style={{ display: 'flex', gap: 12 }}>
-            <button onClick={() => navigate('/signup')} style={{ padding: '12px 28px', borderRadius: 10, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Commencer gratuitement →</button>
-            <button onClick={() => navigate('/login')} style={{ padding: '12px 20px', borderRadius: 10, border: '0.5px solid #E0EAE3', background: '#fff', color: '#6B7280', fontSize: 14, cursor: 'pointer', fontFamily: 'inherit' }}>Se connecter</button>
+            <button onClick={openSignup} style={{ padding: '12px 28px', borderRadius: 10, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Commencer gratuitement →</button>
+            <button onClick={openLogin} style={{ padding: '12px 20px', borderRadius: 10, border: '0.5px solid #E0EAE3', background: '#fff', color: '#6B7280', fontSize: 14, cursor: 'pointer', fontFamily: 'inherit' }}>Se connecter</button>
           </div>
         </div>
 
@@ -166,7 +173,7 @@ export default function Accueil() {
         </div>
 
         <div style={{ textAlign: 'center', marginTop: 48 }}>
-          <button onClick={() => navigate('/signup')} style={{ padding: '14px 48px', borderRadius: 12, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 16, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>Go →</button>
+          <button onClick={openSignup} style={{ padding: '14px 48px', borderRadius: 12, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 16, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>Go →</button>
           <div style={{ marginTop: 12, fontSize: 12, color: '#9CA3AF' }}>Gratuit · Sans carte bancaire · En 2 minutes</div>
         </div>
       </section>
@@ -182,7 +189,6 @@ export default function Accueil() {
               Apprenez à investir et créez-vous une fortune solide et diversifiée au fil du temps.
             </p>
           </div>
-
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
             <div style={{ background: 'rgba(255,255,255,0.06)', border: '0.5px solid rgba(255,255,255,0.1)', borderRadius: 16, padding: '24px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 12 }}>
               <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#EAF6E4', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, border: '2px solid #4CAF2E' }}>🚀</div>
@@ -190,7 +196,6 @@ export default function Accueil() {
               <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, background: '#EAF6E4', color: '#2E7D1E', fontWeight: 500 }}>Obtenu</span>
               <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', lineHeight: 1.6 }}>Tu n'es plus spectateur, tu es le pilote de ton futur.</div>
             </div>
-
             <div style={{ background: 'rgba(255,255,255,0.06)', border: '0.5px solid rgba(255,255,255,0.1)', borderRadius: 16, padding: '24px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 12 }}>
               <div style={{ width: 64, height: 64, borderRadius: '50%', border: '2px solid #854F0B', overflow: 'hidden' }}>
                 <img src={METRONOME_URL} alt="métronome" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -202,7 +207,6 @@ export default function Accueil() {
               </div>
               <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>3 / 6 mois → Argent</div>
             </div>
-
             <div style={{ background: 'rgba(255,255,255,0.06)', border: '0.5px solid rgba(255,255,255,0.1)', borderRadius: 16, padding: '24px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 12 }}>
               <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#FFF8DC', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, border: '2px solid #854F0B' }}>💰</div>
               <div style={{ fontSize: 15, fontWeight: 600, color: '#fff' }}>Cap des X€</div>
@@ -224,7 +228,6 @@ export default function Accueil() {
           </h2>
           <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.8, margin: '0 0 8px' }}>Rejoignez Start Invest et ses utilisateurs.</p>
           <p style={{ fontSize: 14, color: '#9CA3AF', lineHeight: 1.8, margin: '0 0 40px' }}>Trouvez votre façon de faire de l'argent en dormant.</p>
-
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 40, textAlign: 'left' }}>
             <div style={{ background: '#fff', border: '0.5px solid #E0EAE3', borderRadius: 16, padding: '24px 20px' }}>
               <div style={{ fontSize: 13, fontWeight: 600, color: '#1B2E4B', marginBottom: 4 }}>Gratuit</div>
@@ -234,7 +237,7 @@ export default function Accueil() {
                   <span style={{ color: '#4CAF2E', fontSize: 14 }}>✓</span>{f}
                 </div>
               ))}
-              <button onClick={() => navigate('/signup')} style={{ width: '100%', marginTop: 16, padding: '10px', borderRadius: 9, border: '0.5px solid #E0EAE3', background: '#F4F7F5', color: '#1B2E4B', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Commencer</button>
+              <button onClick={openSignup} style={{ width: '100%', marginTop: 16, padding: '10px', borderRadius: 9, border: '0.5px solid #E0EAE3', background: '#F4F7F5', color: '#1B2E4B', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Commencer</button>
             </div>
             <div style={{ background: '#1B2E4B', border: '2px solid #4CAF2E', borderRadius: 16, padding: '24px 20px', position: 'relative' }}>
               <div style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: '#4CAF2E', color: '#fff', fontSize: 10, fontWeight: 600, padding: '3px 12px', borderRadius: 20 }}>POPULAIRE</div>
@@ -245,11 +248,10 @@ export default function Accueil() {
                   <span style={{ color: '#4CAF2E', fontSize: 14 }}>✓</span>{f}
                 </div>
               ))}
-              <button onClick={() => navigate('/signup')} style={{ width: '100%', marginTop: 16, padding: '10px', borderRadius: 9, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Commencer</button>
+              <button onClick={openSignup} style={{ width: '100%', marginTop: 16, padding: '10px', borderRadius: 9, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Commencer</button>
             </div>
           </div>
-
-          <button onClick={() => navigate('/signup')} style={{ padding: '14px 48px', borderRadius: 12, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 16, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>Go →</button>
+          <button onClick={openSignup} style={{ padding: '14px 48px', borderRadius: 12, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 16, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>Go →</button>
           <div style={{ marginTop: 16, fontSize: 12, color: '#9CA3AF' }}>Gratuit · Sans carte bancaire · En 2 minutes</div>
         </div>
       </section>
@@ -291,6 +293,7 @@ export default function Accueil() {
         <div style={{ fontSize: 11, color: '#9CA3AF' }}>© 2026 StartInvest — Bâtir son mental, construire son avenir.</div>
       </footer>
 
+      {authOpen && <AuthModal defaultMode={authMode} onClose={() => setAuthOpen(false)} />}
     </div>
   )
 }
