@@ -14,7 +14,9 @@ export default function Fonctionnalites() {
         </div>
         <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
           {[['Accueil', '/'], ['Fonctionnalités', '/fonctionnalites'], ['Challenge', '/challenge-public'], ['Abonnement', '/abonnement-public']].map(([label, path]) => (
-            <span key={label} onClick={() => navigate(path)} style={{ fontSize: 13, color: label === 'Fonctionnalités' ? '#1B2E4B' : '#6B7280', padding: '5px 12px', borderRadius: 6, cursor: 'pointer', fontWeight: label === 'Fonctionnalités' ? 500 : 400 }}>
+            <span key={label} onClick={() => navigate(path)} style={{ fontSize: 13, color: label === 'Fonctionnalités' ? '#1B2E4B' : '#6B7280', padding: '5px 12px', borderRadius: 6, cursor: 'pointer', fontWeight: label === 'Fonctionnalités' ? 500 : 400 }}
+              onMouseEnter={e => e.currentTarget.style.color = '#1B2E4B'}
+              onMouseLeave={e => e.currentTarget.style.color = label === 'Fonctionnalités' ? '#1B2E4B' : '#6B7280'}>
               {label}
             </span>
           ))}
@@ -81,11 +83,15 @@ export default function Fonctionnalites() {
             <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 12, background: '#EAF6E4', display: 'inline-block', padding: '3px 10px', borderRadius: 20 }}>Portefeuille</div>
             <h2 style={{ fontSize: 28, fontWeight: 700, color: '#1B2E4B', lineHeight: 1.3, margin: '0 0 14px' }}>Gérez tous vos comptes au même endroit</h2>
             <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.8, margin: '0 0 20px' }}>Livret A, PEA, CTO, Assurance-vie — visualisez votre patrimoine complet, suivez votre matelas de sécurité et planifiez vos virements mensuels.</p>
-            {['Suivi multi-comptes', 'Matelas de sécurité', 'Plan de virement mensuel', 'Répartition du patrimoine'].map(f => (
+            {['Suivi multi-comptes', 'Matelas de sécurité', 'Plan de virement mensuel automatique', 'Répartition du patrimoine', 'Objectif d\'épargne par compte'].map(f => (
               <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, fontSize: 13, color: '#6B7280' }}>
                 <span style={{ color: '#4CAF2E' }}>✓</span>{f}
               </div>
             ))}
+            <div style={{ marginTop: 16, background: '#F4F7F5', borderRadius: 10, padding: '12px 14px', border: '0.5px solid #E0EAE3' }}>
+              <div style={{ fontSize: 12, fontWeight: 500, color: '#1B2E4B', marginBottom: 4 }}>Plan de versement mensuel</div>
+              <div style={{ fontSize: 12, color: '#6B7280', lineHeight: 1.6 }}>Définissez vos pourcentages d'allocation et StartInvest calcule exactement combien virer sur chaque compte chaque mois.</div>
+            </div>
           </div>
           <div style={{ background: '#F4F7F5', borderRadius: 16, border: '0.5px solid #E0EAE3', padding: '24px' }}>
             {[
@@ -110,6 +116,22 @@ export default function Fonctionnalites() {
             <div style={{ marginTop: 16, background: '#1B2E4B', borderRadius: 10, padding: '10px 14px', display: 'flex', justifyContent: 'space-between' }}>
               <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)' }}>Total patrimoine</span>
               <span style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>34 600 €</span>
+            </div>
+            <div style={{ marginTop: 10, background: '#EAF6E4', borderRadius: 10, padding: '10px 14px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                <span style={{ fontSize: 11, color: '#2E7D1E' }}>Virement ce mois</span>
+                <span style={{ fontSize: 11, fontWeight: 600, color: '#4CAF2E' }}>440 €</span>
+              </div>
+              {[
+                { dest: 'Livret A', pct: '30%', val: '132 €' },
+                { dest: 'PEA', pct: '50%', val: '220 €' },
+                { dest: 'CTO', pct: '20%', val: '88 €' },
+              ].map(({ dest, pct, val }) => (
+                <div key={dest} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: '#6B7280', marginBottom: 3 }}>
+                  <span>{dest}</span>
+                  <span>{pct} — {val}</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -154,7 +176,12 @@ export default function Fonctionnalites() {
         <div>
           <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 12, background: '#EAF6E4', display: 'inline-block', padding: '3px 10px', borderRadius: 20 }}>Investissement</div>
           <h2 style={{ fontSize: 28, fontWeight: 700, color: '#1B2E4B', lineHeight: 1.3, margin: '0 0 14px' }}>Suivez vos ETF et plus-values en temps réel</h2>
-          <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.8, margin: '0 0 20px' }}>Enregistrez vos achats, calculez votre PRU automatiquement et visualisez vos allocations par enveloppe (PEA, CTO, Assurance-vie).</p>
+          <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.8, margin: '0 0 12px' }}>
+            Gardez une trace de chaque mouvement. Notez vos décisions, apprenez de vos investissements.
+          </p>
+          <p style={{ fontSize: 13, color: '#4CAF2E', fontWeight: 500, fontStyle: 'italic', margin: '0 0 20px', lineHeight: 1.6, borderLeft: '3px solid #4CAF2E', paddingLeft: 12 }}>
+            "Le journal qui vous transforme en investisseur pro."
+          </p>
           {['Journal d\'achat ETF', 'Calcul PRU automatique', 'Suivi par enveloppe', '+140 ETF européens référencés', 'Mise à jour prix quotidienne'].map(f => (
             <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, fontSize: 13, color: '#6B7280' }}>
               <span style={{ color: '#4CAF2E' }}>✓</span>{f}
