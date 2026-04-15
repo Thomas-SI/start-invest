@@ -35,6 +35,7 @@ export default function Accueil() {
         </div>
       </nav>
 
+      {/* HERO */}
       <section id="hero" style={{ padding: '80px 40px 60px', maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, alignItems: 'center' }}>
         <div>
           <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 16, background: '#EAF6E4', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Nouvelle façon d'investir</div>
@@ -52,38 +53,56 @@ export default function Accueil() {
           </div>
         </div>
 
+        {/* CAMEMBERT */}
         <div style={{ position: 'relative' }}>
           <div style={{ background: '#fff', borderRadius: 16, border: '0.5px solid #E0EAE3', padding: '20px 24px', boxShadow: '0 4px 24px rgba(27,46,75,0.06)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: '#1B2E4B' }}>PE500</div>
-              <div style={{ fontSize: 12, color: '#4CAF2E', fontWeight: 500 }}>+18.4% cette année</div>
-            </div>
-            <div style={{ fontSize: 11, color: '#9CA3AF', marginBottom: 16 }}>Amundi PEA S&P 500</div>
-            <svg width="100%" height="120" viewBox="0 0 300 120">
-              <defs>
-                <linearGradient id="gfill" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#4CAF2E" stopOpacity="0.15"/>
-                  <stop offset="100%" stopColor="#4CAF2E" stopOpacity="0"/>
-                </linearGradient>
-              </defs>
-              <path d="M0 90 C20 85, 40 88, 60 75 C80 62, 90 70, 110 58 C130 46, 140 52, 160 40 C180 28, 190 35, 210 25 C230 15, 250 20, 270 12 L270 120 L0 120 Z" fill="url(#gfill)"/>
-              <path d="M0 90 C20 85, 40 88, 60 75 C80 62, 90 70, 110 58 C130 46, 140 52, 160 40 C180 28, 190 35, 210 25 C230 15, 250 20, 270 12" fill="none" stroke="#4CAF2E" strokeWidth="2" strokeLinecap="round"/>
-              <circle cx="270" cy="12" r="4" fill="#4CAF2E"/>
-            </svg>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: '#9CA3AF', marginTop: 8 }}>
-              {['Jan', 'Mar', 'Mai', 'Juil', 'Sep', 'Nov'].map(m => <span key={m}>{m}</span>)}
+            <div style={{ fontSize: 13, fontWeight: 600, color: '#1B2E4B', marginBottom: 4 }}>Mon Portefeuille</div>
+            <div style={{ fontSize: 11, color: '#9CA3AF', marginBottom: 20 }}>Répartition par enveloppe</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+              <svg width="130" height="130" viewBox="0 0 120 120">
+                <circle cx="60" cy="60" r="45" fill="none" stroke="#1B2E4B" strokeWidth="28"
+                  strokeDasharray="141.3 141.3" strokeDashoffset="0" transform="rotate(-90 60 60)" />
+                <circle cx="60" cy="60" r="45" fill="none" stroke="#4CAF2E" strokeWidth="28"
+                  strokeDasharray="84.8 198.0" strokeDashoffset="-141.3" transform="rotate(-90 60 60)" />
+                <circle cx="60" cy="60" r="45" fill="none" stroke="#BA7517" strokeWidth="28"
+                  strokeDasharray="56.5 226.2" strokeDashoffset="-226.1" transform="rotate(-90 60 60)" />
+                <circle cx="60" cy="60" r="31" fill="#fff" />
+                <text x="60" y="56" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1B2E4B">34 600 €</text>
+                <text x="60" y="70" textAnchor="middle" fontSize="9" fill="#9CA3AF">patrimoine</text>
+              </svg>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, flex: 1 }}>
+                {[
+                  { label: 'PEA', pct: '50%', val: '15 400 €', color: '#1B2E4B' },
+                  { label: 'CTO', pct: '30%', val: '6 800 €', color: '#4CAF2E' },
+                  { label: 'Ass. Vie', pct: '20%', val: '4 200 €', color: '#BA7517' },
+                ].map(({ label, pct, val, color }) => (
+                  <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{ width: 10, height: 10, borderRadius: '50%', background: color, flexShrink: 0 }} />
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span style={{ fontSize: 12, fontWeight: 500, color: '#1B2E4B' }}>{label}</span>
+                        <span style={{ fontSize: 12, color: '#9CA3AF' }}>{pct}</span>
+                      </div>
+                      <div style={{ fontSize: 10, color: '#9CA3AF' }}>{val}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-          <div style={{ position: 'absolute', bottom: -20, right: -20, background: '#fff', border: '0.5px solid #4CAF2E', borderRadius: 14, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10, boxShadow: '0 4px 16px rgba(76,175,46,0.12)' }}>
-            <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#EAF6E4', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, border: '2px solid #4CAF2E' }}>🚀</div>
+
+          {/* BADGE ARCHITECTE */}
+          <div style={{ position: 'absolute', bottom: -20, right: -20, background: '#fff', border: '0.5px solid #185FA5', borderRadius: 14, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10, boxShadow: '0 4px 16px rgba(24,95,165,0.12)' }}>
+            <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#E6F1FB', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, border: '2px solid #185FA5' }}>🏗️</div>
             <div>
-              <div style={{ fontSize: 11, fontWeight: 600, color: '#1B2E4B' }}>Le Grand Saut</div>
-              <div style={{ fontSize: 10, color: '#4CAF2E' }}>Accomplissement débloqué !</div>
+              <div style={{ fontSize: 11, fontWeight: 600, color: '#1B2E4B' }}>L'Architecte</div>
+              <div style={{ fontSize: 10, color: '#185FA5' }}>Accomplissement débloqué !</div>
             </div>
           </div>
         </div>
       </section>
 
+      {/* FEATURES */}
       <section id="features" style={{ padding: '80px 40px 40px', maxWidth: 1100, margin: '0 auto' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
 
@@ -168,16 +187,13 @@ export default function Accueil() {
                     <stop offset="100%" stopColor="#1B2E4B" stopOpacity="0"/>
                   </linearGradient>
                 </defs>
-                {/* Épargne simple */}
                 <path d="M0 90 C60 88, 120 82, 180 75 C220 70, 240 68, 260 65 L260 100 L0 100 Z" fill="url(#savefill)"/>
                 <path d="M0 90 C60 88, 120 82, 180 75 C220 70, 240 68, 260 65" fill="none" stroke="#1B2E4B" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="4 3"/>
-                {/* DCA avec intérêts composés */}
                 <path d="M0 90 C40 82, 80 70, 120 55 C160 40, 200 25, 260 8 L260 100 L0 100 Z" fill="url(#dcafill)"/>
                 <path d="M0 90 C40 82, 80 70, 120 55 C160 40, 200 25, 260 8" fill="none" stroke="#4CAF2E" strokeWidth="2" strokeLinecap="round"/>
                 <circle cx="260" cy="8" r="3" fill="#4CAF2E"/>
-                {/* Labels */}
-                <text x="200" y="6" fill="#4CAF2E" fontSize="9" fontWeight="700">DCA +127%</text>
-                <text x="190" y="62" fill="#1B2E4B" fontSize="9">Épargne +30%</text>
+                <text x="195" y="6" fill="#4CAF2E" fontSize="9" fontWeight="700">DCA +127%</text>
+                <text x="185" y="62" fill="#1B2E4B" fontSize="9">Épargne +30%</text>
               </svg>
               <div style={{ display: 'flex', gap: 14, justifyContent: 'center', marginTop: 6 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
@@ -204,6 +220,7 @@ export default function Accueil() {
         </div>
       </section>
 
+      {/* MINDSET */}
       <section id="challenge" style={{ background: '#1B2E4B', padding: '80px 40px', marginTop: 60 }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 52 }}>
@@ -246,6 +263,7 @@ export default function Accueil() {
         </div>
       </section>
 
+      {/* ABONNEMENT */}
       <section id="abonnement" style={{ padding: '100px 40px 80px', background: '#F4F7F5', textAlign: 'center' }}>
         <div style={{ maxWidth: 580, margin: '0 auto' }}>
           <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 16, background: '#EAF6E4', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Rejoignez-nous</div>
@@ -282,6 +300,7 @@ export default function Accueil() {
         </div>
       </section>
 
+      {/* SOCIAL */}
       <section style={{ background: '#fff', borderTop: '0.5px solid #E0EAE3', padding: '60px 40px', textAlign: 'center' }}>
         <div style={{ maxWidth: 400, margin: '0 auto' }}>
           <div style={{ fontSize: 14, fontWeight: 500, color: '#1B2E4B', marginBottom: 28 }}>Vous pouvez me rejoindre sur :</div>
