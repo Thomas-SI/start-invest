@@ -2,6 +2,45 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AuthModal from '../components/AuthModal'
 
+const plans = [
+  {
+    id: 'gratuit', nom: 'Gratuit',
+    prixMensuel: '0€', prixAnnuel: '0€',
+    periodeMensuel: 'pour toujours', periodeAnnuel: 'pour toujours',
+    pages: ['Mes Finances', 'Concentration', 'Abonnement', 'Compte'],
+    features: [
+      { label: 'Suivi finances de base', inclus: true },
+      { label: 'Simulateur DCA basique', inclus: true },
+      { label: 'Données ETF actualisées 1x/jour', inclus: true },
+      { label: 'Portefeuille & Investissement', inclus: false },
+      { label: 'Données ETF en temps réel', inclus: false },
+      { label: 'Recommandations IA', inclus: false },
+      { label: 'Rapports journaliers', inclus: false },
+      { label: 'Support prioritaire', inclus: false },
+    ]
+  },
+  {
+    id: 'premium', nom: 'Premium', recommande: true,
+    prixMensuel: '7.99€', prixAnnuel: '67€',
+    periodeMensuel: 'par mois', periodeAnnuel: 'par an · économisez 29%',
+    pages: ['Mes Finances', 'Portefeuille', 'Investissement', 'Croissance', 'Concentration', 'Abonnement', 'Guide', 'Compte'],
+    features: [
+      { label: 'Suivi finances complet', inclus: true },
+      { label: 'Simulateur DCA avancé', inclus: true },
+      { label: 'Données ETF en temps réel', inclus: true },
+      { label: 'Recommandations IA', inclus: true },
+      { label: 'Rapports journaliers', inclus: true },
+      { label: 'IA agent personnalisée', inclus: true },
+      { label: 'Analyse fiscale avancée', inclus: true },
+      { label: 'Accès API personnelle', inclus: true },
+      { label: 'Support prioritaire', inclus: true },
+      { label: 'Webinaires exclusifs', inclus: true },
+      { label: 'Gestionnaire du patrimoine IA', inclus: true },
+      { label: 'Accès communauté', inclus: true },
+    ]
+  },
+]
+
 export default function AbonnementPublic() {
   const navigate = useNavigate()
   const [annuel, setAnnuel] = useState(false)
@@ -10,9 +49,6 @@ export default function AbonnementPublic() {
 
   const openLogin = () => { setAuthMode('login'); setAuthOpen(true) }
   const openSignup = () => { setAuthMode('signup'); setAuthOpen(true) }
-
-  const GRATUIT = ['Mes Finances', 'Portefeuille', 'Journal ETF', 'Accomplissements de base', 'Accès communauté']
-  const PREMIUM = ['Tout le plan Gratuit', 'Simulateur DCA avancé', 'Concentration & Mindset', 'Accomplissement Vroum Vroum ⚡', 'Mises à jour prix quotidiennes', 'Support prioritaire']
 
   return (
     <div style={{ fontFamily: 'inherit', background: '#F4F7F5', minHeight: '100vh' }}>
@@ -46,48 +82,61 @@ export default function AbonnementPublic() {
           Commencez gratuitement. Passez à Premium quand vous êtes prêt.
         </p>
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 48 }}>
-          <span style={{ fontSize: 13, color: !annuel ? '#1B2E4B' : '#9CA3AF', fontWeight: !annuel ? 500 : 400 }}>Mensuel</span>
-          <div onClick={() => setAnnuel(a => !a)} style={{ width: 44, height: 24, borderRadius: 12, background: annuel ? '#4CAF2E' : '#E0EAE3', cursor: 'pointer', position: 'relative', transition: 'background 0.2s' }}>
-            <div style={{ position: 'absolute', top: 2, left: annuel ? 22 : 2, width: 20, height: 20, borderRadius: '50%', background: '#fff', transition: 'left 0.2s' }} />
-          </div>
-          <span style={{ fontSize: 13, color: annuel ? '#1B2E4B' : '#9CA3AF', fontWeight: annuel ? 500 : 400 }}>Annuel</span>
-          {annuel && <span style={{ fontSize: 11, background: '#EAF6E4', color: '#2E7D1E', padding: '2px 8px', borderRadius: 20, fontWeight: 500 }}>-29%</span>}
+        {/* TOGGLE */}
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 0, background: '#fff', border: '0.5px solid #E0EAE3', borderRadius: 30, padding: '4px', marginBottom: 48 }}>
+          <button onClick={() => setAnnuel(false)} style={{ padding: '7px 20px', borderRadius: 20, border: 'none', background: !annuel ? '#1B2E4B' : 'transparent', color: !annuel ? '#fff' : '#9CA3AF', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' }}>Mensuel</button>
+          <button onClick={() => setAnnuel(true)} style={{ padding: '7px 20px', borderRadius: 20, border: 'none', background: annuel ? '#1B2E4B' : 'transparent', color: annuel ? '#fff' : '#9CA3AF', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s', display: 'flex', alignItems: 'center', gap: 6 }}>
+            Annuel
+            <span style={{ fontSize: 9, background: '#4CAF2E', color: '#fff', padding: '2px 6px', borderRadius: 10, fontWeight: 600 }}>-29%</span>
+          </button>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, maxWidth: 700, margin: '0 auto' }}>
-          <div style={{ background: '#fff', border: '0.5px solid #E0EAE3', borderRadius: 20, padding: '32px 28px', textAlign: 'left' }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: '#6B7280', marginBottom: 8 }}>Gratuit</div>
-            <div style={{ fontSize: 36, fontWeight: 700, color: '#1B2E4B', marginBottom: 6 }}>0 €</div>
-            <div style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 24 }}>Pour toujours</div>
-            <div style={{ borderTop: '0.5px solid #E0EAE3', paddingTop: 20, marginBottom: 24 }}>
-              {GRATUIT.map(f => (
-                <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10, fontSize: 13, color: '#6B7280' }}>
-                  <span style={{ color: '#4CAF2E', fontSize: 14 }}>✓</span>{f}
-                </div>
-              ))}
-            </div>
-            <button onClick={openSignup} style={{ width: '100%', padding: '12px', borderRadius: 10, border: '0.5px solid #E0EAE3', background: '#F4F7F5', color: '#1B2E4B', fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Commencer gratuitement</button>
-          </div>
+        {/* PLANS */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, maxWidth: 780, margin: '0 auto' }}>
+          {plans.map(({ id, nom, recommande, features, pages, prixMensuel, prixAnnuel, periodeMensuel, periodeAnnuel }) => {
+            const prix = annuel ? prixAnnuel : prixMensuel
+            const periode = annuel ? periodeAnnuel : periodeMensuel
+            return (
+              <div key={id} style={{ background: recommande ? '#1B2E4B' : '#fff', border: `${recommande ? '2px' : '0.5px'} solid ${recommande ? '#4CAF2E' : '#E0EAE3'}`, borderRadius: 20, padding: '28px 24px', display: 'flex', flexDirection: 'column', textAlign: 'left', position: 'relative' }}>
+                {recommande && <div style={{ position: 'absolute', top: -14, left: '50%', transform: 'translateX(-50%)', background: '#4CAF2E', color: '#fff', fontSize: 11, fontWeight: 600, padding: '4px 16px', borderRadius: 20, whiteSpace: 'nowrap' }}>⭐ Recommandé</div>}
 
-          <div style={{ background: '#1B2E4B', border: '2px solid #4CAF2E', borderRadius: 20, padding: '32px 28px', textAlign: 'left', position: 'relative' }}>
-            <div style={{ position: 'absolute', top: -14, left: '50%', transform: 'translateX(-50%)', background: '#4CAF2E', color: '#fff', fontSize: 11, fontWeight: 600, padding: '4px 16px', borderRadius: 20, whiteSpace: 'nowrap' }}>⭐ LE PLUS POPULAIRE</div>
-            <div style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.6)', marginBottom: 8 }}>Premium</div>
-            <div style={{ fontSize: 36, fontWeight: 700, color: '#fff', marginBottom: 4 }}>{annuel ? '67 €' : '7.99 €'}</div>
-            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', marginBottom: 24 }}>{annuel ? 'facturé en une fois par an' : 'par mois'}</div>
-            <div style={{ borderTop: '0.5px solid rgba(255,255,255,0.1)', paddingTop: 20, marginBottom: 24 }}>
-              {PREMIUM.map(f => (
-                <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10, fontSize: 13, color: 'rgba(255,255,255,0.7)' }}>
-                  <span style={{ color: '#4CAF2E', fontSize: 14 }}>✓</span>{f}
+                <div style={{ fontSize: 16, fontWeight: 600, color: recommande ? '#fff' : '#1B2E4B', marginBottom: 4 }}>{nom}</div>
+                <div style={{ fontSize: 32, fontWeight: 700, color: recommande ? '#fff' : '#1B2E4B', marginBottom: 2 }}>{prix}</div>
+                <div style={{ fontSize: 11, color: recommande ? 'rgba(255,255,255,0.5)' : '#9CA3AF', marginBottom: 20 }}>{periode}</div>
+
+                <div style={{ marginBottom: 16 }}>
+                  <div style={{ fontSize: 10, fontWeight: 500, color: recommande ? 'rgba(255,255,255,0.5)' : '#9CA3AF', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 8 }}>Pages accessibles</div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
+                    {pages.map(p => (
+                      <span key={p} style={{ fontSize: 10, padding: '3px 8px', borderRadius: 20, background: recommande ? 'rgba(255,255,255,0.1)' : '#F4F7F5', color: recommande ? '#fff' : '#1B2E4B', border: `0.5px solid ${recommande ? 'rgba(255,255,255,0.15)' : '#E0EAE3'}` }}>{p}</span>
+                    ))}
+                  </div>
                 </div>
-              ))}
-            </div>
-            <button onClick={openSignup} style={{ width: '100%', padding: '12px', borderRadius: 10, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Commencer avec Premium</button>
-          </div>
+
+                <div style={{ height: 0.5, background: recommande ? 'rgba(255,255,255,0.1)' : '#E0EAE3', marginBottom: 16 }} />
+
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 24 }}>
+                  {features.map(({ label, inclus }) => (
+                    <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: inclus ? (recommande ? '#fff' : '#1B2E4B') : (recommande ? 'rgba(255,255,255,0.25)' : '#9CA3AF') }}>
+                      <div style={{ width: 16, height: 16, borderRadius: '50%', background: inclus ? (recommande ? 'rgba(76,175,46,0.3)' : '#EAF6E4') : 'transparent', border: inclus ? 'none' : `0.5px solid ${recommande ? 'rgba(255,255,255,0.15)' : '#E0EAE3'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        {inclus && <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1.5 4L3 5.5L6.5 2" stroke="#4CAF2E" strokeWidth="1.2" strokeLinecap="round"/></svg>}
+                      </div>
+                      {label}
+                    </div>
+                  ))}
+                </div>
+
+                <button onClick={openSignup} style={{ width: '100%', padding: '12px', borderRadius: 10, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
+                  {recommande ? 'Commencer avec Premium →' : 'Commencer gratuitement'}
+                </button>
+              </div>
+            )
+          })}
         </div>
       </section>
 
-      <section style={{ padding: '80px 40px', maxWidth: 700, margin: '0 auto' }}>
+      {/* FAQ */}
+      <section style={{ padding: '60px 40px', maxWidth: 700, margin: '0 auto' }}>
         <h2 style={{ fontSize: 26, fontWeight: 700, color: '#1B2E4B', textAlign: 'center', marginBottom: 40 }}>Questions fréquentes</h2>
         {[
           { q: 'Puis-je annuler à tout moment ?', r: 'Oui, vous pouvez annuler votre abonnement à tout moment depuis votre espace compte.' },

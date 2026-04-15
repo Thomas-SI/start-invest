@@ -6,11 +6,95 @@ import ChallengesModal from '../components/ChallengesModal'
 const METRONOME_URL = 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/AB94501C-5932-4B4C-93F1-D1CD5A4BAA25.png'
 const LOGO_URL = 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/IMG_2819.jpeg'
 
+const plansData = [
+  {
+    id: 'gratuit', nom: 'Gratuit',
+    prixMensuel: '0€', prixAnnuel: '0€',
+    periodeMensuel: 'pour toujours', periodeAnnuel: 'pour toujours',
+    pages: ['Mes Finances', 'Concentration', 'Abonnement', 'Compte'],
+    features: [
+      { label: 'Suivi finances de base', inclus: true },
+      { label: 'Simulateur DCA basique', inclus: true },
+      { label: 'Données ETF actualisées 1x/jour', inclus: true },
+      { label: 'Portefeuille & Investissement', inclus: false },
+      { label: 'Données ETF en temps réel', inclus: false },
+      { label: 'Recommandations IA', inclus: false },
+      { label: 'Rapports journaliers', inclus: false },
+      { label: 'Support prioritaire', inclus: false },
+    ]
+  },
+  {
+    id: 'premium', nom: 'Premium', recommande: true,
+    prixMensuel: '7.99€', prixAnnuel: '67€',
+    periodeMensuel: 'par mois', periodeAnnuel: 'par an · économisez 29%',
+    pages: ['Mes Finances', 'Portefeuille', 'Investissement', 'Croissance', 'Concentration', 'Abonnement', 'Guide', 'Compte'],
+    features: [
+      { label: 'Suivi finances complet', inclus: true },
+      { label: 'Simulateur DCA avancé', inclus: true },
+      { label: 'Données ETF en temps réel', inclus: true },
+      { label: 'Recommandations IA', inclus: true },
+      { label: 'Rapports journaliers', inclus: true },
+      { label: 'IA agent personnalisée', inclus: true },
+      { label: 'Analyse fiscale avancée', inclus: true },
+      { label: 'Accès API personnelle', inclus: true },
+      { label: 'Support prioritaire', inclus: true },
+      { label: 'Webinaires exclusifs', inclus: true },
+      { label: 'Gestionnaire du patrimoine IA', inclus: true },
+      { label: 'Accès communauté', inclus: true },
+    ]
+  },
+]
+
+function PlanCard({ plan, abonnementAnnuel, openSignup }) {
+  const [expanded, setExpanded] = useState(false)
+  const { id, nom, recommande, features, pages, prixMensuel, prixAnnuel, periodeMensuel, periodeAnnuel } = plan
+  const prix = abonnementAnnuel ? prixAnnuel : prixMensuel
+  const periode = abonnementAnnuel ? periodeAnnuel : periodeMensuel
+  const featuresVisible = expanded ? features : features.slice(0, 4)
+
+  return (
+    <div style={{ background: recommande ? '#1B2E4B' : '#fff', border: `${recommande ? '2px' : '0.5px'} solid ${recommande ? '#4CAF2E' : '#E0EAE3'}`, borderRadius: 20, padding: '28px 24px', display: 'flex', flexDirection: 'column', position: 'relative', textAlign: 'left' }}>
+      {recommande && <div style={{ position: 'absolute', top: -14, left: '50%', transform: 'translateX(-50%)', background: '#4CAF2E', color: '#fff', fontSize: 11, fontWeight: 600, padding: '4px 16px', borderRadius: 20, whiteSpace: 'nowrap' }}>⭐ Recommandé</div>}
+      <div style={{ fontSize: 16, fontWeight: 600, color: recommande ? '#fff' : '#1B2E4B', marginBottom: 4 }}>{nom}</div>
+      <div style={{ fontSize: 32, fontWeight: 700, color: recommande ? '#fff' : '#1B2E4B', marginBottom: 2 }}>{prix}</div>
+      <div style={{ fontSize: 11, color: recommande ? 'rgba(255,255,255,0.5)' : '#9CA3AF', marginBottom: 20 }}>{periode}</div>
+      <div style={{ marginBottom: 16 }}>
+        <div style={{ fontSize: 10, fontWeight: 500, color: recommande ? 'rgba(255,255,255,0.5)' : '#9CA3AF', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 8 }}>Pages accessibles</div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
+          {pages.map(p => (
+            <span key={p} style={{ fontSize: 10, padding: '3px 8px', borderRadius: 20, background: recommande ? 'rgba(255,255,255,0.1)' : '#F4F7F5', color: recommande ? '#fff' : '#1B2E4B', border: `0.5px solid ${recommande ? 'rgba(255,255,255,0.15)' : '#E0EAE3'}` }}>{p}</span>
+          ))}
+        </div>
+      </div>
+      <div style={{ height: 0.5, background: recommande ? 'rgba(255,255,255,0.1)' : '#E0EAE3', marginBottom: 16 }} />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 12 }}>
+        {featuresVisible.map(({ label, inclus }) => (
+          <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: inclus ? (recommande ? '#fff' : '#1B2E4B') : (recommande ? 'rgba(255,255,255,0.25)' : '#9CA3AF') }}>
+            <div style={{ width: 16, height: 16, borderRadius: '50%', background: inclus ? (recommande ? 'rgba(76,175,46,0.3)' : '#EAF6E4') : 'transparent', border: inclus ? 'none' : `0.5px solid ${recommande ? 'rgba(255,255,255,0.15)' : '#E0EAE3'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              {inclus && <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1.5 4L3 5.5L6.5 2" stroke="#4CAF2E" strokeWidth="1.2" strokeLinecap="round"/></svg>}
+            </div>
+            {label}
+          </div>
+        ))}
+      </div>
+      {features.length > 4 && (
+        <button onClick={() => setExpanded(e => !e)} style={{ background: 'none', border: 'none', color: '#4CAF2E', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit', marginBottom: 16, textAlign: 'left', padding: 0 }}>
+          {expanded ? '▲ Voir moins' : `▼ Voir ${features.length - 4} de plus`}
+        </button>
+      )}
+      <button onClick={openSignup} style={{ width: '100%', padding: '12px', borderRadius: 10, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', marginTop: 'auto' }}>
+        {recommande ? 'Commencer avec Premium →' : 'Commencer gratuitement'}
+      </button>
+    </div>
+  )
+}
+
 export default function Accueil() {
   const navigate = useNavigate()
   const [authOpen, setAuthOpen] = useState(false)
   const [authMode, setAuthMode] = useState('login')
   const [challengesOpen, setChallengesOpen] = useState(false)
+  const [abonnementAnnuel, setAbonnementAnnuel] = useState(false)
 
   const openLogin = () => { setAuthMode('login'); setAuthOpen(true) }
   const openSignup = () => { setAuthMode('signup'); setAuthOpen(true) }
@@ -48,26 +132,20 @@ export default function Accueil() {
           <p style={{ fontSize: 15, color: '#6B7280', lineHeight: 1.7, margin: '0 0 36px', maxWidth: 420 }}>
             Suivez vos finances. Atteignez vos objectifs.<br />Ayez un pas dans le futur.
           </p>
-          <div style={{ display: 'flex', gap: 12 }}>
-            <button onClick={openSignup} style={{ padding: '12px 28px', borderRadius: 10, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
-              Commencer gratuitement →
-            </button>
-          </div>
+          <button onClick={openSignup} style={{ padding: '12px 28px', borderRadius: 10, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
+            Commencer gratuitement →
+          </button>
         </div>
 
-        {/* CAMEMBERT */}
         <div style={{ position: 'relative' }}>
           <div style={{ background: '#fff', borderRadius: 16, border: '0.5px solid #E0EAE3', padding: '20px 24px', boxShadow: '0 4px 24px rgba(27,46,75,0.06)' }}>
             <div style={{ fontSize: 13, fontWeight: 600, color: '#1B2E4B', marginBottom: 4 }}>Mon Portefeuille</div>
             <div style={{ fontSize: 11, color: '#9CA3AF', marginBottom: 20 }}>Répartition par enveloppe</div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
               <svg width="130" height="130" viewBox="0 0 120 120">
-                <circle cx="60" cy="60" r="45" fill="none" stroke="#1B2E4B" strokeWidth="28"
-                  strokeDasharray="141.3 141.3" strokeDashoffset="0" transform="rotate(-90 60 60)" />
-                <circle cx="60" cy="60" r="45" fill="none" stroke="#4CAF2E" strokeWidth="28"
-                  strokeDasharray="84.8 198.0" strokeDashoffset="-141.3" transform="rotate(-90 60 60)" />
-                <circle cx="60" cy="60" r="45" fill="none" stroke="#BA7517" strokeWidth="28"
-                  strokeDasharray="56.5 226.2" strokeDashoffset="-226.1" transform="rotate(-90 60 60)" />
+                <circle cx="60" cy="60" r="45" fill="none" stroke="#1B2E4B" strokeWidth="28" strokeDasharray="141.3 141.3" strokeDashoffset="0" transform="rotate(-90 60 60)" />
+                <circle cx="60" cy="60" r="45" fill="none" stroke="#4CAF2E" strokeWidth="28" strokeDasharray="84.8 198.0" strokeDashoffset="-141.3" transform="rotate(-90 60 60)" />
+                <circle cx="60" cy="60" r="45" fill="none" stroke="#BA7517" strokeWidth="28" strokeDasharray="56.5 226.2" strokeDashoffset="-226.1" transform="rotate(-90 60 60)" />
                 <circle cx="60" cy="60" r="31" fill="#fff" />
                 <text x="60" y="56" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1B2E4B">34 600 €</text>
                 <text x="60" y="70" textAnchor="middle" fontSize="9" fill="#9CA3AF">patrimoine</text>
@@ -92,8 +170,6 @@ export default function Accueil() {
               </div>
             </div>
           </div>
-
-          {/* BADGE ARCHITECTE */}
           <div style={{ position: 'absolute', bottom: -20, right: -20, background: '#fff', border: '0.5px solid #185FA5', borderRadius: 14, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10, boxShadow: '0 4px 16px rgba(24,95,165,0.12)' }}>
             <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#E6F1FB', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, border: '2px solid #185FA5' }}>🏗️</div>
             <div>
@@ -267,37 +343,26 @@ export default function Accueil() {
 
       {/* ABONNEMENT */}
       <section id="abonnement" style={{ padding: '100px 40px 80px', background: '#F4F7F5', textAlign: 'center' }}>
-        <div style={{ maxWidth: 580, margin: '0 auto' }}>
+        <div style={{ maxWidth: 820, margin: '0 auto' }}>
           <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 16, background: '#EAF6E4', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Rejoignez-nous</div>
           <h2 style={{ fontSize: 34, fontWeight: 700, color: '#1B2E4B', lineHeight: 1.3, margin: '0 0 16px' }}>
             Ne laissez plus jamais<br /><span style={{ color: '#4CAF2E' }}>votre argent dormir.</span>
           </h2>
-          <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.8, margin: '0 0 8px' }}>Rejoignez Start Invest et ses utilisateurs.</p>
-          <p style={{ fontSize: 14, color: '#9CA3AF', lineHeight: 1.8, margin: '0 0 40px' }}>Trouvez votre façon de faire de l'argent en dormant.</p>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 40, textAlign: 'left' }}>
-            <div style={{ background: '#fff', border: '0.5px solid #E0EAE3', borderRadius: 16, padding: '24px 20px' }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: '#1B2E4B', marginBottom: 4 }}>Gratuit</div>
-              <div style={{ fontSize: 28, fontWeight: 700, color: '#1B2E4B', marginBottom: 16 }}>0 €<span style={{ fontSize: 13, fontWeight: 400, color: '#9CA3AF' }}>/mois</span></div>
-              {['Mes Finances', 'Portefeuille', 'Journal ETF', 'Accomplissements'].map(f => (
-                <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, fontSize: 13, color: '#6B7280' }}>
-                  <span style={{ color: '#4CAF2E', fontSize: 14 }}>✓</span>{f}
-                </div>
-              ))}
-              <button onClick={openSignup} style={{ width: '100%', marginTop: 16, padding: '10px', borderRadius: 9, border: '0.5px solid #E0EAE3', background: '#F4F7F5', color: '#1B2E4B', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Commencer</button>
-            </div>
-            <div style={{ background: '#1B2E4B', border: '2px solid #4CAF2E', borderRadius: 16, padding: '24px 20px', position: 'relative' }}>
-              <div style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: '#4CAF2E', color: '#fff', fontSize: 10, fontWeight: 600, padding: '3px 12px', borderRadius: 20 }}>POPULAIRE</div>
-              <div style={{ fontSize: 13, fontWeight: 600, color: '#fff', marginBottom: 4 }}>Premium</div>
-              <div style={{ fontSize: 28, fontWeight: 700, color: '#fff', marginBottom: 16 }}>7.99 €<span style={{ fontSize: 13, fontWeight: 400, color: 'rgba(255,255,255,0.5)' }}>/mois</span></div>
-              {['Tout le plan Gratuit', 'Simulateur DCA', 'Concentration', 'Vroum Vroum 🏎️', 'Support prioritaire'].map(f => (
-                <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, fontSize: 13, color: 'rgba(255,255,255,0.7)' }}>
-                  <span style={{ color: '#4CAF2E', fontSize: 14 }}>✓</span>{f}
-                </div>
-              ))}
-              <button onClick={openSignup} style={{ width: '100%', marginTop: 16, padding: '10px', borderRadius: 9, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Commencer</button>
-            </div>
+          <p style={{ fontSize: 14, color: '#9CA3AF', lineHeight: 1.8, margin: '0 0 32px' }}>Trouvez votre façon de faire de l'argent en dormant.</p>
+
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 0, background: '#fff', border: '0.5px solid #E0EAE3', borderRadius: 30, padding: '4px', marginBottom: 40 }}>
+            <button onClick={() => setAbonnementAnnuel(false)} style={{ padding: '7px 20px', borderRadius: 20, border: 'none', background: !abonnementAnnuel ? '#1B2E4B' : 'transparent', color: !abonnementAnnuel ? '#fff' : '#9CA3AF', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' }}>Mensuel</button>
+            <button onClick={() => setAbonnementAnnuel(true)} style={{ padding: '7px 20px', borderRadius: 20, border: 'none', background: abonnementAnnuel ? '#1B2E4B' : 'transparent', color: abonnementAnnuel ? '#fff' : '#9CA3AF', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s', display: 'flex', alignItems: 'center', gap: 6 }}>
+              Annuel
+              <span style={{ fontSize: 9, background: '#4CAF2E', color: '#fff', padding: '2px 6px', borderRadius: 10, fontWeight: 600 }}>-29%</span>
+            </button>
           </div>
-          <button onClick={openSignup} style={{ padding: '14px 48px', borderRadius: 12, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 16, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>Go →</button>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+            {plansData.map(plan => (
+              <PlanCard key={plan.id} plan={plan} abonnementAnnuel={abonnementAnnuel} openSignup={openSignup} />
+            ))}
+          </div>
         </div>
       </section>
 
