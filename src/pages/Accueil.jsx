@@ -8,17 +8,17 @@ export default function Accueil() {
 
       {/* NAVBAR */}
       <nav style={{ background: '#fff', borderBottom: '0.5px solid #E0EAE3', padding: '0 40px', height: 58, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 100 }}>
-        <div style={{ display: 'flex', alignItems: 'baseline' }}>
+        <div onClick={() => navigate('/')} style={{ display: 'flex', alignItems: 'baseline', cursor: 'pointer' }}>
           <span style={{ fontSize: 18, fontWeight: 800, color: '#1B2E4B', fontStyle: 'italic' }}>START</span>
           <span style={{ fontSize: 18, fontWeight: 800, color: '#4CAF2E', fontStyle: 'italic' }}>INVEST</span>
         </div>
         <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
-          {[['Accueil', '#hero'], ['Fonctionnalités', '#features'], ['Challenge', '#challenge'], ['Abonnement', '#abonnement']].map(([label, anchor]) => (
-            <a key={label} href={anchor} style={{ fontSize: 13, color: '#6B7280', padding: '5px 12px', borderRadius: 6, cursor: 'pointer', textDecoration: 'none' }}
+          {[['Accueil', '/'], ['Fonctionnalités', '/fonctionnalites'], ['Challenge', '/challenge-public'], ['Abonnement', '/abonnement-public']].map(([label, path]) => (
+            <span key={label} onClick={() => navigate(path)} style={{ fontSize: 13, color: label === 'Accueil' ? '#1B2E4B' : '#6B7280', padding: '5px 12px', borderRadius: 6, cursor: 'pointer', fontWeight: label === 'Accueil' ? 500 : 400 }}
               onMouseEnter={e => e.currentTarget.style.color = '#1B2E4B'}
-              onMouseLeave={e => e.currentTarget.style.color = '#6B7280'}>
+              onMouseLeave={e => e.currentTarget.style.color = label === 'Accueil' ? '#1B2E4B' : '#6B7280'}>
               {label}
-            </a>
+            </span>
           ))}
         </div>
         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
@@ -243,7 +243,6 @@ export default function Accueil() {
           <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.8, margin: '0 0 8px' }}>Rejoignez Start Invest et ses utilisateurs.</p>
           <p style={{ fontSize: 14, color: '#9CA3AF', lineHeight: 1.8, margin: '0 0 40px' }}>Trouvez votre façon de faire de l'argent en dormant.</p>
 
-          {/* PLANS */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 40, textAlign: 'left' }}>
             <div style={{ background: '#fff', border: '0.5px solid #E0EAE3', borderRadius: 16, padding: '24px 20px' }}>
               <div style={{ fontSize: 13, fontWeight: 600, color: '#1B2E4B', marginBottom: 4 }}>Gratuit</div>

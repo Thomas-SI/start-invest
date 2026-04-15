@@ -16,6 +16,9 @@ import Abonnement from './pages/Abonnement'
 import Compte from './pages/Compte'
 import Parametres from './pages/Parametres'
 import Onboarding from './pages/Onboarding'
+import Fonctionnalites from './pages/Fonctionnalites'
+import ChallengePublic from './pages/ChallengePublic'
+import AbonnementPublic from './pages/AbonnementPublic'
 import './index.css'
 
 const queryClient = new QueryClient({
@@ -48,6 +51,9 @@ createRoot(document.getElementById('root')).render(
             <Route path="/abonnement" element={<Abonnement />} />
             <Route path="/compte" element={<Compte />} />
             <Route path="/parametres" element={<Parametres />} />
+            <Route path="/fonctionnalites" element={<Fonctionnalites />} />
+            <Route path="/challenge-public" element={<ChallengePublic />} />
+            <Route path="/abonnement-public" element={<AbonnementPublic />} />
           </Routes>
         </BrowserRouter>
       </ThemeProvider>
