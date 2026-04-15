@@ -106,7 +106,6 @@ export default function Accueil() {
       <section id="features" style={{ padding: '80px 40px 40px', maxWidth: 1100, margin: '0 auto' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
 
-          {/* CARD FINANCES */}
           <div style={{ background: '#fff', borderRadius: 16, border: '0.5px solid #E0EAE3', overflow: 'hidden' }}>
             <div style={{ background: '#F4F7F5', padding: '28px 24px', minHeight: 200, display: 'flex', flexDirection: 'column', gap: 8 }}>
               {[
@@ -135,7 +134,6 @@ export default function Accueil() {
             </div>
           </div>
 
-          {/* CARD ENVELOPPES */}
           <div style={{ background: '#fff', borderRadius: 16, border: '0.5px solid #E0EAE3', overflow: 'hidden' }}>
             <div style={{ background: '#F4F7F5', padding: '28px 24px', minHeight: 200, display: 'flex', flexDirection: 'column', gap: 10 }}>
               {[
@@ -163,7 +161,6 @@ export default function Accueil() {
             </div>
           </div>
 
-          {/* CARD DCA */}
           <div style={{ background: '#fff', borderRadius: 16, border: '0.5px solid #E0EAE3', overflow: 'hidden' }}>
             <div style={{ background: '#F4F7F5', padding: '20px 24px', minHeight: 200, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
@@ -216,22 +213,25 @@ export default function Accueil() {
 
         <div style={{ textAlign: 'center', marginTop: 48 }}>
           <button onClick={openSignup} style={{ padding: '14px 48px', borderRadius: 12, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 16, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>Go →</button>
-          <div style={{ marginTop: 12, fontSize: 12, color: '#9CA3AF' }}>Gratuit · Sans carte bancaire · En 2 minutes</div>
         </div>
       </section>
 
-      {/* MINDSET */}
+      {/* CHALLENGE */}
       <section id="challenge" style={{ background: '#1B2E4B', padding: '80px 40px', marginTop: 60 }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 52 }}>
-            <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 16, background: 'rgba(76,175,46,0.15)', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Mindset</div>
+            <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 16, background: 'rgba(76,175,46,0.15)', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Challenge</div>
             <h2 style={{ fontSize: 34, fontWeight: 700, color: '#fff', lineHeight: 1.3, margin: '0 0 16px' }}>
               Pensez à 5 ans,{' '}<span style={{ color: '#4CAF2E' }}>pas à 5 mois.</span>
             </h2>
-            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.55)', lineHeight: 1.8, margin: '0 auto', maxWidth: 460 }}>
-              Apprenez à investir et créez-vous une fortune solide et diversifiée au fil du temps.
+            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.55)', lineHeight: 1.8, margin: '0 auto 32px', maxWidth: 460 }}>
+              Fixez-vous des objectifs et atteignez-les avec discipline au fil du temps.
             </p>
+            <button onClick={() => navigate('/challenge-public')} style={{ padding: '11px 28px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.2)', background: 'rgba(255,255,255,0.08)', color: '#fff', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>
+              Voir tous les challenges →
+            </button>
           </div>
+
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
             <div style={{ background: 'rgba(255,255,255,0.06)', border: '0.5px solid rgba(255,255,255,0.1)', borderRadius: 16, padding: '24px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 12 }}>
               <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#EAF6E4', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, border: '2px solid #4CAF2E' }}>🚀</div>
@@ -296,7 +296,6 @@ export default function Accueil() {
             </div>
           </div>
           <button onClick={openSignup} style={{ padding: '14px 48px', borderRadius: 12, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 16, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>Go →</button>
-          <div style={{ marginTop: 16, fontSize: 12, color: '#9CA3AF' }}>Gratuit · Sans carte bancaire · En 2 minutes</div>
         </div>
       </section>
 
