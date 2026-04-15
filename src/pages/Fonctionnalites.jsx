@@ -236,6 +236,51 @@ export default function Fonctionnalites() {
         </div>
       </section>
 
+      {/* FEATURE 5 — CHALLENGE */}
+      <section style={{ padding: '60px 40px', maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, alignItems: 'center' }}>
+        <div>
+          <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 12, background: '#EAF6E4', display: 'inline-block', padding: '3px 10px', borderRadius: 20 }}>Challenge</div>
+          <h2 style={{ fontSize: 28, fontWeight: 700, color: '#1B2E4B', lineHeight: 1.3, margin: '0 0 14px' }}>Apprendre et rester motivé</h2>
+          <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.8, margin: '0 0 12px' }}>
+            Collectionnez les badges, maintenez vos efforts et regardez votre empire grandir sans stress.
+          </p>
+          <p style={{ fontSize: 13, color: '#4CAF2E', fontWeight: 500, fontStyle: 'italic', margin: '0 0 20px', lineHeight: 1.6, borderLeft: '3px solid #4CAF2E', paddingLeft: 12 }}>
+            "Chaque investissement régulier est un badge de plus dans votre livret."
+          </p>
+          {['Livret d\'accomplissements', 'Badges évolutifs (Bronze → Légendaire)', 'Suivi de progression en temps réel', 'Défis basés sur vos actions réelles'].map(f => (
+            <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, fontSize: 13, color: '#6B7280' }}>
+              <span style={{ color: '#4CAF2E' }}>✓</span>{f}
+            </div>
+          ))}
+        </div>
+        <div style={{ background: '#1B2E4B', borderRadius: 16, padding: '28px 24px' }}>
+          {[
+            { emoji: '🚀', nom: 'Le Grand Saut', tag: 'Obtenu', tagColor: '#2E7D1E', tagBg: '#EAF6E4', desc: 'Tu n\'es plus spectateur.', progress: null, locked: false },
+            { emoji: '🧗', nom: 'Le Métronome', tag: 'Bronze — 3 mois', tagColor: '#854F0B', tagBg: '#FFF0DC', desc: '3 / 6 mois → Argent', progress: 50, locked: false },
+            { emoji: '💰', nom: 'Cap des X€', tag: 'Or — 1 000 €', tagColor: '#633806', tagBg: '#FFF8DC', desc: '1 200 / 2 000 € → Platine', progress: 60, locked: false },
+            { emoji: '🗿', nom: 'Main de Fer', tag: '?', tagColor: '#9CA3AF', tagBg: 'rgba(255,255,255,0.08)', desc: '6 mois sans vente', progress: null, locked: true },
+          ].map(({ emoji, nom, tag, tagColor, tagBg, desc, progress, locked }) => (
+            <div key={nom} style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14, background: 'rgba(255,255,255,0.05)', borderRadius: 12, padding: '12px 14px', border: '0.5px solid rgba(255,255,255,0.08)' }}>
+              <div style={{ width: 44, height: 44, borderRadius: '50%', background: locked ? 'rgba(255,255,255,0.06)' : tagBg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, border: `2px solid ${locked ? 'rgba(255,255,255,0.15)' : tagColor}`, flexShrink: 0 }}>
+                {locked ? '?' : emoji}
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                  <span style={{ fontSize: 12, fontWeight: 500, color: locked ? 'rgba(255,255,255,0.3)' : '#fff' }}>{nom}</span>
+                  <span style={{ fontSize: 9, padding: '2px 7px', borderRadius: 20, background: tagBg, color: tagColor, fontWeight: 500 }}>{tag}</span>
+                </div>
+                {progress && (
+                  <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 3, height: 4, overflow: 'hidden', marginBottom: 3 }}>
+                    <div style={{ height: '100%', borderRadius: 3, background: tagColor, width: `${progress}%` }} />
+                  </div>
+                )}
+                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)' }}>{desc}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* CTA */}
       <section style={{ padding: '80px 40px', textAlign: 'center', background: '#F4F7F5' }}>
         <h2 style={{ fontSize: 30, fontWeight: 700, color: '#1B2E4B', margin: '0 0 16px' }}>Prêt à commencer ?</h2>
