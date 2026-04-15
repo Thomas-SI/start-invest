@@ -32,12 +32,12 @@ const ACCOMPLISSEMENTS = [
   { slug: 'vroum-vroum', nom: 'Vroum Vroum', emoji: '⚡', message: 'Je vois déjà l\'avenir.', quete: 'S\'abonner à StartInvest Premium' },
 ]
 
-// Du plus commun (index 0) au plus rare (index 5)
-// Cercles : plus rare = plus GRAND (comme Google Maps dézoomé)
+// Index 0 = le plus commun, index 5 = le plus rare
+// Vue initiale : on voit seulement notre position + le palier suivant
 const PALIERS = [
-  { label: 'Médiane', montant: 22000, couleur: '#6B7280', desc: 'La moitié des Français a moins de 22 000 € de patrimoine financier hors immobilier. Source : INSEE 2024' },
-  { label: 'Top 30%', montant: 45000, couleur: '#3B82F6', desc: '30% des Français les mieux dotés en épargne financière. Source : INSEE 2024' },
+  { label: 'Top 30%', montant: 45000, couleur: '#3B82F6', desc: '30% des Français les mieux dotés en épargne financière hors immobilier. Source : INSEE 2024' },
   { label: 'Top 20%', montant: 80000, couleur: '#854F0B', desc: 'Top 20% des épargnants. Seuls 9,8% des Français détiennent un PEA. Source : INSEE 2024' },
+  { label: 'Top 15%', montant: 110000, couleur: '#BA7517', desc: 'Top 15% des épargnants français en patrimoine financier. Source : INSEE 2024' },
   { label: 'Top 10%', montant: 175000, couleur: '#4CAF2E', desc: 'Top 10% des épargnants français. Patrimoine financier moyen > 175 000 €. Source : INSEE 2024' },
   { label: 'Top 5%', montant: 350000, couleur: '#534AB7', desc: 'Top 5% des épargnants. Patrimoine financier exceptionnel. Source : INSEE 2024' },
   { label: 'Top 1%', montant: 900000, couleur: '#993556', desc: 'Top 1% des épargnants français. Au-delà de 900 000 € de patrimoine financier. Source : INSEE & Banque de France 2024' },
@@ -105,72 +105,64 @@ const checkAndGrant = async (user, investissements, transactions, accomplissemen
   return toInsert.length + toUpdate.length
 }
 
-// Tailles de cercle : index 0 (Médiane) = 56px, index 5 (Top 1%) = 280px
-// Plus rare = plus grand cercle
-const TAILLES = [56, 96, 136, 176, 224, 280]
-
-function MaPosition({ totalInvesti, comptes, accomplissements }) {
+function MaPosition({ totalInvesti, comptes }) {
   const t = useTheme()
-  const [niveau, setNiveau] = useState(0) // 0 = vue par défaut centrée sur l'user
+  const [zoomLevel, setZoomLevel] = useState(0)
+  // zoomLevel = 0 → vue initiale (notre cercle + 1 palier au-dessus)
+  // zoomLevel < 0 → zoom IN (on voit les paliers en dessous dans notre cercle)
+  // zoomLevel > 0 → dézoom (on voit les paliers au-dessus autour de nous)
   const [palierInfo, setPalierInfo] = useState(null)
 
   const soldeComptes = comptes.reduce((acc, c) => acc + parseFloat(c.solde_actuel || c.solde || 0), 0)
   const patrimoine = Math.round(totalInvesti + soldeComptes)
 
-  const slugsObtenus = new Set(accomplissements.map(a => a.slug))
-  const badgesObtenus = ACCOMPLISSEMENTS.filter(a => slugsObtenus.has(a.slug))
+  // Palier juste au-dessus de l'user (le prochain à franchir)
+  const indexSuivant = PALIERS.findIndex(p => patrimoine < p.montant)
+  // -1 si au-dessus de tout, sinon index du prochain palier
+  const indexProchain = indexSuivant === -1 ? PALIERS.length : indexSuivant
+  // Paliers déjà franchis
+  const paliersAtteints = PALIERS.filter(p => patrimoine >= p.montant)
+  // Paliers pas encore atteints
+  const paliersAVenir = PALIERS.filter(p => patrimoine < p.montant)
 
-  // Index du dernier palier atteint (-1 si aucun)
-  const indexAtteint = PALIERS.reduce((best, p, i) => patrimoine >= p.montant ? i : best, -1)
-  const palierAtteint = indexAtteint >= 0 ? PALIERS[indexAtteint] : null
-  const palierSuivant = PALIERS[indexAtteint + 1] || null
+  const palierAtteint = paliersAtteints[paliersAtteints.length - 1] || null
+  const palierSuivant = paliersAVenir[0] || null
 
-  // niveau: 0 = vue de base (on voit palier atteint + palier suivant autour de l'user)
-  // niveau > 0 = dézoom → on voit les paliers encore plus grands (rares)
-  // niveau < 0 = zoom → on voit les paliers plus petits (déjà franchis)
+  // Vue initiale (zoom=0): notre cercle user au centre, cercle du palier suivant autour
+  // Zoom in (zoom<0): on voit les paliers franchis DANS notre cercle, de plus en plus petits vers le centre
+  // Dézoom (zoom>0): on voit les paliers à venir AUTOUR de nous, de plus en plus grands
 
-  // Décalage d'affichage: on centre le viewport sur l'user
-  // On affiche les paliers dont l'index est dans la fenêtre [-2+niveau, +2+niveau] par rapport à indexAtteint
-  const windowCenter = indexAtteint + niveau
-  const minVisible = Math.max(-1, windowCenter - 1)
-  const maxVisible = Math.min(PALIERS.length - 1, windowCenter + 2)
+  // Rayons des cercles extérieurs (paliers à venir visibles)
+  const RAYONS_EXT = [110, 160, 210, 260] // px
+  // Rayons des cercles intérieurs (paliers franchis visibles dans notre cercle)
+  const RAYONS_INT = [55, 38, 26, 16] // px
 
-  // Paliers à afficher (autour de la position user)
-  // On inclut aussi un "palier zéro" si l'user est en dessous de tous
-  const paliersVisibles = PALIERS.map((p, i) => ({ ...p, i })).filter(p => p.i >= minVisible && p.i <= maxVisible)
+  // Combien de paliers extérieurs montrer selon dézoom
+  const nbExt = Math.min(zoomLevel > 0 ? zoomLevel + 1 : 1, paliersAVenir.length, 4)
+  // Combien de paliers intérieurs montrer selon zoom
+  const nbInt = Math.min(zoomLevel < 0 ? Math.abs(zoomLevel) : 0, paliersAtteints.length, 4)
 
-  // Rayon de chaque cercle visible dans la vue actuelle
-  // Le cercle le plus proche de l'user a le plus petit rayon affiché
-  // On mappe les paliers visibles à des rayons d'affichage
-  const RAYONS_AFFICHAGE = [50, 100, 160, 220] // px du plus proche au plus loin
+  // Vue initiale: 1 cercle extérieur (le prochain palier) + notre cercle
+  const paliersExtVisibles = paliersAVenir.slice(0, nbExt)
+  const paliersIntVisibles = [...paliersAtteints].reverse().slice(0, nbInt)
 
-  // Paliers à afficher avec leur rayon dans la vue
-  // Paliers plus grands que l'user (non atteints) → cercles autour
-  // Paliers plus petits que l'user (atteints) → cercles intérieurs (déjà dépassés)
-  const paliersPlusGrands = paliersVisibles.filter(p => p.i > indexAtteint)
-  const paliersPlusPetits = paliersVisibles.filter(p => p.i <= indexAtteint)
+  const canZoomIn = zoomLevel > -(paliersAtteints.length)
+  const canZoomOut = zoomLevel < paliersAVenir.length
 
-  // Cercles autour de l'user = paliers non atteints (du plus proche au plus loin)
-  // Cercles à l'intérieur = paliers atteints (du plus récent au plus ancien)
-  const rayonUser = 36
-
-  // Pour les cercles extérieurs (non atteints), ils grandissent vers l'extérieur
-  const extRayons = [80, 140, 200, 260]
-  // Pour les cercles intérieurs (atteints), ils rétrécissent vers le centre
-  const intRayons = [24, 16, 10, 6]
-
-  const canZoomIn = niveau > -(indexAtteint + 1)
-  const canZoomOut = niveau < PALIERS.length - 1 - indexAtteint
+  // Progression vers le palier suivant
+  const progPct = palierSuivant
+    ? Math.min(100, Math.round((patrimoine / palierSuivant.montant) * 100))
+    : 100
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
 
       {/* CARTE PATRIMOINE */}
       <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 14, padding: '16px 18px' }}>
-        <div style={{ fontSize: 12, color: t.textMuted, marginBottom: 4 }}>Ton patrimoine financier estimé</div>
+        <div style={{ fontSize: 12, color: t.textMuted, marginBottom: 4 }}>Patrimoine financier estimé</div>
         <div style={{ fontSize: 26, fontWeight: 700, color: t.text }}>{patrimoine.toLocaleString('fr-FR')} €</div>
-        <div style={{ fontSize: 11, color: t.textMuted, marginTop: 2 }}>Investissements + soldes comptes (hors immobilier)</div>
-        <div style={{ marginTop: 10, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        <div style={{ fontSize: 11, color: t.textMuted, marginTop: 2, marginBottom: 10 }}>Investissements + soldes comptes · hors immobilier</div>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           {palierAtteint ? (
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: palierAtteint.couleur + '18', border: `0.5px solid ${palierAtteint.couleur}`, borderRadius: 20, padding: '4px 12px' }}>
               <div style={{ width: 6, height: 6, borderRadius: '50%', background: palierAtteint.couleur }} />
@@ -178,66 +170,73 @@ function MaPosition({ totalInvesti, comptes, accomplissements }) {
             </div>
           ) : (
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: t.bgSecondary, borderRadius: 20, padding: '4px 12px' }}>
-              <span style={{ fontSize: 11, color: t.textMuted }}>En dessous de la médiane</span>
+              <span style={{ fontSize: 11, color: t.textMuted }}>En dessous des paliers</span>
             </div>
           )}
           {palierSuivant && (
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: t.bgSecondary, borderRadius: 20, padding: '4px 12px' }}>
-              <span style={{ fontSize: 11, color: t.textMuted }}>Prochain : </span>
+              <span style={{ fontSize: 11, color: t.textMuted }}>Prochain :</span>
               <span style={{ fontSize: 11, fontWeight: 600, color: palierSuivant.couleur }}>{palierSuivant.label}</span>
-              <span style={{ fontSize: 11, color: t.textMuted }}>à {(palierSuivant.montant - patrimoine).toLocaleString('fr-FR')} €</span>
+              <span style={{ fontSize: 11, color: t.textMuted }}>−{(palierSuivant.montant - patrimoine).toLocaleString('fr-FR')} €</span>
             </div>
           )}
         </div>
+        {palierSuivant && (
+          <div style={{ marginTop: 12 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: t.textMuted, marginBottom: 5 }}>
+              <span>Vers {palierSuivant.label}</span>
+              <span>{progPct}%</span>
+            </div>
+            <div style={{ background: t.bgSecondary, borderRadius: 4, height: 5, overflow: 'hidden' }}>
+              <div style={{ height: '100%', borderRadius: 4, background: palierSuivant.couleur, width: `${progPct}%`, transition: 'width 0.5s' }} />
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* VUE CARTE */}
+      {/* VISUALISATION */}
       <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 14, overflow: 'hidden' }}>
 
-        {/* BARRE ZOOM */}
+        {/* HEADER */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', borderBottom: `0.5px solid ${t.border}` }}>
           <div>
             <div style={{ fontSize: 13, fontWeight: 500, color: t.text }}>Ta position</div>
-            <div style={{ fontSize: 11, color: t.textMuted }}>INSEE 2024 · hors immobilier</div>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ fontSize: 11, color: t.textMuted }}>
-              {niveau < 0 ? `Zoom ×${Math.abs(niveau) + 1}` : niveau > 0 ? `Dézoom ×${niveau + 1}` : 'Vue normale'}
-            </span>
-            <div style={{ display: 'flex', gap: 4 }}>
-              <button
-                onClick={() => { setNiveau(n => n - 1); setPalierInfo(null) }}
-                disabled={!canZoomIn}
-                style={{ width: 32, height: 32, borderRadius: 8, border: `0.5px solid ${t.border}`, background: canZoomIn ? t.bgSecondary : t.bg, color: canZoomIn ? t.text : t.textMuted, fontSize: 18, cursor: canZoomIn ? 'pointer' : 'default', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'inherit' }}>
-                +
-              </button>
-              <button
-                onClick={() => { setNiveau(n => n + 1); setPalierInfo(null) }}
-                disabled={!canZoomOut}
-                style={{ width: 32, height: 32, borderRadius: 8, border: `0.5px solid ${t.border}`, background: canZoomOut ? t.bgSecondary : t.bg, color: canZoomOut ? t.text : t.textMuted, fontSize: 18, cursor: canZoomOut ? 'pointer' : 'default', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'inherit' }}>
-                −
-              </button>
+            <div style={{ fontSize: 11, color: t.textMuted }}>
+              {zoomLevel === 0 && 'Vue normale — palier suivant'}
+              {zoomLevel > 0 && `Dézoom · ${zoomLevel} palier${zoomLevel > 1 ? 's' : ''} au-dessus visible${zoomLevel > 1 ? 's' : ''}`}
+              {zoomLevel < 0 && `Zoom · ${Math.abs(zoomLevel)} palier${Math.abs(zoomLevel) > 1 ? 's' : ''} franchi${Math.abs(zoomLevel) > 1 ? 's' : ''} visible${Math.abs(zoomLevel) > 1 ? 's' : ''}`}
             </div>
+          </div>
+          <div style={{ display: 'flex', gap: 4 }}>
+            <button
+              onClick={() => { setZoomLevel(z => z - 1); setPalierInfo(null) }}
+              disabled={!canZoomIn}
+              title="Zoom — voir les paliers franchis à l'intérieur"
+              style={{ width: 34, height: 34, borderRadius: 9, border: `0.5px solid ${t.border}`, background: canZoomIn ? t.bgSecondary : t.bg, color: canZoomIn ? t.text : t.textMuted, fontSize: 18, cursor: canZoomIn ? 'pointer' : 'default', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              +
+            </button>
+            <button
+              onClick={() => { setZoomLevel(z => z + 1); setPalierInfo(null) }}
+              disabled={!canZoomOut}
+              title="Dézoom — voir les paliers à venir autour"
+              style={{ width: 34, height: 34, borderRadius: 9, border: `0.5px solid ${t.border}`, background: canZoomOut ? t.bgSecondary : t.bg, color: canZoomOut ? t.text : t.textMuted, fontSize: 18, cursor: canZoomOut ? 'pointer' : 'default', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              −
+            </button>
           </div>
         </div>
 
-        {/* CANVAS CARTE */}
-        <div style={{ position: 'relative', height: 320, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', background: t.bg }}>
+        {/* CANVAS */}
+        <div style={{ position: 'relative', height: 340, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', background: t.dark ? '#0A0F0A' : '#F6FBF6' }}>
 
-          {/* GRILLE DE FOND style carte */}
-          <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.06 }}>
-            {[...Array(8)].map((_, i) => (
-              <line key={`h${i}`} x1="0" y1={i * 46} x2="100%" y2={i * 46} stroke={t.dark ? '#fff' : '#000'} strokeWidth="0.5" />
-            ))}
-            {[...Array(12)].map((_, i) => (
-              <line key={`v${i}`} x1={i * 46} y1="0" x2={i * 46} y2="100%" stroke={t.dark ? '#fff' : '#000'} strokeWidth="0.5" />
-            ))}
+          {/* GRILLE FOND */}
+          <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.04 }} xmlns="http://www.w3.org/2000/svg">
+            {[...Array(10)].map((_, i) => <line key={`h${i}`} x1="0" y1={i * 40} x2="100%" y2={i * 40} stroke={t.dark ? '#fff' : '#000'} strokeWidth="1" />)}
+            {[...Array(14)].map((_, i) => <line key={`v${i}`} x1={i * 40} y1="0" x2={i * 40} y2="100%" stroke={t.dark ? '#fff' : '#000'} strokeWidth="1" />)}
           </svg>
 
-          {/* CERCLES EXTÉRIEURS — paliers non atteints (plus grands, autour de l'user) */}
-          {paliersPlusGrands.slice(0, 4).map((palier, idx) => {
-            const rayon = extRayons[idx]
-            const taille = rayon * 2
+          {/* CERCLES EXTÉRIEURS — paliers à venir, du plus proche au plus loin */}
+          {paliersExtVisibles.map((palier, idx) => {
+            const rayon = RAYONS_EXT[idx]
             const estActif = palierInfo?.label === palier.label
             return (
               <div
@@ -245,30 +244,30 @@ function MaPosition({ totalInvesti, comptes, accomplissements }) {
                 onClick={() => setPalierInfo(estActif ? null : palier)}
                 style={{
                   position: 'absolute',
-                  width: taille,
-                  height: taille,
+                  width: rayon * 2,
+                  height: rayon * 2,
                   borderRadius: '50%',
-                  border: `1.5px dashed ${palier.couleur}60`,
-                  background: 'transparent',
+                  border: `2px dashed ${palier.couleur}70`,
+                  background: estActif ? palier.couleur + '08' : 'transparent',
                   cursor: 'pointer',
-                  transition: 'all 0.35s cubic-bezier(0.4,0,0.2,1)',
-                  boxShadow: estActif ? `0 0 0 2px ${palier.couleur}` : 'none',
+                  transition: 'all 0.4s cubic-bezier(0.4,0,0.2,1)',
+                  boxShadow: estActif ? `0 0 0 2px ${palier.couleur}60` : 'none',
                   display: 'flex',
                   alignItems: 'flex-start',
                   justifyContent: 'center',
+                  zIndex: 4 - idx,
                 }}
               >
                 <div style={{
-                  marginTop: 8,
+                  marginTop: 10,
                   fontSize: 9,
-                  fontWeight: 600,
+                  fontWeight: 700,
                   color: palier.couleur,
-                  background: t.bg + 'ee',
-                  padding: '2px 7px',
+                  background: (t.dark ? '#0A0F0A' : '#F6FBF6') + 'ee',
+                  padding: '2px 8px',
                   borderRadius: 10,
-                  border: `0.5px solid ${palier.couleur}60`,
+                  border: `0.5px solid ${palier.couleur}50`,
                   whiteSpace: 'nowrap',
-                  backdropFilter: 'blur(4px)',
                 }}>
                   {palier.label} · {palier.montant.toLocaleString('fr-FR')} €
                 </div>
@@ -276,90 +275,100 @@ function MaPosition({ totalInvesti, comptes, accomplissements }) {
             )
           })}
 
-          {/* ZONE ATTEINTE — cercle plein autour de l'user */}
-          {palierAtteint && (
-            <div style={{
-              position: 'absolute',
-              width: 90,
-              height: 90,
-              borderRadius: '50%',
-              background: `radial-gradient(circle, ${palierAtteint.couleur}15 0%, ${palierAtteint.couleur}05 100%)`,
-              border: `2px solid ${palierAtteint.couleur}40`,
-              transition: 'all 0.35s',
-            }} />
-          )}
-
-          {/* CERCLES INTÉRIEURS — paliers déjà atteints (plus petits, à l'intérieur) */}
-          {paliersPlusPetits.slice(0, 3).map((palier, idx) => {
-            const rayon = intRayons[idx]
-            if (rayon < 6) return null
-            const taille = rayon * 2
-            return (
-              <div
-                key={palier.label}
-                onClick={() => setPalierInfo(palierInfo?.label === palier.label ? null : palier)}
-                style={{
-                  position: 'absolute',
-                  width: taille,
-                  height: taille,
-                  borderRadius: '50%',
-                  border: `1.5px solid ${palier.couleur}`,
-                  background: palier.couleur + '20',
-                  cursor: 'pointer',
-                  transition: 'all 0.35s',
-                  zIndex: 8,
-                }}
-              />
-            )
-          })}
-
-          {/* POINT UTILISATEUR */}
+          {/* CERCLE UTILISATEUR */}
           <div style={{
             position: 'absolute',
-            width: rayonUser * 2,
-            height: rayonUser * 2,
+            width: 100,
+            height: 100,
             borderRadius: '50%',
-            background: palierAtteint ? palierAtteint.couleur + '25' : '#4CAF2E25',
+            background: palierAtteint
+              ? `radial-gradient(circle, ${palierAtteint.couleur}20 0%, ${palierAtteint.couleur}08 100%)`
+              : `radial-gradient(circle, #4CAF2E20 0%, #4CAF2E08 100%)`,
             border: `3px solid ${palierAtteint ? palierAtteint.couleur : '#4CAF2E'}`,
             display: 'flex',
-            flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            zIndex: 15,
-            boxShadow: `0 0 0 4px ${palierAtteint ? palierAtteint.couleur + '20' : '#4CAF2E20'}, 0 4px 20px rgba(0,0,0,0.15)`,
-            transition: 'all 0.35s',
+            zIndex: 10,
+            boxShadow: `0 0 0 6px ${palierAtteint ? palierAtteint.couleur + '15' : '#4CAF2E15'}, 0 8px 32px rgba(0,0,0,0.2)`,
+            transition: 'all 0.4s',
+            overflow: 'hidden',
           }}>
-            <div style={{ fontSize: 20 }}>👤</div>
-            {badgesObtenus.length > 0 && (
-              <div style={{ fontSize: 8, lineHeight: 1, marginTop: 1 }}>
-                {badgesObtenus.slice(0, 2).map(b => b.svgIcon ? '🎵' : b.emoji).join('')}
-              </div>
-            )}
+
+            {/* CERCLES INTÉRIEURS — paliers franchis, de plus en plus petits vers le centre */}
+            {paliersIntVisibles.map((palier, idx) => {
+              const rayon = RAYONS_INT[idx]
+              const estActif = palierInfo?.label === palier.label
+              return (
+                <div
+                  key={palier.label}
+                  onClick={(e) => { e.stopPropagation(); setPalierInfo(estActif ? null : palier) }}
+                  style={{
+                    position: 'absolute',
+                    width: rayon * 2,
+                    height: rayon * 2,
+                    borderRadius: '50%',
+                    border: `1.5px solid ${palier.couleur}`,
+                    background: palier.couleur + '25',
+                    cursor: 'pointer',
+                    transition: 'all 0.4s',
+                    zIndex: 10 + idx,
+                    boxShadow: estActif ? `0 0 0 2px ${palier.couleur}` : 'none',
+                  }}
+                />
+              )
+            })}
+
+            {/* POINT CENTRAL */}
+            <div style={{
+              position: 'absolute',
+              width: 28,
+              height: 28,
+              borderRadius: '50%',
+              background: palierAtteint ? palierAtteint.couleur : '#4CAF2E',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 20,
+              boxShadow: `0 2px 8px ${palierAtteint ? palierAtteint.couleur + '60' : '#4CAF2E60'}`,
+            }}>
+              <span style={{ fontSize: 14 }}>👤</span>
+            </div>
           </div>
 
-          {/* PATRIMOINE AFFICHÉ SOUS LE POINT */}
+          {/* PATRIMOINE SOUS LE CERCLE */}
           <div style={{
             position: 'absolute',
-            top: '50%',
+            top: 'calc(50% + 58px)',
             left: '50%',
-            transform: 'translate(-50%, calc(-50% + 46px))',
+            transform: 'translateX(-50%)',
             fontSize: 10,
-            fontWeight: 600,
+            fontWeight: 700,
             color: palierAtteint ? palierAtteint.couleur : '#4CAF2E',
-            background: t.bgCard + 'ee',
-            padding: '2px 8px',
+            background: (t.dark ? '#0A0F0A' : '#F6FBF6') + 'ee',
+            padding: '3px 10px',
             borderRadius: 10,
             border: `0.5px solid ${palierAtteint ? palierAtteint.couleur + '60' : '#4CAF2E60'}`,
             whiteSpace: 'nowrap',
-            zIndex: 16,
-            backdropFilter: 'blur(4px)',
+            zIndex: 15,
           }}>
             {patrimoine.toLocaleString('fr-FR')} €
+            {palierAtteint && <span style={{ fontWeight: 400, marginLeft: 4 }}>· {palierAtteint.label}</span>}
           </div>
 
+          {/* INDICATION ZOOM */}
+          {zoomLevel === 0 && paliersAtteints.length > 0 && (
+            <div style={{ position: 'absolute', bottom: 12, left: '50%', transform: 'translateX(-50%)', fontSize: 10, color: t.textMuted, whiteSpace: 'nowrap' }}>
+              + pour voir tes paliers franchis à l'intérieur
+            </div>
+          )}
+          {zoomLevel === 0 && paliersAVenir.length > 1 && (
+            <div style={{ position: 'absolute', top: 12, left: '50%', transform: 'translateX(-50%)', fontSize: 10, color: t.textMuted, whiteSpace: 'nowrap' }}>
+              − pour voir les paliers suivants autour
+            </div>
+          )}
         </div>
 
-        {/* POPUP INFO PALIER CLIQUÉ */}
+        {/* POPUP INFO */}
         {palierInfo && (
           <div style={{ margin: '0 16px 16px', background: palierInfo.couleur + '12', border: `0.5px solid ${palierInfo.couleur}`, borderRadius: 10, padding: '12px 14px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
@@ -369,12 +378,8 @@ function MaPosition({ totalInvesti, comptes, accomplissements }) {
             <div style={{ fontSize: 12, color: t.textSecondary, lineHeight: 1.5 }}>{palierInfo.desc}</div>
             {patrimoine < palierInfo.montant && (
               <div style={{ marginTop: 8 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: t.textMuted, marginBottom: 4 }}>
-                  <span>Progression</span>
-                  <span>{Math.min(100, Math.round((patrimoine / palierInfo.montant) * 100))}%</span>
-                </div>
-                <div style={{ background: t.bgSecondary, borderRadius: 4, height: 5, overflow: 'hidden' }}>
-                  <div style={{ height: '100%', borderRadius: 4, background: palierInfo.couleur, width: `${Math.min(100, Math.round((patrimoine / palierInfo.montant) * 100))}%`, transition: 'width 0.5s' }} />
+                <div style={{ background: t.bgSecondary, borderRadius: 4, height: 4, overflow: 'hidden' }}>
+                  <div style={{ height: '100%', borderRadius: 4, background: palierInfo.couleur, width: `${Math.min(100, Math.round((patrimoine / palierInfo.montant) * 100))}%` }} />
                 </div>
                 <div style={{ fontSize: 10, color: t.textMuted, marginTop: 3 }}>
                   encore {(palierInfo.montant - patrimoine).toLocaleString('fr-FR')} € pour atteindre ce palier
@@ -386,37 +391,34 @@ function MaPosition({ totalInvesti, comptes, accomplissements }) {
         )}
 
         {/* LÉGENDE */}
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 16, padding: '10px 16px', borderTop: `0.5px solid ${t.border}` }}>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 16, padding: '10px 16px', borderTop: `0.5px solid ${t.border}`, flexWrap: 'wrap' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-            <div style={{ width: 16, height: 0, borderTop: `2px dashed #6B7280` }} />
-            <span style={{ fontSize: 10, color: t.textMuted }}>À atteindre</span>
+            <div style={{ width: 16, height: 0, borderTop: '2px dashed #6B7280' }} />
+            <span style={{ fontSize: 10, color: t.textMuted }}>Palier à atteindre</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-            <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#4CAF2E40', border: '1.5px solid #4CAF2E' }} />
-            <span style={{ fontSize: 10, color: t.textMuted }}>Déjà atteint</span>
+            <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#4CAF2E30', border: '1.5px solid #4CAF2E' }} />
+            <span style={{ fontSize: 10, color: t.textMuted }}>Palier franchi</span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-            <span style={{ fontSize: 12 }}>+</span>
-            <span style={{ fontSize: 10, color: t.textMuted }}>Zoom · </span>
-            <span style={{ fontSize: 12 }}>−</span>
-            <span style={{ fontSize: 10, color: t.textMuted }}>Dézoom</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <span style={{ fontSize: 11, color: t.textMuted }}>+ zoom · − dézoom</span>
           </div>
         </div>
       </div>
 
-      {/* LISTE TOUS LES PALIERS */}
+      {/* LISTE */}
       <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 14, padding: '16px 18px' }}>
         <div style={{ fontSize: 13, fontWeight: 500, color: t.text, marginBottom: 12 }}>Tous les paliers</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {[...PALIERS].reverse().map((palier) => {
             const atteint = patrimoine >= palier.montant
-            const realIndex = PALIERS.findIndex(p => p.label === palier.label)
-            const estSuivant = !atteint && (realIndex === 0 || patrimoine >= PALIERS[realIndex - 1]?.montant)
+            const realIdx = PALIERS.findIndex(p => p.label === palier.label)
+            const estSuivant = !atteint && (realIdx === 0 || patrimoine >= PALIERS[realIdx - 1]?.montant)
             return (
               <div key={palier.label} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 9, background: atteint ? palier.couleur + '10' : 'transparent', border: `0.5px solid ${atteint ? palier.couleur : t.border}`, opacity: atteint || estSuivant ? 1 : 0.4 }}>
                 <div style={{ width: 10, height: 10, borderRadius: '50%', background: atteint ? palier.couleur : 'transparent', border: `2px solid ${atteint ? palier.couleur : t.border}`, flexShrink: 0 }} />
                 <div style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span style={{ fontSize: 12, fontWeight: atteint ? 600 : 400, color: atteint ? palier.couleur : t.textMuted }}>{palier.label}</span>
                     <span style={{ fontSize: 12, color: atteint ? palier.couleur : t.textMuted }}>≥ {palier.montant.toLocaleString('fr-FR')} €</span>
                   </div>
@@ -426,7 +428,7 @@ function MaPosition({ totalInvesti, comptes, accomplissements }) {
                         <div style={{ height: '100%', borderRadius: 3, background: palier.couleur, width: `${Math.min(100, Math.round((patrimoine / palier.montant) * 100))}%` }} />
                       </div>
                       <div style={{ fontSize: 10, color: t.textMuted, marginTop: 2 }}>
-                        {patrimoine.toLocaleString('fr-FR')} / {palier.montant.toLocaleString('fr-FR')} € · encore {(palier.montant - patrimoine).toLocaleString('fr-FR')} €
+                        encore {(palier.montant - patrimoine).toLocaleString('fr-FR')} €
                       </div>
                     </div>
                   )}
@@ -641,7 +643,6 @@ export default function Challenge() {
           <MaPosition
             totalInvesti={totalInvesti}
             comptes={comptes}
-            accomplissements={accomplissements}
           />
         )}
 
