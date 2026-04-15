@@ -23,59 +23,13 @@ const GRADES_METRONOME = [
 ]
 
 const ACCOMPLISSEMENTS = [
-  {
-    slug: 'premier-pas',
-    nom: 'Premier Pas',
-    emoji: '🌱',
-    message: 'Bienvenue chez Start Invest.',
-    quete: 'S\'inscrire sur StartInvest',
-  },
-  {
-    slug: 'grand-saut',
-    nom: 'Le Grand Saut',
-    emoji: '🚀',
-    message: 'Tu n\'es plus spectateur, tu es le pilote de ton futur.',
-    quete: 'Acheter votre premier ETF',
-  },
-  {
-    slug: 'metronome',
-    nom: 'Le Métronome',
-    svgIcon: true,
-    message: 'La magie des intérêts composés adore ta régularité. Continue !',
-    quete: 'Investir régulièrement chaque mois',
-    evolutif: true,
-    grades: GRADES_METRONOME,
-  },
-  {
-    slug: 'main-de-fer',
-    nom: 'Main de Fer',
-    emoji: '🗿',
-    message: 'Le calme est une compétence.',
-    quete: '6 mois sans aucune vente',
-  },
-  {
-    slug: 'architecte',
-    nom: 'L\'Architecte',
-    emoji: '🏗️',
-    message: 'Ton patrimoine est maintenant solide et diversifié. Beau travail !',
-    quete: 'Posséder 3 ETF différents',
-  },
-  {
-    slug: 'cap',
-    nom: 'Cap des X€',
-    emoji: '💰',
-    message: 'Le premier palier est le plus dur. La machine est lancée.',
-    quete: 'Atteindre un palier d\'investissement',
-    evolutif: true,
-    grades: GRADES_CAP,
-  },
-  {
-    slug: 'vroum-vroum',
-    nom: 'Vroum Vroum',
-    emoji: '⚡',
-    message: 'Je vois déjà l\'avenir.',
-    quete: 'S\'abonner à StartInvest Premium',
-  },
+  { slug: 'premier-pas', nom: 'Premier Pas', emoji: '🌱', message: 'Bienvenue chez Start Invest.', quete: 'S\'inscrire sur StartInvest' },
+  { slug: 'grand-saut', nom: 'Le Grand Saut', emoji: '🚀', message: 'Tu n\'es plus spectateur, tu es le pilote de ton futur.', quete: 'Acheter votre premier ETF' },
+  { slug: 'metronome', nom: 'Le Métronome', svgIcon: true, message: 'La magie des intérêts composés adore ta régularité. Continue !', quete: 'Investir régulièrement chaque mois', evolutif: true, grades: GRADES_METRONOME },
+  { slug: 'main-de-fer', nom: 'Main de Fer', emoji: '🗿', message: 'Le calme est une compétence.', quete: '6 mois sans aucune vente' },
+  { slug: 'architecte', nom: 'L\'Architecte', emoji: '🏗️', message: 'Ton patrimoine est maintenant solide et diversifié. Beau travail !', quete: 'Posséder 3 ETF différents' },
+  { slug: 'cap', nom: 'Cap des X€', emoji: '💰', message: 'Le premier palier est le plus dur. La machine est lancée.', quete: 'Atteindre un palier d\'investissement', evolutif: true, grades: GRADES_CAP },
+  { slug: 'vroum-vroum', nom: 'Vroum Vroum', emoji: '⚡', message: 'Je vois déjà l\'avenir.', quete: 'S\'abonner à StartInvest Premium' },
 ]
 
 const fetchChallengeData = async () => {
@@ -86,12 +40,7 @@ const fetchChallengeData = async () => {
     supabase.from('investissements').select('*').eq('user_id', user.id),
     supabase.from('transactions').select('*').eq('user_id', user.id).order('date', { ascending: true }),
   ])
-  return {
-    user,
-    accomplissements: accRes.data || [],
-    investissements: invRes.data || [],
-    transactions: txRes.data || [],
-  }
+  return { user, accomplissements: accRes.data || [], investissements: invRes.data || [], transactions: txRes.data || [] }
 }
 
 const calcStreak = (transactions) => {
@@ -113,41 +62,34 @@ const checkAndGrant = async (user, investissements, transactions, accomplissemen
   const slugsObtenus = new Set(accomplissements.map(a => a.slug))
   const toInsert = []
   const toUpdate = []
-
   const totalInvesti = investissements.reduce((acc, i) => acc + parseFloat(i.quantite) * parseFloat(i.pru || i.prix_achat_unitaire || 0), 0)
   const nbEtfDifferents = [...new Set(investissements.map(i => i.ticker))].length
   const achats = transactions.filter(t => t.type === 'Achat')
   const ventes = transactions.filter(t => t.type === 'Vente')
   const streak = calcStreak(transactions)
-
   if (!slugsObtenus.has('premier-pas')) toInsert.push({ user_id: user.id, slug: 'premier-pas' })
   if (!slugsObtenus.has('grand-saut') && achats.length > 0) toInsert.push({ user_id: user.id, slug: 'grand-saut' })
   if (!slugsObtenus.has('architecte') && nbEtfDifferents >= 3) toInsert.push({ user_id: user.id, slug: 'architecte' })
-
   if (!slugsObtenus.has('main-de-fer') && ventes.length === 0 && achats.length > 0) {
     const firstAchat = new Date(achats[0].date)
     const now = new Date()
     const mois = (now.getFullYear() - firstAchat.getFullYear()) * 12 + (now.getMonth() - firstAchat.getMonth())
     if (mois >= 6) toInsert.push({ user_id: user.id, slug: 'main-de-fer' })
   }
-
   const gradeMetronome = [...GRADES_METRONOME].reverse().find(g => streak >= g.mois)
   if (gradeMetronome) {
     const existing = accomplissements.find(a => a.slug === 'metronome')
     if (!existing) toInsert.push({ user_id: user.id, slug: 'metronome', niveau: gradeMetronome.niveau })
     else if (existing.niveau !== gradeMetronome.niveau) toUpdate.push({ id: existing.id, niveau: gradeMetronome.niveau })
   }
-
   const gradeCap = [...GRADES_CAP].reverse().find(g => totalInvesti >= g.palier)
   if (gradeCap) {
     const existing = accomplissements.find(a => a.slug === 'cap')
     if (!existing) toInsert.push({ user_id: user.id, slug: 'cap', niveau: gradeCap.niveau })
     else if (existing.niveau !== gradeCap.niveau) toUpdate.push({ id: existing.id, niveau: gradeCap.niveau })
   }
-
   if (toInsert.length > 0) await supabase.from('accomplissements').insert(toInsert)
   for (const u of toUpdate) await supabase.from('accomplissements').update({ niveau: u.niveau }).eq('id', u.id)
-
   return toInsert.length + toUpdate.length
 }
 
@@ -156,7 +98,6 @@ export default function Challenge() {
   const queryClient = useQueryClient()
   const [onglet, setOnglet] = useState('obtenus')
   const [checking, setChecking] = useState(true)
-
   const { data, isLoading } = useQuery({ queryKey: ['challenge'], queryFn: fetchChallengeData })
 
   useEffect(() => {
@@ -173,7 +114,6 @@ export default function Challenge() {
   const accomplissements = data?.accomplissements || []
   const investissements = data?.investissements || []
   const transactions = data?.transactions || []
-
   const bleu = t.dark ? '#3B82F6' : '#1B2E4B'
   const streak = calcStreak(transactions)
   const totalInvesti = investissements.reduce((acc, i) => acc + parseFloat(i.quantite) * parseFloat(i.pru || i.prix_achat_unitaire || 0), 0)
@@ -238,9 +178,15 @@ export default function Challenge() {
     </div>
   )
 
-  const BadgeIcon = ({ acc, size = 28 }) => {
-    if (acc.svgIcon) return <img src={METRONOME_URL} alt="métronome" style={{ width: size, height: size, objectFit: 'contain' }} />
-    return <span style={{ fontSize: size }}>{acc.emoji}</span>
+  const BadgeIcon = ({ acc, size = 60 }) => {
+    if (acc.svgIcon) return (
+      <img
+        src={METRONOME_URL}
+        alt="métronome"
+        style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
+      />
+    )
+    return <span style={{ fontSize: size * 0.45 }}>{acc.emoji}</span>
   }
 
   const BadgeCard = ({ acc, obtenu }) => {
@@ -253,7 +199,7 @@ export default function Challenge() {
     return (
       <div style={{ background: obtenu ? (t.dark ? '#0F1F0F' : '#F6FFF3') : t.bgCard, border: `0.5px solid ${obtenu ? '#4CAF2E' : t.border}`, borderRadius: 12, padding: 14, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 6 }}>
         <div style={{ width: 60, height: 60, borderRadius: '50%', background: obtenu ? (gradeActuel ? gradeActuel.niveauBg : '#EAF6E4') : t.bgSecondary, display: 'flex', alignItems: 'center', justifyContent: 'center', border: obtenu ? `2px solid ${gradeActuel ? gradeActuel.niveauColor : '#4CAF2E'}` : `1.5px dashed ${t.border}`, overflow: 'hidden' }}>
-          {obtenu ? <BadgeIcon acc={acc} size={28} /> : <span style={{ fontSize: 22, color: t.textMuted }}>?</span>}
+          {obtenu ? <BadgeIcon acc={acc} size={60} /> : <span style={{ fontSize: 22, color: t.textMuted }}>?</span>}
         </div>
         <div style={{ fontSize: 12, fontWeight: 500, color: obtenu ? t.text : t.textMuted, lineHeight: 1.3 }}>{acc.nom}</div>
         {obtenu && gradeActuel && <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 20, fontWeight: 500, background: gradeActuel.niveauBg, color: gradeActuel.niveauColor }}>{gradeActuel.niveau}</span>}
