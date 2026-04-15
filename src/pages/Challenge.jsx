@@ -4,6 +4,8 @@ import { supabase } from '../lib/supabase'
 import Navbar from '../components/Navbar'
 import { useTheme } from '../lib/ThemeContext'
 
+const METRONOME_URL = 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/AB94501C-5932-4B4C-93F1-D1CD5A4BAA25.png'
+
 const GRADES_CAP = [
   { slug: 'cap-bronze', palier: 100, niveau: 'Bronze', niveauColor: '#854F0B', niveauBg: '#FFF0DC' },
   { slug: 'cap-argent', palier: 500, niveau: 'Argent', niveauColor: '#444441', niveauBg: '#F0F0F0' },
@@ -38,7 +40,7 @@ const ACCOMPLISSEMENTS = [
   {
     slug: 'metronome',
     nom: 'Le Métronome',
-    emoji: '🧗',
+    svgIcon: true,
     message: 'La magie des intérêts composés adore ta régularité. Continue !',
     quete: 'Investir régulièrement chaque mois',
     evolutif: true,
@@ -168,7 +170,6 @@ export default function Challenge() {
     run()
   }, [data?.user?.id])
 
-  const user = data?.user || null
   const accomplissements = data?.accomplissements || []
   const investissements = data?.investissements || []
   const transactions = data?.transactions || []
@@ -237,6 +238,11 @@ export default function Challenge() {
     </div>
   )
 
+  const BadgeIcon = ({ acc, size = 28 }) => {
+    if (acc.svgIcon) return <img src={METRONOME_URL} alt="métronome" style={{ width: size, height: size, objectFit: 'contain' }} />
+    return <span style={{ fontSize: size }}>{acc.emoji}</span>
+  }
+
   const BadgeCard = ({ acc, obtenu }) => {
     const gradeActuel = obtenu ? getGradeActuel(acc) : null
     const prochain = getProchainGrade(acc)
@@ -246,8 +252,8 @@ export default function Challenge() {
 
     return (
       <div style={{ background: obtenu ? (t.dark ? '#0F1F0F' : '#F6FFF3') : t.bgCard, border: `0.5px solid ${obtenu ? '#4CAF2E' : t.border}`, borderRadius: 12, padding: 14, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 6 }}>
-        <div style={{ width: 60, height: 60, borderRadius: '50%', background: obtenu ? (gradeActuel ? gradeActuel.niveauBg : '#EAF6E4') : t.bgSecondary, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, border: obtenu ? `2px solid ${gradeActuel ? gradeActuel.niveauColor : '#4CAF2E'}` : `1.5px dashed ${t.border}` }}>
-          {obtenu ? acc.emoji : <span style={{ fontSize: 22, color: t.textMuted }}>?</span>}
+        <div style={{ width: 60, height: 60, borderRadius: '50%', background: obtenu ? (gradeActuel ? gradeActuel.niveauBg : '#EAF6E4') : t.bgSecondary, display: 'flex', alignItems: 'center', justifyContent: 'center', border: obtenu ? `2px solid ${gradeActuel ? gradeActuel.niveauColor : '#4CAF2E'}` : `1.5px dashed ${t.border}`, overflow: 'hidden' }}>
+          {obtenu ? <BadgeIcon acc={acc} size={28} /> : <span style={{ fontSize: 22, color: t.textMuted }}>?</span>}
         </div>
         <div style={{ fontSize: 12, fontWeight: 500, color: obtenu ? t.text : t.textMuted, lineHeight: 1.3 }}>{acc.nom}</div>
         {obtenu && gradeActuel && <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 20, fontWeight: 500, background: gradeActuel.niveauBg, color: gradeActuel.niveauColor }}>{gradeActuel.niveau}</span>}

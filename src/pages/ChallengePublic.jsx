@@ -1,72 +1,18 @@
 import { useNavigate } from 'react-router-dom'
 
+const METRONOME_URL = 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/AB94501C-5932-4B4C-93F1-D1CD5A4BAA25.png'
+
 export default function ChallengePublic() {
   const navigate = useNavigate()
 
   const BADGES = [
-    {
-      emoji: '🌱',
-      nom: 'Premier Pas',
-      desc: 'Dès l\'inscription sur StartInvest.',
-      message: 'Bienvenue chez Start Invest.',
-      tag: 'Automatique',
-      tagColor: '#2E7D1E',
-      tagBg: '#EAF6E4',
-    },
-    {
-      emoji: '🚀',
-      nom: 'Le Grand Saut',
-      desc: 'Acheter son premier ETF.',
-      message: 'Tu n\'es plus spectateur, tu es le pilote de ton futur.',
-      tag: 'Premier achat',
-      tagColor: '#2E7D1E',
-      tagBg: '#EAF6E4',
-    },
-    {
-      emoji: '🧗',
-      nom: 'Le Métronome',
-      desc: 'Investir régulièrement chaque mois.',
-      message: 'La magie des intérêts composés adore ta régularité.',
-      tag: 'Bronze → Platine',
-      tagColor: '#854F0B',
-      tagBg: '#FFF0DC',
-    },
-    {
-      emoji: '🗿',
-      nom: 'Main de Fer',
-      desc: '6 mois sans aucune vente.',
-      message: 'Le calme est une compétence.',
-      tag: 'Discipline',
-      tagColor: '#444441',
-      tagBg: '#F0F0F0',
-    },
-    {
-      emoji: '🏗️',
-      nom: 'L\'Architecte',
-      desc: 'Posséder 3 ETF différents.',
-      message: 'Ton patrimoine est maintenant solide et diversifié.',
-      tag: 'Diversification',
-      tagColor: '#185FA5',
-      tagBg: '#E6F1FB',
-    },
-    {
-      emoji: '💰',
-      nom: 'Cap des X€',
-      desc: 'Atteindre un palier d\'investissement.',
-      message: 'Le premier palier est le plus dur. La machine est lancée.',
-      tag: 'Bronze → Légendaire',
-      tagColor: '#633806',
-      tagBg: '#FFF8DC',
-    },
-    {
-      emoji: '⚡',
-      nom: 'Vroum Vroum',
-      desc: 'S\'abonner à StartInvest Premium.',
-      message: 'Je vois déjà l\'avenir.',
-      tag: 'Premium',
-      tagColor: '#534AB7',
-      tagBg: '#EEEDFE',
-    },
+    { emoji: '🌱', nom: 'Premier Pas', desc: 'Dès l\'inscription sur StartInvest.', message: 'Bienvenue chez Start Invest.', tag: 'Automatique', tagColor: '#2E7D1E', tagBg: '#EAF6E4' },
+    { emoji: '🚀', nom: 'Le Grand Saut', desc: 'Acheter son premier ETF.', message: 'Tu n\'es plus spectateur, tu es le pilote de ton futur.', tag: 'Premier achat', tagColor: '#2E7D1E', tagBg: '#EAF6E4' },
+    { img: METRONOME_URL, nom: 'Le Métronome', desc: 'Investir régulièrement chaque mois.', message: 'La magie des intérêts composés adore ta régularité.', tag: 'Bronze → Platine', tagColor: '#854F0B', tagBg: '#FFF0DC' },
+    { emoji: '🗿', nom: 'Main de Fer', desc: '6 mois sans aucune vente.', message: 'Le calme est une compétence.', tag: 'Discipline', tagColor: '#444441', tagBg: '#F0F0F0' },
+    { emoji: '🏗️', nom: 'L\'Architecte', desc: 'Posséder 3 ETF différents.', message: 'Ton patrimoine est maintenant solide et diversifié.', tag: 'Diversification', tagColor: '#185FA5', tagBg: '#E6F1FB' },
+    { emoji: '💰', nom: 'Cap des X€', desc: 'Atteindre un palier d\'investissement.', message: 'Le premier palier est le plus dur. La machine est lancée.', tag: 'Bronze → Légendaire', tagColor: '#633806', tagBg: '#FFF8DC' },
+    { emoji: '⚡', nom: 'Vroum Vroum', desc: 'S\'abonner à StartInvest Premium.', message: 'Je vois déjà l\'avenir.', tag: 'Premium', tagColor: '#534AB7', tagBg: '#EEEDFE' },
   ]
 
   return (
@@ -102,7 +48,7 @@ export default function ChallengePublic() {
             <span style={{ color: '#4CAF2E' }}>marathon</span>
             {' '}et non comme un sprint,
           </h1>
-          <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.6)', lineHeight: 1.8, margin: '0 0 48px', maxWidth: 560, marginLeft: 'auto', marginRight: 'auto' }}>
+          <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.6)', lineHeight: 1.8, margin: '0 auto 48px', maxWidth: 560 }}>
             nous avons créé les challenges pour vous tirer vers le haut.
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14, maxWidth: 600, margin: '0 auto' }}>
@@ -131,10 +77,13 @@ export default function ChallengePublic() {
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
-          {BADGES.map(({ emoji, nom, desc, message, tag, tagColor, tagBg }) => (
+          {BADGES.map(({ emoji, img, nom, desc, message, tag, tagColor, tagBg }) => (
             <div key={nom} style={{ background: '#fff', border: '0.5px solid #E0EAE3', borderRadius: 16, padding: '20px', display: 'flex', gap: 16, alignItems: 'flex-start' }}>
-              <div style={{ width: 56, height: 56, borderRadius: '50%', background: tagBg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26, border: `2px solid ${tagColor}`, flexShrink: 0 }}>
-                {emoji}
+              <div style={{ width: 56, height: 56, borderRadius: '50%', background: tagBg, display: 'flex', alignItems: 'center', justifyContent: 'center', border: `2px solid ${tagColor}`, flexShrink: 0, overflow: 'hidden' }}>
+                {img
+                  ? <img src={img} alt={nom} style={{ width: 42, height: 42, objectFit: 'contain' }} />
+                  : <span style={{ fontSize: 26 }}>{emoji}</span>
+                }
               </div>
               <div style={{ flex: 1 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>

@@ -1,5 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 
+const METRONOME_URL = 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/AB94501C-5932-4B4C-93F1-D1CD5A4BAA25.png'
+
 export default function Accueil() {
   const navigate = useNavigate()
 
@@ -209,7 +211,9 @@ export default function Accueil() {
             </div>
 
             <div style={{ background: 'rgba(255,255,255,0.06)', border: '0.5px solid rgba(255,255,255,0.1)', borderRadius: 16, padding: '24px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 12 }}>
-              <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#FFF0DC', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, border: '2px solid #854F0B' }}>🧗</div>
+              <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#FFF0DC', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #854F0B', overflow: 'hidden' }}>
+                <img src={METRONOME_URL} alt="métronome" style={{ width: 48, height: 48, objectFit: 'contain' }} />
+              </div>
               <div style={{ fontSize: 15, fontWeight: 600, color: '#fff' }}>Le Métronome</div>
               <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, background: '#FFF0DC', color: '#854F0B', fontWeight: 500 }}>Bronze — 3 mois</span>
               <div style={{ width: '100%', background: 'rgba(255,255,255,0.1)', borderRadius: 4, height: 5, overflow: 'hidden' }}>
