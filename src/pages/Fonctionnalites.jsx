@@ -120,7 +120,7 @@ export default function Fonctionnalites() {
           <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.8, margin: '0 0 20px' }}>Saisissez vos revenus et depenses. StartInvest calcule automatiquement combien vous pouvez investir chaque mois selon la regle 50/30/20.</p>
           {['Suivi revenus et depenses', 'Regle 50/30/20 automatique', 'Calcul capacite d epargne', 'Echeances et charges annuelles'].map(f => (
             <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, fontSize: 13, color: '#6B7280' }}>
-              <span style={{ color: '#4CAF2E' }}>ok</span>{f}
+              <span style={{ color: '#4CAF2E' }}>✓</span>{f}
             </div>
           ))}
         </div>
@@ -135,7 +135,7 @@ export default function Fonctionnalites() {
             <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.8, margin: '0 0 20px' }}>Livret A, PEA, CTO, Assurance-vie — visualisez votre patrimoine complet, suivez votre matelas de securite et planifiez vos virements mensuels.</p>
             {['Suivi multi-comptes', 'Matelas de securite', 'Plan de virement mensuel automatique', 'Repartition du patrimoine', 'Objectif d epargne par compte'].map(f => (
               <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, fontSize: 13, color: '#6B7280' }}>
-                <span style={{ color: '#4CAF2E' }}>ok</span>{f}
+                <span style={{ color: '#4CAF2E' }}>✓</span>{f}
               </div>
             ))}
           </div>
@@ -209,7 +209,7 @@ export default function Fonctionnalites() {
           <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.8, margin: '0 0 20px' }}>Gardez une trace de chaque mouvement. Notez vos decisions, apprenez de vos investissements.</p>
           {['Journal d achat ETF', 'Calcul PRU automatique', 'Suivi par enveloppe', '+140 ETF europeens references', 'Mise a jour prix quotidienne'].map(f => (
             <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, fontSize: 13, color: '#6B7280' }}>
-              <span style={{ color: '#4CAF2E' }}>ok</span>{f}
+              <span style={{ color: '#4CAF2E' }}>✓</span>{f}
             </div>
           ))}
         </div>
@@ -224,7 +224,7 @@ export default function Fonctionnalites() {
             <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.8, margin: '0 0 20px' }}>Decouvrez combien votre investissement peut valoir dans 5, 10 ou 20 ans grace au simulateur DCA.</p>
             {['Simulateur DCA', 'Projection sur 1 a 30 ans', 'Calcul des interets composes', 'Base sur votre capacite d epargne reelle'].map(f => (
               <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, fontSize: 13, color: '#6B7280' }}>
-                <span style={{ color: '#4CAF2E' }}>ok</span>{f}
+                <span style={{ color: '#4CAF2E' }}>✓</span>{f}
               </div>
             ))}
           </div>
@@ -242,7 +242,7 @@ export default function Fonctionnalites() {
           <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.8, margin: '0 0 20px' }}>Collectionnez les badges, maintenez vos efforts et regardez votre empire grandir sans stress.</p>
           {['Livret d accomplissements', 'Badges evolutifs Bronze vers Legendaire', 'Suivi de progression en temps reel', 'Defis bases sur vos actions reelles'].map(f => (
             <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, fontSize: 13, color: '#6B7280' }}>
-              <span style={{ color: '#4CAF2E' }}>ok</span>{f}
+              <span style={{ color: '#4CAF2E' }}>✓</span>{f}
             </div>
           ))}
         </div>
