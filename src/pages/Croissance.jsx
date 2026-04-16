@@ -56,7 +56,7 @@ export default function Croissance() {
   const initiale = user?.user_metadata?.prenom?.[0]?.toUpperCase() || '?'
   const historique = simulerDCA(capitalInitial, versement, taux, duree)
   const derniere = historique[historique.length - 1]
-  const fiscalite = enveloppe === 'PEA' ? 0.172 : 0.30
+  const fiscalite = enveloppe === 'PEA' ? 0.182 : 0.314
   const capitalApresFisc = derniere ? Math.round(derniere.capitalInvesti + derniere.interets * (1 - fiscalite)) : 0
   const maxVal = derniere?.capitalTotal || 1
 
