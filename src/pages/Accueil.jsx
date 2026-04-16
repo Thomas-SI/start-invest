@@ -10,15 +10,15 @@ const LOGO_URL = 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/pub
 const plansData = [
   {
     id: 'gratuit', nom: 'Gratuit',
-    prixMensuel: '0€', prixAnnuel: '0€',
+    prixMensuel: '0 euros', prixAnnuel: '0 euros',
     periodeMensuel: 'pour toujours', periodeAnnuel: 'pour toujours',
     pages: ['Mes Finances', 'Concentration', 'Abonnement', 'Compte'],
     features: [
       { label: 'Suivi finances de base', inclus: true },
       { label: 'Simulateur DCA basique', inclus: true },
-      { label: 'Données ETF actualisées 1x/jour', inclus: true },
-      { label: 'Portefeuille & Investissement', inclus: false },
-      { label: 'Données ETF en temps réel', inclus: false },
+      { label: 'Donnees ETF actualisees 1x/jour', inclus: true },
+      { label: 'Portefeuille et Investissement', inclus: false },
+      { label: 'Donnees ETF en temps reel', inclus: false },
       { label: 'Recommandations IA', inclus: false },
       { label: 'Rapports journaliers', inclus: false },
       { label: 'Support prioritaire', inclus: false },
@@ -26,22 +26,22 @@ const plansData = [
   },
   {
     id: 'premium', nom: 'Premium', recommande: true,
-    prixMensuel: '7.99€', prixAnnuel: '67€',
+    prixMensuel: '7.99 euros', prixAnnuel: '67 euros',
     periodeMensuel: 'par mois', periodeAnnuel: 'par an economisez 29%',
     pages: ['Mes Finances', 'Portefeuille', 'Investissement', 'Croissance', 'Concentration', 'Abonnement', 'Guide', 'Compte'],
     features: [
       { label: 'Suivi finances complet', inclus: true },
-      { label: 'Simulateur DCA avancé', inclus: true },
-      { label: 'Données ETF en temps réel', inclus: true },
+      { label: 'Simulateur DCA avance', inclus: true },
+      { label: 'Donnees ETF en temps reel', inclus: true },
       { label: 'Recommandations IA', inclus: true },
       { label: 'Rapports journaliers', inclus: true },
-      { label: 'IA agent personnalisée', inclus: true },
-      { label: 'Analyse fiscale avancée', inclus: true },
-      { label: 'Accès API personnelle', inclus: true },
+      { label: 'IA agent personnalisee', inclus: true },
+      { label: 'Analyse fiscale avancee', inclus: true },
+      { label: 'Acces API personnelle', inclus: true },
       { label: 'Support prioritaire', inclus: true },
       { label: 'Webinaires exclusifs', inclus: true },
       { label: 'Gestionnaire du patrimoine IA', inclus: true },
-      { label: 'Accès communauté', inclus: true },
+      { label: 'Acces communaute', inclus: true },
     ]
   },
 ]
@@ -103,6 +103,7 @@ export default function Accueil() {
   return (
     <div style={{ fontFamily: 'inherit', background: '#F4F7F5', minHeight: '100vh' }}>
 
+      {/* NAV */}
       <nav style={{ background: '#fff', borderBottom: '0.5px solid #E0EAE3', padding: '0 40px', height: 58, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 100 }}>
         <div onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
           <img src={LOGO_URL} alt="StartInvest" style={{ height: 38, width: 38, borderRadius: '50%', objectFit: 'cover' }} />
@@ -122,35 +123,42 @@ export default function Accueil() {
         </div>
       </nav>
 
+      {/* HERO */}
       <section id="hero" style={{ padding: '80px 40px 60px', maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, alignItems: 'center' }}>
-        <div>
+        <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 16, background: '#EAF6E4', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Nouvelle facon d investir</div>
           <h1 style={{ fontSize: 42, fontWeight: 700, color: '#1B2E4B', lineHeight: 1.2, margin: '0 0 20px' }}>
             Prenez une longueur<br />
             <span style={{ color: '#4CAF2E' }}>d avance.</span>
           </h1>
-          <p style={{ fontSize: 15, color: '#6B7280', lineHeight: 1.7, margin: '0 0 36px', maxWidth: 420 }}>
-            Suivez vos finances. Atteignez vos objectifs. Ayez un pas dans le futur.
+          <p style={{ fontSize: 15, color: '#6B7280', lineHeight: 1.7, margin: '0 0 36px' }}>
+            Suivez vos finances. Atteignez vos objectifs.<br />Ayez un pas dans le futur.
           </p>
-          <button onClick={openSignup} style={{ padding: '12px 28px', borderRadius: 10, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
-            Commencer gratuitement
-          </button>
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <button onClick={openSignup} style={{ padding: '12px 28px', borderRadius: 10, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
+              Commencer gratuitement
+            </button>
+          </div>
         </div>
 
         <div style={{ position: 'relative' }}>
-          <div style={{ background: '#fff', borderRadius: 16, border: '0.5px solid #E0EAE3', padding: '20px 24px', boxShadow: '0 4px 24px rgba(27,46,75,0.06)' }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: '#1B2E4B', marginBottom: 4 }}>Mon Portefeuille</div>
+          <div style={{ background: '#fff', borderRadius: 16, border: '0.5px solid #E0EAE3', padding: '24px', boxShadow: '0 4px 24px rgba(27,46,75,0.06)' }}>
+            <div style={{ fontSize: 14, fontWeight: 600, color: '#1B2E4B', marginBottom: 2 }}>Mon Portefeuille</div>
             <div style={{ fontSize: 11, color: '#9CA3AF', marginBottom: 20 }}>Repartition par enveloppe</div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
-              <svg width="130" height="130" viewBox="0 0 120 120">
-                <circle cx="60" cy="60" r="45" fill="none" stroke="#1B2E4B" strokeWidth="28" strokeDasharray="141.3 141.3" strokeDashoffset="0" transform="rotate(-90 60 60)" />
-                <circle cx="60" cy="60" r="45" fill="none" stroke="#4CAF2E" strokeWidth="28" strokeDasharray="84.8 198.0" strokeDashoffset="-141.3" transform="rotate(-90 60 60)" />
-                <circle cx="60" cy="60" r="45" fill="none" stroke="#BA7517" strokeWidth="28" strokeDasharray="56.5 226.2" strokeDashoffset="-226.1" transform="rotate(-90 60 60)" />
-                <circle cx="60" cy="60" r="31" fill="#fff" />
-                <text x="60" y="56" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1B2E4B">34 600 euros</text>
-                <text x="60" y="70" textAnchor="middle" fontSize="9" fill="#9CA3AF">patrimoine</text>
-              </svg>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, flex: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 28 }}>
+              {/* GRAPHIQUE */}
+              <div style={{ flexShrink: 0 }}>
+                <svg width="160" height="160" viewBox="0 0 120 120">
+                  <circle cx="60" cy="60" r="45" fill="none" stroke="#1B2E4B" strokeWidth="26" strokeDasharray="141.3 141.3" strokeDashoffset="0" transform="rotate(-90 60 60)" />
+                  <circle cx="60" cy="60" r="45" fill="none" stroke="#4CAF2E" strokeWidth="26" strokeDasharray="84.8 198.0" strokeDashoffset="-141.3" transform="rotate(-90 60 60)" />
+                  <circle cx="60" cy="60" r="45" fill="none" stroke="#BA7517" strokeWidth="26" strokeDasharray="56.5 226.2" strokeDashoffset="-226.1" transform="rotate(-90 60 60)" />
+                  <circle cx="60" cy="60" r="33" fill="#fff" />
+                  <text x="60" y="57" textAnchor="middle" fontSize="10" fontWeight="700" fill="#1B2E4B">34 600</text>
+                  <text x="60" y="69" textAnchor="middle" fontSize="9" fill="#9CA3AF">euros</text>
+                </svg>
+              </div>
+              {/* LEGENDE */}
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {[
                   { label: 'PEA', pct: '50%', val: '15 400 euros', color: '#1B2E4B' },
                   { label: 'CTO', pct: '30%', val: '6 800 euros', color: '#4CAF2E' },
@@ -159,17 +167,26 @@ export default function Accueil() {
                   <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <div style={{ width: 10, height: 10, borderRadius: '50%', background: color, flexShrink: 0 }} />
                     <div style={{ flex: 1 }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span style={{ fontSize: 12, fontWeight: 500, color: '#1B2E4B' }}>{label}</span>
-                        <span style={{ fontSize: 12, color: '#9CA3AF' }}>{pct}</span>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontSize: 13, fontWeight: 600, color: '#1B2E4B' }}>{label}</span>
+                        <span style={{ fontSize: 12, fontWeight: 600, color }}>{pct}</span>
                       </div>
-                      <div style={{ fontSize: 10, color: '#9CA3AF' }}>{val}</div>
+                      <div style={{ fontSize: 11, color: '#9CA3AF' }}>{val}</div>
+                      <div style={{ background: '#F0F0F0', borderRadius: 3, height: 4, marginTop: 4, overflow: 'hidden' }}>
+                        <div style={{ height: '100%', borderRadius: 3, background: color, width: pct }} />
+                      </div>
                     </div>
                   </div>
                 ))}
+                <div style={{ paddingTop: 10, borderTop: '0.5px solid #E0EAE3', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: 11, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '.05em' }}>Total</span>
+                  <span style={{ fontSize: 14, fontWeight: 700, color: '#1B2E4B' }}>34 600 euros</span>
+                </div>
               </div>
             </div>
           </div>
+
+          {/* BADGE */}
           <div style={{ position: 'absolute', bottom: -20, right: -20, background: '#fff', border: '0.5px solid #185FA5', borderRadius: 14, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10, boxShadow: '0 4px 16px rgba(24,95,165,0.12)' }}>
             <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#E6F1FB', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, border: '2px solid #185FA5' }}>🏗️</div>
             <div>
@@ -180,6 +197,7 @@ export default function Accueil() {
         </div>
       </section>
 
+      {/* FEATURES */}
       <section id="features" style={{ padding: '80px 40px 40px', maxWidth: 1100, margin: '0 auto' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
           <div style={{ background: '#fff', borderRadius: 16, border: '0.5px solid #E0EAE3', overflow: 'hidden' }}>
@@ -291,6 +309,7 @@ export default function Accueil() {
         </div>
       </section>
 
+      {/* CHALLENGE */}
       <section id="challenge" style={{ background: '#1B2E4B', padding: '80px 40px', marginTop: 60 }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 52 }}>
@@ -336,6 +355,7 @@ export default function Accueil() {
         </div>
       </section>
 
+      {/* ABONNEMENT */}
       <section id="abonnement" style={{ padding: '100px 40px 80px', background: '#F4F7F5', textAlign: 'center' }}>
         <div style={{ maxWidth: 820, margin: '0 auto' }}>
           <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 16, background: '#EAF6E4', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Rejoignez-nous</div>
@@ -358,6 +378,7 @@ export default function Accueil() {
         </div>
       </section>
 
+      {/* SOCIAL */}
       <section style={{ background: '#fff', borderTop: '0.5px solid #E0EAE3', padding: '60px 40px', textAlign: 'center' }}>
         <div style={{ maxWidth: 400, margin: '0 auto' }}>
           <div style={{ fontSize: 14, fontWeight: 500, color: '#1B2E4B', marginBottom: 28 }}>Vous pouvez me rejoindre sur :</div>
