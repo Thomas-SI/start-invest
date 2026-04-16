@@ -250,7 +250,7 @@ export default function Fonctionnalites() {
           {[
             { img: null, emoji: '🚀', nom: 'Le Grand Saut', tag: 'Obtenu', tagColor: '#2E7D1E', tagBg: '#EAF6E4', desc: 'Tu n es plus spectateur.', progress: null },
             { img: METRONOME_URL, emoji: null, nom: 'Le Metronome', tag: 'Bronze 3 mois', tagColor: '#854F0B', tagBg: '#FFF0DC', desc: '3 / 6 mois vers Argent', progress: 50 },
-            { img: null, emoji: '💰', nom: 'Cap des X euros', tag: 'Or 1 000 euros', tagColor: '#633806', tagBg: '#FFF8DC', desc: '1 200 / 2 000 euros vers Platine', progress: 60 },
+            { img: null, emoji: '💰', nom: 'Ascension', tag: 'Or 1 000 euros', tagColor: '#633806', tagBg: '#FFF8DC', desc: '1 200 / 2 000 euros vers Platine', progress: 60 },
             { img: null, emoji: '🗿', nom: 'Main de Fer', tag: '?', tagColor: '#9CA3AF', tagBg: 'rgba(255,255,255,0.08)', desc: '6 mois sans vente', progress: null, locked: true },
           ].map(({ img, emoji, nom, tag, tagColor, tagBg, desc, progress, locked }) => (
             <div key={nom} style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14, background: 'rgba(255,255,255,0.05)', borderRadius: 12, padding: '12px 14px', border: '0.5px solid rgba(255,255,255,0.08)' }}>

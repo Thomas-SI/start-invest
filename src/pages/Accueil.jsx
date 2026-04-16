@@ -341,7 +341,7 @@ export default function Accueil() {
             </div>
             <div style={{ background: 'rgba(255,255,255,0.06)', border: '0.5px solid rgba(255,255,255,0.1)', borderRadius: 16, padding: '24px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 12 }}>
               <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#FFF8DC', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, border: '2px solid #854F0B' }}>💰</div>
-              <div style={{ fontSize: 15, fontWeight: 600, color: '#fff' }}>Cap des X euros</div>
+              <div style={{ fontSize: 15, fontWeight: 600, color: '#fff' }}>Ascension</div>
               <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, background: '#FFF8DC', color: '#633806', fontWeight: 500 }}>Or 1 000 euros</span>
               <div style={{ width: '100%', background: 'rgba(255,255,255,0.1)', borderRadius: 4, height: 5, overflow: 'hidden' }}>
                 <div style={{ height: '100%', borderRadius: 4, background: '#BA7517', width: '60%' }} />

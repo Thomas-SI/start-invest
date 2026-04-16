@@ -19,7 +19,7 @@ export default function ChallengePublic() {
     { img: METRONOME_URL, nom: 'Le Metronome', desc: 'Investir regulierement chaque mois.', message: 'La magie des interets composes adore ta regularite.', tag: 'Bronze vers Platine', tagColor: '#854F0B', tagBg: '#FFF0DC' },
     { emoji: '🗿', nom: 'Main de Fer', desc: '6 mois sans aucune vente.', message: 'Le calme est une competence.', tag: 'Discipline', tagColor: '#444441', tagBg: '#F0F0F0' },
     { emoji: '🏗️', nom: 'L Architecte', desc: 'Posseder 3 ETF differents.', message: 'Ton patrimoine est maintenant solide et diversifie.', tag: 'Diversification', tagColor: '#185FA5', tagBg: '#E6F1FB' },
-    { emoji: '💰', nom: 'Cap des X euros', desc: 'Atteindre un palier d investissement.', message: 'Le premier palier est le plus dur. La machine est lancee.', tag: 'Bronze vers Legendaire', tagColor: '#633806', tagBg: '#FFF8DC' },
+    { emoji: '💰', nom: 'Ascension', desc: 'Atteindre un palier d investissement.', message: 'Le premier palier est le plus dur. La machine est lancee.', tag: 'Bronze vers Legendaire', tagColor: '#633806', tagBg: '#FFF8DC' },
     { emoji: '⚡', nom: 'Loin et Vite', desc: 'S abonner a StartInvest Premium.', message: 'Je vois deja l avenir.', tag: 'Premium', tagColor: '#534AB7', tagBg: '#EEEDFE' },
   ]
 

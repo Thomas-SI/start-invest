@@ -9,7 +9,7 @@ const BADGES_DATA = [
   { slug: 'metronome', img: METRONOME_URL, nom: 'Le Metronome', desc: 'Investir regulierement chaque mois.', message: 'La magie des interets composes adore ta regularite.', tag: 'Bronze vers Platine', tagColor: '#854F0B', tagBg: '#FFF0DC' },
   { slug: 'main-de-fer', nom: 'Main de Fer', emoji: '🗿', desc: '6 mois sans aucune vente.', message: 'Le calme est une competence.', tag: 'Discipline', tagColor: '#444441', tagBg: '#F0F0F0' },
   { slug: 'architecte', nom: "L Architecte", emoji: '🏗️', desc: 'Posseder 3 ETF differents.', message: 'Ton patrimoine est maintenant solide et diversifie.', tag: 'Diversification', tagColor: '#185FA5', tagBg: '#E6F1FB' },
-  { slug: 'cap', nom: 'Cap des X euros', emoji: '💰', desc: "Atteindre un palier d investissement.", message: 'Le premier palier est le plus dur. La machine est lancee.', tag: 'Bronze vers Legendaire', tagColor: '#633806', tagBg: '#FFF8DC' },
+  { slug: 'cap', nom: 'Ascension', emoji: '💰', desc: "Atteindre un palier d investissement.", message: 'Le premier palier est le plus dur. La machine est lancee.', tag: 'Bronze vers Legendaire', tagColor: '#633806', tagBg: '#FFF8DC' },
   { slug: 'vroum-vroum', nom: 'Loin et Vite', emoji: '⚡', desc: "S abonner a StartInvest Premium.", message: "Je vois deja l avenir.", tag: 'Premium', tagColor: '#534AB7', tagBg: '#EEEDFE' },
 ]
 
