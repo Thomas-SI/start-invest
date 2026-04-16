@@ -44,13 +44,41 @@ const CHAPITRES = [
 ]
 
 const CONTENU = [
-  { page: 1, texte: "START INVEST GUIDE DE L'INVESTISSEUR DÉBUTANT Bâtir son mental pour construire son avenir. Ce guide a été conçu pour les utilisateurs de l'application Start Invest. Chaque fiche est claire, simple et directement actionnable. Aucun jargon inutile — uniquement ce que tu as besoin de savoir pour commencer à investir intelligemment." },
-  { page: 2, texte: "SOMMAIRE 01 Comprendre l'environnement L'inflation Le piège du Livret A Le risque de ne pas investir Le mythe du bon moment 02 Stratégies d'investissement Lump Sum vs DCA L'effet boule de neige Les intérêts composés Commencer tôt 03 Choisir sa banque Banques classiques vs en ligne CTO vs PEA Comparatif des meilleures plateformes 04 Les bases essentielles Le matelas de sécurité La fiscalité complète Les ETF La diversification Les frais 05 Passer à l'action Comment et où investir La routine de 15 minutes Le rééquilibrage" },
-  { page: 3, texte: "PARTIE 01 Comprendre l'Environnement. Avant d'investir le moindre euro, comprends pourquoi ne pas agir est déjà une décision — et souvent la pire. 1.1 L'ennemi invisible : l'inflation. L'inflation, c'est l'augmentation générale des prix chaque année. En France, elle tourne autour de 2 à 3% par an. Sur le long terme, l'effet est dévastateur pour ton épargne. 10 000€ immobilisés valent 8 200€ dans 10 ans et 6 730€ dans 20 ans. 1.2 Le piège du Livret A. Le Livret A rapporte actuellement 1,7% par an. Si l'inflation dépasse ce taux, ton argent perd du pouvoir d'achat chaque année malgré les intérêts. Le Livret A reste utile uniquement pour ton matelas de sécurité, pas pour investir. 1.3 Le risque de ne pas prendre de risque. Ne pas investir n'est pas la solution la plus sûre. Le vrai risque c'est de se réveiller dans 20 ans et de réaliser que tes économies ne permettent plus de maintenir ton niveau de vie. 1.4 Le mythe du bon moment. Personne ne connaît le bon moment pour investir. Les études montrent que rester investi en permanence bat systématiquement le market timing sur le long terme." },
-  { page: 5, texte: "PARTIE 02 Stratégies d'Investissement. 2.1 Lump Sum vs DCA. Lump Sum : tu investis tout d'un coup, maximise le temps sur le marché. DCA investissement régulier : tu investis un montant fixe chaque mois, réduit le risque de mal timing. Pour un débutant, le DCA est la stratégie recommandée. 2.2 L'effet boule de neige et les intérêts composés. 100€/mois à 8% : 18 417€ après 10 ans, 59 295€ après 20 ans, 150 030€ après 30 ans. 2.3 L'importance de commencer tôt. Commencer à 25 ans avec 100€/mois donne 351 000€ à 65 ans. Commencer à 35 ans donne 150 000€. Commencer à 45 ans donne seulement 58 000€." },
-  { page: 7, texte: "PARTIE 03 Choisir sa Banque. 3.1 Banques classiques vs banques en ligne. Les banques classiques coûtent 5 à 25€/mois. Les banques en ligne sont gratuites. 3.2 CTO vs PEA. CTO : plafond illimité, flat tax 31,4%. PEA : plafond 150 000€, exonéré d'IR après 5 ans. Stratégie : ouvre un PEA en priorité, complète avec un CTO. 3.3 Comparatif plateformes. Bourso Bank, Fortuneo, Bourse Direct, Trade Republic, Degiro, Interactive Brokers, Linxea." },
-  { page: 9, texte: "PARTIE 04 Les Bases Essentielles. 4.1 Le matelas de sécurité. Entre 3 et 12 mois de charges fixes sur Livret A ou LDDS. 4.4 La fiscalité flat tax PFU 31,4%. Le PEA après 5 ans : gains imposés uniquement à 18,6%. Déclarer les comptes étrangers via formulaire 3916. 4.5 ETF Exchange Traded Fund : fonds qui réplique un indice boursier. ETF World investit dans les 1 500 plus grandes entreprises mondiales. TER frais annuels moins de 0,30% recommandé. 4.6 La diversification. ETF World plus Obligations plus SCPI = risque faible." },
-  { page: 11, texte: "PARTIE 05 Passer à l'Action. Étape 1 : matelas de sécurité 3 à 12 mois. Étape 2 : PEA chez Bourso Bank ou Bourse Direct, CTO chez Trade Republic ou Degiro. Étape 3 : ETF World éligible PEA. Étape 4 : virement automatique le jour de la paie. Étape 5 : même montant même ETF chaque mois. La routine 15 minutes par mois. Le rééquilibrage une fois par trimestre ou par an." },
+  {
+    page: 3,
+    chapitre: '01',
+    titreChapitre: "Comprendre l'environnement",
+    couleur: '#3B82F6',
+    texte: "Avant d'investir le moindre euro, comprends pourquoi ne pas agir est déjà une décision — et souvent la pire. L'inflation, c'est l'augmentation générale des prix chaque année. En France, elle tourne autour de 2 à 3% par an. Sur le long terme, l'effet est dévastateur pour ton épargne. 10 000€ immobilisés valent 8 200€ dans 10 ans et 6 730€ dans 20 ans. Le Livret A rapporte actuellement 1,7% par an. Si l'inflation dépasse ce taux, ton argent perd du pouvoir d'achat chaque année malgré les intérêts. Le Livret A reste utile uniquement pour ton matelas de sécurité, pas pour investir. Ne pas investir n'est pas la solution la plus sûre. Le vrai risque c'est de se réveiller dans 20 ans et de réaliser que tes économies ne permettent plus de maintenir ton niveau de vie. Personne ne connaît le bon moment pour investir. Les études montrent que rester investi en permanence bat systématiquement le market timing sur le long terme.",
+  },
+  {
+    page: 5,
+    chapitre: '02',
+    titreChapitre: "Stratégies d'investissement",
+    couleur: '#4CAF2E',
+    texte: "Lump Sum : tu investis tout d'un coup, maximise le temps sur le marché. DCA investissement régulier : tu investis un montant fixe chaque mois, réduit le risque de mal timing. Pour un débutant, le DCA est la stratégie recommandée. L'effet boule de neige : 100€/mois à 8% donnent 18 417€ après 10 ans, 59 295€ après 20 ans, 150 030€ après 30 ans. L'importance de commencer tôt : commencer à 25 ans avec 100€/mois donne 351 000€ à 65 ans. Commencer à 35 ans donne 150 000€. Commencer à 45 ans donne seulement 58 000€.",
+  },
+  {
+    page: 7,
+    chapitre: '03',
+    titreChapitre: "Choisir sa banque",
+    couleur: '#F59E0B',
+    texte: "Les banques classiques coûtent 5 à 25€/mois. Les banques en ligne sont gratuites. CTO : plafond illimité, flat tax 31,4%. PEA : plafond 150 000€, exonéré d'IR après 5 ans. Stratégie : ouvre un PEA en priorité, complète avec un CTO. Comparatif plateformes : Bourso Bank, Fortuneo, Bourse Direct, Trade Republic, Degiro, Interactive Brokers, Linxea.",
+  },
+  {
+    page: 9,
+    chapitre: '04',
+    titreChapitre: "Les bases essentielles",
+    couleur: '#8B5CF6',
+    texte: "Le matelas de sécurité : entre 3 et 12 mois de charges fixes sur Livret A ou LDDS. La fiscalité : flat tax PFU 31,4%. Le PEA après 5 ans : gains imposés uniquement à 18,6%. Déclarer les comptes étrangers via formulaire 3916. ETF Exchange Traded Fund : fonds qui réplique un indice boursier. ETF World investit dans les 1 500 plus grandes entreprises mondiales. TER frais annuels moins de 0,30% recommandé. La diversification : ETF World plus Obligations plus SCPI égal risque faible.",
+  },
+  {
+    page: 11,
+    chapitre: '05',
+    titreChapitre: "Passer à l'action",
+    couleur: '#EC4899',
+    texte: "Étape 1 : matelas de sécurité 3 à 12 mois. Étape 2 : PEA chez Bourso Bank ou Bourse Direct, CTO chez Trade Republic ou Degiro. Étape 3 : ETF World éligible PEA. Étape 4 : virement automatique le jour de la paie. Étape 5 : même montant même ETF chaque mois. La routine 15 minutes par mois. Le rééquilibrage une fois par trimestre ou par an.",
+  },
 ]
 
 export default function Guide() {
@@ -61,44 +89,54 @@ export default function Guide() {
 
   const lancerRecherche = (val) => {
     setRecherche(val)
-    rechercheRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    setTimeout(() => {
+      rechercheRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }, 100)
 
     if (val.trim().length < 3) { setResultats([]); return }
 
     const mots = val.toLowerCase().trim().split(/\s+/).filter(m => m.length > 2)
     const res = []
 
-    for (const { page, texte } of CONTENU) {
-      const texteLower = texte.toLowerCase()
-      const score = mots.filter(m => texteLower.includes(m)).length
+    for (const contenu of CONTENU) {
+      const texteLower = contenu.texte.toLowerCase()
+      const titreLower = contenu.titreChapitre.toLowerCase()
+      const score = mots.filter(m => texteLower.includes(m) || titreLower.includes(m)).length
       if (score === 0) continue
 
+      // Trouver le passage le plus pertinent
       const premierMot = mots.find(m => texteLower.includes(m))
-      const idx = texteLower.indexOf(premierMot)
-      const debut = Math.max(0, idx - 150)
-      const fin = Math.min(texte.length, idx + 300)
-      let extrait = texte.slice(debut, fin).trim()
-      if (debut > 0) extrait = '...' + extrait
-      if (fin < texte.length) extrait = extrait + '...'
+      let extrait = ''
+      if (premierMot) {
+        const idx = texteLower.indexOf(premierMot)
+        const debut = Math.max(0, idx - 80)
+        const fin = Math.min(contenu.texte.length, idx + 350)
+        extrait = contenu.texte.slice(debut, fin).trim()
+        if (debut > 0) extrait = '...' + extrait
+        if (fin < contenu.texte.length) extrait = extrait + '...'
+      } else {
+        extrait = contenu.texte.slice(0, 300) + '...'
+      }
 
+      // Surligner les mots trouvés
       let extraitSurligne = extrait
       for (const mot of mots) {
         const regex = new RegExp(`(${mot})`, 'gi')
         extraitSurligne = extraitSurligne.replace(regex, '[[[$1]]]')
       }
 
-      res.push({ page, extrait: extraitSurligne, score })
+      res.push({ ...contenu, extrait: extraitSurligne, score })
     }
 
     res.sort((a, b) => b.score - a.score)
-    setResultats(res.slice(0, 5))
+    setResultats(res.slice(0, 4))
   }
 
   const renderExtrait = (extrait) => {
     const parts = extrait.split(/\[\[\[|\]\]\]/)
     return parts.map((part, i) =>
       i % 2 === 1
-        ? <mark key={i} style={{ background: '#EAF6E4', color: '#2E7D1E', borderRadius: 3, padding: '0 2px' }}>{part}</mark>
+        ? <mark key={i} style={{ background: '#EAF6E4', color: '#2E7D1E', borderRadius: 3, padding: '0 2px', fontWeight: 600 }}>{part}</mark>
         : <span key={i}>{part}</span>
     )
   }
@@ -110,10 +148,7 @@ export default function Guide() {
 
         {/* HEADER */}
         <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div>
-            <div style={{ fontSize: 16, fontWeight: 600, color: t.text, marginBottom: 4 }}>Guide de l'investisseur débutant</div>
-            <div style={{ fontSize: 12, color: t.textMuted }}>5 parties · 12 pages · Par Thomas Bouchard</div>
-          </div>
+          <div style={{ fontSize: 16, fontWeight: 600, color: t.text }}>Guide de l'investisseur débutant</div>
           <a href={PDF_URL} target="_blank" rel="noreferrer" style={{ background: '#1B2E4B', color: '#fff', fontSize: 12, fontWeight: 500, padding: '10px 18px', borderRadius: 8, textDecoration: 'none', whiteSpace: 'nowrap' }}>
             ↓ Télécharger le guide
           </a>
@@ -130,15 +165,27 @@ export default function Guide() {
           />
 
           {resultats.length > 0 && (
-            <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 10 }}>
               <div style={{ fontSize: 11, color: t.textMuted, display: 'flex', justifyContent: 'space-between' }}>
-                <span>{resultats.length} résultat{resultats.length > 1 ? 's' : ''} trouvé{resultats.length > 1 ? 's' : ''} pour "{recherche}"</span>
+                <span>{resultats.length} résultat{resultats.length > 1 ? 's' : ''} pour "{recherche}"</span>
                 <span onClick={() => { setResultats([]); setRecherche('') }} style={{ cursor: 'pointer', color: '#E24B4A' }}>✕ Effacer</span>
               </div>
               {resultats.map((r, i) => (
-                <div key={i} style={{ background: t.bgSecondary, borderRadius: 8, padding: 12, border: `0.5px solid ${t.border}` }}>
-                  <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 6 }}>Page {r.page}</div>
-                  <div style={{ fontSize: 12, color: t.text, lineHeight: 1.6 }}>{renderExtrait(r.extrait)}</div>
+                <div key={i} style={{ background: t.bgSecondary, borderRadius: 10, border: `0.5px solid ${r.couleur}30`, overflow: 'hidden' }}>
+                  {/* En-tête du chapitre */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', background: r.couleur + '12', borderBottom: `0.5px solid ${r.couleur}20` }}>
+                    <div style={{ width: 28, height: 28, borderRadius: 8, background: r.couleur + '25', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: r.couleur, flexShrink: 0 }}>
+                      {r.chapitre}
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: r.couleur }}>{r.titreChapitre}</div>
+                      <div style={{ fontSize: 10, color: t.textMuted }}>Page {r.page}</div>
+                    </div>
+                  </div>
+                  {/* Extrait du contenu */}
+                  <div style={{ padding: '12px 14px', fontSize: 12, color: t.text, lineHeight: 1.7 }}>
+                    {renderExtrait(r.extrait)}
+                  </div>
                 </div>
               ))}
             </div>
