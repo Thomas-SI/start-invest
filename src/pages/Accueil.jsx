@@ -90,6 +90,49 @@ function PlanCard({ plan, abonnementAnnuel, openSignup }) {
   )
 }
 
+const DCAChart = () => {
+  const data = [
+    { annee: 2, investi: 9600, interets: 800, total: 10400 },
+    { annee: 4, investi: 19200, interets: 3200, total: 22400 },
+    { annee: 6, investi: 28800, interets: 7800, total: 36600 },
+    { annee: 8, investi: 38400, interets: 14600, total: 53000 },
+    { annee: 10, investi: 48000, interets: 20960, total: 68960 },
+  ]
+  const max = 68960
+  return (
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 14 }}>
+        <div>
+          <div style={{ fontSize: 10, color: '#9CA3AF', marginBottom: 2 }}>Versement mensuel</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: '#1B2E4B' }}>400 euros/mois</div>
+        </div>
+        <div style={{ textAlign: 'right' }}>
+          <div style={{ fontSize: 10, color: '#9CA3AF', marginBottom: 2 }}>Sur 10 ans · 7%/an</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: '#4CAF2E' }}>+127%</div>
+        </div>
+      </div>
+      {data.map(({ annee, investi, interets, total }) => (
+        <div key={annee} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+          <div style={{ fontSize: 10, color: '#9CA3AF', width: 36, flexShrink: 0 }}>An {annee}</div>
+          <div style={{ flex: 1, position: 'relative', height: 18 }}>
+            <div style={{ position: 'absolute', left: 0, top: 3, height: 12, borderRadius: 3, background: '#E3F0FF', width: `${investi / max * 100}%` }} />
+            <div style={{ position: 'absolute', left: `${investi / max * 100}%`, top: 3, height: 12, borderRadius: '0 3px 3px 0', background: '#4CAF2E', width: `${interets / max * 100}%` }} />
+          </div>
+          <div style={{ fontSize: 10, fontWeight: 600, color: '#1B2E4B', width: 80, textAlign: 'right', flexShrink: 0 }}>{total.toLocaleString('fr-FR')} euros</div>
+        </div>
+      ))}
+      <div style={{ display: 'flex', gap: 14, marginTop: 8 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 10, color: '#9CA3AF' }}>
+          <div style={{ width: 10, height: 10, borderRadius: 2, background: '#E3F0FF' }} />Capital investi
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 10, color: '#9CA3AF' }}>
+          <div style={{ width: 10, height: 10, borderRadius: 2, background: '#4CAF2E' }} />Interets composes
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function Accueil() {
   const navigate = useNavigate()
   const [authOpen, setAuthOpen] = useState(false)
@@ -103,7 +146,6 @@ export default function Accueil() {
   return (
     <div style={{ fontFamily: 'inherit', background: '#F4F7F5', minHeight: '100vh' }}>
 
-      {/* NAV */}
       <nav style={{ background: '#fff', borderBottom: '0.5px solid #E0EAE3', padding: '0 40px', height: 58, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 100 }}>
         <div onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
           <img src={LOGO_URL} alt="StartInvest" style={{ height: 38, width: 38, borderRadius: '50%', objectFit: 'cover' }} />
@@ -146,7 +188,6 @@ export default function Accueil() {
             <div style={{ fontSize: 14, fontWeight: 600, color: '#1B2E4B', marginBottom: 2 }}>Mon Portefeuille</div>
             <div style={{ fontSize: 11, color: '#9CA3AF', marginBottom: 20 }}>Repartition par enveloppe</div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 28 }}>
-              {/* GRAPHIQUE */}
               <div style={{ flexShrink: 0 }}>
                 <svg width="160" height="160" viewBox="0 0 120 120">
                   <circle cx="60" cy="60" r="45" fill="none" stroke="#1B2E4B" strokeWidth="26" strokeDasharray="141.3 141.3" strokeDashoffset="0" transform="rotate(-90 60 60)" />
@@ -157,7 +198,6 @@ export default function Accueil() {
                   <text x="60" y="69" textAnchor="middle" fontSize="9" fill="#9CA3AF">euros</text>
                 </svg>
               </div>
-              {/* LEGENDE */}
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {[
                   { label: 'PEA', pct: '50%', val: '15 400 euros', color: '#1B2E4B' },
@@ -185,8 +225,6 @@ export default function Accueil() {
               </div>
             </div>
           </div>
-
-          {/* BADGE */}
           <div style={{ position: 'absolute', bottom: -20, right: -20, background: '#fff', border: '0.5px solid #185FA5', borderRadius: 14, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10, boxShadow: '0 4px 16px rgba(24,95,165,0.12)' }}>
             <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#E6F1FB', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, border: '2px solid #185FA5' }}>🏗️</div>
             <div>
@@ -200,6 +238,8 @@ export default function Accueil() {
       {/* FEATURES */}
       <section id="features" style={{ padding: '80px 40px 40px', maxWidth: 1100, margin: '0 auto' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
+
+          {/* CARD FINANCES */}
           <div style={{ background: '#fff', borderRadius: 16, border: '0.5px solid #E0EAE3', overflow: 'hidden' }}>
             <div style={{ background: '#F4F7F5', padding: '28px 24px', minHeight: 200, display: 'flex', flexDirection: 'column', gap: 8 }}>
               {[
@@ -228,6 +268,7 @@ export default function Accueil() {
             </div>
           </div>
 
+          {/* CARD ENVELOPPES */}
           <div style={{ background: '#fff', borderRadius: 16, border: '0.5px solid #E0EAE3', overflow: 'hidden' }}>
             <div style={{ background: '#F4F7F5', padding: '28px 24px', minHeight: 200, display: 'flex', flexDirection: 'column', gap: 10 }}>
               {[
@@ -255,53 +296,17 @@ export default function Accueil() {
             </div>
           </div>
 
+          {/* CARD DCA */}
           <div style={{ background: '#fff', borderRadius: 16, border: '0.5px solid #E0EAE3', overflow: 'hidden' }}>
             <div style={{ background: '#F4F7F5', padding: '20px 24px', minHeight: 200, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
-                <div>
-                  <div style={{ fontSize: 10, color: '#9CA3AF', marginBottom: 2 }}>Versement mensuel</div>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: '#1B2E4B' }}>400 euros/mois</div>
-                </div>
-                <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: 10, color: '#9CA3AF', marginBottom: 2 }}>Sur 10 ans</div>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: '#4CAF2E' }}>+127%</div>
-                </div>
-              </div>
-              <svg width="100%" height="100" viewBox="0 0 260 100">
-                <defs>
-                  <linearGradient id="dcafill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#4CAF2E" stopOpacity="0.2"/>
-                    <stop offset="100%" stopColor="#4CAF2E" stopOpacity="0"/>
-                  </linearGradient>
-                  <linearGradient id="savefill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#1B2E4B" stopOpacity="0.1"/>
-                    <stop offset="100%" stopColor="#1B2E4B" stopOpacity="0"/>
-                  </linearGradient>
-                </defs>
-                <path d="M0 90 C60 88, 120 82, 180 75 C220 70, 240 68, 260 65 L260 100 L0 100 Z" fill="url(#savefill)"/>
-                <path d="M0 90 C60 88, 120 82, 180 75 C220 70, 240 68, 260 65" fill="none" stroke="#1B2E4B" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="4 3"/>
-                <path d="M0 90 C40 82, 80 70, 120 55 C160 40, 200 25, 260 8 L260 100 L0 100 Z" fill="url(#dcafill)"/>
-                <path d="M0 90 C40 82, 80 70, 120 55 C160 40, 200 25, 260 8" fill="none" stroke="#4CAF2E" strokeWidth="2" strokeLinecap="round"/>
-                <circle cx="260" cy="8" r="3" fill="#4CAF2E"/>
-                <text x="195" y="6" fill="#4CAF2E" fontSize="9" fontWeight="700">DCA +127%</text>
-                <text x="185" y="62" fill="#1B2E4B" fontSize="9">Epargne +30%</text>
-              </svg>
-              <div style={{ display: 'flex', gap: 14, justifyContent: 'center', marginTop: 6 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                  <div style={{ width: 10, height: 2, background: '#4CAF2E', borderRadius: 1 }} />
-                  <span style={{ fontSize: 10, color: '#6B7280' }}>Avec DCA</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                  <div style={{ width: 10, height: 2, background: '#1B2E4B', borderRadius: 1, opacity: 0.5 }} />
-                  <span style={{ fontSize: 10, color: '#6B7280' }}>Epargne classique</span>
-                </div>
-              </div>
+              <DCAChart />
             </div>
             <div style={{ padding: '18px 24px' }}>
               <div style={{ fontSize: 15, fontWeight: 600, color: '#1B2E4B', marginBottom: 6 }}>Prevoyez vos performances</div>
               <div style={{ fontSize: 13, color: '#9CA3AF', lineHeight: 1.6 }}>Decouvrez les performances atteignables selon votre capacite d epargne.</div>
             </div>
           </div>
+
         </div>
 
         <div style={{ textAlign: 'center', marginTop: 48 }}>

@@ -5,6 +5,49 @@ import FooterPublic from '../components/FooterPublic'
 
 const METRONOME_URL = 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/AB94501C-5932-4B4C-93F1-D1CD5A4BAA25.png'
 
+const DCAChart = () => {
+  const data = [
+    { annee: 2, investi: 9600, interets: 800, total: 10400 },
+    { annee: 4, investi: 19200, interets: 3200, total: 22400 },
+    { annee: 6, investi: 28800, interets: 7800, total: 36600 },
+    { annee: 8, investi: 38400, interets: 14600, total: 53000 },
+    { annee: 10, investi: 48000, interets: 20960, total: 68960 },
+  ]
+  const max = 68960
+  return (
+    <div style={{ padding: '24px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 14 }}>
+        <div>
+          <div style={{ fontSize: 10, color: '#9CA3AF', marginBottom: 2 }}>Versement mensuel</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: '#1B2E4B' }}>400 euros/mois</div>
+        </div>
+        <div style={{ textAlign: 'right' }}>
+          <div style={{ fontSize: 10, color: '#9CA3AF', marginBottom: 2 }}>Sur 10 ans · 7%/an</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: '#4CAF2E' }}>+127%</div>
+        </div>
+      </div>
+      {data.map(({ annee, investi, interets, total }) => (
+        <div key={annee} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+          <div style={{ fontSize: 10, color: '#9CA3AF', width: 36, flexShrink: 0 }}>An {annee}</div>
+          <div style={{ flex: 1, position: 'relative', height: 20 }}>
+            <div style={{ position: 'absolute', left: 0, top: 4, height: 12, borderRadius: 3, background: '#E3F0FF', width: `${investi / max * 100}%` }} />
+            <div style={{ position: 'absolute', left: `${investi / max * 100}%`, top: 4, height: 12, borderRadius: '0 3px 3px 0', background: '#4CAF2E', width: `${interets / max * 100}%` }} />
+          </div>
+          <div style={{ fontSize: 10, fontWeight: 600, color: '#1B2E4B', width: 85, textAlign: 'right', flexShrink: 0 }}>{total.toLocaleString('fr-FR')} euros</div>
+        </div>
+      ))}
+      <div style={{ display: 'flex', gap: 16, marginTop: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: '#9CA3AF' }}>
+          <div style={{ width: 10, height: 10, borderRadius: 2, background: '#E3F0FF' }} />Capital investi
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: '#9CA3AF' }}>
+          <div style={{ width: 10, height: 10, borderRadius: 2, background: '#4CAF2E' }} />Interets composes
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function Fonctionnalites() {
   const navigate = useNavigate()
   const [authOpen, setAuthOpen] = useState(false)
@@ -46,6 +89,7 @@ export default function Fonctionnalites() {
         </p>
       </section>
 
+      {/* FINANCES */}
       <section style={{ padding: '40px 40px', maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, alignItems: 'center', marginBottom: 40 }}>
         <div style={{ background: '#fff', borderRadius: 16, border: '0.5px solid #E0EAE3', padding: '28px 24px' }}>
           <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', marginBottom: 12 }}>Mes Finances</div>
@@ -82,6 +126,7 @@ export default function Fonctionnalites() {
         </div>
       </section>
 
+      {/* PORTEFEUILLE */}
       <section style={{ background: '#fff', padding: '60px 40px' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, alignItems: 'center' }}>
           <div>
@@ -122,6 +167,7 @@ export default function Fonctionnalites() {
         </div>
       </section>
 
+      {/* INVESTISSEMENT */}
       <section style={{ padding: '60px 40px', maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, alignItems: 'center' }}>
         <div style={{ background: '#F4F7F5', borderRadius: 16, border: '0.5px solid #E0EAE3', padding: '24px' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 14 }}>
@@ -169,6 +215,7 @@ export default function Fonctionnalites() {
         </div>
       </section>
 
+      {/* CROISSANCE */}
       <section style={{ background: '#fff', padding: '60px 40px' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, alignItems: 'center' }}>
           <div>
@@ -181,58 +228,19 @@ export default function Fonctionnalites() {
               </div>
             ))}
           </div>
-          <div style={{ background: '#F4F7F5', borderRadius: 16, border: '0.5px solid #E0EAE3', padding: '24px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
-              <div>
-                <div style={{ fontSize: 10, color: '#9CA3AF', marginBottom: 2 }}>Versement mensuel</div>
-                <div style={{ fontSize: 16, fontWeight: 700, color: '#1B2E4B' }}>400 euros/mois</div>
-              </div>
-              <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: 10, color: '#9CA3AF', marginBottom: 2 }}>Sur 10 ans</div>
-                <div style={{ fontSize: 16, fontWeight: 700, color: '#4CAF2E' }}>+127%</div>
-              </div>
-            </div>
-            <svg width="100%" height="120" viewBox="0 0 260 120">
-              <defs>
-                <linearGradient id="dcafill2" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#4CAF2E" stopOpacity="0.2"/>
-                  <stop offset="100%" stopColor="#4CAF2E" stopOpacity="0"/>
-                </linearGradient>
-                <linearGradient id="savefill2" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#1B2E4B" stopOpacity="0.1"/>
-                  <stop offset="100%" stopColor="#1B2E4B" stopOpacity="0"/>
-                </linearGradient>
-              </defs>
-              <path d="M0 110 C60 108, 120 100, 180 90 C220 83, 240 80, 260 76 L260 120 L0 120 Z" fill="url(#savefill2)"/>
-              <path d="M0 110 C60 108, 120 100, 180 90 C220 83, 240 80, 260 76" fill="none" stroke="#1B2E4B" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="4 3"/>
-              <path d="M0 110 C40 100, 80 85, 120 65 C160 45, 200 28, 260 8 L260 120 L0 120 Z" fill="url(#dcafill2)"/>
-              <path d="M0 110 C40 100, 80 85, 120 65 C160 45, 200 28, 260 8" fill="none" stroke="#4CAF2E" strokeWidth="2.5" strokeLinecap="round"/>
-              <circle cx="260" cy="8" r="4" fill="#4CAF2E"/>
-              <text x="195" y="6" fill="#4CAF2E" fontSize="10" fontWeight="700">DCA +127%</text>
-              <text x="185" y="73" fill="#1B2E4B" fontSize="10">Epargne +30%</text>
-            </svg>
-            <div style={{ marginTop: 16, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
-              {[
-                { label: 'Investi', val: '48 000 euros', color: '#1B2E4B' },
-                { label: 'Valeur finale', val: '108 960 euros', color: '#4CAF2E' },
-                { label: 'Gain net', val: '+60 960 euros', color: '#4CAF2E' },
-              ].map(({ label, val, color }) => (
-                <div key={label} style={{ background: '#fff', borderRadius: 8, padding: '8px 10px', textAlign: 'center' }}>
-                  <div style={{ fontSize: 9, color: '#9CA3AF', marginBottom: 3 }}>{label}</div>
-                  <div style={{ fontSize: 12, fontWeight: 700, color }}>{val}</div>
-                </div>
-              ))}
-            </div>
+          <div style={{ background: '#F4F7F5', borderRadius: 16, border: '0.5px solid #E0EAE3', overflow: 'hidden' }}>
+            <DCAChart />
           </div>
         </div>
       </section>
 
+      {/* CHALLENGE */}
       <section style={{ padding: '60px 40px', maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, alignItems: 'center' }}>
         <div>
           <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 12, background: '#EAF6E4', display: 'inline-block', padding: '3px 10px', borderRadius: 20 }}>Challenge</div>
           <h2 style={{ fontSize: 28, fontWeight: 700, color: '#1B2E4B', lineHeight: 1.3, margin: '0 0 14px' }}>Apprendre et rester motive</h2>
           <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.8, margin: '0 0 20px' }}>Collectionnez les badges, maintenez vos efforts et regardez votre empire grandir sans stress.</p>
-          {['Livret d accomplissements', 'Badges evolutifs (Bronze vers Legendaire)', 'Suivi de progression en temps reel', 'Defis bases sur vos actions reelles'].map(f => (
+          {['Livret d accomplissements', 'Badges evolutifs Bronze vers Legendaire', 'Suivi de progression en temps reel', 'Defis bases sur vos actions reelles'].map(f => (
             <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, fontSize: 13, color: '#6B7280' }}>
               <span style={{ color: '#4CAF2E' }}>ok</span>{f}
             </div>
@@ -268,6 +276,7 @@ export default function Fonctionnalites() {
         </div>
       </section>
 
+      {/* CTA */}
       <section style={{ padding: '80px 40px', textAlign: 'center', background: '#F4F7F5' }}>
         <h2 style={{ fontSize: 30, fontWeight: 700, color: '#1B2E4B', margin: '0 0 16px' }}>Pret a batir votre futur ?</h2>
         <p style={{ fontSize: 14, color: '#9CA3AF', margin: '0 0 32px' }}>Commencer l aventure Start Invest.</p>
