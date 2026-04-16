@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AuthModal from '../components/AuthModal'
 import ChallengesModal from '../components/ChallengesModal'
+import FooterPublic from '../components/FooterPublic'
 
 const METRONOME_URL = 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/AB94501C-5932-4B4C-93F1-D1CD5A4BAA25.png'
 const LOGO_URL = 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/IMG_2819.jpeg'
@@ -26,7 +27,7 @@ const plansData = [
   {
     id: 'premium', nom: 'Premium', recommande: true,
     prixMensuel: '7.99€', prixAnnuel: '67€',
-    periodeMensuel: 'par mois', periodeAnnuel: 'par an · économisez 29%',
+    periodeMensuel: 'par mois', periodeAnnuel: 'par an economisez 29%',
     pages: ['Mes Finances', 'Portefeuille', 'Investissement', 'Croissance', 'Concentration', 'Abonnement', 'Guide', 'Compte'],
     features: [
       { label: 'Suivi finances complet', inclus: true },
@@ -47,14 +48,14 @@ const plansData = [
 
 function PlanCard({ plan, abonnementAnnuel, openSignup }) {
   const [expanded, setExpanded] = useState(false)
-  const { id, nom, recommande, features, pages, prixMensuel, prixAnnuel, periodeMensuel, periodeAnnuel } = plan
+  const { nom, recommande, features, pages, prixMensuel, prixAnnuel, periodeMensuel, periodeAnnuel } = plan
   const prix = abonnementAnnuel ? prixAnnuel : prixMensuel
   const periode = abonnementAnnuel ? periodeAnnuel : periodeMensuel
   const featuresVisible = expanded ? features : features.slice(0, 4)
 
   return (
     <div style={{ background: recommande ? '#1B2E4B' : '#fff', border: `${recommande ? '2px' : '0.5px'} solid ${recommande ? '#4CAF2E' : '#E0EAE3'}`, borderRadius: 20, padding: '28px 24px', display: 'flex', flexDirection: 'column', position: 'relative', textAlign: 'left' }}>
-      {recommande && <div style={{ position: 'absolute', top: -14, left: '50%', transform: 'translateX(-50%)', background: '#4CAF2E', color: '#fff', fontSize: 11, fontWeight: 600, padding: '4px 16px', borderRadius: 20, whiteSpace: 'nowrap' }}>⭐ Recommandé</div>}
+      {recommande && <div style={{ position: 'absolute', top: -14, left: '50%', transform: 'translateX(-50%)', background: '#4CAF2E', color: '#fff', fontSize: 11, fontWeight: 600, padding: '4px 16px', borderRadius: 20, whiteSpace: 'nowrap' }}>Recommande</div>}
       <div style={{ fontSize: 16, fontWeight: 600, color: recommande ? '#fff' : '#1B2E4B', marginBottom: 4 }}>{nom}</div>
       <div style={{ fontSize: 32, fontWeight: 700, color: recommande ? '#fff' : '#1B2E4B', marginBottom: 2 }}>{prix}</div>
       <div style={{ fontSize: 11, color: recommande ? 'rgba(255,255,255,0.5)' : '#9CA3AF', marginBottom: 20 }}>{periode}</div>
@@ -79,11 +80,11 @@ function PlanCard({ plan, abonnementAnnuel, openSignup }) {
       </div>
       {features.length > 4 && (
         <button onClick={() => setExpanded(e => !e)} style={{ background: 'none', border: 'none', color: '#4CAF2E', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit', marginBottom: 16, textAlign: 'left', padding: 0 }}>
-          {expanded ? '▲ Voir moins' : `▼ Voir ${features.length - 4} de plus`}
+          {expanded ? 'Voir moins' : `Voir ${features.length - 4} de plus`}
         </button>
       )}
       <button onClick={openSignup} style={{ width: '100%', padding: '12px', borderRadius: 10, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', marginTop: 'auto' }}>
-        {recommande ? 'Commencer avec Premium →' : 'Commencer gratuitement'}
+        {recommande ? 'Commencer avec Premium' : 'Commencer gratuitement'}
       </button>
     </div>
   )
@@ -107,7 +108,7 @@ export default function Accueil() {
           <img src={LOGO_URL} alt="StartInvest" style={{ height: 38, width: 38, borderRadius: '50%', objectFit: 'cover' }} />
         </div>
         <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
-          {[['Accueil', '/'], ['Fonctionnalités', '/fonctionnalites'], ['Challenge', '/challenge-public'], ['Abonnement', '/abonnement-public']].map(([label, path]) => (
+          {[['Accueil', '/'], ['Fonctionnalites', '/fonctionnalites'], ['Challenge', '/challenge-public'], ['Abonnement', '/abonnement-public']].map(([label, path]) => (
             <span key={label} onClick={() => navigate(path)} style={{ fontSize: 13, color: label === 'Accueil' ? '#1B2E4B' : '#6B7280', padding: '5px 12px', borderRadius: 6, cursor: 'pointer', fontWeight: label === 'Accueil' ? 500 : 400 }}
               onMouseEnter={e => e.currentTarget.style.color = '#1B2E4B'}
               onMouseLeave={e => e.currentTarget.style.color = label === 'Accueil' ? '#1B2E4B' : '#6B7280'}>
@@ -117,44 +118,43 @@ export default function Accueil() {
         </div>
         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
           <button onClick={openLogin} style={{ padding: '7px 16px', borderRadius: 8, border: '0.5px solid #1B2E4B', background: 'transparent', color: '#1B2E4B', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Se connecter</button>
-          <button onClick={openSignup} style={{ padding: '7px 16px', borderRadius: 8, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>S'inscrire gratuitement</button>
+          <button onClick={openSignup} style={{ padding: '7px 16px', borderRadius: 8, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>S inscrire gratuitement</button>
         </div>
       </nav>
 
-      {/* HERO */}
       <section id="hero" style={{ padding: '80px 40px 60px', maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, alignItems: 'center' }}>
         <div>
-          <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 16, background: '#EAF6E4', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Nouvelle façon d'investir</div>
+          <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 16, background: '#EAF6E4', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Nouvelle facon d investir</div>
           <h1 style={{ fontSize: 42, fontWeight: 700, color: '#1B2E4B', lineHeight: 1.2, margin: '0 0 20px' }}>
             Prenez une longueur<br />
-            <span style={{ color: '#4CAF2E' }}>d'avance.</span>
+            <span style={{ color: '#4CAF2E' }}>d avance.</span>
           </h1>
           <p style={{ fontSize: 15, color: '#6B7280', lineHeight: 1.7, margin: '0 0 36px', maxWidth: 420 }}>
-            Suivez vos finances. Atteignez vos objectifs.<br />Ayez un pas dans le futur.
+            Suivez vos finances. Atteignez vos objectifs. Ayez un pas dans le futur.
           </p>
           <button onClick={openSignup} style={{ padding: '12px 28px', borderRadius: 10, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
-            Commencer gratuitement →
+            Commencer gratuitement
           </button>
         </div>
 
         <div style={{ position: 'relative' }}>
           <div style={{ background: '#fff', borderRadius: 16, border: '0.5px solid #E0EAE3', padding: '20px 24px', boxShadow: '0 4px 24px rgba(27,46,75,0.06)' }}>
             <div style={{ fontSize: 13, fontWeight: 600, color: '#1B2E4B', marginBottom: 4 }}>Mon Portefeuille</div>
-            <div style={{ fontSize: 11, color: '#9CA3AF', marginBottom: 20 }}>Répartition par enveloppe</div>
+            <div style={{ fontSize: 11, color: '#9CA3AF', marginBottom: 20 }}>Repartition par enveloppe</div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
               <svg width="130" height="130" viewBox="0 0 120 120">
                 <circle cx="60" cy="60" r="45" fill="none" stroke="#1B2E4B" strokeWidth="28" strokeDasharray="141.3 141.3" strokeDashoffset="0" transform="rotate(-90 60 60)" />
                 <circle cx="60" cy="60" r="45" fill="none" stroke="#4CAF2E" strokeWidth="28" strokeDasharray="84.8 198.0" strokeDashoffset="-141.3" transform="rotate(-90 60 60)" />
                 <circle cx="60" cy="60" r="45" fill="none" stroke="#BA7517" strokeWidth="28" strokeDasharray="56.5 226.2" strokeDashoffset="-226.1" transform="rotate(-90 60 60)" />
                 <circle cx="60" cy="60" r="31" fill="#fff" />
-                <text x="60" y="56" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1B2E4B">34 600 €</text>
+                <text x="60" y="56" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1B2E4B">34 600 euros</text>
                 <text x="60" y="70" textAnchor="middle" fontSize="9" fill="#9CA3AF">patrimoine</text>
               </svg>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10, flex: 1 }}>
                 {[
-                  { label: 'PEA', pct: '50%', val: '15 400 €', color: '#1B2E4B' },
-                  { label: 'CTO', pct: '30%', val: '6 800 €', color: '#4CAF2E' },
-                  { label: 'Ass. Vie', pct: '20%', val: '4 200 €', color: '#BA7517' },
+                  { label: 'PEA', pct: '50%', val: '15 400 euros', color: '#1B2E4B' },
+                  { label: 'CTO', pct: '30%', val: '6 800 euros', color: '#4CAF2E' },
+                  { label: 'Ass. Vie', pct: '20%', val: '4 200 euros', color: '#BA7517' },
                 ].map(({ label, pct, val, color }) => (
                   <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <div style={{ width: 10, height: 10, borderRadius: '50%', background: color, flexShrink: 0 }} />
@@ -173,23 +173,21 @@ export default function Accueil() {
           <div style={{ position: 'absolute', bottom: -20, right: -20, background: '#fff', border: '0.5px solid #185FA5', borderRadius: 14, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10, boxShadow: '0 4px 16px rgba(24,95,165,0.12)' }}>
             <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#E6F1FB', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, border: '2px solid #185FA5' }}>🏗️</div>
             <div>
-              <div style={{ fontSize: 11, fontWeight: 600, color: '#1B2E4B' }}>L'Architecte</div>
-              <div style={{ fontSize: 10, color: '#185FA5' }}>Accomplissement débloqué !</div>
+              <div style={{ fontSize: 11, fontWeight: 600, color: '#1B2E4B' }}>L Architecte</div>
+              <div style={{ fontSize: 10, color: '#185FA5' }}>Accomplissement debloque !</div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* FEATURES */}
       <section id="features" style={{ padding: '80px 40px 40px', maxWidth: 1100, margin: '0 auto' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
-
           <div style={{ background: '#fff', borderRadius: 16, border: '0.5px solid #E0EAE3', overflow: 'hidden' }}>
             <div style={{ background: '#F4F7F5', padding: '28px 24px', minHeight: 200, display: 'flex', flexDirection: 'column', gap: 8 }}>
               {[
-                { label: 'Revenus', val: '2 000 €', color: '#4CAF2E', w: '80%' },
-                { label: 'Dépenses fixes', val: '1 000 €', color: '#1B2E4B', w: '50%' },
-                { label: 'Investissable', val: '400 €', color: '#BA7517', w: '20%' },
+                { label: 'Revenus', val: '2 000 euros', color: '#4CAF2E', w: '80%' },
+                { label: 'Depenses fixes', val: '1 000 euros', color: '#1B2E4B', w: '50%' },
+                { label: 'Investissable', val: '400 euros', color: '#BA7517', w: '20%' },
               ].map(({ label, val, color, w }) => (
                 <div key={label}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 4 }}>
@@ -202,12 +200,12 @@ export default function Accueil() {
                 </div>
               ))}
               <div style={{ marginTop: 8, background: '#EAF6E4', borderRadius: 8, padding: '6px 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: 10, color: '#2E7D1E' }}>Règle 50/30/20</span>
-                <span style={{ fontSize: 12, fontWeight: 700, color: '#4CAF2E' }}>✓</span>
+                <span style={{ fontSize: 10, color: '#2E7D1E' }}>Regle 50/30/20</span>
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#4CAF2E' }}>OK</span>
               </div>
             </div>
             <div style={{ padding: '18px 24px' }}>
-              <div style={{ fontSize: 15, fontWeight: 600, color: '#1B2E4B', marginBottom: 6 }}>Analysez vos dépenses</div>
+              <div style={{ fontSize: 15, fontWeight: 600, color: '#1B2E4B', marginBottom: 6 }}>Analysez vos depenses</div>
               <div style={{ fontSize: 13, color: '#9CA3AF', lineHeight: 1.6 }}>Donnez-leur une importance.</div>
             </div>
           </div>
@@ -215,9 +213,9 @@ export default function Accueil() {
           <div style={{ background: '#fff', borderRadius: 16, border: '0.5px solid #E0EAE3', overflow: 'hidden' }}>
             <div style={{ background: '#F4F7F5', padding: '28px 24px', minHeight: 200, display: 'flex', flexDirection: 'column', gap: 10 }}>
               {[
-                { label: 'PEA', desc: 'Bourse européenne', color: '#1B2E4B', w: '80%', tag: 'Plafond 150 000 €' },
+                { label: 'PEA', desc: 'Bourse europeenne', color: '#1B2E4B', w: '80%', tag: 'Plafond 150 000 euros' },
                 { label: 'CTO', desc: 'Bourse mondiale', color: '#3B82F6', w: '60%', tag: 'Sans plafond' },
-                { label: 'Ass. Vie', desc: 'Épargne long terme', color: '#BA7517', w: '40%', tag: 'Avantage fiscal' },
+                { label: 'Ass. Vie', desc: 'Epargne long terme', color: '#BA7517', w: '40%', tag: 'Avantage fiscal' },
               ].map(({ label, desc, color, w, tag }) => (
                 <div key={label} style={{ background: '#fff', borderRadius: 8, padding: '8px 10px', border: '0.5px solid #E0EAE3' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
@@ -234,8 +232,8 @@ export default function Accueil() {
               ))}
             </div>
             <div style={{ padding: '18px 24px' }}>
-              <div style={{ fontSize: 15, fontWeight: 600, color: '#1B2E4B', marginBottom: 6 }}>Découvrez comment investir</div>
-              <div style={{ fontSize: 13, color: '#9CA3AF', lineHeight: 1.6 }}>Il y a différentes façons d'investir, choisissez les bonnes.</div>
+              <div style={{ fontSize: 15, fontWeight: 600, color: '#1B2E4B', marginBottom: 6 }}>Decouvrez comment investir</div>
+              <div style={{ fontSize: 13, color: '#9CA3AF', lineHeight: 1.6 }}>Il y a differentes facons d investir, choisissez les bonnes.</div>
             </div>
           </div>
 
@@ -244,7 +242,7 @@ export default function Accueil() {
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
                 <div>
                   <div style={{ fontSize: 10, color: '#9CA3AF', marginBottom: 2 }}>Versement mensuel</div>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: '#1B2E4B' }}>400 €/mois</div>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: '#1B2E4B' }}>400 euros/mois</div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
                   <div style={{ fontSize: 10, color: '#9CA3AF', marginBottom: 2 }}>Sur 10 ans</div>
@@ -268,7 +266,7 @@ export default function Accueil() {
                 <path d="M0 90 C40 82, 80 70, 120 55 C160 40, 200 25, 260 8" fill="none" stroke="#4CAF2E" strokeWidth="2" strokeLinecap="round"/>
                 <circle cx="260" cy="8" r="3" fill="#4CAF2E"/>
                 <text x="195" y="6" fill="#4CAF2E" fontSize="9" fontWeight="700">DCA +127%</text>
-                <text x="185" y="62" fill="#1B2E4B" fontSize="9">Épargne +30%</text>
+                <text x="185" y="62" fill="#1B2E4B" fontSize="9">Epargne +30%</text>
               </svg>
               <div style={{ display: 'flex', gap: 14, justifyContent: 'center', marginTop: 6 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
@@ -277,79 +275,74 @@ export default function Accueil() {
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                   <div style={{ width: 10, height: 2, background: '#1B2E4B', borderRadius: 1, opacity: 0.5 }} />
-                  <span style={{ fontSize: 10, color: '#6B7280' }}>Épargne classique</span>
+                  <span style={{ fontSize: 10, color: '#6B7280' }}>Epargne classique</span>
                 </div>
               </div>
             </div>
             <div style={{ padding: '18px 24px' }}>
-              <div style={{ fontSize: 15, fontWeight: 600, color: '#1B2E4B', marginBottom: 6 }}>Prévoyez vos performances</div>
-              <div style={{ fontSize: 13, color: '#9CA3AF', lineHeight: 1.6 }}>Découvrez les performances atteignables selon votre capacité d'épargne.</div>
+              <div style={{ fontSize: 15, fontWeight: 600, color: '#1B2E4B', marginBottom: 6 }}>Prevoyez vos performances</div>
+              <div style={{ fontSize: 13, color: '#9CA3AF', lineHeight: 1.6 }}>Decouvrez les performances atteignables selon votre capacite d epargne.</div>
             </div>
           </div>
-
         </div>
 
         <div style={{ textAlign: 'center', marginTop: 48 }}>
-          <button onClick={openSignup} style={{ padding: '14px 48px', borderRadius: 12, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 16, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>Go →</button>
+          <button onClick={openSignup} style={{ padding: '14px 48px', borderRadius: 12, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 16, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>Go</button>
         </div>
       </section>
 
-      {/* CHALLENGE */}
       <section id="challenge" style={{ background: '#1B2E4B', padding: '80px 40px', marginTop: 60 }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 52 }}>
             <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 16, background: 'rgba(76,175,46,0.15)', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Challenge</div>
             <h2 style={{ fontSize: 34, fontWeight: 700, color: '#fff', lineHeight: 1.3, margin: '0 0 16px' }}>
-              Pensez à 5 ans,{' '}<span style={{ color: '#4CAF2E' }}>pas à 5 mois.</span>
+              Pensez a 5 ans, <span style={{ color: '#4CAF2E' }}>pas a 5 mois.</span>
             </h2>
             <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.55)', lineHeight: 1.8, margin: '0 auto 32px', maxWidth: 460 }}>
               Fixez-vous des objectifs et atteignez-les avec discipline au fil du temps.
             </p>
             <button onClick={() => setChallengesOpen(true)} style={{ padding: '11px 28px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.2)', background: 'rgba(255,255,255,0.08)', color: '#fff', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>
-              Voir tous les challenges →
+              Voir tous les challenges
             </button>
           </div>
-
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
             <div style={{ background: 'rgba(255,255,255,0.06)', border: '0.5px solid rgba(255,255,255,0.1)', borderRadius: 16, padding: '24px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 12 }}>
               <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#EAF6E4', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, border: '2px solid #4CAF2E' }}>🚀</div>
               <div style={{ fontSize: 15, fontWeight: 600, color: '#fff' }}>Le Grand Saut</div>
               <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, background: '#EAF6E4', color: '#2E7D1E', fontWeight: 500 }}>Obtenu</span>
-              <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', lineHeight: 1.6 }}>Tu n'es plus spectateur, tu es le pilote de ton futur.</div>
+              <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', lineHeight: 1.6 }}>Tu n es plus spectateur, tu es le pilote de ton futur.</div>
             </div>
             <div style={{ background: 'rgba(255,255,255,0.06)', border: '0.5px solid rgba(255,255,255,0.1)', borderRadius: 16, padding: '24px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 12 }}>
               <div style={{ width: 64, height: 64, borderRadius: '50%', border: '2px solid #854F0B', overflow: 'hidden' }}>
-                <img src={METRONOME_URL} alt="métronome" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <img src={METRONOME_URL} alt="metronome" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
-              <div style={{ fontSize: 15, fontWeight: 600, color: '#fff' }}>Le Métronome</div>
-              <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, background: '#FFF0DC', color: '#854F0B', fontWeight: 500 }}>Bronze — 3 mois</span>
+              <div style={{ fontSize: 15, fontWeight: 600, color: '#fff' }}>Le Metronome</div>
+              <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, background: '#FFF0DC', color: '#854F0B', fontWeight: 500 }}>Bronze 3 mois</span>
               <div style={{ width: '100%', background: 'rgba(255,255,255,0.1)', borderRadius: 4, height: 5, overflow: 'hidden' }}>
                 <div style={{ height: '100%', borderRadius: 4, background: '#854F0B', width: '50%' }} />
               </div>
-              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>3 / 6 mois → Argent</div>
+              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>3 / 6 mois vers Argent</div>
             </div>
             <div style={{ background: 'rgba(255,255,255,0.06)', border: '0.5px solid rgba(255,255,255,0.1)', borderRadius: 16, padding: '24px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 12 }}>
               <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#FFF8DC', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, border: '2px solid #854F0B' }}>💰</div>
-              <div style={{ fontSize: 15, fontWeight: 600, color: '#fff' }}>Cap des X€</div>
-              <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, background: '#FFF8DC', color: '#633806', fontWeight: 500 }}>Or — 1 000 €</span>
+              <div style={{ fontSize: 15, fontWeight: 600, color: '#fff' }}>Cap des X euros</div>
+              <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, background: '#FFF8DC', color: '#633806', fontWeight: 500 }}>Or 1 000 euros</span>
               <div style={{ width: '100%', background: 'rgba(255,255,255,0.1)', borderRadius: 4, height: 5, overflow: 'hidden' }}>
                 <div style={{ height: '100%', borderRadius: 4, background: '#BA7517', width: '60%' }} />
               </div>
-              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>1 200 / 2 000 € → Platine</div>
+              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>1 200 / 2 000 euros vers Platine</div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ABONNEMENT */}
       <section id="abonnement" style={{ padding: '100px 40px 80px', background: '#F4F7F5', textAlign: 'center' }}>
         <div style={{ maxWidth: 820, margin: '0 auto' }}>
           <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 16, background: '#EAF6E4', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Rejoignez-nous</div>
           <h2 style={{ fontSize: 34, fontWeight: 700, color: '#1B2E4B', lineHeight: 1.3, margin: '0 0 16px' }}>
-            Ne laissez plus jamais<br /><span style={{ color: '#4CAF2E' }}>votre argent dormir.</span>
+            Ne laissez plus jamais <span style={{ color: '#4CAF2E' }}>votre argent dormir.</span>
           </h2>
-          <p style={{ fontSize: 14, color: '#9CA3AF', lineHeight: 1.8, margin: '0 0 32px' }}>Trouvez votre façon de faire de l'argent en dormant.</p>
-
+          <p style={{ fontSize: 14, color: '#9CA3AF', lineHeight: 1.8, margin: '0 0 32px' }}>Trouvez votre facon de faire de l argent en dormant.</p>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 0, background: '#fff', border: '0.5px solid #E0EAE3', borderRadius: 30, padding: '4px', marginBottom: 40 }}>
             <button onClick={() => setAbonnementAnnuel(false)} style={{ padding: '7px 20px', borderRadius: 20, border: 'none', background: !abonnementAnnuel ? '#1B2E4B' : 'transparent', color: !abonnementAnnuel ? '#fff' : '#9CA3AF', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' }}>Mensuel</button>
             <button onClick={() => setAbonnementAnnuel(true)} style={{ padding: '7px 20px', borderRadius: 20, border: 'none', background: abonnementAnnuel ? '#1B2E4B' : 'transparent', color: abonnementAnnuel ? '#fff' : '#9CA3AF', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s', display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -357,7 +350,6 @@ export default function Accueil() {
               <span style={{ fontSize: 9, background: '#4CAF2E', color: '#fff', padding: '2px 6px', borderRadius: 10, fontWeight: 600 }}>-29%</span>
             </button>
           </div>
-
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
             {plansData.map(plan => (
               <PlanCard key={plan.id} plan={plan} abonnementAnnuel={abonnementAnnuel} openSignup={openSignup} />
@@ -366,7 +358,6 @@ export default function Accueil() {
         </div>
       </section>
 
-      {/* SOCIAL */}
       <section style={{ background: '#fff', borderTop: '0.5px solid #E0EAE3', padding: '60px 40px', textAlign: 'center' }}>
         <div style={{ maxWidth: 400, margin: '0 auto' }}>
           <div style={{ fontSize: 14, fontWeight: 500, color: '#1B2E4B', marginBottom: 28 }}>Vous pouvez me rejoindre sur :</div>
@@ -396,13 +387,7 @@ export default function Accueil() {
         </div>
       </section>
 
-      <footer style={{ borderTop: '0.5px solid #E0EAE3', padding: '20px 40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fff' }}>
-        <div style={{ display: 'flex', alignItems: 'baseline' }}>
-          <span style={{ fontSize: 13, fontWeight: 800, color: '#1B2E4B', fontStyle: 'italic' }}>START</span>
-          <span style={{ fontSize: 13, fontWeight: 800, color: '#4CAF2E', fontStyle: 'italic' }}>INVEST</span>
-        </div>
-        <div style={{ fontSize: 11, color: '#9CA3AF' }}>© 2026 StartInvest — Bâtir son mental, construire son avenir.</div>
-      </footer>
+      <FooterPublic />
 
       {authOpen && <AuthModal defaultMode={authMode} onClose={() => setAuthOpen(false)} />}
       {challengesOpen && <ChallengesModal onClose={() => setChallengesOpen(false)} />}
