@@ -19,6 +19,9 @@ import Onboarding from './pages/Onboarding'
 import Fonctionnalites from './pages/Fonctionnalites'
 import ChallengePublic from './pages/ChallengePublic'
 import AbonnementPublic from './pages/AbonnementPublic'
+import MentionsLegales from './pages/MentionsLegales'
+import Confidentialite from './pages/Confidentialite'
+import CGV from './pages/CGV'
 import './index.css'
 
 const queryClient = new QueryClient({
@@ -54,6 +57,9 @@ createRoot(document.getElementById('root')).render(
             <Route path="/fonctionnalites" element={<Fonctionnalites />} />
             <Route path="/challenge-public" element={<ChallengePublic />} />
             <Route path="/abonnement-public" element={<AbonnementPublic />} />
+            <Route path="/mentions-legales" element={<MentionsLegales />} />
+            <Route path="/confidentialite" element={<Confidentialite />} />
+            <Route path="/cgv" element={<CGV />} />
           </Routes>
         </BrowserRouter>
       </ThemeProvider>
