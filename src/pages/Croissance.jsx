@@ -33,6 +33,13 @@ export default function Croissance() {
   const [taux, setTaux] = useState(7)
   const [duree, setDuree] = useState(25)
   const [enveloppe, setEnveloppe] = useState('PEA')
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -61,16 +68,16 @@ export default function Croissance() {
   const maxVal = derniere?.capitalTotal || 1
 
   return (
-    <div style={{ background: t.bg, height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+    <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar page="Croissance" initiale={initiale} />
 
-      <div style={{ padding: '16px 20px', flex: 1, overflow: 'auto' }}>
+      <div style={{ padding: isMobile ? '16px 12px' : '16px 20px', flex: 1 }}>
         <div style={{ marginBottom: 16 }}>
-          <div style={{ fontSize: 16, fontWeight: 500, color: t.text }}>Simulateur de croissance</div>
+          <div style={{ fontSize: isMobile ? 18 : 16, fontWeight: 500, color: t.text }}>Simulateur de croissance</div>
           <div style={{ fontSize: 12, color: t.textMuted, marginTop: 2 }}>Projetez votre patrimoine sur le long terme</div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: 16 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '300px 1fr', gap: isMobile ? 12 : 16 }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: 16 }}>
               <div style={{ fontSize: 13, fontWeight: 500, color: t.text, marginBottom: 14 }}>Paramètres</div>
@@ -126,7 +133,7 @@ export default function Croissance() {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0,1fr))', gap: 10 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, minmax(0,1fr))' : 'repeat(4, minmax(0,1fr))', gap: 10 }}>
               {[
                 ['Capital investi', `${derniere?.capitalInvesti.toLocaleString('fr-FR')} €`, t.text],
                 ['Capital total', `${derniere?.capitalTotal.toLocaleString('fr-FR')} €`, '#4CAF2E'],
@@ -135,7 +142,7 @@ export default function Croissance() {
               ].map(([l, v, c]) => (
                 <div key={l} style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: 12 }}>
                   <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>{l}</div>
-                  <div style={{ fontSize: 16, fontWeight: 500, color: c }}>{v}</div>
+                  <div style={{ fontSize: isMobile ? 14 : 16, fontWeight: 500, color: c }}>{v}</div>
                 </div>
               ))}
             </div>
@@ -145,16 +152,16 @@ export default function Croissance() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {historique.filter((_, i) => i % Math.max(1, Math.floor(historique.length / 8)) === 0 || i === historique.length - 1).map(({ annee, capitalInvesti, capitalTotal, interets }) => (
                   <div key={annee} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <div style={{ fontSize: 10, color: t.textMuted, width: 40, flexShrink: 0 }}>An {annee}</div>
+                    <div style={{ fontSize: 10, color: t.textMuted, width: isMobile ? 32 : 40, flexShrink: 0 }}>An {annee}</div>
                     <div style={{ flex: 1, position: 'relative', height: 20 }}>
                       <div style={{ position: 'absolute', left: 0, top: 4, height: 12, borderRadius: 3, background: '#E3F0FF', width: `${capitalInvesti / maxVal * 100}%` }} />
                       <div style={{ position: 'absolute', left: `${capitalInvesti / maxVal * 100}%`, top: 4, height: 12, borderRadius: '0 3px 3px 0', background: '#4CAF2E', width: `${interets / maxVal * 100}%` }} />
                     </div>
-                    <div style={{ fontSize: 10, fontWeight: 500, color: t.text, width: 90, textAlign: 'right', flexShrink: 0 }}>{capitalTotal.toLocaleString('fr-FR')} €</div>
+                    <div style={{ fontSize: 10, fontWeight: 500, color: t.text, width: isMobile ? 70 : 90, textAlign: 'right', flexShrink: 0 }}>{capitalTotal.toLocaleString('fr-FR')} €</div>
                   </div>
                 ))}
               </div>
-              <div style={{ display: 'flex', gap: 16, marginTop: 12 }}>
+              <div style={{ display: 'flex', gap: 16, marginTop: 12, flexWrap: 'wrap' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: t.textMuted }}>
                   <div style={{ width: 10, height: 10, borderRadius: 2, background: '#E3F0FF' }} />Capital investi
                 </div>
