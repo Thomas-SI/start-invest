@@ -3,43 +3,25 @@ import { useNavigate } from 'react-router-dom'
 import AuthModal from '../components/AuthModal'
 import FooterPublic from '../components/FooterPublic'
 
-const plans = [
-  {
-    id: 'gratuit', nom: 'Gratuit',
-    prixMensuel: '0 euros', prixAnnuel: '0 euros',
-    periodeMensuel: 'pour toujours', periodeAnnuel: 'pour toujours',
-    pages: ['Mes Finances', 'Concentration', 'Abonnement', 'Compte'],
-    features: [
-      { label: 'Suivi finances de base', inclus: true },
-      { label: 'Simulateur DCA basique', inclus: true },
-      { label: 'Donnees ETF actualisees 1x/jour', inclus: true },
-      { label: 'Portefeuille & Investissement', inclus: false },
-      { label: 'Donnees ETF en temps reel', inclus: false },
-      { label: 'Recommandations IA', inclus: false },
-      { label: 'Rapports journaliers', inclus: false },
-      { label: 'Support prioritaire', inclus: false },
-    ]
-  },
-  {
-    id: 'premium', nom: 'Premium', recommande: true,
-    prixMensuel: '7.99 euros', prixAnnuel: '67 euros',
-    periodeMensuel: 'par mois', periodeAnnuel: 'par an economisez 29%',
-    pages: ['Mes Finances', 'Portefeuille', 'Investissement', 'Croissance', 'Concentration', 'Abonnement', 'Guide', 'Compte'],
-    features: [
-      { label: 'Suivi finances complet', inclus: true },
-      { label: 'Simulateur DCA avance', inclus: true },
-      { label: 'Donnees ETF en temps reel', inclus: true },
-      { label: 'Recommandations IA', inclus: true },
-      { label: 'Rapports journaliers', inclus: true },
-      { label: 'IA agent personnalisee', inclus: true },
-      { label: 'Analyse fiscale avancee', inclus: true },
-      { label: 'Acces API personnelle', inclus: true },
-      { label: 'Support prioritaire', inclus: true },
-      { label: 'Webinaires exclusifs', inclus: true },
-      { label: 'Gestionnaire du patrimoine IA', inclus: true },
-      { label: 'Acces communaute', inclus: true },
-    ]
-  },
+const featuresGratuit = [
+  'Suivi finance de base',
+  'Taux d epargne personnalise',
+  'Simulateur de croissance',
+  'Vue des challenges',
+]
+
+const featuresPremium = [
+  'Suivi finance de base',
+  'Capacite d epargne personnalisee',
+  'Simulateur de croissance',
+  'Acces portefeuille',
+  'Vue des challenges',
+  'Tableau des allocations',
+  'Plan virement par compte',
+  'Journal suivi d investissement',
+  'Projection croissance',
+  'Acces challenge et recompense',
+  'Guide complet investissement',
 ]
 
 export default function AbonnementPublic() {
@@ -79,9 +61,12 @@ export default function AbonnementPublic() {
         <h1 style={{ fontSize: 38, fontWeight: 700, color: '#1B2E4B', lineHeight: 1.2, margin: '0 0 16px' }}>
           Simple, transparent, sans surprise.
         </h1>
-        <p style={{ fontSize: 15, color: '#6B7280', maxWidth: 440, margin: '0 auto 36px' }}>
+        <p style={{ fontSize: 15, color: '#6B7280', maxWidth: 440, margin: '0 auto 12px' }}>
           Commencez gratuitement. Passez a Premium quand vous etes pret.
         </p>
+        <div style={{ fontSize: 13, color: '#4CAF2E', fontWeight: 500, background: '#EAF6E4', display: 'inline-block', padding: '6px 16px', borderRadius: 20, marginBottom: 36 }}>
+          Essayez gratuitement pendant 15 jours
+        </div>
 
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 0, background: '#fff', border: '0.5px solid #E0EAE3', borderRadius: 30, padding: '4px', marginBottom: 48 }}>
           <button onClick={() => setAnnuel(false)} style={{ padding: '7px 20px', borderRadius: 20, border: 'none', background: !annuel ? '#1B2E4B' : 'transparent', color: !annuel ? '#fff' : '#9CA3AF', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' }}>Mensuel</button>
@@ -91,51 +76,61 @@ export default function AbonnementPublic() {
           </button>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, maxWidth: 700, margin: '0 auto' }}>
-          {plans.map(({ id, nom, recommande, features, pages, prixMensuel, prixAnnuel, periodeMensuel, periodeAnnuel }) => {
-            const prix = annuel ? prixAnnuel : prixMensuel
-            const periode = annuel ? periodeAnnuel : periodeMensuel
-            return (
-              <div key={id} style={{ background: recommande ? '#1B2E4B' : '#fff', border: `${recommande ? '2px' : '0.5px'} solid ${recommande ? '#4CAF2E' : '#E0EAE3'}`, borderRadius: 20, padding: '28px 24px', display: 'flex', flexDirection: 'column', textAlign: 'left', position: 'relative' }}>
-                {recommande && <div style={{ position: 'absolute', top: -14, left: '50%', transform: 'translateX(-50%)', background: '#4CAF2E', color: '#fff', fontSize: 11, fontWeight: 600, padding: '4px 16px', borderRadius: 20, whiteSpace: 'nowrap' }}>Recommande</div>}
-                <div style={{ fontSize: 16, fontWeight: 600, color: recommande ? '#fff' : '#1B2E4B', marginBottom: 4 }}>{nom}</div>
-                <div style={{ fontSize: 32, fontWeight: 700, color: recommande ? '#fff' : '#1B2E4B', marginBottom: 2 }}>{prix}</div>
-                <div style={{ fontSize: 11, color: recommande ? 'rgba(255,255,255,0.5)' : '#9CA3AF', marginBottom: 20 }}>{periode}</div>
-                <div style={{ marginBottom: 16 }}>
-                  <div style={{ fontSize: 10, fontWeight: 500, color: recommande ? 'rgba(255,255,255,0.5)' : '#9CA3AF', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 8 }}>Pages accessibles</div>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
-                    {pages.map(p => (
-                      <span key={p} style={{ fontSize: 10, padding: '3px 8px', borderRadius: 20, background: recommande ? 'rgba(255,255,255,0.1)' : '#F4F7F5', color: recommande ? '#fff' : '#1B2E4B', border: `0.5px solid ${recommande ? 'rgba(255,255,255,0.15)' : '#E0EAE3'}` }}>{p}</span>
-                    ))}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, maxWidth: 720, margin: '0 auto' }}>
+
+          {/* GRATUIT */}
+          <div style={{ background: '#fff', border: '0.5px solid #E0EAE3', borderRadius: 20, padding: '32px 28px', textAlign: 'left' }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: '#6B7280', marginBottom: 8 }}>Gratuit</div>
+            <div style={{ fontSize: 36, fontWeight: 700, color: '#1B2E4B', marginBottom: 4 }}>0 euros</div>
+            <div style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 24 }}>pour toujours</div>
+            <div style={{ borderTop: '0.5px solid #E0EAE3', paddingTop: 20, marginBottom: 24 }}>
+              {featuresGratuit.map(f => (
+                <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10, fontSize: 13, color: '#1B2E4B' }}>
+                  <div style={{ width: 18, height: 18, borderRadius: '50%', background: '#EAF6E4', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <svg width="9" height="9" viewBox="0 0 8 8" fill="none"><path d="M1.5 4L3 5.5L6.5 2" stroke="#4CAF2E" strokeWidth="1.2" strokeLinecap="round"/></svg>
                   </div>
+                  {f}
                 </div>
-                <div style={{ height: 0.5, background: recommande ? 'rgba(255,255,255,0.1)' : '#E0EAE3', marginBottom: 16 }} />
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 24 }}>
-                  {features.map(({ label, inclus }) => (
-                    <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: inclus ? (recommande ? '#fff' : '#1B2E4B') : (recommande ? 'rgba(255,255,255,0.25)' : '#9CA3AF') }}>
-                      <div style={{ width: 16, height: 16, borderRadius: '50%', background: inclus ? (recommande ? 'rgba(76,175,46,0.3)' : '#EAF6E4') : 'transparent', border: inclus ? 'none' : `0.5px solid ${recommande ? 'rgba(255,255,255,0.15)' : '#E0EAE3'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                        {inclus && <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1.5 4L3 5.5L6.5 2" stroke="#4CAF2E" strokeWidth="1.2" strokeLinecap="round"/></svg>}
-                      </div>
-                      {label}
-                    </div>
-                  ))}
+              ))}
+            </div>
+            <button onClick={openSignup} style={{ width: '100%', padding: '12px', borderRadius: 10, border: '0.5px solid #E0EAE3', background: '#F4F7F5', color: '#1B2E4B', fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>
+              Commencer gratuitement
+            </button>
+          </div>
+
+          {/* PREMIUM */}
+          <div style={{ background: '#1B2E4B', border: '2px solid #4CAF2E', borderRadius: 20, padding: '32px 28px', textAlign: 'left', position: 'relative' }}>
+            <div style={{ position: 'absolute', top: -14, left: '50%', transform: 'translateX(-50%)', background: '#4CAF2E', color: '#fff', fontSize: 11, fontWeight: 600, padding: '4px 16px', borderRadius: 20, whiteSpace: 'nowrap' }}>Recommande</div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.6)', marginBottom: 8 }}>Premium</div>
+            <div style={{ fontSize: 36, fontWeight: 700, color: '#fff', marginBottom: 4 }}>{annuel ? '67 euros' : '7.99 euros'}</div>
+            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', marginBottom: 4 }}>{annuel ? 'facture en une fois par an' : 'par mois'}</div>
+            <div style={{ fontSize: 11, color: '#4CAF2E', fontWeight: 500, marginBottom: 24 }}>15 jours gratuits pour essayer</div>
+            <div style={{ borderTop: '0.5px solid rgba(255,255,255,0.1)', paddingTop: 20, marginBottom: 24 }}>
+              {featuresPremium.map(f => (
+                <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10, fontSize: 13, color: 'rgba(255,255,255,0.85)' }}>
+                  <div style={{ width: 18, height: 18, borderRadius: '50%', background: 'rgba(76,175,46,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <svg width="9" height="9" viewBox="0 0 8 8" fill="none"><path d="M1.5 4L3 5.5L6.5 2" stroke="#4CAF2E" strokeWidth="1.2" strokeLinecap="round"/></svg>
+                  </div>
+                  {f}
                 </div>
-                <button onClick={openSignup} style={{ width: '100%', padding: '12px', borderRadius: 10, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
-                  {recommande ? 'Commencer avec Premium' : 'Commencer gratuitement'}
-                </button>
-              </div>
-            )
-          })}
+              ))}
+            </div>
+            <button onClick={openSignup} style={{ width: '100%', padding: '12px', borderRadius: 10, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
+              Essayer 15 jours gratuitement
+            </button>
+          </div>
+
         </div>
       </section>
 
-      <section style={{ padding: '60px 40px', maxWidth: 700, margin: '0 auto' }}>
+      {/* FAQ */}
+      <section style={{ padding: '60px 40px', maxWidth: 720, margin: '0 auto' }}>
         <h2 style={{ fontSize: 26, fontWeight: 700, color: '#1B2E4B', textAlign: 'center', marginBottom: 40 }}>Questions frequentes</h2>
         {[
-          { q: 'Puis-je annuler a tout moment ?', r: 'Oui, vous pouvez annuler votre abonnement a tout moment depuis votre espace compte.' },
+          { q: 'Comment fonctionne les 15 jours gratuits ?', r: 'Vous acces a toutes les fonctionnalites Premium pendant 15 jours sans carte bancaire requise. A la fin de la periode, vous choisissez de continuer ou de rester sur le plan gratuit.' },
+          { q: 'Puis-je annuler a tout moment ?', r: 'Oui, vous pouvez annuler votre abonnement a tout moment depuis votre espace compte. Aucun engagement.' },
           { q: 'Le plan gratuit est-il vraiment gratuit ?', r: 'Oui, sans limite de temps et sans carte bancaire requise.' },
-          { q: 'Mes donnees sont-elles securisees ?', r: 'Vos donnees sont chiffrees et hebergees sur des serveurs securises Supabase.' },
-          { q: 'Puis-je passer de gratuit a Premium ?', r: 'Oui, a tout moment depuis la page Abonnement dans votre espace personnel.' },
+          { q: 'Mes donnees sont-elles securisees ?', r: 'Vos donnees sont chiffrees et hebergees sur des serveurs securises Supabase en Europe (Frankfurt).' },
         ].map(({ q, r }) => (
           <div key={q} style={{ background: '#fff', border: '0.5px solid #E0EAE3', borderRadius: 12, padding: '18px 20px', marginBottom: 10 }}>
             <div style={{ fontSize: 14, fontWeight: 500, color: '#1B2E4B', marginBottom: 6 }}>{q}</div>

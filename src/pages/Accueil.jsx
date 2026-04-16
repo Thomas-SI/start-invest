@@ -14,14 +14,14 @@ const plansData = [
     periodeMensuel: 'pour toujours', periodeAnnuel: 'pour toujours',
     pages: ['Mes Finances', 'Concentration', 'Abonnement', 'Compte'],
     features: [
-      { label: 'Suivi finances de base', inclus: true },
-      { label: 'Simulateur DCA basique', inclus: true },
-      { label: 'Donnees ETF actualisees 1x/jour', inclus: true },
-      { label: 'Portefeuille et Investissement', inclus: false },
-      { label: 'Donnees ETF en temps reel', inclus: false },
-      { label: 'Recommandations IA', inclus: false },
-      { label: 'Rapports journaliers', inclus: false },
-      { label: 'Support prioritaire', inclus: false },
+      { label: 'Suivi finance de base', inclus: true },
+      { label: 'Taux d epargne personnalise', inclus: true },
+      { label: 'Simulateur de croissance', inclus: true },
+      { label: 'Vue des challenges', inclus: true },
+      { label: 'Acces portefeuille', inclus: false },
+      { label: 'Tableau des allocations', inclus: false },
+      { label: 'Journal suivi d investissement', inclus: false },
+      { label: 'Guide complet investissement', inclus: false },
     ]
   },
   {
@@ -30,18 +30,17 @@ const plansData = [
     periodeMensuel: 'par mois', periodeAnnuel: 'par an economisez 29%',
     pages: ['Mes Finances', 'Portefeuille', 'Investissement', 'Croissance', 'Concentration', 'Abonnement', 'Guide', 'Compte'],
     features: [
-      { label: 'Suivi finances complet', inclus: true },
-      { label: 'Simulateur DCA avance', inclus: true },
-      { label: 'Donnees ETF en temps reel', inclus: true },
-      { label: 'Recommandations IA', inclus: true },
-      { label: 'Rapports journaliers', inclus: true },
-      { label: 'IA agent personnalisee', inclus: true },
-      { label: 'Analyse fiscale avancee', inclus: true },
-      { label: 'Acces API personnelle', inclus: true },
-      { label: 'Support prioritaire', inclus: true },
-      { label: 'Webinaires exclusifs', inclus: true },
-      { label: 'Gestionnaire du patrimoine IA', inclus: true },
-      { label: 'Acces communaute', inclus: true },
+      { label: 'Suivi finance de base', inclus: true },
+      { label: 'Capacite d epargne personnalisee', inclus: true },
+      { label: 'Simulateur de croissance', inclus: true },
+      { label: 'Acces portefeuille', inclus: true },
+      { label: 'Vue des challenges', inclus: true },
+      { label: 'Tableau des allocations', inclus: true },
+      { label: 'Plan virement par compte', inclus: true },
+      { label: 'Journal suivi d investissement', inclus: true },
+      { label: 'Projection croissance', inclus: true },
+      { label: 'Acces challenge et recompense', inclus: true },
+      { label: 'Guide complet investissement', inclus: true },
     ]
   },
 ]
@@ -51,14 +50,15 @@ function PlanCard({ plan, abonnementAnnuel, openSignup }) {
   const { nom, recommande, features, pages, prixMensuel, prixAnnuel, periodeMensuel, periodeAnnuel } = plan
   const prix = abonnementAnnuel ? prixAnnuel : prixMensuel
   const periode = abonnementAnnuel ? periodeAnnuel : periodeMensuel
-  const featuresVisible = expanded ? features : features.slice(0, 4)
+  const featuresVisible = expanded ? features : features.slice(0, 5)
 
   return (
     <div style={{ background: recommande ? '#1B2E4B' : '#fff', border: `${recommande ? '2px' : '0.5px'} solid ${recommande ? '#4CAF2E' : '#E0EAE3'}`, borderRadius: 20, padding: '28px 24px', display: 'flex', flexDirection: 'column', position: 'relative', textAlign: 'left' }}>
       {recommande && <div style={{ position: 'absolute', top: -14, left: '50%', transform: 'translateX(-50%)', background: '#4CAF2E', color: '#fff', fontSize: 11, fontWeight: 600, padding: '4px 16px', borderRadius: 20, whiteSpace: 'nowrap' }}>Recommande</div>}
       <div style={{ fontSize: 16, fontWeight: 600, color: recommande ? '#fff' : '#1B2E4B', marginBottom: 4 }}>{nom}</div>
       <div style={{ fontSize: 32, fontWeight: 700, color: recommande ? '#fff' : '#1B2E4B', marginBottom: 2 }}>{prix}</div>
-      <div style={{ fontSize: 11, color: recommande ? 'rgba(255,255,255,0.5)' : '#9CA3AF', marginBottom: 20 }}>{periode}</div>
+      <div style={{ fontSize: 11, color: recommande ? 'rgba(255,255,255,0.5)' : '#9CA3AF', marginBottom: recommande ? 4 : 20 }}>{periode}</div>
+      {recommande && <div style={{ fontSize: 11, color: '#4CAF2E', fontWeight: 500, marginBottom: 16 }}>15 jours gratuits pour essayer</div>}
       <div style={{ marginBottom: 16 }}>
         <div style={{ fontSize: 10, fontWeight: 500, color: recommande ? 'rgba(255,255,255,0.5)' : '#9CA3AF', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 8 }}>Pages accessibles</div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
@@ -78,13 +78,13 @@ function PlanCard({ plan, abonnementAnnuel, openSignup }) {
           </div>
         ))}
       </div>
-      {features.length > 4 && (
+      {features.length > 5 && (
         <button onClick={() => setExpanded(e => !e)} style={{ background: 'none', border: 'none', color: '#4CAF2E', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit', marginBottom: 16, textAlign: 'left', padding: 0 }}>
-          {expanded ? 'Voir moins' : `Voir ${features.length - 4} de plus`}
+          {expanded ? 'Voir moins' : `Voir ${features.length - 5} de plus`}
         </button>
       )}
       <button onClick={openSignup} style={{ width: '100%', padding: '12px', borderRadius: 10, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', marginTop: 'auto' }}>
-        {recommande ? 'Commencer avec Premium' : 'Commencer gratuitement'}
+        {recommande ? 'Essayer 15 jours gratuitement' : 'Commencer gratuitement'}
       </button>
     </div>
   )
@@ -107,7 +107,7 @@ const DCAChart = () => {
           <div style={{ fontSize: 14, fontWeight: 700, color: '#1B2E4B' }}>400 euros/mois</div>
         </div>
         <div style={{ textAlign: 'right' }}>
-          <div style={{ fontSize: 10, color: '#9CA3AF', marginBottom: 2 }}>Sur 10 ans · 7%/an</div>
+          <div style={{ fontSize: 10, color: '#9CA3AF', marginBottom: 2 }}>Sur 10 ans 7%/an</div>
           <div style={{ fontSize: 14, fontWeight: 700, color: '#4CAF2E' }}>+127%</div>
         </div>
       </div>
@@ -165,7 +165,6 @@ export default function Accueil() {
         </div>
       </nav>
 
-      {/* HERO */}
       <section id="hero" style={{ padding: '80px 40px 60px', maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, alignItems: 'center' }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 16, background: '#EAF6E4', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Nouvelle facon d investir</div>
@@ -235,11 +234,8 @@ export default function Accueil() {
         </div>
       </section>
 
-      {/* FEATURES */}
       <section id="features" style={{ padding: '80px 40px 40px', maxWidth: 1100, margin: '0 auto' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
-
-          {/* CARD FINANCES */}
           <div style={{ background: '#fff', borderRadius: 16, border: '0.5px solid #E0EAE3', overflow: 'hidden' }}>
             <div style={{ background: '#F4F7F5', padding: '28px 24px', minHeight: 200, display: 'flex', flexDirection: 'column', gap: 8 }}>
               {[
@@ -268,7 +264,6 @@ export default function Accueil() {
             </div>
           </div>
 
-          {/* CARD ENVELOPPES */}
           <div style={{ background: '#fff', borderRadius: 16, border: '0.5px solid #E0EAE3', overflow: 'hidden' }}>
             <div style={{ background: '#F4F7F5', padding: '28px 24px', minHeight: 200, display: 'flex', flexDirection: 'column', gap: 10 }}>
               {[
@@ -296,7 +291,6 @@ export default function Accueil() {
             </div>
           </div>
 
-          {/* CARD DCA */}
           <div style={{ background: '#fff', borderRadius: 16, border: '0.5px solid #E0EAE3', overflow: 'hidden' }}>
             <div style={{ background: '#F4F7F5', padding: '20px 24px', minHeight: 200, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               <DCAChart />
@@ -306,7 +300,6 @@ export default function Accueil() {
               <div style={{ fontSize: 13, color: '#9CA3AF', lineHeight: 1.6 }}>Decouvrez les performances atteignables selon votre capacite d epargne.</div>
             </div>
           </div>
-
         </div>
 
         <div style={{ textAlign: 'center', marginTop: 48 }}>
@@ -314,7 +307,6 @@ export default function Accueil() {
         </div>
       </section>
 
-      {/* CHALLENGE */}
       <section id="challenge" style={{ background: '#1B2E4B', padding: '80px 40px', marginTop: 60 }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 52 }}>
@@ -360,14 +352,14 @@ export default function Accueil() {
         </div>
       </section>
 
-      {/* ABONNEMENT */}
       <section id="abonnement" style={{ padding: '100px 40px 80px', background: '#F4F7F5', textAlign: 'center' }}>
         <div style={{ maxWidth: 820, margin: '0 auto' }}>
           <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 16, background: '#EAF6E4', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Rejoignez-nous</div>
           <h2 style={{ fontSize: 34, fontWeight: 700, color: '#1B2E4B', lineHeight: 1.3, margin: '0 0 16px' }}>
             Ne laissez plus jamais <span style={{ color: '#4CAF2E' }}>votre argent dormir.</span>
           </h2>
-          <p style={{ fontSize: 14, color: '#9CA3AF', lineHeight: 1.8, margin: '0 0 32px' }}>Trouvez votre facon de faire de l argent en dormant.</p>
+          <p style={{ fontSize: 14, color: '#9CA3AF', lineHeight: 1.8, margin: '0 0 8px' }}>Trouvez votre facon de faire de l argent en dormant.</p>
+          <p style={{ fontSize: 13, color: '#4CAF2E', fontWeight: 500, margin: '0 0 32px' }}>Essayez gratuitement pendant 15 jours</p>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 0, background: '#fff', border: '0.5px solid #E0EAE3', borderRadius: 30, padding: '4px', marginBottom: 40 }}>
             <button onClick={() => setAbonnementAnnuel(false)} style={{ padding: '7px 20px', borderRadius: 20, border: 'none', background: !abonnementAnnuel ? '#1B2E4B' : 'transparent', color: !abonnementAnnuel ? '#fff' : '#9CA3AF', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' }}>Mensuel</button>
             <button onClick={() => setAbonnementAnnuel(true)} style={{ padding: '7px 20px', borderRadius: 20, border: 'none', background: abonnementAnnuel ? '#1B2E4B' : 'transparent', color: abonnementAnnuel ? '#fff' : '#9CA3AF', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s', display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -383,7 +375,6 @@ export default function Accueil() {
         </div>
       </section>
 
-      {/* SOCIAL */}
       <section style={{ background: '#fff', borderTop: '0.5px solid #E0EAE3', padding: '60px 40px', textAlign: 'center' }}>
         <div style={{ maxWidth: 400, margin: '0 auto' }}>
           <div style={{ fontSize: 14, fontWeight: 500, color: '#1B2E4B', marginBottom: 28 }}>Vous pouvez me rejoindre sur :</div>
