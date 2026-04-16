@@ -85,10 +85,16 @@ export default function Guide() {
   const t = useTheme()
   const [recherche, setRecherche] = useState('')
   const [resultats, setResultats] = useState([])
+  const [expandedResults, setExpandedResults] = useState({})
   const rechercheRef = React.useRef(null)
+
+  const toggleExpand = (index) => {
+    setExpandedResults(prev => ({ ...prev, [index]: !prev[index] }))
+  }
 
   const lancerRecherche = (val) => {
     setRecherche(val)
+    setExpandedResults({})
     setTimeout(() => {
       rechercheRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
     }, 100)
@@ -104,13 +110,12 @@ export default function Guide() {
       const score = mots.filter(m => texteLower.includes(m) || titreLower.includes(m)).length
       if (score === 0) continue
 
-      // Trouver le passage le plus pertinent
       const premierMot = mots.find(m => texteLower.includes(m))
       let extrait = ''
       if (premierMot) {
         const idx = texteLower.indexOf(premierMot)
         const debut = Math.max(0, idx - 80)
-        const fin = Math.min(contenu.texte.length, idx + 350)
+        const fin = Math.min(contenu.texte.length, idx + 300)
         extrait = contenu.texte.slice(debut, fin).trim()
         if (debut > 0) extrait = '...' + extrait
         if (fin < contenu.texte.length) extrait = extrait + '...'
@@ -118,22 +123,29 @@ export default function Guide() {
         extrait = contenu.texte.slice(0, 300) + '...'
       }
 
-      // Surligner les mots trouvés
+      // Surligner dans l'extrait
       let extraitSurligne = extrait
       for (const mot of mots) {
         const regex = new RegExp(`(${mot})`, 'gi')
         extraitSurligne = extraitSurligne.replace(regex, '[[[$1]]]')
       }
 
-      res.push({ ...contenu, extrait: extraitSurligne, score })
+      // Surligner dans le texte complet
+      let texteSurligne = contenu.texte
+      for (const mot of mots) {
+        const regex = new RegExp(`(${mot})`, 'gi')
+        texteSurligne = texteSurligne.replace(regex, '[[[$1]]]')
+      }
+
+      res.push({ ...contenu, extrait: extraitSurligne, texteComplet: texteSurligne, score })
     }
 
     res.sort((a, b) => b.score - a.score)
     setResultats(res.slice(0, 4))
   }
 
-  const renderExtrait = (extrait) => {
-    const parts = extrait.split(/\[\[\[|\]\]\]/)
+  const renderTexte = (texte) => {
+    const parts = texte.split(/\[\[\[|\]\]\]/)
     return parts.map((part, i) =>
       i % 2 === 1
         ? <mark key={i} style={{ background: '#EAF6E4', color: '#2E7D1E', borderRadius: 3, padding: '0 2px', fontWeight: 600 }}>{part}</mark>
@@ -168,7 +180,7 @@ export default function Guide() {
             <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 10 }}>
               <div style={{ fontSize: 11, color: t.textMuted, display: 'flex', justifyContent: 'space-between' }}>
                 <span>{resultats.length} résultat{resultats.length > 1 ? 's' : ''} pour "{recherche}"</span>
-                <span onClick={() => { setResultats([]); setRecherche('') }} style={{ cursor: 'pointer', color: '#E24B4A' }}>✕ Effacer</span>
+                <span onClick={() => { setResultats([]); setRecherche(''); setExpandedResults({}) }} style={{ cursor: 'pointer', color: '#E24B4A' }}>✕ Effacer</span>
               </div>
               {resultats.map((r, i) => (
                 <div key={i} style={{ background: t.bgSecondary, borderRadius: 10, border: `0.5px solid ${r.couleur}30`, overflow: 'hidden' }}>
@@ -177,14 +189,24 @@ export default function Guide() {
                     <div style={{ width: 28, height: 28, borderRadius: 8, background: r.couleur + '25', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: r.couleur, flexShrink: 0 }}>
                       {r.chapitre}
                     </div>
-                    <div>
+                    <div style={{ flex: 1 }}>
                       <div style={{ fontSize: 12, fontWeight: 600, color: r.couleur }}>{r.titreChapitre}</div>
                       <div style={{ fontSize: 10, color: t.textMuted }}>Page {r.page}</div>
                     </div>
                   </div>
-                  {/* Extrait du contenu */}
+                  {/* Contenu */}
                   <div style={{ padding: '12px 14px', fontSize: 12, color: t.text, lineHeight: 1.7 }}>
-                    {renderExtrait(r.extrait)}
+                    {expandedResults[i]
+                      ? renderTexte(r.texteComplet)
+                      : renderTexte(r.extrait)
+                    }
+                  </div>
+                  {/* Bouton afficher plus/moins */}
+                  <div
+                    onClick={() => toggleExpand(i)}
+                    style={{ padding: '8px 14px', borderTop: `0.5px solid ${r.couleur}15`, cursor: 'pointer', fontSize: 11, color: r.couleur, fontWeight: 500, display: 'flex', alignItems: 'center', gap: 4, background: r.couleur + '05' }}
+                  >
+                    {expandedResults[i] ? '▲ Afficher moins' : '▼ Afficher le chapitre complet'}
                   </div>
                 </div>
               ))}
