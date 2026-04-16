@@ -16,6 +16,9 @@ export default function Compte() {
   const [succes, setSucces] = useState(false)
   const [erreur, setErreur] = useState(null)
   const [showAPropos, setShowAPropos] = useState(false)
+  const [showMentions, setShowMentions] = useState(false)
+  const [showCGV, setShowCGV] = useState(false)
+  const [showConfidentialite, setShowConfidentialite] = useState(false)
   const [showSupprimer, setShowSupprimer] = useState(false)
   const [confirmSupprimer, setConfirmSupprimer] = useState('')
   const [photoUrl, setPhotoUrl] = useState(null)
@@ -39,12 +42,8 @@ export default function Compte() {
 
   const handleSave = async () => {
     if (loading) return
-    if (!prenom.trim() && !nom.trim()) {
-      setErreur('Veuillez saisir au moins un prénom ou un nom.')
-      return
-    }
-    setLoading(true)
-    setErreur(null)
+    if (!prenom.trim() && !nom.trim()) { setErreur('Veuillez saisir au moins un prénom ou un nom.'); return }
+    setLoading(true); setErreur(null)
     try {
       const { error } = await supabase.auth.updateUser({ data: { prenom, nom, metier } })
       if (error) throw new Error('Erreur lors de la sauvegarde.')
@@ -60,12 +59,8 @@ export default function Compte() {
   const handlePhotoUpload = async (e) => {
     const file = e.target.files[0]
     if (!file || !user) return
-    if (file.size > 2 * 1024 * 1024) {
-      setErreurPhoto('La photo ne doit pas dépasser 2 Mo.')
-      return
-    }
-    setUploadingPhoto(true)
-    setErreurPhoto(null)
+    if (file.size > 2 * 1024 * 1024) { setErreurPhoto('La photo ne doit pas dépasser 2 Mo.'); return }
+    setUploadingPhoto(true); setErreurPhoto(null)
     try {
       const ext = file.name.split('.').pop()
       const path = `${user.id}/avatar.${ext}`
@@ -94,6 +89,27 @@ export default function Compte() {
 
   const initiale = user?.user_metadata?.prenom?.[0]?.toUpperCase() || '?'
   const inputStyle = { width: '100%', padding: '9px 12px', borderRadius: 8, border: `0.5px solid ${t.border}`, fontSize: 13, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text, boxSizing: 'border-box' }
+
+  const SectionLegale = ({ titre, open, onToggle, children }) => (
+    <div style={{ border: `0.5px solid ${t.border}`, borderRadius: 10, overflow: 'hidden' }}>
+      <div onClick={onToggle} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', cursor: 'pointer', background: t.bgSecondary }}>
+        <div style={{ fontSize: 12, fontWeight: 500, color: t.text }}>{titre}</div>
+        <div style={{ fontSize: 14, color: t.textMuted }}>{open ? '−' : '+'}</div>
+      </div>
+      {open && (
+        <div style={{ padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {children}
+        </div>
+      )}
+    </div>
+  )
+
+  const Article = ({ numero, titre, children }) => (
+    <div>
+      <div style={{ fontSize: 11, fontWeight: 600, color: t.text, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '.04em' }}>{numero}. {titre}</div>
+      <div style={{ fontSize: 12, color: t.textMuted, lineHeight: 1.7 }}>{children}</div>
+    </div>
+  )
 
   return (
     <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -126,21 +142,13 @@ export default function Compte() {
           </div>
 
           {erreurPhoto && (
-            <div style={{ background: '#FCEBEB', border: '0.5px solid #E24B4A', borderRadius: 8, padding: '8px 12px', fontSize: 12, color: '#E24B4A', marginBottom: 12 }}>
-              ⚠️ {erreurPhoto}
-            </div>
+            <div style={{ background: '#FCEBEB', border: '0.5px solid #E24B4A', borderRadius: 8, padding: '8px 12px', fontSize: 12, color: '#E24B4A', marginBottom: 12 }}>⚠️ {erreurPhoto}</div>
           )}
 
           {/* INFORMATIONS PERSONNELLES */}
           <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 14, padding: 20, marginBottom: 12 }}>
             <div style={{ fontSize: 13, fontWeight: 500, color: t.text, marginBottom: 16 }}>Informations personnelles</div>
-
-            {erreur && (
-              <div style={{ background: '#FCEBEB', border: '0.5px solid #E24B4A', borderRadius: 8, padding: '8px 12px', fontSize: 12, color: '#E24B4A', marginBottom: 12 }}>
-                ⚠️ {erreur}
-              </div>
-            )}
-
+            {erreur && <div style={{ background: '#FCEBEB', border: '0.5px solid #E24B4A', borderRadius: 8, padding: '8px 12px', fontSize: 12, color: '#E24B4A', marginBottom: 12 }}>⚠️ {erreur}</div>}
             <div style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 11, color: t.textMuted, marginBottom: 4 }}>Prénom</div>
@@ -159,11 +167,7 @@ export default function Compte() {
               <div style={{ fontSize: 11, color: t.textMuted, marginBottom: 4 }}>Description / Métier</div>
               <input value={metier} onChange={e => setMetier(e.target.value)} placeholder="ex: Ingénieur, Étudiant, Entrepreneur..." style={inputStyle} />
             </div>
-            {succes && (
-              <div style={{ fontSize: 12, color: '#2E7D1E', background: '#EAF6E4', padding: '8px 12px', borderRadius: 8, marginBottom: 12 }}>
-                ✓ Informations sauvegardées !
-              </div>
-            )}
+            {succes && <div style={{ fontSize: 12, color: '#2E7D1E', background: '#EAF6E4', padding: '8px 12px', borderRadius: 8, marginBottom: 12 }}>✓ Informations sauvegardées !</div>}
             <button onClick={handleSave} disabled={loading} style={{ background: loading ? '#9CA3AF' : '#4CAF2E', color: '#fff', fontSize: 13, fontWeight: 500, padding: '10px 20px', borderRadius: 9, border: 'none', cursor: loading ? 'not-allowed' : 'pointer', fontFamily: 'inherit' }}>
               {loading ? '⏳ Sauvegarde...' : 'Sauvegarder'}
             </button>
@@ -190,24 +194,105 @@ export default function Compte() {
               <div style={{ fontSize: 13, fontWeight: 500, color: t.text }}>À propos & Mentions légales</div>
               <div style={{ fontSize: 16, color: t.textMuted }}>{showAPropos ? '−' : '+'}</div>
             </div>
+
             {showAPropos && (
-              <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 16 }}>
-                <div>
-                  <div style={{ fontSize: 11, fontWeight: 500, color: t.text, textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 6 }}>À propos de StartInvest</div>
-                  <div style={{ fontSize: 12, color: t.textMuted, lineHeight: 1.6 }}>StartInvest est une application d'aide à la gestion de portefeuille d'ETF destinée aux particuliers souhaitant suivre et optimiser leurs investissements long terme.</div>
+              <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+
+                {/* Intro */}
+                <div style={{ fontSize: 12, color: t.textMuted, lineHeight: 1.6, padding: '10px 14px', background: t.bgSecondary, borderRadius: 10 }}>
+                  StartInvest est une application d'aide à la gestion de portefeuille d'ETF destinée aux particuliers souhaitant suivre et optimiser leurs investissements long terme.
                 </div>
+
+                {/* MENTIONS LÉGALES */}
+                <SectionLegale titre="Mentions légales" open={showMentions} onToggle={() => setShowMentions(v => !v)}>
+                  <Article numero="1" titre="Éditeur du site">
+                    Le site www.start-invest.fr est édité par :<br />
+                    <strong style={{ color: t.text }}>Nom de la société :</strong> START_INVEST<br />
+                    <strong style={{ color: t.text }}>Statut juridique :</strong> Entrepreneur Individuel<br />
+                    <strong style={{ color: t.text }}>Siège social :</strong> 44 Rue Pasquier, 75008 PARIS, FRANCE<br />
+                    <strong style={{ color: t.text }}>E-mail :</strong> contact@start-invest.fr<br />
+                    <strong style={{ color: t.text }}>SIRET :</strong> 90915142500024<br />
+                    <strong style={{ color: t.text }}>Directeur de la publication :</strong> Thomas BOUCHARD
+                  </Article>
+                  <div style={{ height: 0.5, background: t.border }} />
+                  <Article numero="2" titre="Hébergeur du site">
+                    Le site est hébergé par la société <strong style={{ color: t.text }}>Vercel Inc.</strong><br />
+                    Siège social : 440 N Barranca Ave #4133, Covina, CA 91723, États-Unis.<br />
+                    Site web : https://vercel.com<br /><br />
+                    Les données applicatives sont stockées via la plateforme <strong style={{ color: t.text }}>Supabase Inc.</strong> sur des serveurs situés en Union Européenne (Région Frankfurt, Allemagne), garantissant ainsi la conformité avec le RGPD.
+                  </Article>
+                  <div style={{ height: 0.5, background: t.border }} />
+                  <Article numero="3" titre="Propriété intellectuelle">
+                    L'ensemble de ce site, ainsi que les produits numériques (guides, fichiers Excel, formations) vendus sous la marque Start Invest, relèvent de la législation française et internationale sur le droit d'auteur et la propriété intellectuelle. Tous les droits de reproduction sont réservés. Toute extraction et/ou reproduction de tout ou partie des informations diffusées sur le site est interdite sans l'autorisation expresse et préalable de l'éditeur.
+                  </Article>
+                  <div style={{ height: 0.5, background: t.border }} />
+                  <Article numero="4" titre="Données personnelles">
+                    Le stockage des données applicatives (calculs de budget et investissements) est assuré par la société Supabase Inc. dont les serveurs sont situés en Europe (Région AWS Frankfurt).
+                  </Article>
+                </SectionLegale>
+
+                {/* CGV */}
+                <SectionLegale titre="Conditions Générales de Vente (CGV)" open={showCGV} onToggle={() => setShowCGV(v => !v)}>
+                  <Article numero="1" titre="Objet">
+                    Les présentes CGV régissent de manière exclusive les relations contractuelles entre l'entreprise START_INVEST et toute personne physique ou morale procédant à l'achat de produits numériques (guides, formations vidéo) ou à l'accès à l'application web de gestion financière sur le site www.start-invest.fr.
+                  </Article>
+                  <div style={{ height: 0.5, background: t.border }} />
+                  <Article numero="2" titre="Prix et paiement">
+                    Les prix sont indiqués en Euros (€). TVA non applicable en tant qu'Entrepreneur Individuel (article 293 B du CGI). Le paiement est exigible immédiatement à la commande via carte bancaire par les plateformes sécurisées Stripe ou PayPal. L'Éditeur n'a jamais accès aux coordonnées bancaires du Client.
+                  </Article>
+                  <div style={{ height: 0.5, background: t.border }} />
+                  <Article numero="3" titre="Livraison des produits numériques">
+                    Le contenu (formation, guides et accès à l'application web) est livré par voie électronique immédiatement après la validation du paiement. Le Client reçoit ses accès par e-mail à l'adresse renseignée lors de la commande.
+                  </Article>
+                  <div style={{ height: 0.5, background: t.border }} />
+                  <Article numero="4" titre="Accès et maintenance">
+                    L'Éditeur s'efforce d'assurer un accès à l'application 24h/24 et 7j/7. L'accès peut être temporairement suspendu pour des raisons de maintenance. L'accès est garanti pour une durée illimitée, sauf en cas d'arrêt définitif du service, auquel cas un préavis de 3 mois sera communiqué au Client.
+                  </Article>
+                  <div style={{ height: 0.5, background: t.border }} />
+                  <Article numero="5" titre="Droit de rétractation">
+                    Conformément à l'article L221-28 du Code de la consommation, le droit de rétractation ne peut être exercé pour les contenus numériques dont l'exécution a commencé après accord préalable exprès du consommateur. En validant sa commande, le Client accepte l'accès immédiat au contenu et renonce expressément à son droit de rétractation.
+                  </Article>
+                  <div style={{ height: 0.5, background: t.border }} />
+                  <Article numero="6" titre="Responsabilité et avertissement légal">
+                    Start Invest fournit des informations, des méthodes et des outils de calcul à titre purement éducatif et pédagogique. L'Éditeur n'est pas Conseiller en Investissement Financier (CIF). Les informations présentées ne constituent en aucun cas un conseil en investissement. L'investissement comporte des risques de perte en capital. Le Client est seul responsable de ses décisions financières.
+                  </Article>
+                  <div style={{ height: 0.5, background: t.border }} />
+                  <Article numero="7" titre="Propriété intellectuelle">
+                    Tous les éléments du site et de l'application (textes, logos, codes sources, calculateurs, vidéos) sont et restent la propriété intellectuelle exclusive de START_INVEST. Toute reproduction, exploitation ou utilisation sans accord préalable est strictement interdite.
+                  </Article>
+                  <div style={{ height: 0.5, background: t.border }} />
+                  <Article numero="8" titre="Droit applicable">
+                    Les présentes CGV sont soumises à la loi française. En cas de litige, et après tentative de résolution amiable, compétence est donnée aux tribunaux français compétents.
+                  </Article>
+                </SectionLegale>
+
+                {/* POLITIQUE DE CONFIDENTIALITÉ */}
+                <SectionLegale titre="Politique de confidentialité" open={showConfidentialite} onToggle={() => setShowConfidentialite(v => !v)}>
+                  <Article numero="1" titre="Collecte des données">
+                    Les chiffres que vous saisissez dans vos outils de gestion (dépenses, montants d'investissement) sont strictement personnels et ne sont jamais partagés avec des tiers. Ils sont chiffrés et ne servent qu'à votre propre consultation au sein de l'application.
+                  </Article>
+                  <div style={{ height: 0.5, background: t.border }} />
+                  <Article numero="2" titre="Utilisation des données">
+                    Nous n'utilisons aucun traceur publicitaire tiers et ne revendons jamais vos informations à des partenaires commerciaux.
+                  </Article>
+                  <div style={{ height: 0.5, background: t.border }} />
+                  <Article numero="3" titre="Données de contact">
+                    Vos informations d'identification (nom, e-mail) sont conservées tant que vous restez inscrit. Pour supprimer définitivement votre compte et l'intégralité de vos données de calcul (budgets, investissements), vous pouvez vous rendre dans l'onglet Paramètres de l'application et cliquer sur "Supprimer mon compte".
+                  </Article>
+                  <div style={{ height: 0.5, background: t.border }} />
+                  <Article numero="4" titre="Données applicatives">
+                    Vos données de calcul (budgets, simulateurs, journal d'investissement) sont conservées pendant toute la durée de vie de votre compte Start Invest. En cas d'inactivité prolongée de plus de 24 mois, ou sur simple demande de votre part, ces données seront définitivement supprimées de nos serveurs sécurisés.
+                  </Article>
+                  <div style={{ height: 0.5, background: t.border }} />
+                  <Article numero="5" titre="Sécurité et stockage">
+                    Vos données d'identification (nom, e-mail) et vos données d'utilisation de l'application (calculs de budget, simulateurs) sont stockées de manière sécurisée. Nous utilisons les services de Supabase Inc. (infrastructure AWS située en Europe, région Frankfurt) pour la base de données, et Vercel Inc. pour l'hébergement de l'interface.
+                  </Article>
+                </SectionLegale>
+
                 <div style={{ height: 0.5, background: t.border }} />
-                <div>
-                  <div style={{ fontSize: 11, fontWeight: 500, color: t.text, textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 6 }}>Avertissement financier</div>
-                  <div style={{ fontSize: 12, color: t.textMuted, lineHeight: 1.6 }}>Les informations fournies ont un caractère purement informatif. Elles ne constituent pas un conseil en investissement. Investir comporte des risques de perte en capital.</div>
+                <div style={{ fontSize: 11, color: t.textMuted, textAlign: 'center' }}>
+                  StartInvest · v1.0 · © {new Date().getFullYear()} Tous droits réservés
                 </div>
-                <div style={{ height: 0.5, background: t.border }} />
-                <div>
-                  <div style={{ fontSize: 11, fontWeight: 500, color: t.text, textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 6 }}>Contact</div>
-                  <div style={{ fontSize: 12, color: t.textMuted, lineHeight: 1.6 }}>contact@startinvest.fr</div>
-                </div>
-                <div style={{ height: 0.5, background: t.border }} />
-                <div style={{ fontSize: 11, color: t.textMuted, textAlign: 'center' }}>StartInvest · v1.0 · © {new Date().getFullYear()} Tous droits réservés</div>
               </div>
             )}
           </div>
