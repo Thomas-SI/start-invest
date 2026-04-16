@@ -132,7 +132,12 @@ export default function Investissement() {
 
   const handleEditTxStart = (tx) => {
     setEditingTxId(tx.id)
-    setEditTxForm({ date: tx.date, quantite: tx.quantite, prix_unitaire: tx.prix_unitaire, frais_courtage: tx.frais_courtage || 0 })
+    setEditTxForm({
+      date: tx.date ? tx.date.substring(0, 10) : new Date().toISOString().split('T')[0],
+      quantite: tx.quantite,
+      prix_unitaire: tx.prix_unitaire,
+      frais_courtage: tx.frais_courtage || 0
+    })
   }
 
   const handleEditTxSave = async (tx) => {
@@ -403,7 +408,12 @@ export default function Investissement() {
                         {isEditing ? (
                           <>
                             <td style={{ padding: '6px 8px' }}>
-                              <input type="date" value={editTxForm.date} onChange={e => setEditTxForm({ ...editTxForm, date: e.target.value })} style={{ ...inputEditStyle, width: 110 }} />
+                              <input
+                                type="date"
+                                value={editTxForm.date}
+                                onChange={e => setEditTxForm({ ...editTxForm, date: e.target.value })}
+                                style={{ ...inputEditStyle, width: 120 }}
+                              />
                             </td>
                             <td style={{ padding: '8px 12px', fontWeight: 500, color: bleu }}>{tx.ticker}</td>
                             <td style={{ padding: '8px 12px' }}>
