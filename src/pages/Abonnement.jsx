@@ -10,7 +10,7 @@ const plans = [
     id: 'gratuit', nom: 'Gratuit', actuel: true,
     prixMensuel: '0€', prixAnnuel: '0€',
     periodeMensuel: 'pour toujours', periodeAnnuel: 'pour toujours',
-    pages: ['Mes Finances', 'Concentration', 'Abonnement', 'Compte'],
+    pages: ['Mes Finances', 'Challenge', 'Abonnement', 'Compte'],
     features: [
       { label: 'Suivi finances de base', inclus: true },
       { label: 'Simulateur DCA basique', inclus: true },
@@ -26,7 +26,7 @@ const plans = [
     id: 'premium', nom: 'Premium', actuel: false, recommande: true,
     prixMensuel: '7.99€', prixAnnuel: '67€',
     periodeMensuel: 'par mois', periodeAnnuel: 'par an · économisez 29%',
-    pages: ['Mes Finances', 'Portefeuille', 'Investissement', 'Croissance', 'Concentration', 'Abonnement', 'Guide', 'Compte'],
+    pages: ['Mes Finances', 'Portefeuille', 'Investissement', 'Croissance', 'Challenge', 'Abonnement', 'Guide', 'Compte'],
     features: [
       { label: 'Suivi finances complet', inclus: true },
       { label: 'Simulateur DCA avancé', inclus: true },
