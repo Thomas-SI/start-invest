@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import Navbar from '../components/Navbar'
+import FooterApp from '../components/FooterApp'
 import { useTheme } from '../lib/ThemeContext'
 
 function simulerDCA(capitalInitial, versementMensuel, tauxAnnuel, dureeAnnees) {
@@ -165,6 +166,7 @@ export default function Croissance() {
           </div>
         </div>
       </div>
+      <FooterApp />
     </div>
   )
 }

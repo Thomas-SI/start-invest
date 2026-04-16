@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import Navbar from '../components/Navbar'
+import FooterApp from '../components/FooterApp'
 import { useTheme } from '../lib/ThemeContext'
 
 export default function Compte() {
@@ -321,6 +322,7 @@ export default function Compte() {
 
         </div>
       </div>
+      <FooterApp />
     </div>
   )
 }

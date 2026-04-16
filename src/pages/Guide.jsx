@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useTheme } from '../lib/ThemeContext'
 import Navbar from '../components/Navbar'
+import FooterApp from '../components/FooterApp'
 
 const PDF_URL = 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/Guide%20Start%20Invest%20V2.pdf'
 
@@ -176,6 +177,7 @@ export default function Guide() {
         </div>
 
       </div>
+      <FooterApp />
     </div>
   )
 }

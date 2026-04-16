@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 import Navbar from '../components/Navbar'
+import FooterApp from '../components/FooterApp'
 import { useTheme } from '../lib/ThemeContext'
 
 const METRONOME_URL = 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/AB94501C-5932-4B4C-93F1-D1CD5A4BAA25.png'
@@ -600,6 +601,7 @@ export default function Challenge() {
           onClose={() => setPositionOpen(false)}
         />
       )}
+      <FooterApp />
     </div>
   )
 }

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 import Navbar from '../components/Navbar'
+import FooterApp from '../components/FooterApp'
 import { useTheme } from '../lib/ThemeContext'
 
 const moisListe = ['Mensuel', 'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
@@ -602,6 +603,7 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+      <FooterApp />
     </div>
   )
 }

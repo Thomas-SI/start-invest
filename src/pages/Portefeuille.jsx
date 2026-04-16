@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 import Navbar from '../components/Navbar'
+import FooterApp from '../components/FooterApp'
 import { useTheme } from '../lib/ThemeContext'
 
 const COMPTES_PREDEFINIS = [
@@ -469,6 +470,7 @@ export default function Portefeuille() {
         </div>
 
       </div>
+      <FooterApp />
     </div>
   )
 }
