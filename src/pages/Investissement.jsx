@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 import Navbar from '../components/Navbar'
 import { useTheme } from '../lib/ThemeContext'
+import FooterApp from '../components/FooterApp'
 
 const ENVELOPPES = ['CTO', 'PEA', 'Assurance-vie']
 const TYPES_ETF = ['Capitalisant', 'Distribuant']
@@ -10,13 +11,13 @@ const TYPES = ['Achat', 'Vente']
 
 const ENVELOPPE_LABELS = {
   'CTO': 'Compte-Titres Ordinaire (CTO)',
-  'PEA': "Plan d'Épargne en Actions (PEA)",
+  'PEA': "Plan d'Epargne en Actions (PEA)",
   'Assurance-vie': 'Assurance-vie',
 }
 
 const fetchInvestissementData = async () => {
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('Non connecté')
+  if (!user) throw new Error('Non connecte')
   const [invRes, txRes, compRes] = await Promise.all([
     supabase.from('investissements').select('*').eq('user_id', user.id).order('ticker', { ascending: true }),
     supabase.from('transactions').select('*').eq('user_id', user.id).order('date', { ascending: false }),
@@ -94,9 +95,9 @@ export default function Investissement() {
 
   const handleAdd = async () => {
     if (loading) return
-    if (!form.ticker || !form.quantite || !form.prix_achat_unitaire) { setErreur('Veuillez remplir le ticker, la quantité et le prix unitaire.'); return }
-    if (parseFloat(form.quantite) <= 0) { setErreur('La quantité doit être supérieure à 0.'); return }
-    if (parseFloat(form.prix_achat_unitaire) <= 0) { setErreur('Le prix unitaire doit être supérieur à 0.'); return }
+    if (!form.ticker || !form.quantite || !form.prix_achat_unitaire) { setErreur('Veuillez remplir le ticker, la quantite et le prix unitaire.'); return }
+    if (parseFloat(form.quantite) <= 0) { setErreur('La quantite doit etre superieure a 0.'); return }
+    if (parseFloat(form.prix_achat_unitaire) <= 0) { setErreur('Le prix unitaire doit etre superieur a 0.'); return }
     setLoading(true); setErreur(null)
     try {
       const ticker = form.ticker.toUpperCase()
@@ -104,7 +105,7 @@ export default function Investissement() {
       const prixUnitaire = parseFloat(form.prix_achat_unitaire)
       const frais = parseFloat(form.frais_courtage) || 0
       const { error: txError } = await supabase.from('transactions').insert({ user_id: user.id, date: form.date, ticker, enveloppe: form.enveloppe, type: form.type, quantite, prix_unitaire: prixUnitaire, frais_courtage: frais })
-      if (txError) throw new Error('Erreur lors de l\'enregistrement de la transaction.')
+      if (txError) throw new Error('Erreur lors de l enregistrement de la transaction.')
       const { data: existingPositions } = await supabase.from('investissements').select('*').eq('user_id', user.id).eq('ticker', ticker).eq('enveloppe', form.enveloppe)
       const existing = existingPositions?.[0]
       if (existing) {
@@ -114,10 +115,10 @@ export default function Investissement() {
         if (form.type === 'Achat') { nouvelleQuantite = ancienneQuantite + quantite; nouveauPru = ((ancienneQuantite * ancienPru) + (quantite * prixUnitaire)) / nouvelleQuantite }
         else { nouvelleQuantite = ancienneQuantite - quantite; nouveauPru = ancienPru }
         const { error } = await supabase.from('investissements').update({ quantite: nouvelleQuantite, pru: Math.round(nouveauPru * 10000) / 10000 }).eq('id', existing.id)
-        if (error) throw new Error('Erreur lors de la mise à jour de la position.')
+        if (error) throw new Error('Erreur lors de la mise a jour de la position.')
       } else {
         const { error } = await supabase.from('investissements').insert({ user_id: user.id, date: form.date, ticker, actif: form.actif, enveloppe: form.enveloppe, type_etf: form.type_etf, type: form.type, quantite, prix_achat_unitaire: prixUnitaire, pru: prixUnitaire, prix_actuel: prixUnitaire, ter: parseFloat(form.ter) || 0, frais_courtage: frais, cible: 0 })
-        if (error) throw new Error('Erreur lors de la création de la position.')
+        if (error) throw new Error('Erreur lors de la creation de la position.')
       }
       queryClient.invalidateQueries({ queryKey: ['investissement'] })
       setForm({ date: new Date().toISOString().split('T')[0], ticker: '', actif: '', enveloppe: 'PEA', type_etf: 'Capitalisant', type: 'Achat', quantite: '', prix_achat_unitaire: '', ter: '', frais_courtage: '' })
@@ -134,34 +135,66 @@ export default function Investissement() {
     setEditingTxId(tx.id)
     setEditTxForm({
       date: tx.date ? tx.date.substring(0, 10) : new Date().toISOString().split('T')[0],
-      quantite: tx.quantite,
-      prix_unitaire: tx.prix_unitaire,
-      frais_courtage: tx.frais_courtage || 0
+      quantite: String(tx.quantite),
+      prix_unitaire: String(tx.prix_unitaire),
+      frais_courtage: String(tx.frais_courtage || 0),
     })
   }
 
   const handleEditTxSave = async (tx) => {
     if (loading) return
     setLoading(true)
+    setErreur(null)
     try {
-      const { error } = await supabase.from('transactions').update({
-        date: editTxForm.date,
-        quantite: parseFloat(editTxForm.quantite),
-        prix_unitaire: parseFloat(editTxForm.prix_unitaire),
-        frais_courtage: parseFloat(editTxForm.frais_courtage) || 0,
+      const newDate = editTxForm.date
+      const newQuantite = parseFloat(editTxForm.quantite)
+      const newPrix = parseFloat(editTxForm.prix_unitaire)
+      const newFrais = parseFloat(editTxForm.frais_courtage) || 0
+
+      if (isNaN(newQuantite) || newQuantite <= 0) throw new Error('Quantite invalide.')
+      if (isNaN(newPrix) || newPrix <= 0) throw new Error('Prix invalide.')
+
+      // 1. Mettre a jour la transaction en base
+      const { error: updateError } = await supabase.from('transactions').update({
+        date: newDate,
+        quantite: newQuantite,
+        prix_unitaire: newPrix,
+        frais_courtage: newFrais,
       }).eq('id', tx.id)
-      if (error) throw new Error('Erreur lors de la modification.')
-      const allTx = transactions.map(t => t.id === tx.id ? { ...t, ...editTxForm, quantite: parseFloat(editTxForm.quantite), prix_unitaire: parseFloat(editTxForm.prix_unitaire) } : t)
-      const txMemePos = allTx.filter(t => t.ticker === tx.ticker && t.enveloppe === tx.enveloppe)
-      let quantiteTotale = 0, coutTotal = 0
-      for (const t of txMemePos) {
-        if (t.type === 'Achat') { quantiteTotale += parseFloat(t.quantite); coutTotal += parseFloat(t.quantite) * parseFloat(t.prix_unitaire) }
-        else quantiteTotale -= parseFloat(t.quantite)
+      if (updateError) throw new Error('Erreur lors de la modification: ' + updateError.message)
+
+      // 2. Recharger toutes les transactions de cette position depuis Supabase
+      const { data: freshTx, error: fetchError } = await supabase
+        .from('transactions')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('ticker', tx.ticker)
+        .eq('enveloppe', tx.enveloppe)
+      if (fetchError) throw new Error('Erreur lors du rechargement.')
+
+      // 3. Recalculer quantite totale et PRU
+      let quantiteTotale = 0
+      let coutTotal = 0
+      for (const t of (freshTx || [])) {
+        const q = parseFloat(t.quantite)
+        const p = parseFloat(t.prix_unitaire)
+        if (t.type === 'Achat') { quantiteTotale += q; coutTotal += q * p }
+        else { quantiteTotale -= q }
       }
       const nouveauPru = quantiteTotale > 0 ? Math.round((coutTotal / quantiteTotale) * 10000) / 10000 : 0
-      await supabase.from('investissements').update({ quantite: quantiteTotale, pru: nouveauPru }).eq('user_id', user.id).eq('ticker', tx.ticker).eq('enveloppe', tx.enveloppe)
+
+      // 4. Mettre a jour la position
+      const { error: posError } = await supabase.from('investissements')
+        .update({ quantite: quantiteTotale, pru: nouveauPru })
+        .eq('user_id', user.id)
+        .eq('ticker', tx.ticker)
+        .eq('enveloppe', tx.enveloppe)
+      if (posError) throw new Error('Erreur lors de la mise a jour de la position.')
+
       queryClient.invalidateQueries({ queryKey: ['investissement'] })
       setEditingTxId(null)
+      setSucces(true)
+      setTimeout(() => setSucces(false), 3000)
     } catch (e) {
       setErreur(e.message)
     } finally {
@@ -191,7 +224,7 @@ export default function Investissement() {
         queryClient.invalidateQueries({ queryKey: ['investissement'] })
         setConfirmDeleteId(null)
       } catch (e) {
-        setErreur('Erreur lors de la suppression. Veuillez réessayer.')
+        setErreur('Erreur lors de la suppression. Veuillez reessayer.')
       }
     } else {
       setConfirmDeleteId(id)
@@ -214,9 +247,9 @@ export default function Investissement() {
       <Navbar page="Investissement" />
       <div style={{ padding: '16px 20px', flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
 
-        {succes && <div style={{ background: '#EAF6E4', border: '0.5px solid #4CAF2E', borderRadius: 8, padding: '10px 14px', fontSize: 12, color: '#2E7D1E', fontWeight: 500 }}>✓ Transaction enregistrée avec succès !</div>}
+        {succes && <div style={{ background: '#EAF6E4', border: '0.5px solid #4CAF2E', borderRadius: 8, padding: '10px 14px', fontSize: 12, color: '#2E7D1E', fontWeight: 500 }}>Transaction modifiee avec succes !</div>}
+        {erreur && <div style={{ background: '#FCEBEB', border: '0.5px solid #E24B4A', borderRadius: 8, padding: '10px 14px', fontSize: 12, color: '#E24B4A' }}>⚠️ {erreur}</div>}
 
-        {/* ALLOCATIONS PAR ENVELOPPE */}
         {enveloppesActives.length > 0 && (
           <>
             <div style={{ fontSize: 14, fontWeight: 500, color: t.text }}>Allocations par enveloppe</div>
@@ -269,7 +302,7 @@ export default function Investissement() {
                                       </div>
                                     </td>
                                     <td style={{ padding: '10px 14px', fontWeight: 500, color: diff > 0 ? '#4CAF2E' : diff < 0 ? '#E24B4A' : t.textMuted }}>
-                                      {pctCible > 0 ? (diff === 0 ? '✓ OK' : `${diff > 0 ? '+' : ''}${diff} titres`) : '—'}
+                                      {pctCible > 0 ? (diff === 0 ? 'OK' : `${diff > 0 ? '+' : ''}${diff} titres`) : '—'}
                                     </td>
                                   </tr>
                                 )
@@ -306,7 +339,6 @@ export default function Investissement() {
           </>
         )}
 
-        {/* CARTES RÉSUMÉ */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0,1fr))', gap: 10 }}>
           {[
             ['Total investi', `${Math.round(totalInvesti).toLocaleString('fr-FR')} €`, t.text],
@@ -321,15 +353,14 @@ export default function Investissement() {
           ))}
         </div>
 
-        {/* JOURNAL */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ fontSize: 14, fontWeight: 500, color: t.text }}>Journal d'investissement</div>
+          <div style={{ fontSize: 14, fontWeight: 500, color: t.text }}>Journal d investissement</div>
           <div style={{ display: 'flex', gap: 8 }}>
             <button onClick={() => setShowJournal(v => !v)} style={{ background: t.bgSecondary, color: t.text, fontSize: 11, padding: '5px 12px', borderRadius: 8, border: `0.5px solid ${t.border}`, cursor: 'pointer', fontFamily: 'inherit' }}>
-              {showJournal ? '− Masquer' : '+ Afficher'}
+              {showJournal ? 'Masquer' : 'Afficher'}
             </button>
             <button onClick={() => { setShowAdd(v => !v); setErreur(null) }} style={{ background: '#4CAF2E', color: '#fff', fontSize: 12, fontWeight: 500, padding: '7px 14px', borderRadius: 8, border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
-              {showAdd ? '− Fermer' : '+ Ajouter'}
+              {showAdd ? 'Fermer' : '+ Ajouter'}
             </button>
           </div>
         </div>
@@ -337,7 +368,6 @@ export default function Investissement() {
         {showAdd && (
           <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: 16 }}>
             <div style={{ fontSize: 12, fontWeight: 500, color: t.text, marginBottom: 12 }}>Nouvel achat / vente</div>
-            {erreur && <div style={{ background: '#FCEBEB', border: '0.5px solid #E24B4A', borderRadius: 8, padding: '8px 12px', fontSize: 12, color: '#E24B4A', marginBottom: 12 }}>⚠️ {erreur}</div>}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, minmax(0,1fr))', gap: 10, marginBottom: 10 }}>
               <div><div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Date</div><input type="date" value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} style={inputStyle} /></div>
               <div><div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Ticker *</div><input placeholder="ex: PE500" value={form.ticker} onChange={e => handleTickerChange(e.target.value)} style={inputStyle} /></div>
@@ -349,7 +379,7 @@ export default function Investissement() {
                 </select>
               </div>
               <div>
-                <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Type d'ETF</div>
+                <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Type ETF</div>
                 <select value={form.type_etf} onChange={e => setForm({ ...form, type_etf: e.target.value })} style={inputStyle}>
                   {TYPES_ETF.map(e => <option key={e} value={e}>{e}</option>)}
                 </select>
@@ -362,17 +392,17 @@ export default function Investissement() {
                   {TYPES.map(e => <option key={e} value={e}>{e}</option>)}
                 </select>
               </div>
-              <div><div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Quantité *</div><input type="number" min="0" placeholder="ex: 10" value={form.quantite} onChange={e => setForm({ ...form, quantite: e.target.value })} style={inputStyle} /></div>
-              <div><div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Prix unitaire (€) *</div><input type="number" min="0" placeholder="ex: 48.10" value={form.prix_achat_unitaire} onChange={e => setForm({ ...form, prix_achat_unitaire: e.target.value })} style={inputStyle} /></div>
+              <div><div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Quantite *</div><input type="number" min="0" placeholder="ex: 10" value={form.quantite} onChange={e => setForm({ ...form, quantite: e.target.value })} style={inputStyle} /></div>
+              <div><div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Prix unitaire (euros) *</div><input type="number" min="0" placeholder="ex: 48.10" value={form.prix_achat_unitaire} onChange={e => setForm({ ...form, prix_achat_unitaire: e.target.value })} style={inputStyle} /></div>
               <div><div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>TER (%)</div><input type="number" min="0" placeholder="ex: 0.25" value={form.ter} onChange={e => setForm({ ...form, ter: e.target.value })} style={inputStyle} /></div>
-              <div><div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Frais courtage (€)</div><input type="number" min="0" placeholder="ex: 2.22" value={form.frais_courtage} onChange={e => setForm({ ...form, frais_courtage: e.target.value })} style={inputStyle} /></div>
+              <div><div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Frais courtage (euros)</div><input type="number" min="0" placeholder="ex: 2.22" value={form.frais_courtage} onChange={e => setForm({ ...form, frais_courtage: e.target.value })} style={inputStyle} /></div>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div style={{ fontSize: 10, color: t.textMuted }}>* Champs obligatoires</div>
               <div style={{ display: 'flex', gap: 8 }}>
                 <button onClick={() => { setShowAdd(false); setErreur(null) }} style={{ padding: '7px 14px', borderRadius: 8, border: `0.5px solid ${t.border}`, background: t.bgSecondary, fontSize: 12, cursor: 'pointer', fontFamily: 'inherit', color: t.text }}>Annuler</button>
                 <button onClick={handleAdd} disabled={loading} style={{ padding: '7px 14px', borderRadius: 8, border: 'none', background: loading ? '#9CA3AF' : '#4CAF2E', color: '#fff', fontSize: 12, fontWeight: 500, cursor: loading ? 'not-allowed' : 'pointer', fontFamily: 'inherit' }}>
-                  {loading ? '⏳ Sauvegarde...' : 'Ajouter'}
+                  {loading ? 'Sauvegarde...' : 'Ajouter'}
                 </button>
               </div>
             </div>
@@ -382,14 +412,14 @@ export default function Investissement() {
         {showJournal && (
           transactions.length === 0 ? (
             <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: '40px', textAlign: 'center', color: t.textMuted, fontSize: 12 }}>
-              Aucun achat enregistré — cliquez sur "+ Ajouter" pour enregistrer votre premier achat
+              Aucun achat enregistre — cliquez sur Ajouter pour enregistrer votre premier achat
             </div>
           ) : (
             <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, overflow: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, minWidth: 1000 }}>
                 <thead>
                   <tr style={{ background: t.bgSecondary }}>
-                    {['Date', 'Ticker', 'Enveloppe', 'Type', 'Quantité', 'Prix achat', 'Prix actuel', 'Frais', 'Coût total', 'Valeur actuelle', ''].map(h => (
+                    {['Date', 'Ticker', 'Enveloppe', 'Type', 'Quantite', 'Prix achat', 'Prix actuel', 'Frais', 'Cout total', 'Valeur actuelle', ''].map(h => (
                       <th key={h} style={{ padding: '8px 12px', textAlign: 'left', fontSize: 10, color: t.textMuted, fontWeight: 500, borderBottom: `0.5px solid ${t.border}`, whiteSpace: 'nowrap' }}>{h}</th>
                     ))}
                   </tr>
@@ -408,12 +438,7 @@ export default function Investissement() {
                         {isEditing ? (
                           <>
                             <td style={{ padding: '6px 8px' }}>
-                              <input
-                                type="date"
-                                value={editTxForm.date}
-                                onChange={e => setEditTxForm({ ...editTxForm, date: e.target.value })}
-                                style={{ ...inputEditStyle, width: 120 }}
-                              />
+                              <input type="date" value={editTxForm.date} onChange={e => setEditTxForm({ ...editTxForm, date: e.target.value })} style={{ ...inputEditStyle, width: 120 }} />
                             </td>
                             <td style={{ padding: '8px 12px', fontWeight: 500, color: bleu }}>{tx.ticker}</td>
                             <td style={{ padding: '8px 12px' }}>
@@ -436,8 +461,10 @@ export default function Investissement() {
                             <td style={{ padding: '8px 12px', color: t.textMuted, fontSize: 11 }}>—</td>
                             <td style={{ padding: '6px 8px' }}>
                               <div style={{ display: 'flex', gap: 4 }}>
-                                <button onClick={() => handleEditTxSave(tx)} disabled={loading} style={{ background: '#EAF6E4', color: '#2E7D1E', border: 'none', borderRadius: 5, padding: '2px 7px', fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>✓</button>
-                                <button onClick={() => setEditingTxId(null)} style={{ background: t.bgSecondary, color: t.textMuted, border: `0.5px solid ${t.border}`, borderRadius: 5, padding: '2px 7px', fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>✕</button>
+                                <button onClick={() => handleEditTxSave(tx)} disabled={loading} style={{ background: '#EAF6E4', color: '#2E7D1E', border: 'none', borderRadius: 5, padding: '2px 7px', fontSize: 11, cursor: loading ? 'not-allowed' : 'pointer', fontFamily: 'inherit' }}>
+                                  {loading ? '...' : 'OK'}
+                                </button>
+                                <button onClick={() => { setEditingTxId(null); setErreur(null) }} style={{ background: t.bgSecondary, color: t.textMuted, border: `0.5px solid ${t.border}`, borderRadius: 5, padding: '2px 7px', fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>X</button>
                               </div>
                             </td>
                           </>
@@ -452,19 +479,19 @@ export default function Investissement() {
                               <span style={{ fontSize: 10, fontWeight: 500, padding: '2px 8px', borderRadius: 20, background: tx.type === 'Achat' ? '#EAF6E4' : '#FCEBEB', color: tx.type === 'Achat' ? '#2E7D1E' : '#E24B4A' }}>{tx.type}</span>
                             </td>
                             <td style={{ padding: '8px 12px', color: t.text }}>{tx.quantite}</td>
-                            <td style={{ padding: '8px 12px', color: t.text }}>{parseFloat(tx.prix_unitaire).toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €</td>
-                            <td style={{ padding: '8px 12px', color: t.text }}>{prixActuel.toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €</td>
-                            <td style={{ padding: '8px 12px', color: t.textSecondary }}>{parseFloat(tx.frais_courtage || 0).toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €</td>
-                            <td style={{ padding: '8px 12px', fontWeight: 500, color: t.text }}>{Math.round(coutTotal).toLocaleString('fr-FR')} €</td>
+                            <td style={{ padding: '8px 12px', color: t.text }}>{parseFloat(tx.prix_unitaire).toLocaleString('fr-FR', { minimumFractionDigits: 2 })} euros</td>
+                            <td style={{ padding: '8px 12px', color: t.text }}>{prixActuel.toLocaleString('fr-FR', { minimumFractionDigits: 2 })} euros</td>
+                            <td style={{ padding: '8px 12px', color: t.textSecondary }}>{parseFloat(tx.frais_courtage || 0).toLocaleString('fr-FR', { minimumFractionDigits: 2 })} euros</td>
+                            <td style={{ padding: '8px 12px', fontWeight: 500, color: t.text }}>{Math.round(coutTotal).toLocaleString('fr-FR')} euros</td>
                             <td style={{ padding: '8px 12px', fontWeight: 500, color: plusValueTx >= 0 ? '#4CAF2E' : '#E24B4A' }}>
-                              {Math.round(valeurActuelleTx).toLocaleString('fr-FR')} €
-                              <span style={{ fontSize: 10, marginLeft: 4 }}>({plusValueTx >= 0 ? '+' : ''}{Math.round(plusValueTx).toLocaleString('fr-FR')} €)</span>
+                              {Math.round(valeurActuelleTx).toLocaleString('fr-FR')} euros
+                              <span style={{ fontSize: 10, marginLeft: 4 }}>({plusValueTx >= 0 ? '+' : ''}{Math.round(plusValueTx).toLocaleString('fr-FR')} euros)</span>
                             </td>
                             <td style={{ padding: '8px 12px' }}>
                               <div style={{ display: 'flex', gap: 4 }}>
-                                <button onClick={() => handleEditTxStart(tx)} style={{ background: t.bgSecondary, color: t.textMuted, border: `0.5px solid ${t.border}`, borderRadius: 5, padding: '2px 7px', fontSize: 10, cursor: 'pointer', fontFamily: 'inherit' }}>✏️</button>
+                                <button onClick={() => handleEditTxStart(tx)} style={{ background: t.bgSecondary, color: t.textMuted, border: `0.5px solid ${t.border}`, borderRadius: 5, padding: '2px 7px', fontSize: 10, cursor: 'pointer', fontFamily: 'inherit' }}>edit</button>
                                 <button onClick={() => handleDeleteTransaction(tx.id)} style={{ background: confirmDeleteId === tx.id ? '#E24B4A' : '#FCEBEB', color: confirmDeleteId === tx.id ? '#fff' : '#E24B4A', border: 'none', borderRadius: 5, padding: '2px 7px', fontSize: 10, cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap', transition: 'all 0.15s' }}>
-                                  {confirmDeleteId === tx.id ? 'Confirmer ?' : '×'}
+                                  {confirmDeleteId === tx.id ? 'Confirmer ?' : 'x'}
                                 </button>
                               </div>
                             </td>
@@ -479,6 +506,7 @@ export default function Investissement() {
           )
         )}
       </div>
+      <FooterApp />
     </div>
   )
 }
