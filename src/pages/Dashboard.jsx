@@ -47,7 +47,7 @@ function simulerDCA(versement, capitalInitial, taux, annees) {
   return { labels, investi, interets, final: Math.round(capital) }
 }
 
-function PopupSimulateur({ versement, onClose }) {
+function PopupSimulateur({ versement, onClose, isMobile }) {
   const canvasRef = useRef(null)
   const chartRef = useRef(null)
   const [duree, setDuree] = useState(10)
@@ -87,8 +87,8 @@ function PopupSimulateur({ versement, onClose }) {
   const totalInterets = final - totalInvesti
 
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200 }}>
-      <div style={{ background: '#fff', borderRadius: 16, padding: 24, width: 560, border: '0.5px solid #E0EAE3', maxHeight: '90vh', overflow: 'auto' }}>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200, padding: isMobile ? 12 : 0 }}>
+      <div style={{ background: '#fff', borderRadius: 16, padding: isMobile ? 16 : 24, width: '100%', maxWidth: 560, border: '0.5px solid #E0EAE3', maxHeight: '90vh', overflow: 'auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
           <div>
             <div style={{ fontSize: 15, fontWeight: 500, color: '#1B2E4B' }}>Projection de croissance</div>
@@ -101,7 +101,7 @@ function PopupSimulateur({ versement, onClose }) {
             <div key={d} onClick={() => setDuree(d)} style={{ fontSize: 12, fontWeight: 500, padding: '5px 14px', borderRadius: 20, cursor: 'pointer', background: duree === d ? '#1B2E4B' : '#F4F7F5', color: duree === d ? '#fff' : '#6B7280', border: '0.5px solid #E0EAE3' }}>{d} ans</div>
           ))}
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0,1fr))', gap: 10, marginBottom: 16 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, minmax(0,1fr))', gap: 10, marginBottom: 16 }}>
           {[['Total investi', `${totalInvesti.toLocaleString('fr-FR')} €`, '#1B2E4B'], ['Capital final', `${final.toLocaleString('fr-FR')} €`, '#4CAF2E'], ['Intérêts générés', `+${totalInterets.toLocaleString('fr-FR')} €`, '#4CAF2E']].map(([l, v, c]) => (
             <div key={l} style={{ background: '#F4F7F5', borderRadius: 10, padding: 12 }}>
               <div style={{ fontSize: 10, color: '#9CA3AF', marginBottom: 4 }}>{l}</div>
@@ -110,7 +110,7 @@ function PopupSimulateur({ versement, onClose }) {
           ))}
         </div>
         {ready ? <div style={{ position: 'relative', height: 220 }}><canvas ref={canvasRef} /></div> : <div style={{ height: 220, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9CA3AF', fontSize: 12 }}>Chargement...</div>}
-        <div style={{ display: 'flex', gap: 16, marginTop: 10 }}>
+        <div style={{ display: 'flex', gap: 16, marginTop: 10, flexWrap: 'wrap' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: '#9CA3AF' }}><div style={{ width: 10, height: 10, borderRadius: 2, background: '#E3F0FF' }} />Capital investi</div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: '#9CA3AF' }}><div style={{ width: 10, height: 10, borderRadius: 2, background: '#4CAF2E' }} />Intérêts composés</div>
         </div>
@@ -119,7 +119,7 @@ function PopupSimulateur({ versement, onClose }) {
   )
 }
 
-function ModalDepenses({ t, onClose, onSave, depensesFixesInit, depensesVariablesInit, loading, erreur }) {
+function ModalDepenses({ t, onClose, onSave, depensesFixesInit, depensesVariablesInit, loading, erreur, isMobile }) {
   const [fixes, setFixes] = useState(depensesFixesInit)
   const [variables, setVariables] = useState(depensesVariablesInit)
   const [newFixe, setNewFixe] = useState('')
@@ -128,8 +128,8 @@ function ModalDepenses({ t, onClose, onSave, depensesFixesInit, depensesVariable
   const totalVariables = variables.reduce((acc, d) => acc + (parseFloat(d.montant) || 0), 0)
 
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 }}>
-      <div style={{ background: t.bgCard, borderRadius: 16, padding: '28px', width: 520, border: `0.5px solid ${t.border}`, maxHeight: '90vh', overflow: 'auto' }}>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: isMobile ? 12 : 0 }}>
+      <div style={{ background: t.bgCard, borderRadius: 16, padding: isMobile ? '20px' : '28px', width: '100%', maxWidth: 520, border: `0.5px solid ${t.border}`, maxHeight: '90vh', overflow: 'auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
           <div style={{ fontSize: 15, fontWeight: 500, color: t.text }}>Mes dépenses</div>
           <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: t.textMuted }}>×</button>
@@ -140,16 +140,16 @@ function ModalDepenses({ t, onClose, onSave, depensesFixesInit, depensesVariable
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {fixes.map((d, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <div style={{ flex: 1, fontSize: 12, color: t.text }}>{d.categorie}</div>
-                <input type="number" min="0" placeholder="0" value={d.montant || ''} onChange={e => { const u = [...fixes]; u[i] = { ...u[i], montant: e.target.value }; setFixes(u) }} style={{ width: 90, padding: '6px 10px', borderRadius: 7, border: `0.5px solid ${t.border}`, fontSize: 13, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text, textAlign: 'right' }} />
+                <div style={{ flex: 1, fontSize: 12, color: t.text, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>{d.categorie}</div>
+                <input type="number" min="0" placeholder="0" value={d.montant || ''} onChange={e => { const u = [...fixes]; u[i] = { ...u[i], montant: e.target.value }; setFixes(u) }} style={{ width: isMobile ? 70 : 90, padding: '6px 10px', borderRadius: 7, border: `0.5px solid ${t.border}`, fontSize: 13, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text, textAlign: 'right' }} />
                 <span style={{ fontSize: 12, color: t.textMuted }}>€</span>
                 {!d.defaut ? <button onClick={() => setFixes(fixes.filter((_, j) => j !== i))} style={{ background: '#FCEBEB', color: '#E24B4A', border: 'none', borderRadius: 5, padding: '3px 7px', fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>×</button> : <div style={{ width: 28 }} />}
               </div>
             ))}
           </div>
           <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
-            <input placeholder="Ajouter une catégorie..." value={newFixe} onChange={e => setNewFixe(e.target.value)} onKeyDown={e => e.key === 'Enter' && newFixe.trim() && (setFixes([...fixes, { categorie: newFixe, montant: 0, defaut: false }]), setNewFixe(''))} style={{ flex: 1, padding: '7px 10px', borderRadius: 7, border: `0.5px solid ${t.border}`, fontSize: 12, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }} />
-            <button onClick={() => newFixe.trim() && (setFixes([...fixes, { categorie: newFixe, montant: 0, defaut: false }]), setNewFixe(''))} style={{ background: t.bgSecondary, color: t.text, border: `0.5px solid ${t.border}`, borderRadius: 7, padding: '7px 12px', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>+ Ajouter</button>
+            <input placeholder="Ajouter une catégorie..." value={newFixe} onChange={e => setNewFixe(e.target.value)} onKeyDown={e => e.key === 'Enter' && newFixe.trim() && (setFixes([...fixes, { categorie: newFixe, montant: 0, defaut: false }]), setNewFixe(''))} style={{ flex: 1, minWidth: 0, padding: '7px 10px', borderRadius: 7, border: `0.5px solid ${t.border}`, fontSize: 12, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }} />
+            <button onClick={() => newFixe.trim() && (setFixes([...fixes, { categorie: newFixe, montant: 0, defaut: false }]), setNewFixe(''))} style={{ background: t.bgSecondary, color: t.text, border: `0.5px solid ${t.border}`, borderRadius: 7, padding: '7px 12px', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>+ Ajouter</button>
           </div>
           <div style={{ fontSize: 12, fontWeight: 500, color: '#E24B4A', marginTop: 8, textAlign: 'right' }}>Total : {totalFixes.toLocaleString('fr-FR')} €</div>
         </div>
@@ -158,16 +158,16 @@ function ModalDepenses({ t, onClose, onSave, depensesFixesInit, depensesVariable
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {variables.map((d, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <div style={{ flex: 1, fontSize: 12, color: t.text }}>{d.categorie}</div>
-                <input type="number" min="0" placeholder="0" value={d.montant || ''} onChange={e => { const u = [...variables]; u[i] = { ...u[i], montant: e.target.value }; setVariables(u) }} style={{ width: 90, padding: '6px 10px', borderRadius: 7, border: `0.5px solid ${t.border}`, fontSize: 13, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text, textAlign: 'right' }} />
+                <div style={{ flex: 1, fontSize: 12, color: t.text, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>{d.categorie}</div>
+                <input type="number" min="0" placeholder="0" value={d.montant || ''} onChange={e => { const u = [...variables]; u[i] = { ...u[i], montant: e.target.value }; setVariables(u) }} style={{ width: isMobile ? 70 : 90, padding: '6px 10px', borderRadius: 7, border: `0.5px solid ${t.border}`, fontSize: 13, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text, textAlign: 'right' }} />
                 <span style={{ fontSize: 12, color: t.textMuted }}>€</span>
                 {!d.defaut ? <button onClick={() => setVariables(variables.filter((_, j) => j !== i))} style={{ background: '#FCEBEB', color: '#E24B4A', border: 'none', borderRadius: 5, padding: '3px 7px', fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>×</button> : <div style={{ width: 28 }} />}
               </div>
             ))}
           </div>
           <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
-            <input placeholder="Ajouter une catégorie..." value={newVariable} onChange={e => setNewVariable(e.target.value)} onKeyDown={e => e.key === 'Enter' && newVariable.trim() && (setVariables([...variables, { categorie: newVariable, montant: 0, defaut: false }]), setNewVariable(''))} style={{ flex: 1, padding: '7px 10px', borderRadius: 7, border: `0.5px solid ${t.border}`, fontSize: 12, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }} />
-            <button onClick={() => newVariable.trim() && (setVariables([...variables, { categorie: newVariable, montant: 0, defaut: false }]), setNewVariable(''))} style={{ background: t.bgSecondary, color: t.text, border: `0.5px solid ${t.border}`, borderRadius: 7, padding: '7px 12px', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>+ Ajouter</button>
+            <input placeholder="Ajouter une catégorie..." value={newVariable} onChange={e => setNewVariable(e.target.value)} onKeyDown={e => e.key === 'Enter' && newVariable.trim() && (setVariables([...variables, { categorie: newVariable, montant: 0, defaut: false }]), setNewVariable(''))} style={{ flex: 1, minWidth: 0, padding: '7px 10px', borderRadius: 7, border: `0.5px solid ${t.border}`, fontSize: 12, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }} />
+            <button onClick={() => newVariable.trim() && (setVariables([...variables, { categorie: newVariable, montant: 0, defaut: false }]), setNewVariable(''))} style={{ background: t.bgSecondary, color: t.text, border: `0.5px solid ${t.border}`, borderRadius: 7, padding: '7px 12px', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>+ Ajouter</button>
           </div>
           <div style={{ fontSize: 12, fontWeight: 500, color: '#BA7517', marginTop: 8, textAlign: 'right' }}>Total : {totalVariables.toLocaleString('fr-FR')} €</div>
         </div>
@@ -182,7 +182,6 @@ function ModalDepenses({ t, onClose, onSave, depensesFixesInit, depensesVariable
   )
 }
 
-// Fonctions de fetch pour React Query
 const fetchDashboardData = async () => {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Non connecté')
@@ -205,6 +204,14 @@ export default function Dashboard() {
   const navigate = useNavigate()
   const t = useTheme()
   const queryClient = useQueryClient()
+
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   const { data, isLoading } = useQuery({
     queryKey: ['dashboard'],
@@ -372,34 +379,34 @@ export default function Dashboard() {
   }, {})
 
   if (isLoading) return (
-    <div style={{ background: t.bg, height: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar page="Mes Finances" initiale="?" />
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: t.textMuted, fontSize: 13 }}>Chargement...</div>
     </div>
   )
 
   return (
-    <div style={{ background: t.bg, height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+    <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
 
-      {showSimulateur && <PopupSimulateur versement={reelInvestissable} onClose={() => setShowSimulateur(false)} />}
+      {showSimulateur && <PopupSimulateur versement={reelInvestissable} onClose={() => setShowSimulateur(false)} isMobile={isMobile} />}
 
       {showModalDepenses && (
-        <ModalDepenses t={t} onClose={() => setShowModalDepenses(false)} onSave={handleSaveDepenses} depensesFixesInit={depensesFixesDetail} depensesVariablesInit={depensesVariablesDetail} loading={loading} erreur={erreurDepenses} />
+        <ModalDepenses t={t} onClose={() => setShowModalDepenses(false)} onSave={handleSaveDepenses} depensesFixesInit={depensesFixesDetail} depensesVariablesInit={depensesVariablesDetail} loading={loading} erreur={erreurDepenses} isMobile={isMobile} />
       )}
 
       {showModalRevenu && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 }}>
-          <div style={{ background: t.bgCard, borderRadius: 16, padding: '32px 28px', width: 380, border: `0.5px solid ${t.border}` }}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: isMobile ? 12 : 0 }}>
+          <div style={{ background: t.bgCard, borderRadius: 16, padding: isMobile ? '24px 20px' : '32px 28px', width: '100%', maxWidth: 380, border: `0.5px solid ${t.border}`, maxHeight: '90vh', overflow: 'auto' }}>
             <div style={{ fontSize: 15, fontWeight: 500, color: t.text, marginBottom: 20 }}>Modifier mes revenus</div>
             {erreurRevenu && <div style={{ background: '#FCEBEB', border: '0.5px solid #E24B4A', borderRadius: 8, padding: '8px 12px', fontSize: 12, color: '#E24B4A', marginBottom: 12 }}>⚠️ {erreurRevenu}</div>}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <div>
                 <div style={{ fontSize: 11, color: t.textMuted, marginBottom: 4 }}>Salaire / Revenus principaux (€)</div>
-                <input type="number" min="0" placeholder="ex: 3 400" value={formRevenu.revenus} onChange={e => setFormRevenu({ ...formRevenu, revenus: e.target.value })} style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `0.5px solid ${t.border}`, fontSize: 14, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }} />
+                <input type="number" min="0" placeholder="ex: 3 400" value={formRevenu.revenus} onChange={e => setFormRevenu({ ...formRevenu, revenus: e.target.value })} style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `0.5px solid ${t.border}`, fontSize: 14, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text, boxSizing: 'border-box' }} />
               </div>
               <div>
                 <div style={{ fontSize: 11, color: t.textMuted, marginBottom: 4 }}>Autres revenus (€)</div>
-                <input type="number" min="0" placeholder="Supplément ou complément de salaire" value={formRevenu.autre_revenu} onChange={e => setFormRevenu({ ...formRevenu, autre_revenu: e.target.value })} style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `0.5px solid ${t.border}`, fontSize: 14, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }} />
+                <input type="number" min="0" placeholder="Supplément ou complément de salaire" value={formRevenu.autre_revenu} onChange={e => setFormRevenu({ ...formRevenu, autre_revenu: e.target.value })} style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `0.5px solid ${t.border}`, fontSize: 14, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text, boxSizing: 'border-box' }} />
               </div>
             </div>
             <div style={{ display: 'flex', gap: 8, marginTop: 20 }}>
@@ -414,7 +421,7 @@ export default function Dashboard() {
 
       <Navbar page="Mes Finances" initiale={initiale} />
 
-      <div style={{ display: 'grid', gridTemplateColumns: '240px 1fr', gap: 12, padding: 12, flex: 1, minHeight: 0, overflow: 'auto' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '240px 1fr', gap: 12, padding: 12, flex: 1 }}>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: 14 }}>
@@ -471,7 +478,7 @@ export default function Dashboard() {
           {alertes.length > 0 && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {alertes.map((a, i) => (
-                <div key={i} style={{ background: bleuAlerte, border: `0.5px solid ${bleuAlerteBorder}`, borderRadius: 10, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div key={i} style={{ background: bleuAlerte, border: `0.5px solid ${bleuAlerteBorder}`, borderRadius: 10, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                   <span style={{ fontSize: 12, fontWeight: 500, color: bleuAlerteText }}>{a.type === 'ce mois' ? 'Échéance ce mois — ' : 'Échéance dans 1 mois — '}</span>
                   <span style={{ fontSize: 12, color: bleuAlerteText }}>{a.libelle} · {a.montant_annuel} €</span>
                 </div>
@@ -502,7 +509,7 @@ export default function Dashboard() {
           </div>
 
           <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, overflow: 'hidden' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', borderBottom: `0.5px solid ${t.border}` }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', borderBottom: `0.5px solid ${t.border}`, gap: 8, flexWrap: 'wrap' }}>
               <div>
                 <div style={{ fontSize: 13, fontWeight: 500, color: t.text }}>Calendrier des échéances</div>
                 {echeances.length > 0 && <div style={{ fontSize: 11, color: t.textMuted, marginTop: 2 }}>Provision totale : <span style={{ color: '#4CAF2E', fontWeight: 500 }}>{Math.round(totalEcheances)} €/mois</span></div>}
@@ -515,30 +522,30 @@ export default function Dashboard() {
             {showAddEch && (
               <div style={{ padding: '12px 16px', background: t.bgSecondary, borderBottom: `0.5px solid ${t.border}` }}>
                 {erreurEcheance && <div style={{ background: '#FCEBEB', border: '0.5px solid #E24B4A', borderRadius: 8, padding: '6px 10px', fontSize: 11, color: '#E24B4A', marginBottom: 8 }}>⚠️ {erreurEcheance}</div>}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr 1fr 1fr auto', gap: 8, alignItems: 'end' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1.5fr 1fr 1fr auto', gap: 8, alignItems: 'end' }}>
                   <div>
                     <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 3 }}>Catégorie</div>
-                    <select value={formEch.categorie} onChange={e => setFormEch({ ...formEch, categorie: e.target.value })} style={{ width: '100%', padding: '7px 8px', borderRadius: 6, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgCard, color: t.text }}>
+                    <select value={formEch.categorie} onChange={e => setFormEch({ ...formEch, categorie: e.target.value })} style={{ width: '100%', padding: '7px 8px', borderRadius: 6, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgCard, color: t.text, boxSizing: 'border-box' }}>
                       <option value="">Sélectionner</option>
                       {categoriesListe.map(c => <option key={c} value={c}>{c}</option>)}
                     </select>
                   </div>
                   <div>
                     <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 3 }}>Libellé</div>
-                    <input placeholder={placeholders[formEch.categorie] || 'ex: Libellé'} value={formEch.libelle} onChange={e => setFormEch({ ...formEch, libelle: e.target.value })} style={{ width: '100%', padding: '7px 8px', borderRadius: 6, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgCard, color: t.text }} />
+                    <input placeholder={placeholders[formEch.categorie] || 'ex: Libellé'} value={formEch.libelle} onChange={e => setFormEch({ ...formEch, libelle: e.target.value })} style={{ width: '100%', padding: '7px 8px', borderRadius: 6, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgCard, color: t.text, boxSizing: 'border-box' }} />
                   </div>
                   <div>
                     <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 3 }}>Mois</div>
-                    <select value={formEch.mois} onChange={e => setFormEch({ ...formEch, mois: e.target.value })} style={{ width: '100%', padding: '7px 8px', borderRadius: 6, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgCard, color: t.text }}>
+                    <select value={formEch.mois} onChange={e => setFormEch({ ...formEch, mois: e.target.value })} style={{ width: '100%', padding: '7px 8px', borderRadius: 6, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgCard, color: t.text, boxSizing: 'border-box' }}>
                       <option value="">Sélectionner</option>
                       {moisListe.map(m => <option key={m} value={m}>{m}</option>)}
                     </select>
                   </div>
                   <div>
                     <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 3 }}>Montant annuel (€)</div>
-                    <input type="number" min="0" placeholder="ex: 600" value={formEch.montant_annuel} onChange={e => setFormEch({ ...formEch, montant_annuel: e.target.value })} style={{ width: '100%', padding: '7px 8px', borderRadius: 6, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgCard, color: t.text }} />
+                    <input type="number" min="0" placeholder="ex: 600" value={formEch.montant_annuel} onChange={e => setFormEch({ ...formEch, montant_annuel: e.target.value })} style={{ width: '100%', padding: '7px 8px', borderRadius: 6, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgCard, color: t.text, boxSizing: 'border-box' }} />
                   </div>
-                  <button onClick={handleAddEcheance} disabled={loading} style={{ background: loading ? '#9CA3AF' : '#4CAF2E', color: '#fff', fontSize: 11, fontWeight: 500, padding: '7px 12px', borderRadius: 7, border: 'none', cursor: loading ? 'not-allowed' : 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>
+                  <button onClick={handleAddEcheance} disabled={loading} style={{ background: loading ? '#9CA3AF' : '#4CAF2E', color: '#fff', fontSize: 11, fontWeight: 500, padding: isMobile ? '9px 12px' : '7px 12px', borderRadius: 7, border: 'none', cursor: loading ? 'not-allowed' : 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>
                     {loading ? '...' : 'Ajouter'}
                   </button>
                 </div>
@@ -548,57 +555,59 @@ export default function Dashboard() {
             {echeances.length === 0 ? (
               <div style={{ padding: '24px', textAlign: 'center', color: t.textMuted, fontSize: 12 }}>Aucune échéance — cliquez sur "+ Ajouter" pour commencer</div>
             ) : (
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
-                <thead>
-                  <tr style={{ background: t.bgSecondary }}>
-                    {['Catégorie', 'Libellé de la dépense', 'Mois', 'Montant annuel', 'Provision / mois', ''].map(h => (
-                      <th key={h} style={{ padding: '8px 14px', textAlign: 'left', fontSize: 10, color: t.textMuted, fontWeight: 500, borderBottom: `0.5px solid ${t.border}`, whiteSpace: 'nowrap' }}>{h}</th>
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, minWidth: 640 }}>
+                  <thead>
+                    <tr style={{ background: t.bgSecondary }}>
+                      {['Catégorie', 'Libellé de la dépense', 'Mois', 'Montant annuel', 'Provision / mois', ''].map(h => (
+                        <th key={h} style={{ padding: '8px 14px', textAlign: 'left', fontSize: 10, color: t.textMuted, fontWeight: 500, borderBottom: `0.5px solid ${t.border}`, whiteSpace: 'nowrap' }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {Object.entries(echeancesParCategorie).map(([cat, items]) => (
+                      items.map((e, i) => (
+                        <tr key={e.id} style={{ borderBottom: `0.5px solid ${t.border}`, background: editingId === e.id ? t.bgSecondary : 'transparent' }}>
+                          {i === 0 && <td rowSpan={items.length} style={{ padding: '8px 14px', fontWeight: 500, color: t.text, verticalAlign: 'middle', borderRight: `0.5px solid ${t.border}`, background: t.bgSecondary, fontSize: 11 }}>{cat}</td>}
+                          {editingId === e.id ? (
+                            <>
+                              <td style={{ padding: '6px 8px' }}><input value={editForm.libelle} onChange={ev => setEditForm({ ...editForm, libelle: ev.target.value })} style={{ width: '100%', padding: '5px 8px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgCard, color: t.text }} /></td>
+                              <td style={{ padding: '6px 8px' }}><select value={editForm.mois} onChange={ev => setEditForm({ ...editForm, mois: ev.target.value })} style={{ width: '100%', padding: '5px 8px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgCard, color: t.text }}>{moisListe.map(m => <option key={m} value={m}>{m}</option>)}</select></td>
+                              <td style={{ padding: '6px 8px' }}><input type="number" value={editForm.montant_annuel} onChange={ev => setEditForm({ ...editForm, montant_annuel: ev.target.value })} style={{ width: '100%', padding: '5px 8px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgCard, color: t.text }} /></td>
+                              <td style={{ padding: '6px 8px', color: '#4CAF2E', fontWeight: 500 }}>{Math.round(parseFloat(editForm.montant_annuel) / 12)} €</td>
+                              <td style={{ padding: '6px 8px' }}>
+                                <div style={{ display: 'flex', gap: 4 }}>
+                                  <button onClick={() => handleEditSave(e.id)} style={{ background: '#EAF6E4', color: '#2E7D1E', border: 'none', borderRadius: 5, padding: '2px 7px', fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>✓</button>
+                                  <button onClick={() => setEditingId(null)} style={{ background: t.bgSecondary, color: t.textMuted, border: `0.5px solid ${t.border}`, borderRadius: 5, padding: '2px 7px', fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>✕</button>
+                                </div>
+                              </td>
+                            </>
+                          ) : (
+                            <>
+                              <td style={{ padding: '7px 14px', color: t.text }}>{e.libelle}</td>
+                              <td style={{ padding: '7px 14px', color: t.textSecondary }}>{e.mois}</td>
+                              <td style={{ padding: '7px 14px', color: t.text, fontWeight: 500 }}>{parseFloat(e.montant_annuel).toLocaleString('fr-FR')} €</td>
+                              <td style={{ padding: '7px 14px', color: '#4CAF2E', fontWeight: 500 }}>{Math.round(parseFloat(e.montant_annuel) / 12)} €</td>
+                              <td style={{ padding: '7px 14px' }}>
+                                <div style={{ display: 'flex', gap: 4 }}>
+                                  <button onClick={() => handleEditStart(e)} style={{ background: bleuBg, color: bleu, border: 'none', borderRadius: 5, padding: '2px 7px', fontSize: 10, cursor: 'pointer', fontFamily: 'inherit' }}>✏️</button>
+                                  <button onClick={() => handleDeleteEcheance(e.id)} style={{ background: '#FCEBEB', color: '#E24B4A', border: 'none', borderRadius: 5, padding: '2px 7px', fontSize: 10, cursor: 'pointer', fontFamily: 'inherit' }}>×</button>
+                                </div>
+                              </td>
+                            </>
+                          )}
+                        </tr>
+                      ))
                     ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {Object.entries(echeancesParCategorie).map(([cat, items]) => (
-                    items.map((e, i) => (
-                      <tr key={e.id} style={{ borderBottom: `0.5px solid ${t.border}`, background: editingId === e.id ? t.bgSecondary : 'transparent' }}>
-                        {i === 0 && <td rowSpan={items.length} style={{ padding: '8px 14px', fontWeight: 500, color: t.text, verticalAlign: 'middle', borderRight: `0.5px solid ${t.border}`, background: t.bgSecondary, fontSize: 11 }}>{cat}</td>}
-                        {editingId === e.id ? (
-                          <>
-                            <td style={{ padding: '6px 8px' }}><input value={editForm.libelle} onChange={ev => setEditForm({ ...editForm, libelle: ev.target.value })} style={{ width: '100%', padding: '5px 8px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgCard, color: t.text }} /></td>
-                            <td style={{ padding: '6px 8px' }}><select value={editForm.mois} onChange={ev => setEditForm({ ...editForm, mois: ev.target.value })} style={{ width: '100%', padding: '5px 8px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgCard, color: t.text }}>{moisListe.map(m => <option key={m} value={m}>{m}</option>)}</select></td>
-                            <td style={{ padding: '6px 8px' }}><input type="number" value={editForm.montant_annuel} onChange={ev => setEditForm({ ...editForm, montant_annuel: ev.target.value })} style={{ width: '100%', padding: '5px 8px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgCard, color: t.text }} /></td>
-                            <td style={{ padding: '6px 8px', color: '#4CAF2E', fontWeight: 500 }}>{Math.round(parseFloat(editForm.montant_annuel) / 12)} €</td>
-                            <td style={{ padding: '6px 8px' }}>
-                              <div style={{ display: 'flex', gap: 4 }}>
-                                <button onClick={() => handleEditSave(e.id)} style={{ background: '#EAF6E4', color: '#2E7D1E', border: 'none', borderRadius: 5, padding: '2px 7px', fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>✓</button>
-                                <button onClick={() => setEditingId(null)} style={{ background: t.bgSecondary, color: t.textMuted, border: `0.5px solid ${t.border}`, borderRadius: 5, padding: '2px 7px', fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>✕</button>
-                              </div>
-                            </td>
-                          </>
-                        ) : (
-                          <>
-                            <td style={{ padding: '7px 14px', color: t.text }}>{e.libelle}</td>
-                            <td style={{ padding: '7px 14px', color: t.textSecondary }}>{e.mois}</td>
-                            <td style={{ padding: '7px 14px', color: t.text, fontWeight: 500 }}>{parseFloat(e.montant_annuel).toLocaleString('fr-FR')} €</td>
-                            <td style={{ padding: '7px 14px', color: '#4CAF2E', fontWeight: 500 }}>{Math.round(parseFloat(e.montant_annuel) / 12)} €</td>
-                            <td style={{ padding: '7px 14px' }}>
-                              <div style={{ display: 'flex', gap: 4 }}>
-                                <button onClick={() => handleEditStart(e)} style={{ background: bleuBg, color: bleu, border: 'none', borderRadius: 5, padding: '2px 7px', fontSize: 10, cursor: 'pointer', fontFamily: 'inherit' }}>✏️</button>
-                                <button onClick={() => handleDeleteEcheance(e.id)} style={{ background: '#FCEBEB', color: '#E24B4A', border: 'none', borderRadius: 5, padding: '2px 7px', fontSize: 10, cursor: 'pointer', fontFamily: 'inherit' }}>×</button>
-                              </div>
-                            </td>
-                          </>
-                        )}
-                      </tr>
-                    ))
-                  ))}
-                  <tr style={{ background: t.bgSecondary, borderTop: `0.5px solid ${t.border}` }}>
-                    <td colSpan={3} style={{ padding: '8px 14px', fontWeight: 500, color: t.text, fontSize: 11 }}>TOTAL</td>
-                    <td style={{ padding: '8px 14px', fontWeight: 500, color: t.text }}>{totalAnnuel.toLocaleString('fr-FR')} €</td>
-                    <td style={{ padding: '8px 14px', fontWeight: 500, color: '#4CAF2E' }}>{Math.round(totalEcheances)} €</td>
-                    <td></td>
-                  </tr>
-                </tbody>
-              </table>
+                    <tr style={{ background: t.bgSecondary, borderTop: `0.5px solid ${t.border}` }}>
+                      <td colSpan={3} style={{ padding: '8px 14px', fontWeight: 500, color: t.text, fontSize: 11 }}>TOTAL</td>
+                      <td style={{ padding: '8px 14px', fontWeight: 500, color: t.text }}>{totalAnnuel.toLocaleString('fr-FR')} €</td>
+                      <td style={{ padding: '8px 14px', fontWeight: 500, color: '#4CAF2E' }}>{Math.round(totalEcheances)} €</td>
+                      <td></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             )}
           </div>
         </div>
