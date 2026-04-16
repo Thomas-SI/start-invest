@@ -1,11 +1,11 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { ThemeProvider } from './lib/ThemeContext'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import Accueil from './pages/Accueil'
-import Login from './pages/Login'
-import Signup from './pages/Signup'
+// import Login from './pages/Login'
+// import Signup from './pages/Signup'
 import Dashboard from './pages/Dashboard'
 import Portefeuille from './pages/Portefeuille'
 import Investissement from './pages/Investissement'
@@ -42,8 +42,8 @@ createRoot(document.getElementById('root')).render(
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Accueil />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
+            <Route path="/login" element={<Navigate to="/" replace />} />
+            <Route path="/signup" element={<Navigate to="/" replace />} />
             <Route path="/onboarding" element={<Onboarding />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/portefeuille" element={<Portefeuille />} />
