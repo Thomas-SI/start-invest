@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AuthModal from '../components/AuthModal'
 import ChallengesModal from '../components/ChallengesModal'
@@ -121,7 +121,7 @@ const DCAChart = () => {
           <div style={{ fontSize: 10, fontWeight: 600, color: '#1B2E4B', width: 80, textAlign: 'right', flexShrink: 0 }}>{total.toLocaleString('fr-FR')} euros</div>
         </div>
       ))}
-      <div style={{ display: 'flex', gap: 14, marginTop: 8 }}>
+      <div style={{ display: 'flex', gap: 14, marginTop: 8, flexWrap: 'wrap' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 10, color: '#9CA3AF' }}>
           <div style={{ width: 10, height: 10, borderRadius: 2, background: '#E3F0FF' }} />Capital investi
         </div>
@@ -133,12 +133,118 @@ const DCAChart = () => {
   )
 }
 
-export default function Accueil() {
+// Navbar publique avec menu burger sur mobile
+function PublicNavbar({ isMobile, openLogin, openSignup, activeLink = 'Accueil' }) {
   const navigate = useNavigate()
+  const [menuOpen, setMenuOpen] = useState(false)
+
+  useEffect(() => {
+    if (!isMobile) setMenuOpen(false)
+  }, [isMobile])
+
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? 'hidden' : ''
+    return () => { document.body.style.overflow = '' }
+  }, [menuOpen])
+
+  const links = [
+    ['Accueil', '/'],
+    ['Fonctionnalites', '/fonctionnalites'],
+    ['Challenge', '/challenge-public'],
+    ['Abonnement', '/abonnement-public'],
+  ]
+
+  const handleNavigate = (path) => {
+    setMenuOpen(false)
+    navigate(path)
+  }
+
+  const Logo = () => (
+    <div onClick={() => handleNavigate('/')} style={{ cursor: 'pointer' }}>
+      <img src={LOGO_URL} alt="StartInvest" style={{ height: 38, width: 38, borderRadius: '50%', objectFit: 'cover' }} />
+    </div>
+  )
+
+  if (isMobile) {
+    return (
+      <>
+        <nav style={{ background: '#fff', borderBottom: '0.5px solid #E0EAE3', padding: '0 16px', height: 58, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 100 }}>
+          <Logo />
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label={menuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
+            style={{ background: 'transparent', border: 'none', padding: 8, cursor: 'pointer', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 5, width: 40, height: 40 }}
+          >
+            <span style={{ width: 22, height: 2, background: '#1B2E4B', borderRadius: 2, transition: 'all 0.25s', transform: menuOpen ? 'rotate(45deg) translate(5px, 5px)' : 'none' }} />
+            <span style={{ width: 22, height: 2, background: '#1B2E4B', borderRadius: 2, transition: 'all 0.25s', opacity: menuOpen ? 0 : 1 }} />
+            <span style={{ width: 22, height: 2, background: '#1B2E4B', borderRadius: 2, transition: 'all 0.25s', transform: menuOpen ? 'rotate(-45deg) translate(5px, -5px)' : 'none' }} />
+          </button>
+        </nav>
+
+        {menuOpen && (
+          <div style={{ position: 'fixed', top: 58, left: 0, right: 0, bottom: 0, background: '#fff', zIndex: 99, display: 'flex', flexDirection: 'column', padding: '20px 0', overflowY: 'auto' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', padding: '12px 0' }}>
+              {links.map(([label, path]) => (
+                <div
+                  key={label}
+                  onClick={() => handleNavigate(path)}
+                  style={{
+                    fontSize: 16,
+                    color: label === activeLink ? '#4CAF2E' : '#1B2E4B',
+                    padding: '16px 24px',
+                    cursor: 'pointer',
+                    fontWeight: label === activeLink ? 600 : 400,
+                    borderLeft: label === activeLink ? '3px solid #4CAF2E' : '3px solid transparent',
+                  }}
+                >
+                  {label}
+                </div>
+              ))}
+            </div>
+
+            <div style={{ padding: '20px 24px', marginTop: 'auto', borderTop: '0.5px solid #E0EAE3', display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <button onClick={() => { setMenuOpen(false); openLogin() }} style={{ padding: '12px', borderRadius: 8, border: '0.5px solid #1B2E4B', background: 'transparent', color: '#1B2E4B', fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Se connecter</button>
+              <button onClick={() => { setMenuOpen(false); openSignup() }} style={{ padding: '12px', borderRadius: 8, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>S inscrire gratuitement</button>
+            </div>
+          </div>
+        )}
+      </>
+    )
+  }
+
+  // Desktop
+  return (
+    <nav style={{ background: '#fff', borderBottom: '0.5px solid #E0EAE3', padding: '0 40px', height: 58, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 100 }}>
+      <Logo />
+      <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+        {links.map(([label, path]) => (
+          <span key={label} onClick={() => navigate(path)} style={{ fontSize: 13, color: label === activeLink ? '#1B2E4B' : '#6B7280', padding: '5px 12px', borderRadius: 6, cursor: 'pointer', fontWeight: label === activeLink ? 500 : 400 }}
+            onMouseEnter={e => e.currentTarget.style.color = '#1B2E4B'}
+            onMouseLeave={e => e.currentTarget.style.color = label === activeLink ? '#1B2E4B' : '#6B7280'}>
+            {label}
+          </span>
+        ))}
+      </div>
+      <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+        <button onClick={openLogin} style={{ padding: '7px 16px', borderRadius: 8, border: '0.5px solid #1B2E4B', background: 'transparent', color: '#1B2E4B', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Se connecter</button>
+        <button onClick={openSignup} style={{ padding: '7px 16px', borderRadius: 8, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>S inscrire gratuitement</button>
+      </div>
+    </nav>
+  )
+}
+
+export default function Accueil() {
   const [authOpen, setAuthOpen] = useState(false)
   const [authMode, setAuthMode] = useState('login')
   const [challengesOpen, setChallengesOpen] = useState(false)
   const [abonnementAnnuel, setAbonnementAnnuel] = useState(false)
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   const openLogin = () => { setAuthMode('login'); setAuthOpen(true) }
   const openSignup = () => { setAuthMode('signup'); setAuthOpen(true) }
@@ -146,33 +252,17 @@ export default function Accueil() {
   return (
     <div style={{ fontFamily: 'inherit', background: '#F4F7F5', minHeight: '100vh' }}>
 
-      <nav style={{ background: '#fff', borderBottom: '0.5px solid #E0EAE3', padding: '0 40px', height: 58, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 100 }}>
-        <div onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
-          <img src={LOGO_URL} alt="StartInvest" style={{ height: 38, width: 38, borderRadius: '50%', objectFit: 'cover' }} />
-        </div>
-        <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
-          {[['Accueil', '/'], ['Fonctionnalites', '/fonctionnalites'], ['Challenge', '/challenge-public'], ['Abonnement', '/abonnement-public']].map(([label, path]) => (
-            <span key={label} onClick={() => navigate(path)} style={{ fontSize: 13, color: label === 'Accueil' ? '#1B2E4B' : '#6B7280', padding: '5px 12px', borderRadius: 6, cursor: 'pointer', fontWeight: label === 'Accueil' ? 500 : 400 }}
-              onMouseEnter={e => e.currentTarget.style.color = '#1B2E4B'}
-              onMouseLeave={e => e.currentTarget.style.color = label === 'Accueil' ? '#1B2E4B' : '#6B7280'}>
-              {label}
-            </span>
-          ))}
-        </div>
-        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-          <button onClick={openLogin} style={{ padding: '7px 16px', borderRadius: 8, border: '0.5px solid #1B2E4B', background: 'transparent', color: '#1B2E4B', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Se connecter</button>
-          <button onClick={openSignup} style={{ padding: '7px 16px', borderRadius: 8, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>S inscrire gratuitement</button>
-        </div>
-      </nav>
+      <PublicNavbar isMobile={isMobile} openLogin={openLogin} openSignup={openSignup} activeLink="Accueil" />
 
-      <section id="hero" style={{ padding: '80px 40px 60px', maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, alignItems: 'center' }}>
+      {/* HERO */}
+      <section id="hero" style={{ padding: isMobile ? '40px 16px 80px' : '80px 40px 60px', maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 40 : 60, alignItems: 'center' }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 16, background: '#EAF6E4', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Nouvelle facon d investir</div>
-          <h1 style={{ fontSize: 42, fontWeight: 700, color: '#1B2E4B', lineHeight: 1.2, margin: '0 0 20px' }}>
+          <h1 style={{ fontSize: isMobile ? 32 : 42, fontWeight: 700, color: '#1B2E4B', lineHeight: 1.2, margin: '0 0 20px' }}>
             Prenez une longueur<br />
             <span style={{ color: '#4CAF2E' }}>d avance.</span>
           </h1>
-          <p style={{ fontSize: 15, color: '#6B7280', lineHeight: 1.7, margin: '0 0 36px' }}>
+          <p style={{ fontSize: isMobile ? 14 : 15, color: '#6B7280', lineHeight: 1.7, margin: '0 0 36px' }}>
             Suivez vos finances. Atteignez vos objectifs.<br />Ayez un pas dans le futur.
           </p>
           <div style={{ display: 'flex', justifyContent: 'center' }}>
@@ -182,11 +272,11 @@ export default function Accueil() {
           </div>
         </div>
 
-        <div style={{ position: 'relative' }}>
-          <div style={{ background: '#fff', borderRadius: 16, border: '0.5px solid #E0EAE3', padding: '24px', boxShadow: '0 4px 24px rgba(27,46,75,0.06)' }}>
+        <div style={{ position: 'relative', marginBottom: isMobile ? 30 : 0 }}>
+          <div style={{ background: '#fff', borderRadius: 16, border: '0.5px solid #E0EAE3', padding: isMobile ? '20px' : '24px', boxShadow: '0 4px 24px rgba(27,46,75,0.06)' }}>
             <div style={{ fontSize: 14, fontWeight: 600, color: '#1B2E4B', marginBottom: 2 }}>Mon Portefeuille</div>
             <div style={{ fontSize: 11, color: '#9CA3AF', marginBottom: 20 }}>Repartition par enveloppe</div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 28 }}>
+            <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', alignItems: 'center', gap: isMobile ? 20 : 28 }}>
               <div style={{ flexShrink: 0 }}>
                 <svg width="160" height="160" viewBox="0 0 120 120">
                   <circle cx="60" cy="60" r="45" fill="none" stroke="#1B2E4B" strokeWidth="26" strokeDasharray="141.3 141.3" strokeDashoffset="0" transform="rotate(-90 60 60)" />
@@ -197,7 +287,7 @@ export default function Accueil() {
                   <text x="60" y="69" textAnchor="middle" fontSize="9" fill="#9CA3AF">euros</text>
                 </svg>
               </div>
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div style={{ flex: 1, width: '100%', display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {[
                   { label: 'PEA', pct: '50%', val: '15 400 euros', color: '#1B2E4B' },
                   { label: 'CTO', pct: '30%', val: '6 800 euros', color: '#4CAF2E' },
@@ -224,18 +314,19 @@ export default function Accueil() {
               </div>
             </div>
           </div>
-          <div style={{ position: 'absolute', bottom: -20, right: -20, background: '#fff', border: '0.5px solid #185FA5', borderRadius: 14, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10, boxShadow: '0 4px 16px rgba(24,95,165,0.12)' }}>
-            <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#E6F1FB', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, border: '2px solid #185FA5' }}>🏗️</div>
+          <div style={{ position: 'absolute', bottom: isMobile ? -15 : -20, right: isMobile ? 10 : -20, background: '#fff', border: '0.5px solid #185FA5', borderRadius: 14, padding: isMobile ? '8px 10px' : '10px 14px', display: 'flex', alignItems: 'center', gap: isMobile ? 8 : 10, boxShadow: '0 4px 16px rgba(24,95,165,0.12)' }}>
+            <div style={{ width: isMobile ? 30 : 36, height: isMobile ? 30 : 36, borderRadius: '50%', background: '#E6F1FB', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: isMobile ? 15 : 18, border: '2px solid #185FA5', flexShrink: 0 }}>🏗️</div>
             <div>
-              <div style={{ fontSize: 11, fontWeight: 600, color: '#1B2E4B' }}>L Architecte</div>
-              <div style={{ fontSize: 10, color: '#185FA5' }}>Accomplissement debloque !</div>
+              <div style={{ fontSize: isMobile ? 10 : 11, fontWeight: 600, color: '#1B2E4B' }}>L Architecte</div>
+              <div style={{ fontSize: isMobile ? 9 : 10, color: '#185FA5' }}>Accomplissement debloque !</div>
             </div>
           </div>
         </div>
       </section>
 
-      <section id="features" style={{ padding: '80px 40px 40px', maxWidth: 1100, margin: '0 auto' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
+      {/* FEATURES */}
+      <section id="features" style={{ padding: isMobile ? '40px 16px 20px' : '80px 40px 40px', maxWidth: 1100, margin: '0 auto' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: isMobile ? 16 : 24 }}>
           <div style={{ background: '#fff', borderRadius: 16, border: '0.5px solid #E0EAE3', overflow: 'hidden' }}>
             <div style={{ background: '#F4F7F5', padding: '28px 24px', minHeight: 200, display: 'flex', flexDirection: 'column', gap: 8 }}>
               {[
@@ -272,12 +363,12 @@ export default function Accueil() {
                 { label: 'Ass. Vie', desc: 'Epargne long terme', color: '#BA7517', w: '40%', tag: 'Avantage fiscal' },
               ].map(({ label, desc, color, w, tag }) => (
                 <div key={label} style={{ background: '#fff', borderRadius: 8, padding: '8px 10px', border: '0.5px solid #E0EAE3' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                    <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4, gap: 8 }}>
+                    <div style={{ minWidth: 0, flex: 1 }}>
                       <div style={{ fontSize: 12, fontWeight: 600, color: '#1B2E4B' }}>{label}</div>
                       <div style={{ fontSize: 10, color: '#9CA3AF' }}>{desc}</div>
                     </div>
-                    <span style={{ fontSize: 9, padding: '2px 6px', borderRadius: 10, background: '#F4F7F5', color: '#6B7280' }}>{tag}</span>
+                    <span style={{ fontSize: 9, padding: '2px 6px', borderRadius: 10, background: '#F4F7F5', color: '#6B7280', whiteSpace: 'nowrap', flexShrink: 0 }}>{tag}</span>
                   </div>
                   <div style={{ background: '#E0EAE3', borderRadius: 3, height: 4, overflow: 'hidden' }}>
                     <div style={{ height: '100%', borderRadius: 3, background: color, width: w }} />
@@ -302,26 +393,27 @@ export default function Accueil() {
           </div>
         </div>
 
-        <div style={{ textAlign: 'center', marginTop: 48 }}>
-          <button onClick={openSignup} style={{ padding: '14px 48px', borderRadius: 12, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 16, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>Go</button>
+        <div style={{ textAlign: 'center', marginTop: isMobile ? 32 : 48 }}>
+          <button onClick={openSignup} style={{ padding: isMobile ? '12px 40px' : '14px 48px', borderRadius: 12, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 16, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>Go</button>
         </div>
       </section>
 
-      <section id="challenge" style={{ background: '#1B2E4B', padding: '80px 40px', marginTop: 60 }}>
+      {/* CHALLENGE */}
+      <section id="challenge" style={{ background: '#1B2E4B', padding: isMobile ? '50px 16px' : '80px 40px', marginTop: isMobile ? 40 : 60 }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 52 }}>
+          <div style={{ textAlign: 'center', marginBottom: isMobile ? 36 : 52 }}>
             <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 16, background: 'rgba(76,175,46,0.15)', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Challenge</div>
-            <h2 style={{ fontSize: 34, fontWeight: 700, color: '#fff', lineHeight: 1.3, margin: '0 0 16px' }}>
+            <h2 style={{ fontSize: isMobile ? 26 : 34, fontWeight: 700, color: '#fff', lineHeight: 1.3, margin: '0 0 16px' }}>
               Pensez a 5 ans, <span style={{ color: '#4CAF2E' }}>pas a 5 mois.</span>
             </h2>
-            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.55)', lineHeight: 1.8, margin: '0 auto 32px', maxWidth: 460 }}>
+            <p style={{ fontSize: isMobile ? 13 : 14, color: 'rgba(255,255,255,0.55)', lineHeight: 1.8, margin: '0 auto 32px', maxWidth: 460 }}>
               Fixez-vous des objectifs et atteignez-les avec discipline au fil du temps.
             </p>
             <button onClick={() => setChallengesOpen(true)} style={{ padding: '11px 28px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.2)', background: 'rgba(255,255,255,0.08)', color: '#fff', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>
               Voir tous les challenges
             </button>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: isMobile ? 14 : 20 }}>
             <div style={{ background: 'rgba(255,255,255,0.06)', border: '0.5px solid rgba(255,255,255,0.1)', borderRadius: 16, padding: '24px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 12 }}>
               <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#EAF6E4', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, border: '2px solid #4CAF2E' }}>🚀</div>
               <div style={{ fontSize: 15, fontWeight: 600, color: '#fff' }}>Le Grand Saut</div>
@@ -352,13 +444,14 @@ export default function Accueil() {
         </div>
       </section>
 
-      <section id="abonnement" style={{ padding: '100px 40px 80px', background: '#F4F7F5', textAlign: 'center' }}>
+      {/* ABONNEMENT */}
+      <section id="abonnement" style={{ padding: isMobile ? '60px 16px 50px' : '100px 40px 80px', background: '#F4F7F5', textAlign: 'center' }}>
         <div style={{ maxWidth: 820, margin: '0 auto' }}>
           <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 16, background: '#EAF6E4', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Rejoignez-nous</div>
-          <h2 style={{ fontSize: 34, fontWeight: 700, color: '#1B2E4B', lineHeight: 1.3, margin: '0 0 16px' }}>
+          <h2 style={{ fontSize: isMobile ? 26 : 34, fontWeight: 700, color: '#1B2E4B', lineHeight: 1.3, margin: '0 0 16px' }}>
             Ne laissez plus jamais <span style={{ color: '#4CAF2E' }}>votre argent dormir.</span>
           </h2>
-          <p style={{ fontSize: 14, color: '#9CA3AF', lineHeight: 1.8, margin: '0 0 8px' }}>Trouvez votre facon de faire de l argent en dormant.</p>
+          <p style={{ fontSize: isMobile ? 13 : 14, color: '#9CA3AF', lineHeight: 1.8, margin: '0 0 8px' }}>Trouvez votre facon de faire de l argent en dormant.</p>
           <p style={{ fontSize: 13, color: '#4CAF2E', fontWeight: 500, margin: '0 0 32px' }}>Essayez gratuitement pendant 15 jours</p>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 0, background: '#fff', border: '0.5px solid #E0EAE3', borderRadius: 30, padding: '4px', marginBottom: 40 }}>
             <button onClick={() => setAbonnementAnnuel(false)} style={{ padding: '7px 20px', borderRadius: 20, border: 'none', background: !abonnementAnnuel ? '#1B2E4B' : 'transparent', color: !abonnementAnnuel ? '#fff' : '#9CA3AF', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' }}>Mensuel</button>
@@ -367,7 +460,7 @@ export default function Accueil() {
               <span style={{ fontSize: 9, background: '#4CAF2E', color: '#fff', padding: '2px 6px', borderRadius: 10, fontWeight: 600 }}>-29%</span>
             </button>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 20 }}>
             {plansData.map(plan => (
               <PlanCard key={plan.id} plan={plan} abonnementAnnuel={abonnementAnnuel} openSignup={openSignup} />
             ))}
@@ -375,14 +468,15 @@ export default function Accueil() {
         </div>
       </section>
 
-      <section style={{ background: '#fff', borderTop: '0.5px solid #E0EAE3', padding: '60px 40px', textAlign: 'center' }}>
+      {/* SOCIAL */}
+      <section style={{ background: '#fff', borderTop: '0.5px solid #E0EAE3', padding: isMobile ? '40px 16px' : '60px 40px', textAlign: 'center' }}>
         <div style={{ maxWidth: 400, margin: '0 auto' }}>
           <div style={{ fontSize: 14, fontWeight: 500, color: '#1B2E4B', marginBottom: 28 }}>Vous pouvez me rejoindre sur :</div>
           <div style={{ width: 100, height: 100, borderRadius: '50%', overflow: 'hidden', margin: '0 auto 24px', border: '3px solid #E0EAE3' }}>
             <img src="https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/IMG_2914.jpeg" alt="StartInvest" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center' }}>
-            <a href="https://instagram.com/startinvest.fr" target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 20px', borderRadius: 10, border: '0.5px solid #E0EAE3', background: '#F4F7F5', textDecoration: 'none', width: 240 }}>
+            <a href="https://instagram.com/startinvest.fr" target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 20px', borderRadius: 10, border: '0.5px solid #E0EAE3', background: '#F4F7F5', textDecoration: 'none', width: 240, maxWidth: '100%', boxSizing: 'border-box' }}>
               <div style={{ width: 28, height: 28, borderRadius: 8, background: 'linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
               </div>
@@ -391,7 +485,7 @@ export default function Accueil() {
                 <div style={{ fontSize: 13, fontWeight: 500, color: '#1B2E4B' }}>startinvest.fr</div>
               </div>
             </a>
-            <a href="https://tiktok.com/@startinvest.fr" target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 20px', borderRadius: 10, border: '0.5px solid #E0EAE3', background: '#F4F7F5', textDecoration: 'none', width: 240 }}>
+            <a href="https://tiktok.com/@startinvest.fr" target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 20px', borderRadius: 10, border: '0.5px solid #E0EAE3', background: '#F4F7F5', textDecoration: 'none', width: 240, maxWidth: '100%', boxSizing: 'border-box' }}>
               <div style={{ width: 28, height: 28, borderRadius: 8, background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.75a4.85 4.85 0 01-1.01-.06z"/></svg>
               </div>
