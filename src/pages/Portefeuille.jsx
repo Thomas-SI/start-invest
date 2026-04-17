@@ -90,6 +90,13 @@ export default function Portefeuille() {
   const [confirmDeleteIdx, setConfirmDeleteIdx] = useState(null)
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
 
+  // États pour le plan de virement
+  const [editingVirIdx, setEditingVirIdx] = useState(null)
+  const [editVirForm, setEditVirForm] = useState({})
+  const [showAddVir, setShowAddVir] = useState(false)
+  const [newVir, setNewVir] = useState({ destination: '', compte: '', pourcentage: '' })
+  const [confirmDeleteVirIdx, setConfirmDeleteVirIdx] = useState(null)
+
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768)
     window.addEventListener('resize', handleResize)
@@ -214,16 +221,43 @@ export default function Portefeuille() {
     await saveComptes(updated)
   }
 
-  const handleVirementChange = async (i, field, value) => {
-    const updated = [...virements]
-    updated[i] = { ...updated[i], [field]: value }
-    await saveVirements(updated)
-  }
-
   const handleCheck = async (i) => {
     const updated = [...virements]
     const nowChecked = !isCheckedCeMois(updated[i])
     updated[i] = { ...updated[i], checked: nowChecked, checked_date: nowChecked ? new Date().toISOString().split('T')[0] : null }
+    await saveVirements(updated)
+  }
+
+  // Handlers plan de virement
+  const handleEditVirStart = (i) => {
+    setEditingVirIdx(i)
+    setEditVirForm({ destination: virements[i].destination, compte: virements[i].compte, pourcentage: virements[i].pourcentage })
+  }
+
+  const handleEditVirSave = async (i) => {
+    if (!editVirForm.destination?.trim()) return
+    const updated = [...virements]
+    updated[i] = { ...updated[i], destination: editVirForm.destination.trim(), compte: editVirForm.compte, pourcentage: parseFloat(editVirForm.pourcentage) || 0 }
+    setEditingVirIdx(null)
+    await saveVirements(updated)
+  }
+
+  const handleDeleteVir = async (i) => {
+    if (confirmDeleteVirIdx === i) {
+      const updated = virements.filter((_, j) => j !== i)
+      setConfirmDeleteVirIdx(null)
+      await saveVirements(updated)
+    } else {
+      setConfirmDeleteVirIdx(i)
+      setTimeout(() => setConfirmDeleteVirIdx(null), 3000)
+    }
+  }
+
+  const handleAddVir = async () => {
+    if (!newVir.destination?.trim() || !newVir.compte) return
+    const updated = [...virements, { destination: newVir.destination.trim(), compte: newVir.compte, pourcentage: parseFloat(newVir.pourcentage) || 0, ordre: virements.length, checked: false, checked_date: null }]
+    setNewVir({ destination: '', compte: '', pourcentage: '' })
+    setShowAddVir(false)
     await saveVirements(updated)
   }
 
@@ -432,13 +466,44 @@ export default function Portefeuille() {
               <div style={{ fontSize: 13, fontWeight: 500, color: t.text }}>Plan de virement mensuel</div>
               <div style={{ fontSize: 11, color: t.textMuted, marginTop: 2 }}>Basé sur votre investissable : <span style={{ fontWeight: 500, color: '#4CAF2E' }}>{investissable.toLocaleString('fr-FR')} €/mois</span></div>
             </div>
-            {tousCoches && <div style={{ fontSize: 11, color: '#2E7D1E', background: '#EAF6E4', padding: '5px 10px', borderRadius: 7, fontWeight: 500 }}>✓ Tous les virements effectués ce mois !</div>}
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+              {tousCoches && <div style={{ fontSize: 11, color: '#2E7D1E', background: '#EAF6E4', padding: '5px 10px', borderRadius: 7, fontWeight: 500 }}>✓ Tous les virements effectués ce mois !</div>}
+              <button onClick={() => setShowAddVir(v => !v)} style={{ background: '#4CAF2E', color: '#fff', fontSize: 11, fontWeight: 500, padding: '6px 12px', borderRadius: 7, border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
+                {showAddVir ? '− Fermer' : '+ Ajouter'}
+              </button>
+            </div>
           </div>
+
+          {showAddVir && (
+            <div style={{ padding: '12px 16px', background: t.bgSecondary, borderBottom: `0.5px solid ${t.border}` }}>
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr 1fr auto', gap: 8, alignItems: 'end' }}>
+                <div>
+                  <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 3 }}>Destination *</div>
+                  <input placeholder="ex: Voyages" value={newVir.destination} onChange={e => setNewVir({ ...newVir, destination: e.target.value })} style={inputStyle} />
+                </div>
+                <div>
+                  <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 3 }}>Compte *</div>
+                  <select value={newVir.compte} onChange={e => setNewVir({ ...newVir, compte: e.target.value })} style={inputStyle}>
+                    <option value="">Sélectionner</option>
+                    {comptes.map(c => <option key={c.nom} value={c.nom}>{c.nom}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 3 }}>Répartition (%)</div>
+                  <input type="number" min="0" max="100" placeholder="ex: 20" value={newVir.pourcentage} onChange={e => setNewVir({ ...newVir, pourcentage: e.target.value })} style={inputStyle} />
+                </div>
+                <button onClick={handleAddVir} style={{ background: '#4CAF2E', color: '#fff', fontSize: 11, fontWeight: 500, padding: isMobile ? '10px 12px' : '7px 12px', borderRadius: 7, border: 'none', cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>
+                  Ajouter
+                </button>
+              </div>
+            </div>
+          )}
+
           <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, minWidth: 620 }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, minWidth: 680 }}>
               <thead>
                 <tr style={{ background: t.bgSecondary }}>
-                  {['', 'Destination', 'Compte bancaire', 'Répartition (%)', 'Montant à virer ce mois'].map(h => (
+                  {['', 'Destination', 'Compte bancaire', 'Répartition (%)', 'Montant à virer ce mois', ''].map(h => (
                     <th key={h} style={{ padding: '8px 14px', textAlign: 'left', fontSize: 10, color: t.textMuted, fontWeight: 500, borderBottom: `0.5px solid ${t.border}`, whiteSpace: 'nowrap' }}>{h}</th>
                   ))}
                 </tr>
@@ -446,22 +511,50 @@ export default function Portefeuille() {
               <tbody>
                 {virements.map((v, i) => {
                   const coche = isCheckedCeMois(v)
+                  const isEditing = editingVirIdx === i
                   return (
-                    <tr key={i} style={{ borderBottom: `0.5px solid ${t.border}`, background: coche ? (t.dark ? 'rgba(76,175,46,0.08)' : '#F6FFF3') : 'transparent' }}>
-                      <td style={{ padding: '10px 14px' }}><input type="checkbox" checked={coche} onChange={() => handleCheck(i)} style={{ accentColor: bleu, cursor: 'pointer', width: 14, height: 14 }} /></td>
-                      <td style={{ padding: '10px 14px', color: coche ? '#4CAF2E' : t.text, fontWeight: 500, textDecoration: coche ? 'line-through' : 'none' }}>{v.destination}</td>
-                      <td style={{ padding: '8px 14px' }}>
-                        <select value={v.compte} onChange={e => handleVirementChange(i, 'compte', e.target.value)} style={{ padding: '5px 8px', borderRadius: 6, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }}>
-                          {comptes.map(c => <option key={c.nom} value={c.nom}>{c.nom}</option>)}
-                        </select>
-                      </td>
-                      <td style={{ padding: '8px 14px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                          <input type="number" min="0" max="100" value={v.pourcentage} onChange={e => handleVirementChange(i, 'pourcentage', parseFloat(e.target.value) || 0)} style={{ width: 60, padding: '5px 8px', borderRadius: 6, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text, textAlign: 'right' }} />
-                          <span style={{ fontSize: 11, color: t.textMuted }}>%</span>
-                        </div>
-                      </td>
-                      <td style={{ padding: '10px 14px', fontWeight: 500, color: '#4CAF2E' }}>{Math.round(investissable * v.pourcentage / 100).toLocaleString('fr-FR')} €</td>
+                    <tr key={i} style={{ borderBottom: `0.5px solid ${t.border}`, background: isEditing ? t.bgSecondary : (coche ? (t.dark ? 'rgba(76,175,46,0.08)' : '#F6FFF3') : 'transparent') }}>
+                      <td style={{ padding: '10px 14px' }}><input type="checkbox" checked={coche} onChange={() => handleCheck(i)} disabled={isEditing} style={{ accentColor: bleu, cursor: isEditing ? 'not-allowed' : 'pointer', width: 14, height: 14 }} /></td>
+                      {isEditing ? (
+                        <>
+                          <td style={{ padding: '6px 8px' }}>
+                            <input value={editVirForm.destination} onChange={e => setEditVirForm({ ...editVirForm, destination: e.target.value })} style={inputStyle} />
+                          </td>
+                          <td style={{ padding: '6px 8px' }}>
+                            <select value={editVirForm.compte} onChange={e => setEditVirForm({ ...editVirForm, compte: e.target.value })} style={inputStyle}>
+                              {comptes.map(c => <option key={c.nom} value={c.nom}>{c.nom}</option>)}
+                            </select>
+                          </td>
+                          <td style={{ padding: '6px 8px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                              <input type="number" min="0" max="100" value={editVirForm.pourcentage} onChange={e => setEditVirForm({ ...editVirForm, pourcentage: e.target.value })} style={{ width: 60, padding: '5px 8px', borderRadius: 6, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgCard, color: t.text, textAlign: 'right' }} />
+                              <span style={{ fontSize: 11, color: t.textMuted }}>%</span>
+                            </div>
+                          </td>
+                          <td style={{ padding: '10px 14px', color: t.textMuted, fontSize: 11 }}>—</td>
+                          <td style={{ padding: '6px 8px' }}>
+                            <div style={{ display: 'flex', gap: 4 }}>
+                              <button onClick={() => handleEditVirSave(i)} style={{ background: '#EAF6E4', color: '#2E7D1E', border: 'none', borderRadius: 5, padding: '2px 7px', fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>✓</button>
+                              <button onClick={() => setEditingVirIdx(null)} style={{ background: t.bgSecondary, color: t.textMuted, border: `0.5px solid ${t.border}`, borderRadius: 5, padding: '2px 7px', fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>✕</button>
+                            </div>
+                          </td>
+                        </>
+                      ) : (
+                        <>
+                          <td style={{ padding: '10px 14px', color: coche ? '#4CAF2E' : t.text, fontWeight: 500, textDecoration: coche ? 'line-through' : 'none' }}>{v.destination}</td>
+                          <td style={{ padding: '10px 14px', color: t.textSecondary }}>{v.compte}</td>
+                          <td style={{ padding: '10px 14px', color: t.text, fontWeight: 500 }}>{v.pourcentage}%</td>
+                          <td style={{ padding: '10px 14px', fontWeight: 500, color: '#4CAF2E' }}>{Math.round(investissable * v.pourcentage / 100).toLocaleString('fr-FR')} €</td>
+                          <td style={{ padding: '10px 14px' }}>
+                            <div style={{ display: 'flex', gap: 4 }}>
+                              <button onClick={() => handleEditVirStart(i)} style={{ background: t.bgSecondary, color: t.textMuted, border: `0.5px solid ${t.border}`, borderRadius: 5, padding: '2px 7px', fontSize: 10, cursor: 'pointer', fontFamily: 'inherit' }}>✏️</button>
+                              <button onClick={() => handleDeleteVir(i)} style={{ background: confirmDeleteVirIdx === i ? '#E24B4A' : '#FCEBEB', color: confirmDeleteVirIdx === i ? '#fff' : '#E24B4A', border: 'none', borderRadius: 5, padding: '2px 7px', fontSize: 10, cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap', transition: 'all 0.15s' }}>
+                                {confirmDeleteVirIdx === i ? 'Confirmer ?' : '×'}
+                              </button>
+                            </div>
+                          </td>
+                        </>
+                      )}
                     </tr>
                   )
                 })}
@@ -469,6 +562,7 @@ export default function Portefeuille() {
                   <td colSpan={3} style={{ padding: '10px 14px', fontWeight: 500, color: t.text, fontSize: 11 }}>TOTAL</td>
                   <td style={{ padding: '10px 14px', fontWeight: 500, color: totalPourcentage === 100 ? '#4CAF2E' : '#E24B4A' }}>{totalPourcentage}%</td>
                   <td style={{ padding: '10px 14px', fontWeight: 500, color: t.text }}>{Math.round(investissable).toLocaleString('fr-FR')} €</td>
+                  <td></td>
                 </tr>
               </tbody>
             </table>
