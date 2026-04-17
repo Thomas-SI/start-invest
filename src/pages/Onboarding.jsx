@@ -34,10 +34,10 @@ const ETAPES = [
   },
   {
     id: 5,
-    emoji: '📚',
-    titre: 'Concentration',
-    description: 'Développez votre mindset d\'investisseur avec des conseils pratiques pour rester discipliné sur le long terme.',
-    animation: 'concentration',
+    emoji: '🏆',
+    titre: 'Challenge',
+    description: 'Relevez des défis financiers pour progresser dans votre parcours d\'investisseur et débloquez des accomplissements au fil de votre parcours.',
+    animation: 'challenge',
   },
   {
     id: 6,
@@ -178,21 +178,25 @@ function AnimationInvestissement() {
   )
 }
 
-function AnimationConcentration() {
+function AnimationChallenge() {
   return (
     <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
       <style>{`
         @keyframes fadeSlide { from { opacity:0; transform:translateY(12px) } to { opacity:1; transform:translateY(0) } }
+        @keyframes badgePop { from { opacity:0; transform:scale(0.5) } to { opacity:1; transform:scale(1) } }
       `}</style>
       <div style={{ width: '100%', maxWidth: 280, display: 'flex', flexDirection: 'column', gap: 8 }}>
         {[
-          { titre: 'Pensez à 5 ans, pas à 5 mois', cat: 'Mindset', color: '#EAF6E4', text: '#2E7D1E', delay: '0s' },
-          { titre: 'Ne timer jamais le marché', cat: 'Mindset', color: '#EAF6E4', text: '#2E7D1E', delay: '0.2s' },
-          { titre: 'Les frais, l\'ennemi silencieux', cat: 'Technique', color: '#EBE9FC', text: '#3C3489', delay: '0.4s' },
-        ].map(({ titre, cat, color, text, delay }) => (
+          { titre: 'Premier pas', emoji: '🎯', statut: 'Débloqué', color: '#EAF6E4', text: '#2E7D1E', delay: '0s' },
+          { titre: 'Ascension', emoji: '⛰️', statut: 'En cours', color: '#E8EEF6', text: '#1B2E4B', delay: '0.2s' },
+          { titre: 'Loin et Vite', emoji: '🚀', statut: 'À débloquer', color: '#F4F7F5', text: '#9CA3AF', delay: '0.4s' },
+        ].map(({ titre, emoji, statut, color, text, delay }) => (
           <div key={titre} style={{ background: '#F4F7F5', borderRadius: 10, padding: '10px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', animationName: 'fadeSlide', animationDuration: '0.5s', animationTimingFunction: 'ease', animationDelay: delay, animationFillMode: 'both' }}>
-            <span style={{ fontSize: 11, fontWeight: 500, color: '#1B2E4B', flex: 1, marginRight: 8 }}>{titre}</span>
-            <span style={{ fontSize: 9, padding: '2px 7px', borderRadius: 20, background: color, color: text, whiteSpace: 'nowrap' }}>{cat}</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1 }}>
+              <span style={{ fontSize: 18, animationName: 'badgePop', animationDuration: '0.5s', animationTimingFunction: 'ease', animationDelay: delay, animationFillMode: 'both' }}>{emoji}</span>
+              <span style={{ fontSize: 11, fontWeight: 500, color: '#1B2E4B' }}>{titre}</span>
+            </div>
+            <span style={{ fontSize: 9, padding: '2px 7px', borderRadius: 20, background: color, color: text, whiteSpace: 'nowrap' }}>{statut}</span>
           </div>
         ))}
       </div>
@@ -227,7 +231,7 @@ function TourApp({ onTerminer }) {
       case 'finances': return <AnimationFinances />
       case 'portefeuille': return <AnimationPortefeuille />
       case 'investissement': return <AnimationInvestissement />
-      case 'concentration': return <AnimationConcentration />
+      case 'challenge': return <AnimationChallenge />
       case 'ready': return <AnimationReady />
       default: return null
     }
@@ -244,13 +248,15 @@ function TourApp({ onTerminer }) {
           ))}
         </div>
 
-        {/* ANIMATION */}
-        <div style={{ height: 200, padding: '8px 20px' }}>
-          {renderAnimation()}
+        {/* ANIMATION - conteneur solidifié avec key pour forcer le remount à chaque étape */}
+        <div style={{ height: 200, padding: '8px 20px', position: 'relative', overflow: 'hidden' }}>
+          <div key={`anim-${etape}`} style={{ position: 'absolute', inset: '8px 20px', overflow: 'hidden' }}>
+            {renderAnimation()}
+          </div>
         </div>
 
-        {/* CONTENU */}
-        <div style={{ padding: '0 28px 24px' }}>
+        {/* CONTENU - avec key pour forcer le remount aussi */}
+        <div key={`content-${etape}`} style={{ padding: '0 28px 24px' }}>
           <div style={{ fontSize: 20, fontWeight: 700, color: '#1B2E4B', marginBottom: 8 }}>
             {current.emoji} {current.titre}
           </div>
