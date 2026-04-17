@@ -15,31 +15,31 @@ const plansData = [
     pages: ['Mes Finances', 'Challenge', 'Abonnement', 'Compte'],
     features: [
       { label: 'Suivi finance de base', inclus: true },
-      { label: 'Taux d epargne personnalise', inclus: true },
+      { label: "Taux d'épargne personnalisé", inclus: true },
       { label: 'Simulateur de croissance', inclus: true },
       { label: 'Vue des challenges', inclus: true },
-      { label: 'Acces portefeuille', inclus: false },
+      { label: 'Accès portefeuille', inclus: false },
       { label: 'Tableau des allocations', inclus: false },
-      { label: 'Journal suivi d investissement', inclus: false },
+      { label: "Journal suivi d'investissement", inclus: false },
       { label: 'Guide complet investissement', inclus: false },
     ]
   },
   {
     id: 'premium', nom: 'Premium', recommande: true,
     prixMensuel: '7.99 euros', prixAnnuel: '67 euros',
-    periodeMensuel: 'par mois', periodeAnnuel: 'par an economisez 29%',
+    periodeMensuel: 'par mois', periodeAnnuel: 'par an économisez 29%',
     pages: ['Mes Finances', 'Portefeuille', 'Investissement', 'Croissance', 'Challenge', 'Abonnement', 'Guide', 'Compte'],
     features: [
       { label: 'Suivi finance de base', inclus: true },
-      { label: 'Capacite d epargne personnalisee', inclus: true },
+      { label: "Capacite d'épargne personnalisée", inclus: true },
       { label: 'Simulateur de croissance', inclus: true },
-      { label: 'Acces portefeuille', inclus: true },
+      { label: 'Accès portefeuille', inclus: true },
       { label: 'Vue des challenges', inclus: true },
       { label: 'Tableau des allocations', inclus: true },
       { label: 'Plan virement par compte', inclus: true },
-      { label: 'Journal suivi d investissement', inclus: true },
+      { label: "Journal suivi d'investissement", inclus: true },
       { label: 'Projection croissance', inclus: true },
-      { label: 'Acces challenge et recompense', inclus: true },
+      { label: 'Accès challenge et récompense', inclus: true },
       { label: 'Guide complet investissement', inclus: true },
     ]
   },
@@ -54,7 +54,7 @@ function PlanCard({ plan, abonnementAnnuel, openSignup }) {
 
   return (
     <div style={{ background: recommande ? '#1B2E4B' : '#fff', border: `${recommande ? '2px' : '0.5px'} solid ${recommande ? '#4CAF2E' : '#E0EAE3'}`, borderRadius: 20, padding: '28px 24px', display: 'flex', flexDirection: 'column', position: 'relative', textAlign: 'left' }}>
-      {recommande && <div style={{ position: 'absolute', top: -14, left: '50%', transform: 'translateX(-50%)', background: '#4CAF2E', color: '#fff', fontSize: 11, fontWeight: 600, padding: '4px 16px', borderRadius: 20, whiteSpace: 'nowrap' }}>Recommande</div>}
+      {recommande && <div style={{ position: 'absolute', top: -14, left: '50%', transform: 'translateX(-50%)', background: '#4CAF2E', color: '#fff', fontSize: 11, fontWeight: 600, padding: '4px 16px', borderRadius: 20, whiteSpace: 'nowrap' }}>Recommandé</div>}
       <div style={{ fontSize: 16, fontWeight: 600, color: recommande ? '#fff' : '#1B2E4B', marginBottom: 4 }}>{nom}</div>
       <div style={{ fontSize: 32, fontWeight: 700, color: recommande ? '#fff' : '#1B2E4B', marginBottom: 2 }}>{prix}</div>
       <div style={{ fontSize: 11, color: recommande ? 'rgba(255,255,255,0.5)' : '#9CA3AF', marginBottom: recommande ? 4 : 20 }}>{periode}</div>
@@ -204,7 +204,7 @@ function PublicNavbar({ isMobile, openLogin, openSignup, activeLink = 'Accueil' 
 
             <div style={{ padding: '20px 24px', marginTop: 'auto', borderTop: '0.5px solid #E0EAE3', display: 'flex', flexDirection: 'column', gap: 10 }}>
               <button onClick={() => { setMenuOpen(false); openLogin() }} style={{ padding: '12px', borderRadius: 8, border: '0.5px solid #1B2E4B', background: 'transparent', color: '#1B2E4B', fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Se connecter</button>
-              <button onClick={() => { setMenuOpen(false); openSignup() }} style={{ padding: '12px', borderRadius: 8, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>S inscrire gratuitement</button>
+              <button onClick={() => { setMenuOpen(false); openSignup() }} style={{ padding: '12px', borderRadius: 8, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>S'inscrire gratuitement</button>
             </div>
           </div>
         )}
@@ -227,7 +227,7 @@ function PublicNavbar({ isMobile, openLogin, openSignup, activeLink = 'Accueil' 
       </div>
       <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
         <button onClick={openLogin} style={{ padding: '7px 16px', borderRadius: 8, border: '0.5px solid #1B2E4B', background: 'transparent', color: '#1B2E4B', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Se connecter</button>
-        <button onClick={openSignup} style={{ padding: '7px 16px', borderRadius: 8, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>S inscrire gratuitement</button>
+        <button onClick={openSignup} style={{ padding: '7px 16px', borderRadius: 8, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>S'inscrire gratuitement</button>
       </div>
     </nav>
   )
@@ -257,10 +257,10 @@ export default function Accueil() {
       {/* HERO */}
       <section id="hero" style={{ padding: isMobile ? '40px 16px 80px' : '80px 40px 60px', maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 40 : 60, alignItems: 'center' }}>
         <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 16, background: '#EAF6E4', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Nouvelle facon d investir</div>
+          <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 16, background: '#EAF6E4', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Nouvelle façon d'investir</div>
           <h1 style={{ fontSize: isMobile ? 32 : 42, fontWeight: 700, color: '#1B2E4B', lineHeight: 1.2, margin: '0 0 20px' }}>
             Prenez une longueur<br />
-            <span style={{ color: '#4CAF2E' }}>d avance.</span>
+            <span style={{ color: '#4CAF2E' }}>d'avance.</span>
           </h1>
           <p style={{ fontSize: isMobile ? 14 : 15, color: '#6B7280', lineHeight: 1.7, margin: '0 0 36px' }}>
             Suivez vos finances. Atteignez vos objectifs.<br />Ayez un pas dans le futur.
@@ -317,8 +317,8 @@ export default function Accueil() {
           <div style={{ position: 'absolute', bottom: isMobile ? -15 : -20, right: isMobile ? 10 : -20, background: '#fff', border: '0.5px solid #185FA5', borderRadius: 14, padding: isMobile ? '8px 10px' : '10px 14px', display: 'flex', alignItems: 'center', gap: isMobile ? 8 : 10, boxShadow: '0 4px 16px rgba(24,95,165,0.12)' }}>
             <div style={{ width: isMobile ? 30 : 36, height: isMobile ? 30 : 36, borderRadius: '50%', background: '#E6F1FB', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: isMobile ? 15 : 18, border: '2px solid #185FA5', flexShrink: 0 }}>🏗️</div>
             <div>
-              <div style={{ fontSize: isMobile ? 10 : 11, fontWeight: 600, color: '#1B2E4B' }}>L Architecte</div>
-              <div style={{ fontSize: isMobile ? 9 : 10, color: '#185FA5' }}>Accomplissement debloque !</div>
+              <div style={{ fontSize: isMobile ? 10 : 11, fontWeight: 600, color: '#1B2E4B' }}>L'Architecte</div>
+              <div style={{ fontSize: isMobile ? 9 : 10, color: '#185FA5' }}>Accomplissement débloqué !</div>
             </div>
           </div>
         </div>
@@ -331,7 +331,7 @@ export default function Accueil() {
             <div style={{ background: '#F4F7F5', padding: '28px 24px', minHeight: 200, display: 'flex', flexDirection: 'column', gap: 8 }}>
               {[
                 { label: 'Revenus', val: '2 000 euros', color: '#4CAF2E', w: '80%' },
-                { label: 'Depenses fixes', val: '1 000 euros', color: '#1B2E4B', w: '50%' },
+                { label: 'Dépenses fixes', val: '1 000 euros', color: '#1B2E4B', w: '50%' },
                 { label: 'Investissable', val: '400 euros', color: '#BA7517', w: '20%' },
               ].map(({ label, val, color, w }) => (
                 <div key={label}>
@@ -345,12 +345,12 @@ export default function Accueil() {
                 </div>
               ))}
               <div style={{ marginTop: 8, background: '#EAF6E4', borderRadius: 8, padding: '6px 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: 10, color: '#2E7D1E' }}>Regle 50/30/20</span>
+                <span style={{ fontSize: 10, color: '#2E7D1E' }}>Règle 50/30/20</span>
                 <span style={{ fontSize: 12, fontWeight: 700, color: '#4CAF2E' }}>OK</span>
               </div>
             </div>
             <div style={{ padding: '18px 24px' }}>
-              <div style={{ fontSize: 15, fontWeight: 600, color: '#1B2E4B', marginBottom: 6 }}>Analysez vos depenses</div>
+              <div style={{ fontSize: 15, fontWeight: 600, color: '#1B2E4B', marginBottom: 6 }}>Analysez vos dépenses</div>
               <div style={{ fontSize: 13, color: '#9CA3AF', lineHeight: 1.6 }}>Donnez-leur une importance.</div>
             </div>
           </div>
@@ -358,9 +358,9 @@ export default function Accueil() {
           <div style={{ background: '#fff', borderRadius: 16, border: '0.5px solid #E0EAE3', overflow: 'hidden' }}>
             <div style={{ background: '#F4F7F5', padding: '28px 24px', minHeight: 200, display: 'flex', flexDirection: 'column', gap: 10 }}>
               {[
-                { label: 'PEA', desc: 'Bourse europeenne', color: '#1B2E4B', w: '80%', tag: 'Plafond 150 000 euros' },
+                { label: 'PEA', desc: 'Bourse européenne', color: '#1B2E4B', w: '80%', tag: 'Plafond 150 000 euros' },
                 { label: 'CTO', desc: 'Bourse mondiale', color: '#3B82F6', w: '60%', tag: 'Sans plafond' },
-                { label: 'Ass. Vie', desc: 'Epargne long terme', color: '#BA7517', w: '40%', tag: 'Avantage fiscal' },
+                { label: 'Ass. Vie', desc: 'Épargne long terme', color: '#BA7517', w: '40%', tag: 'Avantage fiscal' },
               ].map(({ label, desc, color, w, tag }) => (
                 <div key={label} style={{ background: '#fff', borderRadius: 8, padding: '8px 10px', border: '0.5px solid #E0EAE3' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4, gap: 8 }}>
@@ -377,8 +377,8 @@ export default function Accueil() {
               ))}
             </div>
             <div style={{ padding: '18px 24px' }}>
-              <div style={{ fontSize: 15, fontWeight: 600, color: '#1B2E4B', marginBottom: 6 }}>Decouvrez comment investir</div>
-              <div style={{ fontSize: 13, color: '#9CA3AF', lineHeight: 1.6 }}>Il y a differentes facons d investir, choisissez les bonnes.</div>
+              <div style={{ fontSize: 15, fontWeight: 600, color: '#1B2E4B', marginBottom: 6 }}>Découvrez comment investir</div>
+              <div style={{ fontSize: 13, color: '#9CA3AF', lineHeight: 1.6 }}>Il y a différentes facons d'investir, choisissez les bonnes.</div>
             </div>
           </div>
 
@@ -387,8 +387,8 @@ export default function Accueil() {
               <DCAChart />
             </div>
             <div style={{ padding: '18px 24px' }}>
-              <div style={{ fontSize: 15, fontWeight: 600, color: '#1B2E4B', marginBottom: 6 }}>Prevoyez vos performances</div>
-              <div style={{ fontSize: 13, color: '#9CA3AF', lineHeight: 1.6 }}>Decouvrez les performances atteignables selon votre capacite d epargne.</div>
+              <div style={{ fontSize: 15, fontWeight: 600, color: '#1B2E4B', marginBottom: 6 }}>Prévoyez vos performances</div>
+              <div style={{ fontSize: 13, color: '#9CA3AF', lineHeight: 1.6 }}>Découvrez les performances atteignables selon votre capacite d'épargne.</div>
             </div>
           </div>
         </div>
@@ -404,7 +404,7 @@ export default function Accueil() {
           <div style={{ textAlign: 'center', marginBottom: isMobile ? 36 : 52 }}>
             <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 16, background: 'rgba(76,175,46,0.15)', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Challenge</div>
             <h2 style={{ fontSize: isMobile ? 26 : 34, fontWeight: 700, color: '#fff', lineHeight: 1.3, margin: '0 0 16px' }}>
-              Pensez a 5 ans, <span style={{ color: '#4CAF2E' }}>pas a 5 mois.</span>
+              Pensez a 5 ans, <span style={{ color: '#4CAF2E' }}>pas à 5 mois.</span>
             </h2>
             <p style={{ fontSize: isMobile ? 13 : 14, color: 'rgba(255,255,255,0.55)', lineHeight: 1.8, margin: '0 auto 32px', maxWidth: 460 }}>
               Fixez-vous des objectifs et atteignez-les avec discipline au fil du temps.
@@ -418,13 +418,13 @@ export default function Accueil() {
               <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#EAF6E4', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, border: '2px solid #4CAF2E' }}>🚀</div>
               <div style={{ fontSize: 15, fontWeight: 600, color: '#fff' }}>Le Grand Saut</div>
               <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, background: '#EAF6E4', color: '#2E7D1E', fontWeight: 500 }}>Obtenu</span>
-              <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', lineHeight: 1.6 }}>Tu n es plus spectateur, tu es le pilote de ton futur.</div>
+              <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', lineHeight: 1.6 }}>Tu n'es plus spectateur, tu es le pilote de ton futur.</div>
             </div>
             <div style={{ background: 'rgba(255,255,255,0.06)', border: '0.5px solid rgba(255,255,255,0.1)', borderRadius: 16, padding: '24px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 12 }}>
               <div style={{ width: 64, height: 64, borderRadius: '50%', border: '2px solid #854F0B', overflow: 'hidden' }}>
-                <img src={METRONOME_URL} alt="metronome" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <img src={METRONOME_URL} alt="métronome" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
-              <div style={{ fontSize: 15, fontWeight: 600, color: '#fff' }}>Le Metronome</div>
+              <div style={{ fontSize: 15, fontWeight: 600, color: '#fff' }}>Le Métronome</div>
               <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, background: '#FFF0DC', color: '#854F0B', fontWeight: 500 }}>Bronze 3 mois</span>
               <div style={{ width: '100%', background: 'rgba(255,255,255,0.1)', borderRadius: 4, height: 5, overflow: 'hidden' }}>
                 <div style={{ height: '100%', borderRadius: 4, background: '#854F0B', width: '50%' }} />
@@ -451,7 +451,7 @@ export default function Accueil() {
           <h2 style={{ fontSize: isMobile ? 26 : 34, fontWeight: 700, color: '#1B2E4B', lineHeight: 1.3, margin: '0 0 16px' }}>
             Ne laissez plus jamais <span style={{ color: '#4CAF2E' }}>votre argent dormir.</span>
           </h2>
-          <p style={{ fontSize: isMobile ? 13 : 14, color: '#9CA3AF', lineHeight: 1.8, margin: '0 0 8px' }}>Trouvez votre facon de faire de l argent en dormant.</p>
+          <p style={{ fontSize: isMobile ? 13 : 14, color: '#9CA3AF', lineHeight: 1.8, margin: '0 0 8px' }}>Trouvez votre façon de faire de l'argent en dormant.</p>
           <p style={{ fontSize: 13, color: '#4CAF2E', fontWeight: 500, margin: '0 0 32px' }}>Essayez gratuitement pendant 15 jours</p>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 0, background: '#fff', border: '0.5px solid #E0EAE3', borderRadius: 30, padding: '4px', marginBottom: 40 }}>
             <button onClick={() => setAbonnementAnnuel(false)} style={{ padding: '7px 20px', borderRadius: 20, border: 'none', background: !abonnementAnnuel ? '#1B2E4B' : 'transparent', color: !abonnementAnnuel ? '#fff' : '#9CA3AF', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' }}>Mensuel</button>

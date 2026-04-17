@@ -359,7 +359,7 @@ export default function Investissement() {
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
-          <div style={{ fontSize: 14, fontWeight: 500, color: t.text }}>Journal d investissement</div>
+          <div style={{ fontSize: 14, fontWeight: 500, color: t.text }}>Journal d'investissement</div>
           <div style={{ display: 'flex', gap: 8 }}>
             <button onClick={() => setShowJournal(v => !v)} style={{ background: t.bgSecondary, color: t.text, fontSize: 11, padding: '5px 12px', borderRadius: 8, border: `0.5px solid ${t.border}`, cursor: 'pointer', fontFamily: 'inherit' }}>
               {showJournal ? 'Masquer' : 'Afficher'}

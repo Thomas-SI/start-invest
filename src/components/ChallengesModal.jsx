@@ -4,13 +4,13 @@ import { supabase } from '../lib/supabase'
 const METRONOME_URL = 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/AB94501C-5932-4B4C-93F1-D1CD5A4BAA25.png'
 
 const BADGES_DATA = [
-  { slug: 'premier-pas', nom: 'Premier Pas', emoji: '🌱', desc: "Dès l inscription sur StartInvest.", message: 'Bienvenue chez Start Invest.', tag: 'Automatique', tagColor: '#2E7D1E', tagBg: '#EAF6E4' },
-  { slug: 'grand-saut', nom: 'Le Grand Saut', emoji: '🚀', desc: 'Acheter son premier ETF.', message: "Tu n es plus spectateur, tu es le pilote de ton futur.", tag: 'Premier achat', tagColor: '#2E7D1E', tagBg: '#EAF6E4' },
-  { slug: 'metronome', img: METRONOME_URL, nom: 'Le Metronome', desc: 'Investir regulierement chaque mois.', message: 'La magie des interets composes adore ta regularite.', tag: 'Bronze vers Platine', tagColor: '#854F0B', tagBg: '#FFF0DC' },
+  { slug: 'premier-pas', nom: 'Premier Pas', emoji: '🌱', desc: "Dès l'inscription sur StartInvest.", message: 'Bienvenue chez Start Invest.', tag: 'Automatique', tagColor: '#2E7D1E', tagBg: '#EAF6E4' },
+  { slug: 'grand-saut', nom: 'Le Grand Saut', emoji: '🚀', desc: 'Acheter son premier ETF.', message: "Tu n'es plus spectateur, tu es le pilote de ton futur.", tag: 'Premier achat', tagColor: '#2E7D1E', tagBg: '#EAF6E4' },
+  { slug: 'metronome', img: METRONOME_URL, nom: 'Le Métronome', desc: 'Investir régulièrement chaque mois.', message: 'La magie des intérêts composes adore ta régularité.', tag: 'Bronze vers Platine', tagColor: '#854F0B', tagBg: '#FFF0DC' },
   { slug: 'main-de-fer', nom: 'Main de Fer', emoji: '🗿', desc: '6 mois sans aucune vente.', message: 'Le calme est une competence.', tag: 'Discipline', tagColor: '#444441', tagBg: '#F0F0F0' },
-  { slug: 'architecte', nom: "L Architecte", emoji: '🏗️', desc: 'Posseder 3 ETF differents.', message: 'Ton patrimoine est maintenant solide et diversifie.', tag: 'Diversification', tagColor: '#185FA5', tagBg: '#E6F1FB' },
-  { slug: 'cap', nom: 'Ascension', emoji: '💰', desc: "Atteindre un palier d investissement.", message: 'Le premier palier est le plus dur. La machine est lancee.', tag: 'Bronze vers Legendaire', tagColor: '#633806', tagBg: '#FFF8DC' },
-  { slug: 'vroum-vroum', nom: 'Loin et Vite', emoji: '⚡', desc: "S abonner a StartInvest Premium.", message: "Je vois deja l avenir.", tag: 'Premium', tagColor: '#534AB7', tagBg: '#EEEDFE' },
+  { slug: 'architecte', nom: "L'Architecte", emoji: '🏗️', desc: 'Posséder 3 ETF différents.', message: 'Ton patrimoine est maintenant solide et diversifie.', tag: 'Diversification', tagColor: '#185FA5', tagBg: '#E6F1FB' },
+  { slug: 'cap', nom: 'Ascension', emoji: '💰', desc: "Atteindre un palier d'investissement.", message: 'Le premier palier est le plus dur. La machine est lancee.', tag: 'Bronze vers Légendaire', tagColor: '#633806', tagBg: '#FFF8DC' },
+  { slug: 'vroum-vroum', nom: 'Loin et Vite', emoji: '⚡', desc: "S'abonner a StartInvest Premium.", message: "Je vois déjà l'avenir.", tag: 'Premium', tagColor: '#534AB7', tagBg: '#EEEDFE' },
 ]
 
 export default function ChallengesModal({ onClose }) {
@@ -36,7 +36,7 @@ export default function ChallengesModal({ onClose }) {
 
         <div style={{ padding: '24px 28px 20px', borderBottom: '0.5px solid #E0EAE3', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
           <div>
-            <div style={{ fontSize: 16, fontWeight: 700, color: '#1B2E4B' }}>Livret d accomplissements</div>
+            <div style={{ fontSize: 16, fontWeight: 700, color: '#1B2E4B' }}>Livret d'accomplissements</div>
             <div style={{ fontSize: 12, color: '#9CA3AF', marginTop: 2 }}>
               {loading ? 'Chargement...' : slugsObtenus.size + ' / ' + BADGES_DATA.length + ' debloques'}
             </div>

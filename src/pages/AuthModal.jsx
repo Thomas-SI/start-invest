@@ -95,7 +95,7 @@ export default function AuthModal({ onClose, defaultMode = 'login' }) {
         </div>
         <div style={{ marginTop: 20, textAlign: 'center', fontSize: 12, color: '#9CA3AF' }}>
           {mode === 'login'
-            ? <span>Pas encore de compte ? <span onClick={() => setMode('signup')} style={{ color: '#4CAF2E', cursor: 'pointer', fontWeight: 500 }}>S inscrire</span></span>
+            ? <span>Pas encore de compte ? <span onClick={() => setMode('signup')} style={{ color: '#4CAF2E', cursor: 'pointer', fontWeight: 500 }}>S'inscrire</span></span>
             : <span>Déjà un compte ? <span onClick={() => setMode('login')} style={{ color: '#4CAF2E', cursor: 'pointer', fontWeight: 500 }}>Se connecter</span></span>
           }
         </div>

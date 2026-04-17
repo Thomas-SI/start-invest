@@ -119,7 +119,7 @@ function PublicNavbar({ isMobile, openLogin, openSignup, activeLink = 'Fonctionn
 
             <div style={{ padding: '20px 24px', marginTop: 'auto', borderTop: '0.5px solid #E0EAE3', display: 'flex', flexDirection: 'column', gap: 10 }}>
               <button onClick={() => { setMenuOpen(false); openLogin() }} style={{ padding: '12px', borderRadius: 8, border: '0.5px solid #1B2E4B', background: 'transparent', color: '#1B2E4B', fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Se connecter</button>
-              <button onClick={() => { setMenuOpen(false); openSignup() }} style={{ padding: '12px', borderRadius: 8, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>S inscrire gratuitement</button>
+              <button onClick={() => { setMenuOpen(false); openSignup() }} style={{ padding: '12px', borderRadius: 8, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>S'inscrire gratuitement</button>
             </div>
           </div>
         )}
@@ -142,7 +142,7 @@ function PublicNavbar({ isMobile, openLogin, openSignup, activeLink = 'Fonctionn
       </div>
       <div style={{ display: 'flex', gap: 10 }}>
         <button onClick={openLogin} style={{ padding: '7px 16px', borderRadius: 8, border: '0.5px solid #1B2E4B', background: 'transparent', color: '#1B2E4B', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Se connecter</button>
-        <button onClick={openSignup} style={{ padding: '7px 16px', borderRadius: 8, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>S inscrire gratuitement</button>
+        <button onClick={openSignup} style={{ padding: '7px 16px', borderRadius: 8, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>S'inscrire gratuitement</button>
       </div>
     </nav>
   )
@@ -174,7 +174,7 @@ export default function Fonctionnalites() {
       <PublicNavbar isMobile={isMobile} openLogin={openLogin} openSignup={openSignup} activeLink="Fonctionnalites" />
 
       <section style={{ padding: isMobile ? '40px 16px 30px' : '60px 40px 40px', maxWidth: 1100, margin: '0 auto', textAlign: 'center' }}>
-        <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 16, background: '#EAF6E4', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Fonctionnalites</div>
+        <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 16, background: '#EAF6E4', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Fonctionnalités</div>
         <h1 style={{ fontSize: h1Size, fontWeight: 700, color: '#1B2E4B', lineHeight: 1.2, margin: '0 0 16px' }}>
           Tout ce dont vous avez besoin pour investir intelligemment.
         </h1>
@@ -189,7 +189,7 @@ export default function Fonctionnalites() {
           <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', marginBottom: 12 }}>Mes Finances</div>
           {[
             { label: 'Revenus', val: '2 000 euros', color: '#4CAF2E', w: '80%' },
-            { label: 'Depenses fixes', val: '1 000 euros', color: '#1B2E4B', w: '50%' },
+            { label: 'Dépenses fixes', val: '1 000 euros', color: '#1B2E4B', w: '50%' },
             { label: 'Envies', val: '600 euros', color: '#BA7517', w: '30%' },
             { label: 'Investissable', val: '400 euros', color: '#3B82F6', w: '20%' },
           ].map(({ label, val, color, w }) => (
@@ -204,14 +204,14 @@ export default function Fonctionnalites() {
             </div>
           ))}
           <div style={{ marginTop: 16, background: '#EAF6E4', borderRadius: 10, padding: '10px 14px', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 4 }}>
-            <span style={{ fontSize: 12, color: '#2E7D1E' }}>Regle 50/30/20</span>
+            <span style={{ fontSize: 12, color: '#2E7D1E' }}>Règle 50/30/20</span>
             <span style={{ fontSize: 13, fontWeight: 700, color: '#4CAF2E' }}>OK Respectee</span>
           </div>
         </div>
         <div>
           <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 12, background: '#EAF6E4', display: 'inline-block', padding: '3px 10px', borderRadius: 20 }}>Budget</div>
-          <h2 style={{ fontSize: h2Size, fontWeight: 700, color: '#1B2E4B', lineHeight: 1.3, margin: '0 0 14px' }}>Analysez vos finances en un coup d oeil</h2>
-          <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.8, margin: '0 0 20px' }}>Saisissez vos revenus et depenses. StartInvest calcule automatiquement combien vous pouvez investir chaque mois selon la regle 50/30/20.</p>
+          <h2 style={{ fontSize: h2Size, fontWeight: 700, color: '#1B2E4B', lineHeight: 1.3, margin: '0 0 14px' }}>Analysez vos finances en un coup d œil</h2>
+          <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.8, margin: '0 0 20px' }}>Saisissez vos revenus et dépenses. StartInvest calcule automatiquement combien vous pouvez investir chaque mois selon la règle 50/30/20.</p>
           {['Suivi revenus et depenses', 'Regle 50/30/20 automatique', 'Calcul capacite d epargne', 'Echeances et charges annuelles'].map(f => (
             <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, fontSize: 13, color: '#6B7280' }}>
               <span style={{ color: '#4CAF2E' }}>✓</span>{f}
@@ -225,8 +225,8 @@ export default function Fonctionnalites() {
         <div style={{ maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: gridCols, gap: gridGap, alignItems: 'center' }}>
           <div>
             <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 12, background: '#EAF6E4', display: 'inline-block', padding: '3px 10px', borderRadius: 20 }}>Portefeuille</div>
-            <h2 style={{ fontSize: h2Size, fontWeight: 700, color: '#1B2E4B', lineHeight: 1.3, margin: '0 0 14px' }}>Gerez tous vos comptes au meme endroit</h2>
-            <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.8, margin: '0 0 20px' }}>Livret A, PEA, CTO, Assurance-vie — visualisez votre patrimoine complet, suivez votre matelas de securite et planifiez vos virements mensuels.</p>
+            <h2 style={{ fontSize: h2Size, fontWeight: 700, color: '#1B2E4B', lineHeight: 1.3, margin: '0 0 14px' }}>Gérez tous vos comptes au même endroit</h2>
+            <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.8, margin: '0 0 20px' }}>Livret A, PEA, CTO, Assurance-vie — visualisez votre patrimoine complet, suivez votre matelas de sécurité et planifiez vos virements mensuels.</p>
             {['Suivi multi-comptes', 'Matelas de securite', 'Plan de virement mensuel automatique', 'Repartition du patrimoine', 'Objectif d epargne par compte'].map(f => (
               <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, fontSize: 13, color: '#6B7280' }}>
                 <span style={{ color: '#4CAF2E' }}>✓</span>{f}
@@ -315,7 +315,7 @@ export default function Fonctionnalites() {
           <div>
             <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 12, background: '#EAF6E4', display: 'inline-block', padding: '3px 10px', borderRadius: 20 }}>Croissance</div>
             <h2 style={{ fontSize: h2Size, fontWeight: 700, color: '#1B2E4B', lineHeight: 1.3, margin: '0 0 14px' }}>Simulez votre croissance avec le DCA</h2>
-            <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.8, margin: '0 0 20px' }}>Decouvrez combien votre investissement peut valoir dans 5, 10 ou 20 ans grace au simulateur DCA.</p>
+            <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.8, margin: '0 0 20px' }}>Découvrez combien votre investissement peut valoir dans 5, 10 ou 20 ans grâce au simulateur DCA.</p>
             {['Simulateur DCA', 'Projection sur 1 a 30 ans', 'Calcul des interets composes', 'Base sur votre capacite d epargne reelle'].map(f => (
               <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, fontSize: 13, color: '#6B7280' }}>
                 <span style={{ color: '#4CAF2E' }}>✓</span>{f}
@@ -342,8 +342,8 @@ export default function Fonctionnalites() {
         </div>
         <div style={{ background: '#1B2E4B', borderRadius: 16, padding: '28px 24px' }}>
           {[
-            { img: null, emoji: '🚀', nom: 'Le Grand Saut', tag: 'Obtenu', tagColor: '#2E7D1E', tagBg: '#EAF6E4', desc: 'Tu n es plus spectateur.', progress: null },
-            { img: METRONOME_URL, emoji: null, nom: 'Le Metronome', tag: 'Bronze 3 mois', tagColor: '#854F0B', tagBg: '#FFF0DC', desc: '3 / 6 mois vers Argent', progress: 50 },
+            { img: null, emoji: '🚀', nom: 'Le Grand Saut', tag: 'Obtenu', tagColor: '#2E7D1E', tagBg: '#EAF6E4', desc: "Tu n'es plus spectateur.", progress: null },
+            { img: METRONOME_URL, emoji: null, nom: 'Le Métronome', tag: 'Bronze 3 mois', tagColor: '#854F0B', tagBg: '#FFF0DC', desc: '3 / 6 mois vers Argent', progress: 50 },
             { img: null, emoji: '💰', nom: 'Ascension', tag: 'Or 1 000 euros', tagColor: '#633806', tagBg: '#FFF8DC', desc: '1 200 / 2 000 euros vers Platine', progress: 60 },
             { img: null, emoji: '🗿', nom: 'Main de Fer', tag: '?', tagColor: '#9CA3AF', tagBg: 'rgba(255,255,255,0.08)', desc: '6 mois sans vente', progress: null, locked: true },
           ].map(({ img, emoji, nom, tag, tagColor, tagBg, desc, progress, locked }) => (
@@ -372,9 +372,9 @@ export default function Fonctionnalites() {
 
       {/* CTA */}
       <section style={{ padding: isMobile ? '50px 16px' : '80px 40px', textAlign: 'center', background: '#F4F7F5' }}>
-        <h2 style={{ fontSize: isMobile ? 24 : 30, fontWeight: 700, color: '#1B2E4B', margin: '0 0 16px' }}>Pret a batir votre futur ?</h2>
-        <p style={{ fontSize: 14, color: '#9CA3AF', margin: '0 0 32px' }}>Commencer l aventure Start Invest.</p>
-        <button onClick={openSignup} style={{ padding: isMobile ? '12px 32px' : '14px 40px', borderRadius: 12, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>S inscrire gratuitement</button>
+        <h2 style={{ fontSize: isMobile ? 24 : 30, fontWeight: 700, color: '#1B2E4B', margin: '0 0 16px' }}>Prêt à bâtir votre futur ?</h2>
+        <p style={{ fontSize: 14, color: '#9CA3AF', margin: '0 0 32px' }}>Commencer l'aventure Start Invest.</p>
+        <button onClick={openSignup} style={{ padding: isMobile ? '12px 32px' : '14px 40px', borderRadius: 12, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>S'inscrire gratuitement</button>
       </section>
 
       <FooterPublic />

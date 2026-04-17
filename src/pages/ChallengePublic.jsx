@@ -76,7 +76,7 @@ function PublicNavbar({ isMobile, openLogin, openSignup, activeLink = 'Challenge
 
             <div style={{ padding: '20px 24px', marginTop: 'auto', borderTop: '0.5px solid #E0EAE3', display: 'flex', flexDirection: 'column', gap: 10 }}>
               <button onClick={() => { setMenuOpen(false); openLogin() }} style={{ padding: '12px', borderRadius: 8, border: '0.5px solid #1B2E4B', background: 'transparent', color: '#1B2E4B', fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Se connecter</button>
-              <button onClick={() => { setMenuOpen(false); openSignup() }} style={{ padding: '12px', borderRadius: 8, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>S inscrire gratuitement</button>
+              <button onClick={() => { setMenuOpen(false); openSignup() }} style={{ padding: '12px', borderRadius: 8, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>S'inscrire gratuitement</button>
             </div>
           </div>
         )}
@@ -98,7 +98,7 @@ function PublicNavbar({ isMobile, openLogin, openSignup, activeLink = 'Challenge
       </div>
       <div style={{ display: 'flex', gap: 10 }}>
         <button onClick={openLogin} style={{ padding: '7px 16px', borderRadius: 8, border: '0.5px solid #1B2E4B', background: 'transparent', color: '#1B2E4B', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Se connecter</button>
-        <button onClick={openSignup} style={{ padding: '7px 16px', borderRadius: 8, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>S inscrire gratuitement</button>
+        <button onClick={openSignup} style={{ padding: '7px 16px', borderRadius: 8, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>S'inscrire gratuitement</button>
       </div>
     </nav>
   )
@@ -119,13 +119,13 @@ export default function ChallengePublic() {
   const openSignup = () => { setAuthMode('signup'); setAuthOpen(true) }
 
   const BADGES = [
-    { emoji: '🌱', nom: 'Premier Pas', desc: 'Des l inscription sur StartInvest.', message: 'Bienvenue chez Start Invest.', tag: 'Automatique', tagColor: '#2E7D1E', tagBg: '#EAF6E4' },
-    { emoji: '🚀', nom: 'Le Grand Saut', desc: 'Acheter son premier ETF.', message: 'Tu n es plus spectateur, tu es le pilote de ton futur.', tag: 'Premier achat', tagColor: '#2E7D1E', tagBg: '#EAF6E4' },
-    { img: METRONOME_URL, nom: 'Le Metronome', desc: 'Investir regulierement chaque mois.', message: 'La magie des interets composes adore ta regularite.', tag: 'Bronze vers Platine', tagColor: '#854F0B', tagBg: '#FFF0DC' },
+    { emoji: '🌱', nom: 'Premier Pas', desc: "Des l'inscription sur StartInvest.", message: 'Bienvenue chez Start Invest.', tag: 'Automatique', tagColor: '#2E7D1E', tagBg: '#EAF6E4' },
+    { emoji: '🚀', nom: 'Le Grand Saut', desc: 'Acheter son premier ETF.', message: "Tu n'es plus spectateur, tu es le pilote de ton futur.", tag: 'Premier achat', tagColor: '#2E7D1E', tagBg: '#EAF6E4' },
+    { img: METRONOME_URL, nom: 'Le Métronome', desc: 'Investir régulièrement chaque mois.', message: 'La magie des intérêts composes adore ta régularité.', tag: 'Bronze vers Platine', tagColor: '#854F0B', tagBg: '#FFF0DC' },
     { emoji: '🗿', nom: 'Main de Fer', desc: '6 mois sans aucune vente.', message: 'Le calme est une competence.', tag: 'Discipline', tagColor: '#444441', tagBg: '#F0F0F0' },
-    { emoji: '🏗️', nom: 'L Architecte', desc: 'Posseder 3 ETF differents.', message: 'Ton patrimoine est maintenant solide et diversifie.', tag: 'Diversification', tagColor: '#185FA5', tagBg: '#E6F1FB' },
-    { emoji: '💰', nom: 'Ascension', desc: 'Atteindre un palier d investissement.', message: 'Le premier palier est le plus dur. La machine est lancee.', tag: 'Bronze vers Legendaire', tagColor: '#633806', tagBg: '#FFF8DC' },
-    { emoji: '⚡', nom: 'Loin et Vite', desc: 'S abonner a StartInvest Premium.', message: 'Je vois deja l avenir.', tag: 'Premium', tagColor: '#534AB7', tagBg: '#EEEDFE' },
+    { emoji: '🏗️', nom: "L'Architecte", desc: 'Posséder 3 ETF différents.', message: 'Ton patrimoine est maintenant solide et diversifie.', tag: 'Diversification', tagColor: '#185FA5', tagBg: '#E6F1FB' },
+    { emoji: '💰', nom: 'Ascension', desc: "Atteindre un palier d'investissement.", message: 'Le premier palier est le plus dur. La machine est lancee.', tag: 'Bronze vers Légendaire', tagColor: '#633806', tagBg: '#FFF8DC' },
+    { emoji: '⚡', nom: 'Loin et Vite', desc: "S'abonner a StartInvest Premium.", message: "Je vois déjà l'avenir.", tag: 'Premium', tagColor: '#534AB7', tagBg: '#EEEDFE' },
   ]
 
   return (
@@ -145,9 +145,9 @@ export default function ChallengePublic() {
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: isMobile ? 10 : 14, maxWidth: 600, margin: '0 auto' }}>
             {[
-              { val: 'Long terme', label: 'La cle de la richesse' },
+              { val: 'Long terme', label: 'La clé de la richesse' },
               { val: 'Regularite', label: 'Plus que le timing' },
-              { val: 'Discipline', label: 'L arme secrete' },
+              { val: 'Discipline', label: "L'arme secrete" },
             ].map(({ val, label }) => (
               <div key={val} style={{ background: 'rgba(255,255,255,0.06)', border: '0.5px solid rgba(255,255,255,0.1)', borderRadius: 12, padding: isMobile ? '14px' : '16px' }}>
                 <div style={{ fontSize: 15, fontWeight: 700, color: '#4CAF2E', marginBottom: 4 }}>{val}</div>
@@ -162,7 +162,7 @@ export default function ChallengePublic() {
       <section style={{ padding: isMobile ? '50px 16px' : '80px 40px', maxWidth: 1100, margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: isMobile ? 36 : 52 }}>
           <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 12, background: '#EAF6E4', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Accomplissements</div>
-          <h2 style={{ fontSize: isMobile ? 24 : 30, fontWeight: 700, color: '#1B2E4B', margin: '0 0 12px' }}>Le livret d accomplissements</h2>
+          <h2 style={{ fontSize: isMobile ? 24 : 30, fontWeight: 700, color: '#1B2E4B', margin: '0 0 12px' }}>Le livret d'accomplissements</h2>
           <p style={{ fontSize: 14, color: '#6B7280', maxWidth: 480, margin: '0 auto' }}>
             Debloquez des badges en progressant dans votre parcours d investisseur. Chaque accomplissement recompense une action concrete.
           </p>
@@ -189,8 +189,8 @@ export default function ChallengePublic() {
       {/* CTA */}
       <section style={{ padding: isMobile ? '50px 16px' : '80px 40px', textAlign: 'center', background: '#F4F7F5' }}>
         <h2 style={{ fontSize: isMobile ? 24 : 30, fontWeight: 700, color: '#1B2E4B', margin: '0 0 16px' }}>Commencez votre parcours</h2>
-        <p style={{ fontSize: 14, color: '#9CA3AF', margin: '0 0 32px' }}>Premier Pas vous attend des l inscription.</p>
-        <button onClick={openSignup} style={{ padding: isMobile ? '12px 32px' : '14px 40px', borderRadius: 12, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>S inscrire gratuitement</button>
+        <p style={{ fontSize: 14, color: '#9CA3AF', margin: '0 0 32px' }}>Premier Pas vous attend des l'inscription.</p>
+        <button onClick={openSignup} style={{ padding: isMobile ? '12px 32px' : '14px 40px', borderRadius: 12, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>S'inscrire gratuitement</button>
       </section>
 
       <FooterPublic />

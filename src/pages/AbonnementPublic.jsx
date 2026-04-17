@@ -96,7 +96,7 @@ function PublicNavbar({ isMobile, openLogin, openSignup, activeLink = 'Abonnemen
 
             <div style={{ padding: '20px 24px', marginTop: 'auto', borderTop: '0.5px solid #E0EAE3', display: 'flex', flexDirection: 'column', gap: 10 }}>
               <button onClick={() => { setMenuOpen(false); openLogin() }} style={{ padding: '12px', borderRadius: 8, border: '0.5px solid #1B2E4B', background: 'transparent', color: '#1B2E4B', fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Se connecter</button>
-              <button onClick={() => { setMenuOpen(false); openSignup() }} style={{ padding: '12px', borderRadius: 8, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>S inscrire gratuitement</button>
+              <button onClick={() => { setMenuOpen(false); openSignup() }} style={{ padding: '12px', borderRadius: 8, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>S'inscrire gratuitement</button>
             </div>
           </div>
         )}
@@ -118,7 +118,7 @@ function PublicNavbar({ isMobile, openLogin, openSignup, activeLink = 'Abonnemen
       </div>
       <div style={{ display: 'flex', gap: 10 }}>
         <button onClick={openLogin} style={{ padding: '7px 16px', borderRadius: 8, border: '0.5px solid #1B2E4B', background: 'transparent', color: '#1B2E4B', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Se connecter</button>
-        <button onClick={openSignup} style={{ padding: '7px 16px', borderRadius: 8, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>S inscrire gratuitement</button>
+        <button onClick={openSignup} style={{ padding: '7px 16px', borderRadius: 8, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>S'inscrire gratuitement</button>
       </div>
     </nav>
   )
@@ -188,7 +188,7 @@ export default function AbonnementPublic() {
 
           {/* PREMIUM */}
           <div style={{ background: '#1B2E4B', border: '2px solid #4CAF2E', borderRadius: 20, padding: isMobile ? '28px 22px' : '32px 28px', textAlign: 'left', position: 'relative' }}>
-            <div style={{ position: 'absolute', top: -14, left: '50%', transform: 'translateX(-50%)', background: '#4CAF2E', color: '#fff', fontSize: 11, fontWeight: 600, padding: '4px 16px', borderRadius: 20, whiteSpace: 'nowrap' }}>Recommande</div>
+            <div style={{ position: 'absolute', top: -14, left: '50%', transform: 'translateX(-50%)', background: '#4CAF2E', color: '#fff', fontSize: 11, fontWeight: 600, padding: '4px 16px', borderRadius: 20, whiteSpace: 'nowrap' }}>Recommandé</div>
             <div style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.6)', marginBottom: 8 }}>Premium</div>
             <div style={{ fontSize: 36, fontWeight: 700, color: '#fff', marginBottom: 4 }}>{annuel ? '67 euros' : '7.99 euros'}</div>
             <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', marginBottom: 4 }}>{annuel ? 'facture en une fois par an' : 'par mois'}</div>
@@ -213,12 +213,12 @@ export default function AbonnementPublic() {
 
       {/* FAQ */}
       <section style={{ padding: isMobile ? '40px 16px 60px' : '60px 40px', maxWidth: 720, margin: '0 auto' }}>
-        <h2 style={{ fontSize: isMobile ? 22 : 26, fontWeight: 700, color: '#1B2E4B', textAlign: 'center', marginBottom: isMobile ? 28 : 40 }}>Questions frequentes</h2>
+        <h2 style={{ fontSize: isMobile ? 22 : 26, fontWeight: 700, color: '#1B2E4B', textAlign: 'center', marginBottom: isMobile ? 28 : 40 }}>Questions fréquentes</h2>
         {[
-          { q: 'Comment fonctionne les 15 jours gratuits ?', r: 'Vous acces a toutes les fonctionnalites Premium pendant 15 jours sans carte bancaire requise. A la fin de la periode, vous choisissez de continuer ou de rester sur le plan gratuit.' },
-          { q: 'Puis-je annuler a tout moment ?', r: 'Oui, vous pouvez annuler votre abonnement a tout moment depuis votre espace compte. Aucun engagement.' },
+          { q: 'Comment fonctionne les 15 jours gratuits ?', r: 'Vous accès a toutes les fonctionnalités Premium pendant 15 jours sans carte bancaire requise. A la fin de la periode, vous choisissez de continuer ou de rester sur le plan gratuit.' },
+          { q: 'Puis-je annuler à tout moment ?', r: 'Oui, vous pouvez annuler votre abonnement à tout moment depuis votre espace compte. Aucun engagement.' },
           { q: 'Le plan gratuit est-il vraiment gratuit ?', r: 'Oui, sans limite de temps et sans carte bancaire requise.' },
-          { q: 'Mes donnees sont-elles securisees ?', r: 'Vos donnees sont chiffrees et hebergees sur des serveurs securises Supabase en Europe (Frankfurt).' },
+          { q: 'Mes données sont-elles sécurisées ?', r: 'Vos données sont chiffrees et hébergées sur des serveurs sécurisés Supabase en Europe (Frankfurt).' },
         ].map(({ q, r }) => (
           <div key={q} style={{ background: '#fff', border: '0.5px solid #E0EAE3', borderRadius: 12, padding: '18px 20px', marginBottom: 10 }}>
             <div style={{ fontSize: 14, fontWeight: 500, color: '#1B2E4B', marginBottom: 6 }}>{q}</div>
