@@ -267,6 +267,18 @@ function PositionModal({ totalInvesti, comptes, onClose }) {
     return () => document.removeEventListener('wheel', handleWheel)
   }, [handleWheel])
 
+  const handleZoomIn = () => {
+    const next = Math.min(3.5, scaleRef.current + 0.2)
+    scaleRef.current = next
+    setScale(next)
+  }
+
+  const handleZoomOut = () => {
+    const next = Math.max(0.3, scaleRef.current - 0.2)
+    scaleRef.current = next
+    setScale(next)
+  }
+
   const W = 360
   const H = 320
   const cx = W / 2
@@ -365,8 +377,22 @@ function PositionModal({ totalInvesti, comptes, onClose }) {
                 borderRadius: 12,
                 margin: '12px 0',
                 overflow: 'hidden',
+                position: 'relative',
               }}
             >
+              {/* Boutons de zoom */}
+              <div style={{ position: 'absolute', top: 8, right: 8, display: 'flex', flexDirection: 'column', gap: 4, zIndex: 2 }}>
+                <button
+                  onClick={(e) => { e.stopPropagation(); handleZoomIn() }}
+                  style={{ width: 32, height: 32, borderRadius: 8, border: `0.5px solid ${t.border}`, background: t.bgCard, color: t.text, fontSize: 18, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}
+                  aria-label="Zoomer"
+                >+</button>
+                <button
+                  onClick={(e) => { e.stopPropagation(); handleZoomOut() }}
+                  style={{ width: 32, height: 32, borderRadius: 8, border: `0.5px solid ${t.border}`, background: t.bgCard, color: t.text, fontSize: 18, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}
+                  aria-label="Dézoomer"
+                >−</button>
+              </div>
               <svg width="100%" height={H} viewBox={`0 0 ${W} ${H}`}>
                 {[...Array(8)].map((_, i) => (
                   <line key={`h${i}`} x1="0" y1={i * 46} x2={W} y2={i * 46} stroke={t.dark ? '#fff' : '#000'} strokeWidth="0.5" opacity="0.04" />
@@ -427,7 +453,7 @@ function PositionModal({ totalInvesti, comptes, onClose }) {
           </div>
 
           <div style={{ textAlign: 'center', fontSize: 10, color: t.textMuted, paddingBottom: 8 }}>
-            Scroll sur le graphique pour zoomer · Clique sur un cercle
+            Utilise les boutons − / + pour zoomer · Clique sur un cercle
           </div>
 
           {palierInfo && (
