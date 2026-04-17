@@ -89,19 +89,6 @@ export default function Parametres() {
               <Toggle active={t.nightShift} onToggle={t.toggleNightShift} />
             </Row>
 
-            <SectionTitle t={t}>Taille du texte <ComingSoon /></SectionTitle>
-            <div style={{ padding: '12px 16px', background: t.bgSecondary, borderRadius: 10, marginBottom: 8 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-                <span style={{ fontSize: 11, color: t.textMuted }}>Petit</span>
-                <span style={{ fontSize: 14, color: t.text, fontWeight: 500 }}>Aa — 14px</span>
-                <span style={{ fontSize: 11, color: t.textMuted }}>Grand</span>
-              </div>
-              <input
-                type="range" min="11" max="18" value={14}
-                style={{ width: '100%', accentColor: '#4CAF2E', cursor: 'not-allowed', opacity: 0.5 }}
-                disabled
-              />
-            </div>
           </div>
 
           {/* LANGUE */}
@@ -161,27 +148,6 @@ export default function Parametres() {
             <SectionTitle t={t}>Don</SectionTitle>
             <Row label="Faire un don" desc="Soutenez le développement de l'application" t={t}>
               <span style={{ fontSize: 16 }}>💚</span>
-            </Row>
-          </div>
-
-          {/* CONNECTEURS */}
-          <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 14, padding: 20, marginBottom: 12 }}>
-            <div style={{ fontSize: 13, fontWeight: 500, color: t.text, marginBottom: 4 }}>Connecteurs <ComingSoon /></div>
-            <SectionTitle t={t}>Intégrations</SectionTitle>
-            <Row label="Compte bancaire" desc="Synchronisez votre banque" t={t}>
-              <span style={{ fontSize: 11, color: t.textMuted }}>→</span>
-            </Row>
-            <Row label="App de gestion du patrimoine" desc="Connectez vos outils" t={t}>
-              <span style={{ fontSize: 11, color: t.textMuted }}>→</span>
-            </Row>
-          </div>
-
-          {/* IA AGENT */}
-          <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 14, padding: 20, marginBottom: 12 }}>
-            <div style={{ fontSize: 13, fontWeight: 500, color: t.text, marginBottom: 4 }}>IA Agent <ComingSoon /></div>
-            <SectionTitle t={t}>Personnalisation</SectionTitle>
-            <Row label="Personnalisation de l'agent" desc="Disponible avec un plan Premium" t={t}>
-              <span style={{ fontSize: 11, color: t.textMuted }}>→</span>
             </Row>
           </div>
 
