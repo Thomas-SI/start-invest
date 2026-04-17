@@ -314,7 +314,7 @@ function PositionModal({ totalInvesti, comptes, onClose }) {
       <div style={{
         position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
         zIndex: 999, background: t.bgCard, borderRadius: 20,
-        width: 420, maxHeight: '88vh',
+        width: 'calc(100% - 32px)', maxWidth: 420, maxHeight: '88vh',
         display: 'flex', flexDirection: 'column',
         boxShadow: '0 20px 60px rgba(0,0,0,0.3)', fontFamily: 'inherit', overflow: 'hidden'
       }}>
