@@ -49,6 +49,13 @@ export default function Abonnement() {
   const t = useTheme()
   const [user, setUser] = useState(null)
   const [annuel, setAnnuel] = useState(false)
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -64,7 +71,7 @@ export default function Abonnement() {
     <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar page="Abonnement" initiale={initiale} />
 
-      <div style={{ padding: '24px 20px', flex: 1 }}>
+      <div style={{ padding: isMobile ? '20px 12px' : '24px 20px', flex: 1 }}>
         <div style={{ textAlign: 'center', marginBottom: 28 }}>
           <div style={{ fontSize: 16, fontWeight: 500, color: t.text, marginBottom: 4 }}>Choisissez votre plan</div>
           <div style={{ fontSize: 12, color: t.textMuted, marginBottom: 20 }}>Passez à la vitesse supérieure dans votre parcours d'investisseur</div>
@@ -87,12 +94,12 @@ export default function Abonnement() {
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0,1fr))', gap: 20, maxWidth: 780, margin: '0 auto' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, minmax(0,1fr))', gap: 20, maxWidth: 780, margin: '0 auto' }}>
           {plans.map(({ id, nom, actuel, recommande, features, pages, prixMensuel, prixAnnuel, periodeMensuel, periodeAnnuel }) => {
             const prix = annuel ? prixAnnuel : prixMensuel
             const periode = annuel ? periodeAnnuel : periodeMensuel
             return (
-              <div key={id} style={{ background: recommande ? '#1B2E4B' : t.bgCard, border: `${recommande ? '2px' : '0.5px'} solid ${recommande ? '#4CAF2E' : t.border}`, borderRadius: 16, padding: 24, display: 'flex', flexDirection: 'column' }}>
+              <div key={id} style={{ background: recommande ? '#1B2E4B' : t.bgCard, border: `${recommande ? '2px' : '0.5px'} solid ${recommande ? '#4CAF2E' : t.border}`, borderRadius: 16, padding: isMobile ? 20 : 24, display: 'flex', flexDirection: 'column' }}>
 
                 {/* BADGE */}
                 <div style={{ marginBottom: 16 }}>
