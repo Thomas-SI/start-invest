@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 import Navbar from '../components/Navbar'
@@ -42,11 +42,18 @@ export default function Investissement() {
   const [editingTxId, setEditingTxId] = useState(null)
   const [editTxForm, setEditTxForm] = useState({})
   const [confirmDeleteId, setConfirmDeleteId] = useState(null)
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
   const [form, setForm] = useState({
     date: new Date().toISOString().split('T')[0],
     ticker: '', actif: '', enveloppe: 'PEA', type_etf: 'Capitalisant',
     type: 'Achat', quantite: '', prix_achat_unitaire: '', ter: '', frais_courtage: '',
   })
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   const { data, isLoading } = useQuery({
     queryKey: ['investissement'],
@@ -154,7 +161,6 @@ export default function Investissement() {
       if (isNaN(newQuantite) || newQuantite <= 0) throw new Error('Quantite invalide.')
       if (isNaN(newPrix) || newPrix <= 0) throw new Error('Prix invalide.')
 
-      // 1. Mettre a jour la transaction en base
       const { error: updateError } = await supabase.from('transactions').update({
         date: newDate,
         quantite: newQuantite,
@@ -163,7 +169,6 @@ export default function Investissement() {
       }).eq('id', tx.id)
       if (updateError) throw new Error('Erreur lors de la modification: ' + updateError.message)
 
-      // 2. Recharger toutes les transactions de cette position depuis Supabase
       const { data: freshTx, error: fetchError } = await supabase
         .from('transactions')
         .select('*')
@@ -172,7 +177,6 @@ export default function Investissement() {
         .eq('enveloppe', tx.enveloppe)
       if (fetchError) throw new Error('Erreur lors du rechargement.')
 
-      // 3. Recalculer quantite totale et PRU
       let quantiteTotale = 0
       let coutTotal = 0
       for (const t of (freshTx || [])) {
@@ -183,7 +187,6 @@ export default function Investissement() {
       }
       const nouveauPru = quantiteTotale > 0 ? Math.round((coutTotal / quantiteTotale) * 10000) / 10000 : 0
 
-      // 4. Mettre a jour la position
       const { error: posError } = await supabase.from('investissements')
         .update({ quantite: quantiteTotale, pru: nouveauPru })
         .eq('user_id', user.id)
@@ -232,7 +235,7 @@ export default function Investissement() {
     }
   }
 
-  const inputStyle = { padding: '5px 8px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgCard, color: t.text, width: '100%' }
+  const inputStyle = { padding: '5px 8px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgCard, color: t.text, width: '100%', boxSizing: 'border-box' }
   const inputEditStyle = { padding: '4px 6px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }
 
   if (isLoading) return (
@@ -245,7 +248,7 @@ export default function Investissement() {
   return (
     <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar page="Investissement" />
-      <div style={{ padding: '16px 20px', flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div style={{ padding: isMobile ? '16px 12px' : '16px 20px', flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
 
         {succes && <div style={{ background: '#EAF6E4', border: '0.5px solid #4CAF2E', borderRadius: 8, padding: '10px 14px', fontSize: 12, color: '#2E7D1E', fontWeight: 500 }}>Transaction modifiee avec succes !</div>}
         {erreur && <div style={{ background: '#FCEBEB', border: '0.5px solid #E24B4A', borderRadius: 8, padding: '10px 14px', fontSize: 12, color: '#E24B4A' }}>⚠️ {erreur}</div>}
@@ -263,59 +266,61 @@ export default function Investissement() {
                 const totalCible = lignes.reduce((a, i) => a + (parseFloat(i.cible) || 0), 0)
                 return (
                   <div key={env} style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, overflow: 'hidden' }}>
-                    <div style={{ padding: '10px 16px', borderBottom: `0.5px solid ${t.border}`, background: t.bgSecondary, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ padding: '10px 16px', borderBottom: `0.5px solid ${t.border}`, background: t.bgSecondary, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                       <div style={{ fontSize: 13, fontWeight: 500, color: t.text }}>{ENVELOPPE_LABELS[env] || env}</div>
                       {totalCible > 0 && <div style={{ fontSize: 11, fontWeight: 500, color: totalCible === 100 ? '#4CAF2E' : '#E24B4A' }}>% Cible total : {totalCible}%</div>}
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '3fr 1fr' }}>
-                      <div style={{ borderRight: `0.5px solid ${t.border}` }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '3fr 1fr' }}>
+                      <div style={{ borderRight: isMobile ? 'none' : `0.5px solid ${t.border}`, borderBottom: isMobile ? `0.5px solid ${t.border}` : 'none' }}>
                         {lignes.length === 0 ? (
                           <div style={{ padding: '24px', textAlign: 'center', color: t.textMuted, fontSize: 12 }}>Aucune position dans cette enveloppe</div>
                         ) : (
-                          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
-                            <thead>
-                              <tr style={{ background: t.bgSecondary }}>
-                                {['Ticker', 'Actif', 'Prix actuel', 'Position', 'Valeur EUR', '% Actuel', '% Cible', 'Achat/Vente'].map(h => (
-                                  <th key={h} style={{ padding: '8px 14px', textAlign: 'left', fontSize: 10, color: t.textMuted, fontWeight: 500, borderBottom: `0.5px solid ${t.border}`, whiteSpace: 'nowrap' }}>{h}</th>
-                                ))}
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {lignes.map((inv) => {
-                                const valAct = calcValeurActuelle(inv)
-                                const pctActuel = totalEnv > 0 ? Math.round((valAct / totalEnv) * 100) : 0
-                                const pctCible = parseFloat(inv.cible) || 0
-                                const prixActuel = parseFloat(inv.prix_actuel) || parseFloat(inv.pru || inv.prix_achat_unitaire || 0)
-                                const diff = pctCible > 0 ? Math.round((pctCible - pctActuel) / 100 * totalEnv / prixActuel) : 0
-                                return (
-                                  <tr key={inv.id} style={{ borderBottom: `0.5px solid ${t.border}`, background: 'transparent' }}>
-                                    <td style={{ padding: '10px 14px', fontWeight: 500, color: bleu }}>{inv.ticker}</td>
-                                    <td style={{ padding: '10px 14px', color: t.text, maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{inv.actif}</td>
-                                    <td style={{ padding: '10px 14px', color: t.text }}>{prixActuel.toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €</td>
-                                    <td style={{ padding: '10px 14px', color: t.text }}>{inv.quantite}</td>
-                                    <td style={{ padding: '10px 14px', fontWeight: 500, color: t.text }}>{Math.round(valAct).toLocaleString('fr-FR')} €</td>
-                                    <td style={{ padding: '10px 14px', color: t.text }}>{pctActuel}%</td>
-                                    <td style={{ padding: '10px 14px' }}>
-                                      <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                                        <input type="number" min="0" max="100" placeholder="0" defaultValue={pctCible || ''} onBlur={e => handleCibleChange(inv, e.target.value)} style={{ width: 60, padding: '4px 6px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text, textAlign: 'right' }} />
-                                        <span style={{ fontSize: 11, color: t.textMuted }}>%</span>
-                                      </div>
-                                    </td>
-                                    <td style={{ padding: '10px 14px', fontWeight: 500, color: diff > 0 ? '#4CAF2E' : diff < 0 ? '#E24B4A' : t.textMuted }}>
-                                      {pctCible > 0 ? (diff === 0 ? 'OK' : `${diff > 0 ? '+' : ''}${diff} titres`) : '—'}
-                                    </td>
-                                  </tr>
-                                )
-                              })}
-                              <tr style={{ background: t.bgSecondary, borderTop: `0.5px solid ${t.border}` }}>
-                                <td colSpan={4} style={{ padding: '10px 14px', fontWeight: 500, color: t.text, fontSize: 11 }}>TOTAL</td>
-                                <td style={{ padding: '10px 14px', fontWeight: 500, color: t.text }}>{Math.round(totalEnv).toLocaleString('fr-FR')} €</td>
-                                <td style={{ padding: '10px 14px', fontWeight: 500, color: t.text }}>100%</td>
-                                <td style={{ padding: '10px 14px', fontWeight: 500, color: totalCible === 100 ? '#4CAF2E' : '#E24B4A' }}>{totalCible}%</td>
-                                <td></td>
-                              </tr>
-                            </tbody>
-                          </table>
+                          <div style={{ overflowX: 'auto' }}>
+                            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, minWidth: 700 }}>
+                              <thead>
+                                <tr style={{ background: t.bgSecondary }}>
+                                  {['Ticker', 'Actif', 'Prix actuel', 'Position', 'Valeur EUR', '% Actuel', '% Cible', 'Achat/Vente'].map(h => (
+                                    <th key={h} style={{ padding: '8px 14px', textAlign: 'left', fontSize: 10, color: t.textMuted, fontWeight: 500, borderBottom: `0.5px solid ${t.border}`, whiteSpace: 'nowrap' }}>{h}</th>
+                                  ))}
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {lignes.map((inv) => {
+                                  const valAct = calcValeurActuelle(inv)
+                                  const pctActuel = totalEnv > 0 ? Math.round((valAct / totalEnv) * 100) : 0
+                                  const pctCible = parseFloat(inv.cible) || 0
+                                  const prixActuel = parseFloat(inv.prix_actuel) || parseFloat(inv.pru || inv.prix_achat_unitaire || 0)
+                                  const diff = pctCible > 0 ? Math.round((pctCible - pctActuel) / 100 * totalEnv / prixActuel) : 0
+                                  return (
+                                    <tr key={inv.id} style={{ borderBottom: `0.5px solid ${t.border}`, background: 'transparent' }}>
+                                      <td style={{ padding: '10px 14px', fontWeight: 500, color: bleu }}>{inv.ticker}</td>
+                                      <td style={{ padding: '10px 14px', color: t.text, maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{inv.actif}</td>
+                                      <td style={{ padding: '10px 14px', color: t.text }}>{prixActuel.toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €</td>
+                                      <td style={{ padding: '10px 14px', color: t.text }}>{inv.quantite}</td>
+                                      <td style={{ padding: '10px 14px', fontWeight: 500, color: t.text }}>{Math.round(valAct).toLocaleString('fr-FR')} €</td>
+                                      <td style={{ padding: '10px 14px', color: t.text }}>{pctActuel}%</td>
+                                      <td style={{ padding: '10px 14px' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                                          <input type="number" min="0" max="100" placeholder="0" defaultValue={pctCible || ''} onBlur={e => handleCibleChange(inv, e.target.value)} style={{ width: 60, padding: '4px 6px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text, textAlign: 'right' }} />
+                                          <span style={{ fontSize: 11, color: t.textMuted }}>%</span>
+                                        </div>
+                                      </td>
+                                      <td style={{ padding: '10px 14px', fontWeight: 500, color: diff > 0 ? '#4CAF2E' : diff < 0 ? '#E24B4A' : t.textMuted }}>
+                                        {pctCible > 0 ? (diff === 0 ? 'OK' : `${diff > 0 ? '+' : ''}${diff} titres`) : '—'}
+                                      </td>
+                                    </tr>
+                                  )
+                                })}
+                                <tr style={{ background: t.bgSecondary, borderTop: `0.5px solid ${t.border}` }}>
+                                  <td colSpan={4} style={{ padding: '10px 14px', fontWeight: 500, color: t.text, fontSize: 11 }}>TOTAL</td>
+                                  <td style={{ padding: '10px 14px', fontWeight: 500, color: t.text }}>{Math.round(totalEnv).toLocaleString('fr-FR')} €</td>
+                                  <td style={{ padding: '10px 14px', fontWeight: 500, color: t.text }}>100%</td>
+                                  <td style={{ padding: '10px 14px', fontWeight: 500, color: totalCible === 100 ? '#4CAF2E' : '#E24B4A' }}>{totalCible}%</td>
+                                  <td></td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
                         )}
                       </div>
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr', gap: 0 }}>
@@ -325,9 +330,9 @@ export default function Investissement() {
                           ['Plus-value', `${plusValueEnv >= 0 ? '+' : ''}${Math.round(plusValueEnv).toLocaleString('fr-FR')} €`, plusValueEnv >= 0 ? '#4CAF2E' : '#E24B4A'],
                           ['Nb positions', nbPositionsEnv.toString(), bleu],
                         ].map(([l, v, c], idx) => (
-                          <div key={l} style={{ padding: '16px', background: 'transparent', borderBottom: idx < 2 ? `0.5px solid ${t.border}` : 'none', borderRight: idx % 2 === 0 ? `0.5px solid ${t.border}` : 'none', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                          <div key={l} style={{ padding: isMobile ? '12px' : '16px', background: 'transparent', borderBottom: idx < 2 ? `0.5px solid ${t.border}` : 'none', borderRight: idx % 2 === 0 ? `0.5px solid ${t.border}` : 'none', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                             <div style={{ fontSize: 9, color: t.textMuted, textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 6 }}>{l}</div>
-                            <div style={{ fontSize: 16, fontWeight: 500, color: c }}>{v}</div>
+                            <div style={{ fontSize: isMobile ? 14 : 16, fontWeight: 500, color: c }}>{v}</div>
                           </div>
                         ))}
                       </div>
@@ -339,21 +344,21 @@ export default function Investissement() {
           </>
         )}
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0,1fr))', gap: 10 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, minmax(0,1fr))' : 'repeat(4, minmax(0,1fr))', gap: 10 }}>
           {[
             ['Total investi', `${Math.round(totalInvesti).toLocaleString('fr-FR')} €`, t.text],
             ['Valeur actuelle', `${Math.round(valeurActuelle).toLocaleString('fr-FR')} €`, '#4CAF2E'],
             ['Plus-value', `${plusValue >= 0 ? '+' : ''}${Math.round(plusValue).toLocaleString('fr-FR')} €`, plusValue >= 0 ? '#4CAF2E' : '#E24B4A'],
             ['Nb positions', nbPositions.toString(), bleu],
           ].map(([l, v, c]) => (
-            <div key={l} style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: 16 }}>
+            <div key={l} style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: isMobile ? 12 : 16 }}>
               <div style={{ fontSize: 10, color: t.textMuted, textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 8 }}>{l}</div>
-              <div style={{ fontSize: 22, fontWeight: 500, color: c }}>{v}</div>
+              <div style={{ fontSize: isMobile ? 18 : 22, fontWeight: 500, color: c }}>{v}</div>
             </div>
           ))}
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
           <div style={{ fontSize: 14, fontWeight: 500, color: t.text }}>Journal d investissement</div>
           <div style={{ display: 'flex', gap: 8 }}>
             <button onClick={() => setShowJournal(v => !v)} style={{ background: t.bgSecondary, color: t.text, fontSize: 11, padding: '5px 12px', borderRadius: 8, border: `0.5px solid ${t.border}`, cursor: 'pointer', fontFamily: 'inherit' }}>
@@ -368,10 +373,10 @@ export default function Investissement() {
         {showAdd && (
           <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: 16 }}>
             <div style={{ fontSize: 12, fontWeight: 500, color: t.text, marginBottom: 12 }}>Nouvel achat / vente</div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, minmax(0,1fr))', gap: 10, marginBottom: 10 }}>
-              <div><div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Date</div><input type="date" value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} style={inputStyle} /></div>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(5, minmax(0,1fr))', gap: 10, marginBottom: 10 }}>
+              <div style={{ gridColumn: isMobile ? '1 / -1' : 'auto' }}><div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Date</div><input type="date" value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} style={inputStyle} /></div>
               <div><div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Ticker *</div><input placeholder="ex: PE500" value={form.ticker} onChange={e => handleTickerChange(e.target.value)} style={inputStyle} /></div>
-              <div><div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Actif</div><input placeholder="ex: Amundi PEA S&P 500" value={form.actif} onChange={e => setForm({ ...form, actif: e.target.value })} style={inputStyle} /></div>
+              <div style={{ gridColumn: isMobile ? '1 / -1' : 'auto' }}><div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Actif</div><input placeholder="ex: Amundi PEA S&P 500" value={form.actif} onChange={e => setForm({ ...form, actif: e.target.value })} style={inputStyle} /></div>
               <div>
                 <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Enveloppe</div>
                 <select value={form.enveloppe} onChange={e => setForm({ ...form, enveloppe: e.target.value })} style={inputStyle}>
@@ -385,7 +390,7 @@ export default function Investissement() {
                 </select>
               </div>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, minmax(0,1fr))', gap: 10, marginBottom: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(5, minmax(0,1fr))', gap: 10, marginBottom: 12 }}>
               <div>
                 <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Type</div>
                 <select value={form.type} onChange={e => setForm({ ...form, type: e.target.value })} style={inputStyle}>
@@ -393,11 +398,11 @@ export default function Investissement() {
                 </select>
               </div>
               <div><div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Quantite *</div><input type="number" min="0" placeholder="ex: 10" value={form.quantite} onChange={e => setForm({ ...form, quantite: e.target.value })} style={inputStyle} /></div>
-              <div><div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Prix unitaire (euros) *</div><input type="number" min="0" placeholder="ex: 48.10" value={form.prix_achat_unitaire} onChange={e => setForm({ ...form, prix_achat_unitaire: e.target.value })} style={inputStyle} /></div>
+              <div style={{ gridColumn: isMobile ? '1 / -1' : 'auto' }}><div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Prix unitaire (euros) *</div><input type="number" min="0" placeholder="ex: 48.10" value={form.prix_achat_unitaire} onChange={e => setForm({ ...form, prix_achat_unitaire: e.target.value })} style={inputStyle} /></div>
               <div><div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>TER (%)</div><input type="number" min="0" placeholder="ex: 0.25" value={form.ter} onChange={e => setForm({ ...form, ter: e.target.value })} style={inputStyle} /></div>
               <div><div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Frais courtage (euros)</div><input type="number" min="0" placeholder="ex: 2.22" value={form.frais_courtage} onChange={e => setForm({ ...form, frais_courtage: e.target.value })} style={inputStyle} /></div>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
               <div style={{ fontSize: 10, color: t.textMuted }}>* Champs obligatoires</div>
               <div style={{ display: 'flex', gap: 8 }}>
                 <button onClick={() => { setShowAdd(false); setErreur(null) }} style={{ padding: '7px 14px', borderRadius: 8, border: `0.5px solid ${t.border}`, background: t.bgSecondary, fontSize: 12, cursor: 'pointer', fontFamily: 'inherit', color: t.text }}>Annuler</button>
