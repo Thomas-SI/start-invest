@@ -88,6 +88,13 @@ export default function Portefeuille() {
   const [erreurEdit, setErreurEdit] = useState(null)
   const [succesEdit, setSuccesEdit] = useState(false)
   const [confirmDeleteIdx, setConfirmDeleteIdx] = useState(null)
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   const { data, isLoading } = useQuery({
     queryKey: ['portefeuille'],
@@ -220,7 +227,7 @@ export default function Portefeuille() {
     await saveVirements(updated)
   }
 
-  const inputStyle = { padding: '5px 8px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgCard, color: t.text, width: '100%' }
+  const inputStyle = { padding: '5px 8px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgCard, color: t.text, width: '100%', boxSizing: 'border-box' }
   const tousCoches = virements.length > 0 && virements.every(v => isCheckedCeMois(v))
 
   if (isLoading) return (
@@ -233,13 +240,13 @@ export default function Portefeuille() {
   return (
     <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar page="Portefeuille" />
-      <div style={{ padding: '16px 20px', flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div style={{ padding: isMobile ? '16px 12px' : '16px 20px', flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
 
         {succesEdit && <div style={{ background: '#EAF6E4', border: '0.5px solid #4CAF2E', borderRadius: 8, padding: '8px 14px', fontSize: 12, color: '#2E7D1E', fontWeight: 500 }}>✓ Compte mis à jour avec succès !</div>}
 
         {/* 1. MATELAS DE SÉCURITÉ */}
         <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: 16 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+          <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', alignItems: isMobile ? 'flex-start' : 'center', gap: isMobile ? 10 : 0, marginBottom: 10 }}>
             <div>
               <div style={{ fontSize: 13, fontWeight: 500, color: t.text }}>Matelas de sécurité</div>
               <div style={{ fontSize: 11, color: t.textMuted, marginTop: 2 }}>
@@ -250,7 +257,7 @@ export default function Portefeuille() {
                 {' '}mois de dépenses fixes
               </div>
             </div>
-            <div style={{ textAlign: 'right' }}>
+            <div style={{ textAlign: isMobile ? 'left' : 'right' }}>
               <div style={{ fontSize: 18, fontWeight: 500, color: remplissageMatelas >= 100 ? '#4CAF2E' : t.text }}>{totalSecurite.toLocaleString('fr-FR')} €</div>
               <div style={{ fontSize: 11, color: t.textMuted }}>sur {objectifMatelas.toLocaleString('fr-FR')} € objectif</div>
             </div>
@@ -258,7 +265,7 @@ export default function Portefeuille() {
           <div style={{ background: t.bgSecondary, borderRadius: 4, height: 10, overflow: 'hidden', marginBottom: 8 }}>
             <div style={{ height: '100%', borderRadius: 4, background: remplissageMatelas >= 100 ? '#4CAF2E' : bleu, width: `${remplissageMatelas}%`, transition: 'width 0.3s' }} />
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 4 }}>
             <div style={{ fontSize: 11, color: t.textMuted }}>Dépenses fixes : <span style={{ fontWeight: 500, color: t.text }}>{depensesFixes.toLocaleString('fr-FR')} €/mois</span></div>
             <div style={{ fontSize: 13, fontWeight: 500, color: remplissageMatelas >= 100 ? '#4CAF2E' : '#E24B4A' }}>{remplissageMatelas}%{remplissageMatelas >= 100 && ' ✓'}</div>
           </div>
@@ -281,7 +288,7 @@ export default function Portefeuille() {
           <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: 16 }}>
             <div style={{ fontSize: 12, fontWeight: 500, color: t.text, marginBottom: 12 }}>Nouveau compte</div>
             {erreurAdd && <div style={{ background: '#FCEBEB', border: '0.5px solid #E24B4A', borderRadius: 8, padding: '8px 12px', fontSize: 12, color: '#E24B4A', marginBottom: 12 }}>⚠️ {erreurAdd}</div>}
-            <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1fr 1fr auto', gap: 10, alignItems: 'end' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1.5fr 1fr 1fr 1fr 1fr auto', gap: 10, alignItems: 'end' }}>
               <div>
                 <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Compte / Support</div>
                 <select value={selectedPredefini} onChange={e => setSelectedPredefini(e.target.value)} style={inputStyle}>
@@ -309,75 +316,77 @@ export default function Portefeuille() {
                 <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Objectif (€)</div>
                 <input type="number" min="0" placeholder="0" value={newObjectif} onChange={e => setNewObjectif(e.target.value)} style={inputStyle} />
               </div>
-              <button onClick={handleAdd} disabled={saving} style={{ background: saving ? '#9CA3AF' : '#4CAF2E', color: '#fff', fontSize: 11, fontWeight: 500, padding: '7px 12px', borderRadius: 7, border: 'none', cursor: saving ? 'not-allowed' : 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>
+              <button onClick={handleAdd} disabled={saving} style={{ background: saving ? '#9CA3AF' : '#4CAF2E', color: '#fff', fontSize: 11, fontWeight: 500, padding: isMobile ? '10px 12px' : '7px 12px', borderRadius: 7, border: 'none', cursor: saving ? 'not-allowed' : 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>
                 {saving ? '...' : 'Ajouter'}
               </button>
             </div>
           </div>
         )}
 
-        <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12 }}>
-          {erreurEdit && <div style={{ padding: '8px 14px', background: '#FCEBEB', borderBottom: '0.5px solid #E24B4A', fontSize: 12, color: '#E24B4A', borderRadius: '12px 12px 0 0' }}>⚠️ {erreurEdit}</div>}
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
-            <thead>
-              <tr style={{ background: t.bgSecondary }}>
-                {['Compte / Support', 'Type', 'Disponibilité', 'Solde actuel', 'Objectif', 'Remplissage', 'Progression', ''].map(h => (
-                  <th key={h} style={{ padding: '10px 14px', textAlign: 'left', fontSize: 10, color: t.textMuted, fontWeight: 500, borderBottom: `0.5px solid ${t.border}`, whiteSpace: 'nowrap' }}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {comptes.map((c, i) => {
-                const remplissage = c.objectif > 0 ? Math.min(Math.round((c.solde / c.objectif) * 100), 100) : 0
-                return (
-                  <tr key={i} style={{ borderBottom: `0.5px solid ${t.border}`, background: editingIdx === i ? t.bgSecondary : 'transparent' }}>
-                    {editingIdx === i ? (
-                      <>
-                        <td style={{ padding: '10px 14px', fontWeight: 500, color: t.text }}>{c.nom}</td>
-                        <td style={{ padding: '10px 14px' }}><span style={{ fontSize: 10, fontWeight: 500, padding: '2px 8px', borderRadius: 20, background: couleurType(c.type) + '20', color: couleurType(c.type) }}>{c.type}</span></td>
-                        <td style={{ padding: '10px 14px', color: t.textSecondary, fontSize: 11 }}>{c.disponibilite}</td>
-                        <td style={{ padding: '6px 8px' }}><input type="number" min="0" value={editForm.solde} onChange={e => setEditForm({ ...editForm, solde: e.target.value })} style={{ ...inputStyle, width: 90 }} /></td>
-                        <td style={{ padding: '6px 8px' }}><input type="number" min="0" value={editForm.objectif} onChange={e => setEditForm({ ...editForm, objectif: e.target.value })} style={{ ...inputStyle, width: 90 }} /></td>
-                        <td style={{ padding: '6px 8px', color: t.textMuted }}>—</td>
-                        <td style={{ padding: '6px 8px', color: t.textMuted }}>—</td>
-                        <td style={{ padding: '6px 8px' }}>
-                          <div style={{ display: 'flex', gap: 4 }}>
-                            <button onClick={() => handleEditSave(i)} disabled={saving} style={{ background: '#EAF6E4', color: '#2E7D1E', border: 'none', borderRadius: 5, padding: '2px 7px', fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>✓</button>
-                            <button onClick={() => { setEditingIdx(null); setErreurEdit(null) }} style={{ background: t.bgSecondary, color: t.textMuted, border: `0.5px solid ${t.border}`, borderRadius: 5, padding: '2px 7px', fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>✕</button>
-                          </div>
-                        </td>
-                      </>
-                    ) : (
-                      <>
-                        <td style={{ padding: '10px 14px', fontWeight: 500, color: t.text }}>{c.nom}</td>
-                        <td style={{ padding: '10px 14px' }}><span style={{ fontSize: 10, fontWeight: 500, padding: '2px 8px', borderRadius: 20, background: couleurType(c.type) + '20', color: couleurType(c.type) }}>{c.type}</span></td>
-                        <td style={{ padding: '10px 14px', color: t.textSecondary, fontSize: 11 }}>{c.disponibilite}</td>
-                        <td style={{ padding: '10px 14px', fontWeight: 500, color: t.text }}>{(parseFloat(c.solde) || 0).toLocaleString('fr-FR')} €</td>
-                        <td style={{ padding: '10px 14px', color: t.textSecondary }}>{c.objectif > 0 ? (parseFloat(c.objectif) || 0).toLocaleString('fr-FR') + ' €' : '—'}</td>
-                        <td style={{ padding: '10px 14px', fontWeight: 500, color: remplissage >= 100 ? '#4CAF2E' : t.text }}>{c.objectif > 0 ? remplissage + '%' : '—'}</td>
-                        <td style={{ padding: '10px 14px', minWidth: 100 }}>
-                          {c.objectif > 0 ? <div style={{ background: t.bgSecondary, borderRadius: 3, height: 6, overflow: 'hidden' }}><div style={{ height: '100%', borderRadius: 3, background: remplissage >= 100 ? '#4CAF2E' : bleu, width: `${remplissage}%`, transition: 'width 0.3s' }} /></div> : '—'}
-                        </td>
-                        <td style={{ padding: '10px 14px' }}>
-                          <div style={{ display: 'flex', gap: 4 }}>
-                            <button onClick={() => handleEditStart(i)} style={{ background: t.bgSecondary, color: t.textMuted, border: `0.5px solid ${t.border}`, borderRadius: 5, padding: '2px 7px', fontSize: 10, cursor: 'pointer', fontFamily: 'inherit' }}>✏️</button>
-                            <button onClick={() => handleDelete(i)} style={{ background: confirmDeleteIdx === i ? '#E24B4A' : '#FCEBEB', color: confirmDeleteIdx === i ? '#fff' : '#E24B4A', border: 'none', borderRadius: 5, padding: '2px 7px', fontSize: 10, cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap', transition: 'all 0.15s' }}>
-                              {confirmDeleteIdx === i ? 'Confirmer ?' : '×'}
-                            </button>
-                          </div>
-                        </td>
-                      </>
-                    )}
-                  </tr>
-                )
-              })}
-              <tr style={{ background: t.bgSecondary, borderTop: `0.5px solid ${t.border}` }}>
-                <td colSpan={3} style={{ padding: '10px 14px', fontWeight: 500, color: t.text, fontSize: 11 }}>TOTAL</td>
-                <td style={{ padding: '10px 14px', fontWeight: 500, color: t.text }}>{total.toLocaleString('fr-FR')} €</td>
-                <td colSpan={4}></td>
-              </tr>
-            </tbody>
-          </table>
+        <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, overflow: 'hidden' }}>
+          {erreurEdit && <div style={{ padding: '8px 14px', background: '#FCEBEB', borderBottom: '0.5px solid #E24B4A', fontSize: 12, color: '#E24B4A' }}>⚠️ {erreurEdit}</div>}
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, minWidth: 860 }}>
+              <thead>
+                <tr style={{ background: t.bgSecondary }}>
+                  {['Compte / Support', 'Type', 'Disponibilité', 'Solde actuel', 'Objectif', 'Remplissage', 'Progression', ''].map(h => (
+                    <th key={h} style={{ padding: '10px 14px', textAlign: 'left', fontSize: 10, color: t.textMuted, fontWeight: 500, borderBottom: `0.5px solid ${t.border}`, whiteSpace: 'nowrap' }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {comptes.map((c, i) => {
+                  const remplissage = c.objectif > 0 ? Math.min(Math.round((c.solde / c.objectif) * 100), 100) : 0
+                  return (
+                    <tr key={i} style={{ borderBottom: `0.5px solid ${t.border}`, background: editingIdx === i ? t.bgSecondary : 'transparent' }}>
+                      {editingIdx === i ? (
+                        <>
+                          <td style={{ padding: '10px 14px', fontWeight: 500, color: t.text }}>{c.nom}</td>
+                          <td style={{ padding: '10px 14px' }}><span style={{ fontSize: 10, fontWeight: 500, padding: '2px 8px', borderRadius: 20, background: couleurType(c.type) + '20', color: couleurType(c.type) }}>{c.type}</span></td>
+                          <td style={{ padding: '10px 14px', color: t.textSecondary, fontSize: 11 }}>{c.disponibilite}</td>
+                          <td style={{ padding: '6px 8px' }}><input type="number" min="0" value={editForm.solde} onChange={e => setEditForm({ ...editForm, solde: e.target.value })} style={{ ...inputStyle, width: 90 }} /></td>
+                          <td style={{ padding: '6px 8px' }}><input type="number" min="0" value={editForm.objectif} onChange={e => setEditForm({ ...editForm, objectif: e.target.value })} style={{ ...inputStyle, width: 90 }} /></td>
+                          <td style={{ padding: '6px 8px', color: t.textMuted }}>—</td>
+                          <td style={{ padding: '6px 8px', color: t.textMuted }}>—</td>
+                          <td style={{ padding: '6px 8px' }}>
+                            <div style={{ display: 'flex', gap: 4 }}>
+                              <button onClick={() => handleEditSave(i)} disabled={saving} style={{ background: '#EAF6E4', color: '#2E7D1E', border: 'none', borderRadius: 5, padding: '2px 7px', fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>✓</button>
+                              <button onClick={() => { setEditingIdx(null); setErreurEdit(null) }} style={{ background: t.bgSecondary, color: t.textMuted, border: `0.5px solid ${t.border}`, borderRadius: 5, padding: '2px 7px', fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>✕</button>
+                            </div>
+                          </td>
+                        </>
+                      ) : (
+                        <>
+                          <td style={{ padding: '10px 14px', fontWeight: 500, color: t.text }}>{c.nom}</td>
+                          <td style={{ padding: '10px 14px' }}><span style={{ fontSize: 10, fontWeight: 500, padding: '2px 8px', borderRadius: 20, background: couleurType(c.type) + '20', color: couleurType(c.type) }}>{c.type}</span></td>
+                          <td style={{ padding: '10px 14px', color: t.textSecondary, fontSize: 11 }}>{c.disponibilite}</td>
+                          <td style={{ padding: '10px 14px', fontWeight: 500, color: t.text }}>{(parseFloat(c.solde) || 0).toLocaleString('fr-FR')} €</td>
+                          <td style={{ padding: '10px 14px', color: t.textSecondary }}>{c.objectif > 0 ? (parseFloat(c.objectif) || 0).toLocaleString('fr-FR') + ' €' : '—'}</td>
+                          <td style={{ padding: '10px 14px', fontWeight: 500, color: remplissage >= 100 ? '#4CAF2E' : t.text }}>{c.objectif > 0 ? remplissage + '%' : '—'}</td>
+                          <td style={{ padding: '10px 14px', minWidth: 100 }}>
+                            {c.objectif > 0 ? <div style={{ background: t.bgSecondary, borderRadius: 3, height: 6, overflow: 'hidden' }}><div style={{ height: '100%', borderRadius: 3, background: remplissage >= 100 ? '#4CAF2E' : bleu, width: `${remplissage}%`, transition: 'width 0.3s' }} /></div> : '—'}
+                          </td>
+                          <td style={{ padding: '10px 14px' }}>
+                            <div style={{ display: 'flex', gap: 4 }}>
+                              <button onClick={() => handleEditStart(i)} style={{ background: t.bgSecondary, color: t.textMuted, border: `0.5px solid ${t.border}`, borderRadius: 5, padding: '2px 7px', fontSize: 10, cursor: 'pointer', fontFamily: 'inherit' }}>✏️</button>
+                              <button onClick={() => handleDelete(i)} style={{ background: confirmDeleteIdx === i ? '#E24B4A' : '#FCEBEB', color: confirmDeleteIdx === i ? '#fff' : '#E24B4A', border: 'none', borderRadius: 5, padding: '2px 7px', fontSize: 10, cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap', transition: 'all 0.15s' }}>
+                                {confirmDeleteIdx === i ? 'Confirmer ?' : '×'}
+                              </button>
+                            </div>
+                          </td>
+                        </>
+                      )}
+                    </tr>
+                  )
+                })}
+                <tr style={{ background: t.bgSecondary, borderTop: `0.5px solid ${t.border}` }}>
+                  <td colSpan={3} style={{ padding: '10px 14px', fontWeight: 500, color: t.text, fontSize: 11 }}>TOTAL</td>
+                  <td style={{ padding: '10px 14px', fontWeight: 500, color: t.text }}>{total.toLocaleString('fr-FR')} €</td>
+                  <td colSpan={4}></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
 
         {/* 3. RÉPARTITION */}
@@ -385,8 +394,8 @@ export default function Portefeuille() {
           <div style={{ fontSize: 13, fontWeight: 500, color: t.text, marginBottom: 4 }}>Répartition du portefeuille</div>
           <div style={{ fontSize: 11, color: t.textMuted, marginBottom: 16 }}>Total : {total.toLocaleString('fr-FR')} €</div>
           {total > 0 ? (
-            <div style={{ display: 'grid', gridTemplateColumns: '200px 1fr', gap: 24, alignItems: 'center' }}>
-              <div style={{ position: 'relative', height: 200 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '200px 1fr', gap: isMobile ? 16 : 24, alignItems: 'center' }}>
+              <div style={{ position: 'relative', height: 200, maxWidth: isMobile ? 200 : '100%', margin: isMobile ? '0 auto' : 0 }}>
                 <canvas ref={canvasRef} />
                 <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', pointerEvents: 'none' }}>
                   <div style={{ fontSize: 16, fontWeight: 500, color: t.text }}>{total.toLocaleString('fr-FR')} €</div>
@@ -397,10 +406,10 @@ export default function Portefeuille() {
                 {comptes.filter(c => parseFloat(c.solde) > 0).map((c, i) => (
                   <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <div style={{ width: 10, height: 10, borderRadius: 2, background: COULEURS[i], flexShrink: 0 }} />
-                    <div style={{ flex: 1 }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
-                        <span style={{ fontSize: 12, color: t.text }}>{c.nom}</span>
-                        <div style={{ display: 'flex', gap: 12 }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3, gap: 8 }}>
+                        <span style={{ fontSize: 12, color: t.text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.nom}</span>
+                        <div style={{ display: 'flex', gap: 12, flexShrink: 0 }}>
                           <span style={{ fontSize: 12, color: t.textMuted }}>{(parseFloat(c.solde) || 0).toLocaleString('fr-FR')} €</span>
                           <span style={{ fontSize: 12, fontWeight: 500, color: t.text, minWidth: 36, textAlign: 'right' }}>{Math.round((parseFloat(c.solde) / total) * 100)}%</span>
                         </div>
@@ -417,53 +426,55 @@ export default function Portefeuille() {
         </div>
 
         {/* 4. PLAN DE VIREMENT */}
-        <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, marginBottom: 20 }}>
-          <div style={{ padding: '12px 16px', borderBottom: `0.5px solid ${t.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, marginBottom: 20, overflow: 'hidden' }}>
+          <div style={{ padding: '12px 16px', borderBottom: `0.5px solid ${t.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
             <div>
               <div style={{ fontSize: 13, fontWeight: 500, color: t.text }}>Plan de virement mensuel</div>
               <div style={{ fontSize: 11, color: t.textMuted, marginTop: 2 }}>Basé sur votre investissable : <span style={{ fontWeight: 500, color: '#4CAF2E' }}>{investissable.toLocaleString('fr-FR')} €/mois</span></div>
             </div>
             {tousCoches && <div style={{ fontSize: 11, color: '#2E7D1E', background: '#EAF6E4', padding: '5px 10px', borderRadius: 7, fontWeight: 500 }}>✓ Tous les virements effectués ce mois !</div>}
           </div>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
-            <thead>
-              <tr style={{ background: t.bgSecondary }}>
-                {['', 'Destination', 'Compte bancaire', 'Répartition (%)', 'Montant à virer ce mois'].map(h => (
-                  <th key={h} style={{ padding: '8px 14px', textAlign: 'left', fontSize: 10, color: t.textMuted, fontWeight: 500, borderBottom: `0.5px solid ${t.border}`, whiteSpace: 'nowrap' }}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {virements.map((v, i) => {
-                const coche = isCheckedCeMois(v)
-                return (
-                  <tr key={i} style={{ borderBottom: `0.5px solid ${t.border}`, background: coche ? (t.dark ? 'rgba(76,175,46,0.08)' : '#F6FFF3') : 'transparent' }}>
-                    <td style={{ padding: '10px 14px' }}><input type="checkbox" checked={coche} onChange={() => handleCheck(i)} style={{ accentColor: bleu, cursor: 'pointer', width: 14, height: 14 }} /></td>
-                    <td style={{ padding: '10px 14px', color: coche ? '#4CAF2E' : t.text, fontWeight: 500, textDecoration: coche ? 'line-through' : 'none' }}>{v.destination}</td>
-                    <td style={{ padding: '8px 14px' }}>
-                      <select value={v.compte} onChange={e => handleVirementChange(i, 'compte', e.target.value)} style={{ padding: '5px 8px', borderRadius: 6, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }}>
-                        {comptes.map(c => <option key={c.nom} value={c.nom}>{c.nom}</option>)}
-                      </select>
-                    </td>
-                    <td style={{ padding: '8px 14px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                        <input type="number" min="0" max="100" value={v.pourcentage} onChange={e => handleVirementChange(i, 'pourcentage', parseFloat(e.target.value) || 0)} style={{ width: 60, padding: '5px 8px', borderRadius: 6, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text, textAlign: 'right' }} />
-                        <span style={{ fontSize: 11, color: t.textMuted }}>%</span>
-                      </div>
-                    </td>
-                    <td style={{ padding: '10px 14px', fontWeight: 500, color: '#4CAF2E' }}>{Math.round(investissable * v.pourcentage / 100).toLocaleString('fr-FR')} €</td>
-                  </tr>
-                )
-              })}
-              <tr style={{ background: t.bgSecondary, borderTop: `0.5px solid ${t.border}` }}>
-                <td colSpan={3} style={{ padding: '10px 14px', fontWeight: 500, color: t.text, fontSize: 11 }}>TOTAL</td>
-                <td style={{ padding: '10px 14px', fontWeight: 500, color: totalPourcentage === 100 ? '#4CAF2E' : '#E24B4A' }}>{totalPourcentage}%</td>
-                <td style={{ padding: '10px 14px', fontWeight: 500, color: t.text }}>{Math.round(investissable).toLocaleString('fr-FR')} €</td>
-              </tr>
-            </tbody>
-          </table>
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, minWidth: 620 }}>
+              <thead>
+                <tr style={{ background: t.bgSecondary }}>
+                  {['', 'Destination', 'Compte bancaire', 'Répartition (%)', 'Montant à virer ce mois'].map(h => (
+                    <th key={h} style={{ padding: '8px 14px', textAlign: 'left', fontSize: 10, color: t.textMuted, fontWeight: 500, borderBottom: `0.5px solid ${t.border}`, whiteSpace: 'nowrap' }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {virements.map((v, i) => {
+                  const coche = isCheckedCeMois(v)
+                  return (
+                    <tr key={i} style={{ borderBottom: `0.5px solid ${t.border}`, background: coche ? (t.dark ? 'rgba(76,175,46,0.08)' : '#F6FFF3') : 'transparent' }}>
+                      <td style={{ padding: '10px 14px' }}><input type="checkbox" checked={coche} onChange={() => handleCheck(i)} style={{ accentColor: bleu, cursor: 'pointer', width: 14, height: 14 }} /></td>
+                      <td style={{ padding: '10px 14px', color: coche ? '#4CAF2E' : t.text, fontWeight: 500, textDecoration: coche ? 'line-through' : 'none' }}>{v.destination}</td>
+                      <td style={{ padding: '8px 14px' }}>
+                        <select value={v.compte} onChange={e => handleVirementChange(i, 'compte', e.target.value)} style={{ padding: '5px 8px', borderRadius: 6, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }}>
+                          {comptes.map(c => <option key={c.nom} value={c.nom}>{c.nom}</option>)}
+                        </select>
+                      </td>
+                      <td style={{ padding: '8px 14px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                          <input type="number" min="0" max="100" value={v.pourcentage} onChange={e => handleVirementChange(i, 'pourcentage', parseFloat(e.target.value) || 0)} style={{ width: 60, padding: '5px 8px', borderRadius: 6, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text, textAlign: 'right' }} />
+                          <span style={{ fontSize: 11, color: t.textMuted }}>%</span>
+                        </div>
+                      </td>
+                      <td style={{ padding: '10px 14px', fontWeight: 500, color: '#4CAF2E' }}>{Math.round(investissable * v.pourcentage / 100).toLocaleString('fr-FR')} €</td>
+                    </tr>
+                  )
+                })}
+                <tr style={{ background: t.bgSecondary, borderTop: `0.5px solid ${t.border}` }}>
+                  <td colSpan={3} style={{ padding: '10px 14px', fontWeight: 500, color: t.text, fontSize: 11 }}>TOTAL</td>
+                  <td style={{ padding: '10px 14px', fontWeight: 500, color: totalPourcentage === 100 ? '#4CAF2E' : '#E24B4A' }}>{totalPourcentage}%</td>
+                  <td style={{ padding: '10px 14px', fontWeight: 500, color: t.text }}>{Math.round(investissable).toLocaleString('fr-FR')} €</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
           {totalPourcentage !== 100 && (
-            <div style={{ padding: '8px 16px', background: '#FCEBEB', borderTop: `0.5px solid ${t.border}`, borderRadius: '0 0 12px 12px' }}>
+            <div style={{ padding: '8px 16px', background: '#FCEBEB', borderTop: `0.5px solid ${t.border}` }}>
               <span style={{ fontSize: 11, color: '#E24B4A' }}>⚠️ Le total des pourcentages doit être égal à 100% (actuellement {totalPourcentage}%)</span>
             </div>
           )}
