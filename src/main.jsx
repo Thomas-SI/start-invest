@@ -3,9 +3,8 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { ThemeProvider } from './lib/ThemeContext'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import ProtectedRoute from './components/ProtectedRoute'
 import Accueil from './pages/Accueil'
-// import Login from './pages/Login'
-// import Signup from './pages/Signup'
 import Dashboard from './pages/Dashboard'
 import Portefeuille from './pages/Portefeuille'
 import Investissement from './pages/Investissement'
@@ -41,25 +40,31 @@ createRoot(document.getElementById('root')).render(
       <ThemeProvider>
         <BrowserRouter>
           <Routes>
+            {/* ROUTES PUBLIQUES */}
             <Route path="/" element={<Accueil />} />
             <Route path="/login" element={<Navigate to="/" replace />} />
             <Route path="/signup" element={<Navigate to="/" replace />} />
-            <Route path="/onboarding" element={<Onboarding />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/portefeuille" element={<Portefeuille />} />
-            <Route path="/investissement" element={<Investissement />} />
-            <Route path="/croissance" element={<Croissance />} />
-            <Route path="/challenge" element={<Challenge />} />
-            <Route path="/guide" element={<Guide />} />
-            <Route path="/abonnement" element={<Abonnement />} />
-            <Route path="/compte" element={<Compte />} />
-            <Route path="/parametres" element={<Parametres />} />
             <Route path="/fonctionnalites" element={<Fonctionnalites />} />
             <Route path="/challenge-public" element={<ChallengePublic />} />
             <Route path="/abonnement-public" element={<AbonnementPublic />} />
             <Route path="/mentions-legales" element={<MentionsLegales />} />
             <Route path="/confidentialite" element={<Confidentialite />} />
             <Route path="/cgv" element={<CGV />} />
+
+            {/* ROUTES PROTÉGÉES */}
+            <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
+            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/portefeuille" element={<ProtectedRoute><Portefeuille /></ProtectedRoute>} />
+            <Route path="/investissement" element={<ProtectedRoute><Investissement /></ProtectedRoute>} />
+            <Route path="/croissance" element={<ProtectedRoute><Croissance /></ProtectedRoute>} />
+            <Route path="/challenge" element={<ProtectedRoute><Challenge /></ProtectedRoute>} />
+            <Route path="/guide" element={<ProtectedRoute><Guide /></ProtectedRoute>} />
+            <Route path="/abonnement" element={<ProtectedRoute><Abonnement /></ProtectedRoute>} />
+            <Route path="/compte" element={<ProtectedRoute><Compte /></ProtectedRoute>} />
+            <Route path="/parametres" element={<ProtectedRoute><Parametres /></ProtectedRoute>} />
+
+            {/* FALLBACK : toute URL inconnue redirige vers Accueil */}
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </BrowserRouter>
       </ThemeProvider>
