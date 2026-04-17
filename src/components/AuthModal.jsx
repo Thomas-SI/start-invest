@@ -56,7 +56,7 @@ export default function AuthModal({ onClose, defaultMode = 'login' }) {
   return (
     <>
       <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 999, backdropFilter: 'blur(2px)' }} />
-      <div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 1000, background: '#fff', borderRadius: 20, padding: '36px 40px', width: 420, boxShadow: '0 20px 60px rgba(27,46,75,0.15)', fontFamily: 'inherit' }}>
+      <div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 1000, background: '#fff', borderRadius: 20, padding: '32px 24px', width: 'calc(100% - 32px)', maxWidth: 420, boxSizing: 'border-box', boxShadow: '0 20px 60px rgba(27,46,75,0.15)', fontFamily: 'inherit' }}>
         <button onClick={onClose} style={{ position: 'absolute', top: 16, right: 16, background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: '#9CA3AF', lineHeight: 1 }}>x</button>
         <div style={{ textAlign: 'center', marginBottom: 24 }}>
           <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center' }}>
