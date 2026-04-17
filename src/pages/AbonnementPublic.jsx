@@ -1,7 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AuthModal from '../components/AuthModal'
 import FooterPublic from '../components/FooterPublic'
+
+const LOGO_URL = 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/IMG_2819.jpeg'
 
 const featuresGratuit = [
   'Suivi finance de base',
@@ -24,11 +26,115 @@ const featuresPremium = [
   'Guide complet investissement',
 ]
 
-export default function AbonnementPublic() {
+function PublicNavbar({ isMobile, openLogin, openSignup, activeLink = 'Abonnement' }) {
   const navigate = useNavigate()
+  const [menuOpen, setMenuOpen] = useState(false)
+
+  useEffect(() => {
+    if (!isMobile) setMenuOpen(false)
+  }, [isMobile])
+
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? 'hidden' : ''
+    return () => { document.body.style.overflow = '' }
+  }, [menuOpen])
+
+  const links = [
+    ['Accueil', '/'],
+    ['Fonctionnalites', '/fonctionnalites'],
+    ['Challenge', '/challenge-public'],
+    ['Abonnement', '/abonnement-public'],
+  ]
+
+  const handleNavigate = (path) => {
+    setMenuOpen(false)
+    navigate(path)
+  }
+
+  const Logo = () => (
+    <div onClick={() => handleNavigate('/')} style={{ cursor: 'pointer' }}>
+      <img src={LOGO_URL} alt="StartInvest" style={{ height: 38, width: 38, borderRadius: '50%', objectFit: 'cover' }} />
+    </div>
+  )
+
+  if (isMobile) {
+    return (
+      <>
+        <nav style={{ background: '#fff', borderBottom: '0.5px solid #E0EAE3', padding: '0 16px', height: 58, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 100 }}>
+          <Logo />
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label={menuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
+            style={{ background: 'transparent', border: 'none', padding: 8, cursor: 'pointer', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 5, width: 40, height: 40 }}
+          >
+            <span style={{ width: 22, height: 2, background: '#1B2E4B', borderRadius: 2, transition: 'all 0.25s', transform: menuOpen ? 'rotate(45deg) translate(5px, 5px)' : 'none' }} />
+            <span style={{ width: 22, height: 2, background: '#1B2E4B', borderRadius: 2, transition: 'all 0.25s', opacity: menuOpen ? 0 : 1 }} />
+            <span style={{ width: 22, height: 2, background: '#1B2E4B', borderRadius: 2, transition: 'all 0.25s', transform: menuOpen ? 'rotate(-45deg) translate(5px, -5px)' : 'none' }} />
+          </button>
+        </nav>
+
+        {menuOpen && (
+          <div style={{ position: 'fixed', top: 58, left: 0, right: 0, bottom: 0, background: '#fff', zIndex: 99, display: 'flex', flexDirection: 'column', padding: '20px 0', overflowY: 'auto' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', padding: '12px 0' }}>
+              {links.map(([label, path]) => (
+                <div
+                  key={label}
+                  onClick={() => handleNavigate(path)}
+                  style={{
+                    fontSize: 16,
+                    color: label === activeLink ? '#4CAF2E' : '#1B2E4B',
+                    padding: '16px 24px',
+                    cursor: 'pointer',
+                    fontWeight: label === activeLink ? 600 : 400,
+                    borderLeft: label === activeLink ? '3px solid #4CAF2E' : '3px solid transparent',
+                  }}
+                >
+                  {label}
+                </div>
+              ))}
+            </div>
+
+            <div style={{ padding: '20px 24px', marginTop: 'auto', borderTop: '0.5px solid #E0EAE3', display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <button onClick={() => { setMenuOpen(false); openLogin() }} style={{ padding: '12px', borderRadius: 8, border: '0.5px solid #1B2E4B', background: 'transparent', color: '#1B2E4B', fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Se connecter</button>
+              <button onClick={() => { setMenuOpen(false); openSignup() }} style={{ padding: '12px', borderRadius: 8, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>S inscrire gratuitement</button>
+            </div>
+          </div>
+        )}
+      </>
+    )
+  }
+
+  return (
+    <nav style={{ background: '#fff', borderBottom: '0.5px solid #E0EAE3', padding: '0 40px', height: 58, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 100 }}>
+      <Logo />
+      <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+        {links.map(([label, path]) => (
+          <span key={label} onClick={() => navigate(path)} style={{ fontSize: 13, color: label === activeLink ? '#1B2E4B' : '#6B7280', padding: '5px 12px', borderRadius: 6, cursor: 'pointer', fontWeight: label === activeLink ? 500 : 400 }}
+            onMouseEnter={e => e.currentTarget.style.color = '#1B2E4B'}
+            onMouseLeave={e => e.currentTarget.style.color = label === activeLink ? '#1B2E4B' : '#6B7280'}>
+            {label}
+          </span>
+        ))}
+      </div>
+      <div style={{ display: 'flex', gap: 10 }}>
+        <button onClick={openLogin} style={{ padding: '7px 16px', borderRadius: 8, border: '0.5px solid #1B2E4B', background: 'transparent', color: '#1B2E4B', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Se connecter</button>
+        <button onClick={openSignup} style={{ padding: '7px 16px', borderRadius: 8, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>S inscrire gratuitement</button>
+      </div>
+    </nav>
+  )
+}
+
+export default function AbonnementPublic() {
   const [annuel, setAnnuel] = useState(false)
   const [authOpen, setAuthOpen] = useState(false)
   const [authMode, setAuthMode] = useState('login')
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   const openLogin = () => { setAuthMode('login'); setAuthOpen(true) }
   const openSignup = () => { setAuthMode('signup'); setAuthOpen(true) }
@@ -36,39 +142,21 @@ export default function AbonnementPublic() {
   return (
     <div style={{ fontFamily: 'inherit', background: '#F4F7F5', minHeight: '100vh' }}>
 
-      <nav style={{ background: '#fff', borderBottom: '0.5px solid #E0EAE3', padding: '0 40px', height: 58, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 100 }}>
-        <div onClick={() => navigate('/')} style={{ display: 'flex', alignItems: 'baseline', cursor: 'pointer' }}>
-          <span style={{ fontSize: 18, fontWeight: 800, color: '#1B2E4B', fontStyle: 'italic' }}>START</span>
-          <span style={{ fontSize: 18, fontWeight: 800, color: '#4CAF2E', fontStyle: 'italic' }}>INVEST</span>
-        </div>
-        <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
-          {[['Accueil', '/'], ['Fonctionnalites', '/fonctionnalites'], ['Challenge', '/challenge-public'], ['Abonnement', '/abonnement-public']].map(([label, path]) => (
-            <span key={label} onClick={() => navigate(path)} style={{ fontSize: 13, color: label === 'Abonnement' ? '#1B2E4B' : '#6B7280', padding: '5px 12px', borderRadius: 6, cursor: 'pointer', fontWeight: label === 'Abonnement' ? 500 : 400 }}
-              onMouseEnter={e => e.currentTarget.style.color = '#1B2E4B'}
-              onMouseLeave={e => e.currentTarget.style.color = label === 'Abonnement' ? '#1B2E4B' : '#6B7280'}>
-              {label}
-            </span>
-          ))}
-        </div>
-        <div style={{ display: 'flex', gap: 10 }}>
-          <button onClick={openLogin} style={{ padding: '7px 16px', borderRadius: 8, border: '0.5px solid #1B2E4B', background: 'transparent', color: '#1B2E4B', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Se connecter</button>
-          <button onClick={openSignup} style={{ padding: '7px 16px', borderRadius: 8, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>S inscrire gratuitement</button>
-        </div>
-      </nav>
+      <PublicNavbar isMobile={isMobile} openLogin={openLogin} openSignup={openSignup} activeLink="Abonnement" />
 
-      <section style={{ padding: '60px 40px 40px', textAlign: 'center' }}>
+      <section style={{ padding: isMobile ? '40px 16px 30px' : '60px 40px 40px', textAlign: 'center' }}>
         <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 16, background: '#EAF6E4', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Abonnement</div>
-        <h1 style={{ fontSize: 38, fontWeight: 700, color: '#1B2E4B', lineHeight: 1.2, margin: '0 0 16px' }}>
+        <h1 style={{ fontSize: isMobile ? 28 : 38, fontWeight: 700, color: '#1B2E4B', lineHeight: 1.2, margin: '0 0 16px' }}>
           Simple, transparent, sans surprise.
         </h1>
-        <p style={{ fontSize: 15, color: '#6B7280', maxWidth: 440, margin: '0 auto 12px' }}>
+        <p style={{ fontSize: isMobile ? 14 : 15, color: '#6B7280', maxWidth: 440, margin: '0 auto 12px' }}>
           Commencez gratuitement. Passez a Premium quand vous etes pret.
         </p>
-        <div style={{ fontSize: 13, color: '#4CAF2E', fontWeight: 500, background: '#EAF6E4', display: 'inline-block', padding: '6px 16px', borderRadius: 20, marginBottom: 36 }}>
+        <div style={{ fontSize: 13, color: '#4CAF2E', fontWeight: 500, background: '#EAF6E4', display: 'inline-block', padding: '6px 16px', borderRadius: 20, marginBottom: isMobile ? 28 : 36 }}>
           Essayez gratuitement pendant 15 jours
         </div>
 
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 0, background: '#fff', border: '0.5px solid #E0EAE3', borderRadius: 30, padding: '4px', marginBottom: 48 }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 0, background: '#fff', border: '0.5px solid #E0EAE3', borderRadius: 30, padding: '4px', marginBottom: isMobile ? 36 : 48 }}>
           <button onClick={() => setAnnuel(false)} style={{ padding: '7px 20px', borderRadius: 20, border: 'none', background: !annuel ? '#1B2E4B' : 'transparent', color: !annuel ? '#fff' : '#9CA3AF', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' }}>Mensuel</button>
           <button onClick={() => setAnnuel(true)} style={{ padding: '7px 20px', borderRadius: 20, border: 'none', background: annuel ? '#1B2E4B' : 'transparent', color: annuel ? '#fff' : '#9CA3AF', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s', display: 'flex', alignItems: 'center', gap: 6 }}>
             Annuel
@@ -76,10 +164,10 @@ export default function AbonnementPublic() {
           </button>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, maxWidth: 720, margin: '0 auto' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 20, maxWidth: 720, margin: '0 auto' }}>
 
           {/* GRATUIT */}
-          <div style={{ background: '#fff', border: '0.5px solid #E0EAE3', borderRadius: 20, padding: '32px 28px', textAlign: 'left' }}>
+          <div style={{ background: '#fff', border: '0.5px solid #E0EAE3', borderRadius: 20, padding: isMobile ? '28px 22px' : '32px 28px', textAlign: 'left' }}>
             <div style={{ fontSize: 13, fontWeight: 600, color: '#6B7280', marginBottom: 8 }}>Gratuit</div>
             <div style={{ fontSize: 36, fontWeight: 700, color: '#1B2E4B', marginBottom: 4 }}>0 euros</div>
             <div style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 24 }}>pour toujours</div>
@@ -99,7 +187,7 @@ export default function AbonnementPublic() {
           </div>
 
           {/* PREMIUM */}
-          <div style={{ background: '#1B2E4B', border: '2px solid #4CAF2E', borderRadius: 20, padding: '32px 28px', textAlign: 'left', position: 'relative' }}>
+          <div style={{ background: '#1B2E4B', border: '2px solid #4CAF2E', borderRadius: 20, padding: isMobile ? '28px 22px' : '32px 28px', textAlign: 'left', position: 'relative' }}>
             <div style={{ position: 'absolute', top: -14, left: '50%', transform: 'translateX(-50%)', background: '#4CAF2E', color: '#fff', fontSize: 11, fontWeight: 600, padding: '4px 16px', borderRadius: 20, whiteSpace: 'nowrap' }}>Recommande</div>
             <div style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.6)', marginBottom: 8 }}>Premium</div>
             <div style={{ fontSize: 36, fontWeight: 700, color: '#fff', marginBottom: 4 }}>{annuel ? '67 euros' : '7.99 euros'}</div>
@@ -124,8 +212,8 @@ export default function AbonnementPublic() {
       </section>
 
       {/* FAQ */}
-      <section style={{ padding: '60px 40px', maxWidth: 720, margin: '0 auto' }}>
-        <h2 style={{ fontSize: 26, fontWeight: 700, color: '#1B2E4B', textAlign: 'center', marginBottom: 40 }}>Questions frequentes</h2>
+      <section style={{ padding: isMobile ? '40px 16px 60px' : '60px 40px', maxWidth: 720, margin: '0 auto' }}>
+        <h2 style={{ fontSize: isMobile ? 22 : 26, fontWeight: 700, color: '#1B2E4B', textAlign: 'center', marginBottom: isMobile ? 28 : 40 }}>Questions frequentes</h2>
         {[
           { q: 'Comment fonctionne les 15 jours gratuits ?', r: 'Vous acces a toutes les fonctionnalites Premium pendant 15 jours sans carte bancaire requise. A la fin de la periode, vous choisissez de continuer ou de rester sur le plan gratuit.' },
           { q: 'Puis-je annuler a tout moment ?', r: 'Oui, vous pouvez annuler votre abonnement a tout moment depuis votre espace compte. Aucun engagement.' },
