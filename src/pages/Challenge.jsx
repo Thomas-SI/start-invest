@@ -104,6 +104,139 @@ const checkAndGrant = async (user, investissements, transactions, accomplissemen
   return toInsert.length + toUpdate.length
 }
 
+// ============ NOUVEAU : POPUP DES NIVEAUX POUR BADGE ÉVOLUTIF ============
+function NiveauxModal({ acc, gradeActuel, valeurActuelle, onClose }) {
+  const t = useTheme()
+  const isMetronome = acc.slug === 'metronome'
+  const unite = isMetronome ? 'mois' : '€'
+
+  const getSeuil = (g) => isMetronome ? g.mois : g.palier
+  const formatSeuil = (g) => isMetronome ? `${g.mois} mois` : `${g.palier.toLocaleString('fr-FR')} €`
+
+  const getStatut = (g) => {
+    const seuil = getSeuil(g)
+    if (gradeActuel?.niveau === g.niveau) return 'actuel'
+    if (valeurActuelle >= seuil) return 'atteint'
+    return 'a-venir'
+  }
+
+  const prochain = acc.grades.find(g => getStatut(g) === 'a-venir')
+  const valeurFormatee = isMetronome ? `${valeurActuelle} mois` : `${Math.round(valeurActuelle).toLocaleString('fr-FR')} €`
+
+  return (
+    <>
+      <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 998, backdropFilter: 'blur(3px)' }} />
+
+      <div style={{
+        position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+        zIndex: 999, background: t.bgCard, borderRadius: 20,
+        width: 'calc(100% - 32px)', maxWidth: 420, maxHeight: '88vh',
+        display: 'flex', flexDirection: 'column',
+        boxShadow: '0 20px 60px rgba(0,0,0,0.3)', fontFamily: 'inherit', overflow: 'hidden'
+      }}>
+        {/* HEADER */}
+        <div style={{ padding: '16px 20px 12px', borderBottom: `0.5px solid ${t.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{ width: 44, height: 44, borderRadius: '50%', background: gradeActuel ? gradeActuel.niveauBg : t.bgSecondary, display: 'flex', alignItems: 'center', justifyContent: 'center', border: gradeActuel ? `2px solid ${gradeActuel.niveauColor}` : `1.5px solid ${t.border}`, overflow: 'hidden', flexShrink: 0 }}>
+              {acc.svgIcon ? <img src={METRONOME_URL} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span style={{ fontSize: 22 }}>{acc.emoji}</span>}
+            </div>
+            <div>
+              <div style={{ fontSize: 15, fontWeight: 600, color: t.text }}>{acc.nom}</div>
+              <div style={{ fontSize: 11, color: t.textMuted, marginTop: 2 }}>{acc.quete}</div>
+            </div>
+          </div>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: t.textMuted, padding: 0 }}>✕</button>
+        </div>
+
+        {/* VALEUR ACTUELLE */}
+        <div style={{ padding: '12px 20px', borderBottom: `0.5px solid ${t.border}`, background: t.bgSecondary, flexShrink: 0 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <div style={{ fontSize: 10, color: t.textMuted, textTransform: 'uppercase', letterSpacing: '.05em' }}>
+                {isMetronome ? 'Série actuelle' : 'Total investi'}
+              </div>
+              <div style={{ fontSize: 18, fontWeight: 700, color: t.text }}>{valeurFormatee}</div>
+            </div>
+            {gradeActuel && (
+              <span style={{ fontSize: 11, padding: '4px 10px', borderRadius: 20, fontWeight: 600, background: gradeActuel.niveauBg, color: gradeActuel.niveauColor, border: `1px solid ${gradeActuel.niveauColor}` }}>
+                {gradeActuel.niveau}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* LISTE DES NIVEAUX */}
+        <div style={{ overflowY: 'auto', flex: 1, padding: '14px 20px' }}>
+          <div style={{ fontSize: 11, color: t.textMuted, textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 10 }}>Tous les niveaux</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {acc.grades.map((g, i) => {
+              const statut = getStatut(g)
+              const seuil = getSeuil(g)
+              const progression = Math.min(100, Math.round((valeurActuelle / seuil) * 100))
+
+              return (
+                <div key={g.slug} style={{
+                  display: 'flex', alignItems: 'center', gap: 12,
+                  padding: '12px 14px', borderRadius: 10,
+                  background: statut === 'actuel' ? g.niveauBg : (statut === 'atteint' ? g.niveauBg + '80' : 'transparent'),
+                  border: `${statut === 'actuel' ? 2 : 1}px solid ${statut === 'a-venir' ? t.border : g.niveauColor}`,
+                  opacity: statut === 'a-venir' && g !== prochain ? 0.5 : 1,
+                }}>
+                  {/* Puce niveau */}
+                  <div style={{
+                    width: 34, height: 34, borderRadius: '50%',
+                    background: statut === 'a-venir' ? 'transparent' : g.niveauBg,
+                    border: `2px solid ${g.niveauColor}`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    flexShrink: 0, fontSize: 11, fontWeight: 700, color: g.niveauColor,
+                  }}>
+                    {i + 1}
+                  </div>
+
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: statut === 'a-venir' ? t.textMuted : g.niveauColor }}>
+                        {g.niveau}
+                      </span>
+                      <span style={{ fontSize: 11, fontWeight: 500, color: statut === 'a-venir' ? t.textMuted : g.niveauColor, whiteSpace: 'nowrap' }}>
+                        {formatSeuil(g)}
+                      </span>
+                    </div>
+                    {g === prochain && (
+                      <div style={{ marginTop: 6 }}>
+                        <div style={{ background: t.bgSecondary, borderRadius: 3, height: 5, overflow: 'hidden' }}>
+                          <div style={{ height: '100%', borderRadius: 3, background: g.niveauColor, width: `${progression}%`, transition: 'width 0.5s' }} />
+                        </div>
+                        <div style={{ fontSize: 10, color: t.textMuted, marginTop: 3 }}>
+                          Encore {isMetronome ? `${seuil - valeurActuelle} mois` : `${(seuil - valeurActuelle).toLocaleString('fr-FR')} €`}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Icône statut */}
+                  {statut === 'atteint' && <span style={{ fontSize: 14, color: g.niveauColor, fontWeight: 700, flexShrink: 0 }}>✓</span>}
+                  {statut === 'actuel' && <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 20, background: g.niveauColor, color: '#fff', fontWeight: 600, flexShrink: 0 }}>Actuel</span>}
+                  {statut === 'a-venir' && g === prochain && <span style={{ fontSize: 14, color: t.textMuted, flexShrink: 0 }}>→</span>}
+                </div>
+              )
+            })}
+          </div>
+
+          {/* Message si niveau max atteint */}
+          {!prochain && gradeActuel && (
+            <div style={{ marginTop: 12, padding: '12px 14px', background: '#FBEAF0', borderRadius: 10, textAlign: 'center' }}>
+              <div style={{ fontSize: 18, marginBottom: 4 }}>🏆</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: '#993556' }}>Niveau maximum atteint !</div>
+              <div style={{ fontSize: 11, color: '#993556', marginTop: 2 }}>Tu as maîtrisé ce challenge. Félicitations !</div>
+            </div>
+          )}
+        </div>
+      </div>
+    </>
+  )
+}
+
 function PositionModal({ totalInvesti, comptes, onClose }) {
   const t = useTheme()
   const canvasRef = useRef(null)
@@ -178,7 +311,6 @@ function PositionModal({ totalInvesti, comptes, onClose }) {
     <>
       <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 998, backdropFilter: 'blur(3px)' }} />
 
-      {/* POPUP — scrollable entière, sauf le canvas */}
       <div style={{
         position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
         zIndex: 999, background: t.bgCard, borderRadius: 20,
@@ -187,7 +319,6 @@ function PositionModal({ totalInvesti, comptes, onClose }) {
         boxShadow: '0 20px 60px rgba(0,0,0,0.3)', fontFamily: 'inherit', overflow: 'hidden'
       }}>
 
-        {/* HEADER fixe */}
         <div style={{ padding: '16px 20px 12px', borderBottom: `0.5px solid ${t.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexShrink: 0 }}>
           <div>
             <div style={{ fontSize: 15, fontWeight: 600, color: t.text }}>Ma position</div>
@@ -196,7 +327,6 @@ function PositionModal({ totalInvesti, comptes, onClose }) {
           <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: t.textMuted, padding: 0 }}>✕</button>
         </div>
 
-        {/* PATRIMOINE fixe */}
         <div style={{ padding: '10px 20px 12px', borderBottom: `0.5px solid ${t.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
           <div>
             <div style={{ fontSize: 20, fontWeight: 700, color: t.text }}>{patrimoine.toLocaleString('fr-FR')} €</div>
@@ -216,16 +346,12 @@ function PositionModal({ totalInvesti, comptes, onClose }) {
           </div>
         </div>
 
-        {/* ZONE PRINCIPALE scrollable */}
         <div style={{ overflowY: 'auto', flex: 1 }}>
 
-          {/* LAYOUT : bandes latérales + canvas au centre */}
           <div style={{ display: 'flex', alignItems: 'stretch' }}>
 
-            {/* BANDE GAUCHE — fine, scrollable, invisible */}
             <div style={{ width: 20, flexShrink: 0 }} />
 
-            {/* CANVAS au centre — capture le wheel uniquement quand souris dessus */}
             <div
               ref={canvasRef}
               onClick={handleCanvasClick}
@@ -242,7 +368,6 @@ function PositionModal({ totalInvesti, comptes, onClose }) {
               }}
             >
               <svg width="100%" height={H} viewBox={`0 0 ${W} ${H}`}>
-                {/* Grille fond */}
                 {[...Array(8)].map((_, i) => (
                   <line key={`h${i}`} x1="0" y1={i * 46} x2={W} y2={i * 46} stroke={t.dark ? '#fff' : '#000'} strokeWidth="0.5" opacity="0.04" />
                 ))}
@@ -250,7 +375,6 @@ function PositionModal({ totalInvesti, comptes, onClose }) {
                   <line key={`v${i}`} x1={i * 46} y1="0" x2={i * 46} y2={H} stroke={t.dark ? '#fff' : '#000'} strokeWidth="0.5" opacity="0.04" />
                 ))}
 
-                {/* Cercles extérieurs — paliers à venir */}
                 {paliersAVenir.map((palier, i) => {
                   const r = extRayons[i]
                   if (r < 10 || r > W) return null
@@ -267,10 +391,8 @@ function PositionModal({ totalInvesti, comptes, onClose }) {
                   )
                 })}
 
-                {/* Cercle utilisateur */}
                 <circle cx={cx} cy={cy} r={rUser} fill={couleurUser + '18'} stroke={couleurUser} strokeWidth="2.5" />
 
-                {/* Cercles intérieurs — paliers franchis */}
                 {[...paliersAtteints].reverse().map((palier, i) => {
                   const r = intRayons[i]
                   if (r < 6 || r >= rUser - 2) return null
@@ -287,11 +409,9 @@ function PositionModal({ totalInvesti, comptes, onClose }) {
                   )
                 })}
 
-                {/* "Vous" intégré dans la bordure haute du cercle */}
                 <line x1={cx - rUser * 0.42} y1={cy - rUser + 1} x2={cx + rUser * 0.42} y2={cy - rUser + 1} stroke={t.dark ? '#0A0F0A' : '#F6FBF6'} strokeWidth="13" />
                 <text x={cx} y={cy - rUser + 5} textAnchor="middle" fontSize="10" fontWeight="700" fill={couleurUser}>Vous</text>
 
-                {/* Patrimoine + palier au centre */}
                 <text x={cx} y={cy - 5} textAnchor="middle" fontSize="12" fontWeight="700" fill={t.dark ? '#fff' : '#1B2E4B'}>
                   {patrimoine.toLocaleString('fr-FR')} €
                 </text>
@@ -303,16 +423,13 @@ function PositionModal({ totalInvesti, comptes, onClose }) {
               </svg>
             </div>
 
-            {/* BANDE DROITE — fine, scrollable, invisible */}
             <div style={{ width: 20, flexShrink: 0 }} />
           </div>
 
-          {/* INDICATION */}
           <div style={{ textAlign: 'center', fontSize: 10, color: t.textMuted, paddingBottom: 8 }}>
             Scroll sur le graphique pour zoomer · Clique sur un cercle
           </div>
 
-          {/* INFO PALIER CLIQUÉ */}
           {palierInfo && (
             <div style={{ margin: '0 20px 12px', background: palierInfo.couleur + '12', border: `0.5px solid ${palierInfo.couleur}`, borderRadius: 10, padding: '12px 14px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
@@ -341,7 +458,6 @@ function PositionModal({ totalInvesti, comptes, onClose }) {
             </div>
           )}
 
-          {/* BOUTON + LISTE PALIERS */}
           <div style={{ padding: '0 20px 20px' }}>
             <button
               onClick={() => setShowPaliers(p => !p)}
@@ -393,6 +509,7 @@ export default function Challenge() {
   const [onglet, setOnglet] = useState('obtenus')
   const [checking, setChecking] = useState(true)
   const [positionOpen, setPositionOpen] = useState(false)
+  const [niveauxOpen, setNiveauxOpen] = useState(null) // slug du badge cliqué
   const { data, isLoading } = useQuery({ queryKey: ['challenge'], queryFn: fetchChallengeData })
 
   useEffect(() => {
@@ -467,6 +584,10 @@ export default function Challenge() {
   const obtenus = ACCOMPLISSEMENTS.filter(a => slugsObtenus.has(a.slug))
   const aDebloquer = ACCOMPLISSEMENTS.filter(a => !slugsObtenus.has(a.slug))
 
+  // Récupère l'accomplissement actuellement ouvert dans le popup niveaux
+  const accOuvert = niveauxOpen ? ACCOMPLISSEMENTS.find(a => a.slug === niveauxOpen) : null
+  const valeurActuelleAcc = accOuvert?.slug === 'metronome' ? streak : (accOuvert?.slug === 'cap' ? totalInvesti : 0)
+
   if (isLoading || checking) return (
     <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar page="Challenge" />
@@ -482,14 +603,41 @@ export default function Challenge() {
   }
 
   const BadgeCard = ({ acc, obtenu }) => {
+    const [isHovered, setIsHovered] = useState(false)
     const gradeActuel = obtenu ? getGradeActuel(acc) : null
     const prochain = getProchainGrade(acc)
     const prog = getProgression(acc)
     const pct = prog ? Math.min(Math.round((prog.current / prog.total) * 100), 100) : 0
     const estMaxLevel = obtenu && acc.evolutif && !prochain
+    const estCliquable = acc.evolutif // uniquement les badges évolutifs sont cliquables
 
     return (
-      <div style={{ background: obtenu ? (t.dark ? '#0F1F0F' : '#F6FFF3') : t.bgCard, border: `0.5px solid ${obtenu ? '#4CAF2E' : t.border}`, borderRadius: 12, padding: 14, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 6 }}>
+      <div
+        onClick={estCliquable ? () => setNiveauxOpen(acc.slug) : undefined}
+        style={{
+          background: obtenu ? (t.dark ? '#0F1F0F' : '#F6FFF3') : t.bgCard,
+          border: `0.5px solid ${obtenu ? '#4CAF2E' : t.border}`,
+          borderRadius: 12,
+          padding: 14,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          textAlign: 'center',
+          gap: 6,
+          cursor: estCliquable ? 'pointer' : 'default',
+          transition: 'transform 0.15s, box-shadow 0.15s',
+          position: 'relative',
+          transform: isHovered ? 'translateY(-2px)' : 'translateY(0)',
+          boxShadow: isHovered ? '0 6px 16px rgba(0,0,0,0.08)' : 'none',
+        }}
+        onMouseEnter={() => { if (estCliquable) setIsHovered(true) }}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        {estCliquable && isHovered && (
+          <div style={{ position: 'absolute', top: 6, right: 8, fontSize: 9, color: t.textMuted, background: t.bgSecondary, padding: '2px 6px', borderRadius: 4 }}>
+            Voir niveaux
+          </div>
+        )}
         <div style={{ width: 60, height: 60, borderRadius: '50%', background: obtenu ? (gradeActuel ? gradeActuel.niveauBg : '#EAF6E4') : t.bgSecondary, display: 'flex', alignItems: 'center', justifyContent: 'center', border: obtenu ? `2px solid ${gradeActuel ? gradeActuel.niveauColor : '#4CAF2E'}` : `1.5px dashed ${t.border}`, overflow: 'hidden' }}>
           {obtenu ? <BadgeIcon acc={acc} size={60} /> : <span style={{ fontSize: 22, color: t.textMuted }}>?</span>}
         </div>
@@ -601,6 +749,17 @@ export default function Challenge() {
           onClose={() => setPositionOpen(false)}
         />
       )}
+
+      {/* POPUP NIVEAUX DU BADGE */}
+      {accOuvert && (
+        <NiveauxModal
+          acc={accOuvert}
+          gradeActuel={getGradeActuel(accOuvert)}
+          valeurActuelle={valeurActuelleAcc}
+          onClose={() => setNiveauxOpen(null)}
+        />
+      )}
+
       <FooterApp />
     </div>
   )
