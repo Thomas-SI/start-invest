@@ -271,11 +271,11 @@ export default function Investissement() {
                       {totalCible > 0 && <div style={{ fontSize: 11, fontWeight: 500, color: totalCible === 100 ? '#4CAF2E' : '#E24B4A' }}>% Cible total : {totalCible}%</div>}
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '3fr 1fr' }}>
-                      <div style={{ borderRight: isMobile ? 'none' : `0.5px solid ${t.border}`, borderBottom: isMobile ? `0.5px solid ${t.border}` : 'none' }}>
+                      <div style={{ borderRight: isMobile ? 'none' : `0.5px solid ${t.border}`, borderBottom: isMobile ? `0.5px solid ${t.border}` : 'none', minWidth: 0, overflow: 'hidden' }}>
                         {lignes.length === 0 ? (
                           <div style={{ padding: '24px', textAlign: 'center', color: t.textMuted, fontSize: 12 }}>Aucune position dans cette enveloppe</div>
                         ) : (
-                          <div style={{ overflowX: 'auto' }}>
+                          <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', touchAction: 'pan-x pan-y', maxWidth: '100%' }}>
                             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, minWidth: 700 }}>
                               <thead>
                                 <tr style={{ background: t.bgSecondary }}>
@@ -420,7 +420,7 @@ export default function Investissement() {
               Aucun achat enregistre — cliquez sur Ajouter pour enregistrer votre premier achat
             </div>
           ) : (
-            <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, overflow: 'auto' }}>
+            <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, overflowX: 'auto', overflowY: 'hidden', WebkitOverflowScrolling: 'touch', touchAction: 'pan-x pan-y', maxWidth: '100%' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, minWidth: 1000 }}>
                 <thead>
                   <tr style={{ background: t.bgSecondary }}>
