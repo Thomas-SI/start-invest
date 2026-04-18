@@ -22,6 +22,8 @@ export default function Compte() {
   const [showConfidentialite, setShowConfidentialite] = useState(false)
   const [showSupprimer, setShowSupprimer] = useState(false)
   const [confirmSupprimer, setConfirmSupprimer] = useState('')
+  const [suppressionLoading, setSuppressionLoading] = useState(false)
+  const [suppressionErreur, setSuppressionErreur] = useState(null)
   const [photoUrl, setPhotoUrl] = useState(null)
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
   const [erreurPhoto, setErreurPhoto] = useState(null)
@@ -78,9 +80,37 @@ export default function Compte() {
   }
 
   const handleDeleteAccount = async () => {
-    if (confirmSupprimer !== email) return
-    await supabase.auth.signOut()
-    navigate('/')
+    if (confirmSupprimer !== email || suppressionLoading) return
+    setSuppressionLoading(true)
+    setSuppressionErreur(null)
+    try {
+      // Recuperer la session active pour obtenir le JWT
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) throw new Error('Session expiree. Reconnecte-toi.')
+
+      // Appeler l'Edge Function delete-account avec le JWT
+      const { data, error } = await supabase.functions.invoke('delete-account', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      })
+
+      if (error) {
+        throw new Error(error.message || 'Erreur lors de la suppression du compte.')
+      }
+      if (data?.error) {
+        throw new Error(data.details || data.error)
+      }
+
+      // Succes : deconnexion + redirection
+      await supabase.auth.signOut()
+      navigate('/')
+    } catch (e) {
+      console.error('Erreur suppression compte:', e)
+      setSuppressionErreur(e.message || 'Une erreur est survenue.')
+      setSuppressionLoading(false)
+    }
   }
 
   const handleLogout = async () => {
@@ -311,10 +341,28 @@ export default function Compte() {
             </div>
             {showSupprimer && (
               <div style={{ marginTop: 16, padding: 16, background: '#FCEBEB', borderRadius: 10 }}>
-                <div style={{ fontSize: 12, color: '#E24B4A', marginBottom: 10 }}>⚠️ Cette action est irréversible. Tapez votre email pour confirmer.</div>
-                <input value={confirmSupprimer} onChange={e => setConfirmSupprimer(e.target.value)} placeholder={email} style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `0.5px solid #E24B4A`, fontSize: 13, fontFamily: 'inherit', outline: 'none', background: '#fff', color: '#E24B4A', marginBottom: 10, boxSizing: 'border-box' }} />
-                <button onClick={handleDeleteAccount} disabled={confirmSupprimer !== email} style={{ background: confirmSupprimer === email ? '#E24B4A' : '#ccc', color: '#fff', fontSize: 13, fontWeight: 500, padding: '10px 20px', borderRadius: 9, border: 'none', cursor: confirmSupprimer === email ? 'pointer' : 'default', fontFamily: 'inherit' }}>
-                  Confirmer la suppression
+                <div style={{ fontSize: 13, fontWeight: 600, color: '#E24B4A', marginBottom: 8 }}>⚠️ Suppression definitive du compte</div>
+                <div style={{ fontSize: 12, color: '#E24B4A', marginBottom: 10, lineHeight: 1.5 }}>
+                  Cette action est <strong>irreversible</strong>. Toutes tes donnees (investissements, transactions, comptes, budget, accomplissements, photo) seront supprimees definitivement. Tape ton email ci-dessous pour confirmer.
+                </div>
+                <input
+                  value={confirmSupprimer}
+                  onChange={e => setConfirmSupprimer(e.target.value)}
+                  placeholder={email}
+                  disabled={suppressionLoading}
+                  style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `0.5px solid #E24B4A`, fontSize: 13, fontFamily: 'inherit', outline: 'none', background: '#fff', color: '#E24B4A', marginBottom: 10, boxSizing: 'border-box' }}
+                />
+                {suppressionErreur && (
+                  <div style={{ background: '#fff', border: '0.5px solid #E24B4A', borderRadius: 8, padding: '8px 12px', fontSize: 12, color: '#E24B4A', marginBottom: 10 }}>
+                    ⚠️ {suppressionErreur}
+                  </div>
+                )}
+                <button
+                  onClick={handleDeleteAccount}
+                  disabled={confirmSupprimer !== email || suppressionLoading}
+                  style={{ background: (confirmSupprimer === email && !suppressionLoading) ? '#E24B4A' : '#ccc', color: '#fff', fontSize: 13, fontWeight: 500, padding: '10px 20px', borderRadius: 9, border: 'none', cursor: (confirmSupprimer === email && !suppressionLoading) ? 'pointer' : 'not-allowed', fontFamily: 'inherit' }}
+                >
+                  {suppressionLoading ? '⏳ Suppression en cours...' : 'Confirmer la suppression definitive'}
                 </button>
               </div>
             )}
