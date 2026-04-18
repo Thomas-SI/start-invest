@@ -322,7 +322,7 @@ export default function Onboarding() {
     navigate('/dashboard')
   }
 
-  const inputStyle = { width: '100%', padding: '12px 14px', borderRadius: 10, border: `0.5px solid ${t.border}`, fontSize: 14, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text, boxSizing: 'border-box' }
+  const inputStyle = { width: '100%', padding: '12px 14px', borderRadius: 10, border: `0.5px solid ${t.border}`, fontSize: 16, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text, boxSizing: 'border-box' }
 
   return (
     <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
