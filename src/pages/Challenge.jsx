@@ -23,16 +23,6 @@ const GRADES_METRONOME = [
   { slug: 'metronome-platine', mois: 18, niveau: 'Platine', niveauColor: '#185FA5', niveauBg: '#E6F1FB' },
 ]
 
-const ACCOMPLISSEMENTS = [
-  { slug: 'premier-pas', nom: 'Premier Pas', emoji: '🌱', message: 'Bienvenue chez Start Invest.', quete: 'S\'inscrire sur StartInvest' },
-  { slug: 'grand-saut', nom: 'Le Grand Saut', emoji: '🚀', message: 'Tu n\'es plus spectateur, tu es le pilote de ton futur.', quete: 'Acheter votre premier ETF' },
-  { slug: 'metronome', nom: 'Le Métronome', svgIcon: true, message: 'La magie des intérêts composés adore ta régularité. Continue !', quete: 'Investir régulièrement chaque mois', evolutif: true, grades: GRADES_METRONOME },
-  { slug: 'main-de-fer', nom: 'Main de Fer', emoji: '🗿', message: 'Le calme est une compétence.', quete: '6 mois sans aucune vente' },
-  { slug: 'architecte', nom: 'L\'Architecte', emoji: '🏗️', message: 'Ton patrimoine est maintenant solide et diversifié. Beau travail !', quete: 'Posséder 3 ETF différents' },
-  { slug: 'cap', nom: 'Ascension', emoji: '💰', message: 'Le premier palier est le plus dur. La machine est lancée.', quete: 'Atteindre un palier d\'investissement', evolutif: true, grades: GRADES_CAP },
-  { slug: 'vroum-vroum', nom: 'Loin et Vite', emoji: '⚡', message: 'Je vois déjà l\'avenir.', quete: 'S\'abonner à StartInvest Premium' },
-]
-
 const PALIERS = [
   { label: 'Top 30%', montant: 45000, couleur: '#3B82F6', desc: '30% des Français les mieux dotés en épargne financière hors immobilier. Source : INSEE 2024' },
   { label: 'Top 20%', montant: 80000, couleur: '#854F0B', desc: 'Top 20% des épargnants. Seuls 9,8% des Français détiennent un PEA. Source : INSEE 2024' },
@@ -42,18 +32,59 @@ const PALIERS = [
   { label: 'Top 1%', montant: 900000, couleur: '#993556', desc: 'Top 1% des épargnants français. Au-delà de 900 000 € de patrimoine financier. Source : INSEE & Banque de France 2024' },
 ]
 
+const MOIS_NOMS = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
+
+const BADGES_MENSUELS_2026 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(m => ({
+  slug: `mois-2026-${String(m).padStart(2, '0')}`,
+  nom: `${MOIS_NOMS[m - 1]} 2026`,
+  annee: 2026,
+  mois: m,
+  quete: `Acheter un ETF en ${MOIS_NOMS[m - 1]} 2026`,
+  categorie: 'mensuel',
+}))
+
+const BADGES_GUIDE = [
+  { slug: 'guide-ch01', nom: "Comprendre l'environnement", chapitre: '01', couleur: '#3B82F6', quete: 'Terminer la Partie 01 du Guide', categorie: 'guide' },
+  { slug: 'guide-ch02', nom: "Stratégies d'investissement", chapitre: '02', couleur: '#4CAF2E', quete: 'Terminer la Partie 02 du Guide', categorie: 'guide' },
+  { slug: 'guide-ch03', nom: 'Choisir sa banque', chapitre: '03', couleur: '#F59E0B', quete: 'Terminer la Partie 03 du Guide', categorie: 'guide' },
+  { slug: 'guide-ch04', nom: 'Les bases essentielles', chapitre: '04', couleur: '#8B5CF6', quete: 'Terminer la Partie 04 du Guide', categorie: 'guide' },
+  { slug: 'guide-ch05', nom: "Passer à l'action", chapitre: '05', couleur: '#EC4899', quete: 'Terminer la Partie 05 du Guide', categorie: 'guide' },
+]
+
+const ACCOMPLISSEMENTS = [
+  { slug: 'premier-pas', nom: 'Premier Pas', message: 'Bienvenue chez Start Invest.', quete: "S'inscrire sur StartInvest", categorie: 'principal' },
+  { slug: 'grand-saut', nom: 'Le Grand Saut', message: "Tu n'es plus spectateur, tu es le pilote de ton futur.", quete: 'Acheter votre premier ETF', categorie: 'principal' },
+  { slug: 'metronome', nom: 'Le Métronome', svgIcon: true, message: 'La magie des intérêts composés adore ta régularité. Continue !', quete: 'Investir régulièrement chaque mois', evolutif: true, grades: GRADES_METRONOME, categorie: 'principal' },
+  { slug: 'main-de-fer', nom: 'Main de Fer', message: 'Le calme est une compétence.', quete: '6 mois sans aucune vente', categorie: 'principal' },
+  { slug: 'architecte', nom: "L'Architecte", message: 'Ton patrimoine est maintenant solide et diversifié. Beau travail !', quete: 'Posséder 3 ETF différents', categorie: 'principal' },
+  { slug: 'cap', nom: 'Ascension', imageUrl: 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/IMG_1212_2.jpeg', message: 'Le premier palier est le plus dur. La machine est lancée.', quete: "Atteindre un palier d'investissement", evolutif: true, grades: GRADES_CAP, categorie: 'principal' },
+  { slug: 'vroum-vroum', nom: 'Loin et Vite', message: "Je vois déjà l'avenir.", quete: "S'abonner à StartInvest Premium", categorie: 'principal' },
+]
+
+const TOUS_BADGES = [...ACCOMPLISSEMENTS, ...BADGES_GUIDE, ...BADGES_MENSUELS_2026]
+
+// ─── Fetch data ───────────────────────────────────────────────────────────────
 const fetchChallengeData = async () => {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Non connecté')
-  const [accRes, invRes, txRes, comptesRes] = await Promise.all([
+  const [accRes, invRes, txRes, comptesRes, profilRes] = await Promise.all([
     supabase.from('accomplissements').select('*').eq('user_id', user.id),
     supabase.from('investissements').select('*').eq('user_id', user.id),
     supabase.from('transactions').select('*').eq('user_id', user.id).order('date', { ascending: true }),
     supabase.from('comptes').select('*').eq('user_id', user.id),
+    supabase.from('profils').select('pseudo').eq('user_id', user.id).single(),
   ])
-  return { user, accomplissements: accRes.data || [], investissements: invRes.data || [], transactions: txRes.data || [], comptes: comptesRes.data || [] }
+  return {
+    user,
+    accomplissements: accRes.data || [],
+    investissements: invRes.data || [],
+    transactions: txRes.data || [],
+    comptes: comptesRes.data || [],
+    pseudo: profilRes.data?.pseudo || null,
+  }
 }
 
+// ─── Calculs ──────────────────────────────────────────────────────────────────
 const calcStreak = (transactions) => {
   const achats = transactions.filter(t => t.type === 'Achat')
   const moisAvecAchat = [...new Set(achats.map(t => t.date.substring(0, 7)))].sort()
@@ -69,6 +100,18 @@ const calcStreak = (transactions) => {
   return streak
 }
 
+const calcStreakMensuel = (slugsObtenus) => {
+  const now = new Date()
+  let streak = 0
+  for (let i = 0; i < 24; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
+    const slug = `mois-${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+    if (slugsObtenus.has(slug)) streak++
+    else break
+  }
+  return streak
+}
+
 const checkAndGrant = async (user, investissements, transactions, accomplissements) => {
   const slugsObtenus = new Set(accomplissements.map(a => a.slug))
   const toInsert = []
@@ -78,6 +121,7 @@ const checkAndGrant = async (user, investissements, transactions, accomplissemen
   const achats = transactions.filter(t => t.type === 'Achat')
   const ventes = transactions.filter(t => t.type === 'Vente')
   const streak = calcStreak(transactions)
+
   if (!slugsObtenus.has('premier-pas')) toInsert.push({ user_id: user.id, slug: 'premier-pas' })
   if (!slugsObtenus.has('grand-saut') && achats.length > 0) toInsert.push({ user_id: user.id, slug: 'grand-saut' })
   if (!slugsObtenus.has('architecte') && nbEtfDifferents >= 3) toInsert.push({ user_id: user.id, slug: 'architecte' })
@@ -99,46 +143,444 @@ const checkAndGrant = async (user, investissements, transactions, accomplissemen
     if (!existing) toInsert.push({ user_id: user.id, slug: 'cap', niveau: gradeCap.niveau })
     else if (existing.niveau !== gradeCap.niveau) toUpdate.push({ id: existing.id, niveau: gradeCap.niveau })
   }
+  for (const badge of BADGES_MENSUELS_2026) {
+    if (slugsObtenus.has(badge.slug)) continue
+    const moisStr = `${badge.annee}-${String(badge.mois).padStart(2, '0')}`
+    const achatCeMois = achats.some(t => t.date.substring(0, 7) === moisStr)
+    if (achatCeMois) toInsert.push({ user_id: user.id, slug: badge.slug })
+  }
   if (toInsert.length > 0) await supabase.from('accomplissements').insert(toInsert)
   for (const u of toUpdate) await supabase.from('accomplissements').update({ niveau: u.niveau }).eq('id', u.id)
   return toInsert.length + toUpdate.length
 }
 
-// ============ NOUVEAU : POPUP DES NIVEAUX POUR BADGE ÉVOLUTIF ============
+// ─── Popup profil ami ─────────────────────────────────────────────────────────
+function PopupAmi({ ami, onClose }) {
+  const t = useTheme()
+  const streakAmi = ami.badges.filter(s => s.startsWith('mois-2026-')).length
+  const badgesPrincipal = ami.badges.filter(s => ACCOMPLISSEMENTS.some(a => a.slug === s))
+  const badgesGuide = ami.badges.filter(s => BADGES_GUIDE.some(b => b.slug === s))
+  const badgesMensuels = ami.badges.filter(s => s.startsWith('mois-2026-')).sort()
+
+  return (
+    <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200, padding: 16 }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: t.bgCard, borderRadius: 16, border: `0.5px solid ${t.border}`, width: '100%', maxWidth: 420, maxHeight: '88vh', overflow: 'auto' }}>
+
+        {/* Header */}
+        <div style={{ padding: '18px 20px', borderBottom: `0.5px solid ${t.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{ width: 46, height: 46, borderRadius: '50%', background: '#E8EEF6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 600, color: '#1B2E4B', flexShrink: 0 }}>
+              {ami.profil?.pseudo?.[0]?.toUpperCase() || '?'}
+            </div>
+            <div>
+              <div style={{ fontSize: 15, fontWeight: 600, color: t.text }}>@{ami.profil?.pseudo || 'Inconnu'}</div>
+              <div style={{ fontSize: 12, color: t.textMuted }}>{ami.badges.length} badge{ami.badges.length > 1 ? 's' : ''} débloqué{ami.badges.length > 1 ? 's' : ''}</div>
+            </div>
+          </div>
+          <button onClick={onClose} style={{ background: t.bgSecondary, border: 'none', borderRadius: 8, padding: '5px 10px', fontSize: 16, cursor: 'pointer', color: t.textSecondary, fontFamily: 'inherit' }}>×</button>
+        </div>
+
+        {/* Streak */}
+        <div style={{ padding: '12px 20px', borderBottom: `0.5px solid ${t.border}`, background: t.bgSecondary, display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ fontSize: 24, lineHeight: 1 }}>
+            {streakAmi > 0 ? '🔥'.repeat(Math.min(streakAmi, 6)) : '—'}
+          </div>
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 500, color: t.text }}>
+              {streakAmi > 0 ? `${streakAmi} mois de suite investis` : 'Aucune série en cours'}
+            </div>
+            <div style={{ fontSize: 11, color: t.textMuted, marginTop: 2 }}>Collection mensuelle 2026</div>
+          </div>
+        </div>
+
+        {/* Badges */}
+        <div style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+          {ami.badges.length === 0 && (
+            <div style={{ textAlign: 'center', color: t.textMuted, fontSize: 12, padding: '20px 0' }}>
+              Aucun badge pour l'instant
+            </div>
+          )}
+
+          {/* Accomplissements */}
+          {badgesPrincipal.length > 0 && (
+            <div>
+              <div style={{ fontSize: 12, fontWeight: 500, color: t.text, marginBottom: 8 }}>Accomplissements</div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                {badgesPrincipal.map(s => {
+                  const badge = ACCOMPLISSEMENTS.find(a => a.slug === s)
+                  return (
+                    <div key={s} style={{ padding: '5px 12px', borderRadius: 20, background: '#EAF6E4', border: '0.5px solid rgba(76,175,46,0.25)', fontSize: 11, color: '#2E7D1E', fontWeight: 500 }}>
+                      {badge?.nom}
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Guide */}
+          {badgesGuide.length > 0 && (
+            <div>
+              <div style={{ fontSize: 12, fontWeight: 500, color: t.text, marginBottom: 8 }}>Guide validé</div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                {badgesGuide.map(s => {
+                  const badge = BADGES_GUIDE.find(b => b.slug === s)
+                  return (
+                    <div key={s} style={{ padding: '5px 12px', borderRadius: 20, background: badge?.couleur + '15', border: `0.5px solid ${badge?.couleur}40`, fontSize: 11, color: badge?.couleur, fontWeight: 500 }}>
+                      {badge?.nom}
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Collection mensuelle */}
+          {badgesMensuels.length > 0 && (
+            <div>
+              <div style={{ fontSize: 12, fontWeight: 500, color: t.text, marginBottom: 8 }}>Collection 2026</div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                {badgesMensuels.map(s => {
+                  const mois = parseInt(s.split('-')[2])
+                  return (
+                    <div key={s} style={{ padding: '4px 10px', borderRadius: 20, background: '#E6F1FB', border: '0.5px solid rgba(59,130,246,0.25)', fontSize: 11, color: '#185FA5', fontWeight: 500 }}>
+                      {MOIS_NOMS[mois - 1]}
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ─── Onglet Amis ──────────────────────────────────────────────────────────────
+function OngletAmis({ userId, monPseudo, t, isMobile }) {
+  const bleu = '#1B2E4B'
+  const [recherche, setRecherche] = useState('')
+  const [resultatsRecherche, setResultatsRecherche] = useState([])
+  const [searching, setSearching] = useState(false)
+  const [amis, setAmis] = useState([])
+  const [demandesRecues, setDemandesRecues] = useState([])
+  const [demandesEnvoyees, setDemandesEnvoyees] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [actionLoading, setActionLoading] = useState(null)
+  const [amiOuvert, setAmiOuvert] = useState(null)
+
+  const chargerAmis = async () => {
+    setLoading(true)
+    try {
+      const { data: relations } = await supabase
+        .from('amis')
+        .select('*')
+        .or(`user_id.eq.${userId},ami_id.eq.${userId}`)
+
+      if (!relations) { setLoading(false); return }
+
+      const amisAcceptes = relations.filter(r => r.statut === 'accepte')
+      const recues = relations.filter(r => r.ami_id === userId && r.statut === 'en_attente')
+      const envoyees = relations.filter(r => r.user_id === userId && r.statut === 'en_attente')
+
+      const amisIds = amisAcceptes.map(r => r.user_id === userId ? r.ami_id : r.user_id)
+      const recuesIds = recues.map(r => r.user_id)
+      const tousLesIds = [...new Set([...amisIds, ...recuesIds])]
+
+      const [profils, accs] = await Promise.all([
+        tousLesIds.length > 0 ? supabase.from('profils').select('user_id, pseudo').in('user_id', tousLesIds) : { data: [] },
+        amisIds.length > 0 ? supabase.from('accomplissements').select('user_id, slug').in('user_id', amisIds) : { data: [] },
+      ])
+
+      const profilsMap = {}
+      profils.data?.forEach(p => { profilsMap[p.user_id] = p })
+
+      const accsMap = {}
+      accs.data?.forEach(a => {
+        if (!accsMap[a.user_id]) accsMap[a.user_id] = []
+        accsMap[a.user_id].push(a.slug)
+      })
+
+      setAmis(amisAcceptes.map(r => {
+        const amiId = r.user_id === userId ? r.ami_id : r.user_id
+        return { ...r, amiId, profil: profilsMap[amiId], badges: accsMap[amiId] || [] }
+      }))
+      setDemandesRecues(recues.map(r => ({ ...r, profil: profilsMap[r.user_id] })))
+      setDemandesEnvoyees(envoyees)
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => { chargerAmis() }, [userId])
+
+  const rechercherPseudo = async (val) => {
+    const terme = (val ?? recherche).trim()
+    if (!terme || terme === monPseudo) { setResultatsRecherche([]); return }
+    if (terme.length < 2) { setResultatsRecherche([]); return }
+    setSearching(true)
+    const { data } = await supabase
+      .from('profils')
+      .select('user_id, pseudo')
+      .ilike('pseudo', `%${terme}%`)
+      .neq('user_id', userId)
+      .limit(5)
+    setResultatsRecherche(data || [])
+    setSearching(false)
+  }
+
+  const envoyerDemande = async (amiId) => {
+    setActionLoading(amiId)
+    try {
+      await supabase.from('amis').insert({ user_id: userId, ami_id: amiId, statut: 'en_attente' })
+      setDemandesEnvoyees(prev => [...prev, { user_id: userId, ami_id: amiId, statut: 'en_attente' }])
+      setResultatsRecherche([])
+      setRecherche('')
+    } catch (e) { console.error(e) }
+    setActionLoading(null)
+  }
+
+  const accepterDemande = async (relationId) => {
+    setActionLoading(relationId)
+    await supabase.from('amis').update({ statut: 'accepte' }).eq('id', relationId)
+    await chargerAmis()
+    setActionLoading(null)
+  }
+
+  const refuserDemande = async (relationId) => {
+    setActionLoading(relationId)
+    await supabase.from('amis').delete().eq('id', relationId)
+    await chargerAmis()
+    setActionLoading(null)
+  }
+
+  const supprimerAmi = async (relationId, e) => {
+    e.stopPropagation()
+    setActionLoading(relationId)
+    await supabase.from('amis').delete().eq('id', relationId)
+    await chargerAmis()
+    setActionLoading(null)
+  }
+
+  const dejaAmi = (amiId) => amis.some(a => a.amiId === amiId)
+  const demandeEnvoyee = (amiId) => demandesEnvoyees.some(d => d.ami_id === amiId)
+
+  if (!monPseudo) return (
+    <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 14, padding: '32px 20px', textAlign: 'center' }}>
+      <div style={{ fontSize: 28, marginBottom: 12 }}>👤</div>
+      <div style={{ fontSize: 14, fontWeight: 500, color: t.text, marginBottom: 8 }}>Crée ton pseudo d'abord</div>
+      <div style={{ fontSize: 12, color: t.textMuted, lineHeight: 1.6, maxWidth: 280, margin: '0 auto 16px' }}>
+        Pour ajouter des amis, tu dois d'abord choisir un pseudo dans la page Compte.
+      </div>
+      <a href="/compte" style={{ display: 'inline-block', background: bleu, color: '#fff', fontSize: 13, fontWeight: 500, padding: '10px 20px', borderRadius: 9, textDecoration: 'none' }}>
+        Aller dans mon compte →
+      </a>
+    </div>
+  )
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+
+      {/* Popup profil ami */}
+      {amiOuvert && <PopupAmi ami={amiOuvert} onClose={() => setAmiOuvert(null)} />}
+
+      {/* Mon pseudo */}
+      <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#E8EEF6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 600, color: bleu, flexShrink: 0 }}>
+          {monPseudo[0].toUpperCase()}
+        </div>
+        <div>
+          <div style={{ fontSize: 11, color: t.textMuted }}>Mon pseudo</div>
+          <div style={{ fontSize: 14, fontWeight: 600, color: t.text }}>@{monPseudo}</div>
+        </div>
+      </div>
+
+      {/* Recherche */}
+      <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: 16 }}>
+        <div style={{ fontSize: 12, fontWeight: 500, color: t.text, marginBottom: 10 }}>Rechercher un ami</div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <input
+            placeholder="Recherche par pseudo..."
+            value={recherche}
+            onChange={e => {
+              setRecherche(e.target.value)
+              clearTimeout(window._pseudoTimer)
+              window._pseudoTimer = setTimeout(() => rechercherPseudo(e.target.value), 400)
+            }}
+            onKeyDown={e => e.key === 'Enter' && rechercherPseudo()}
+            autoCapitalize="none"
+            autoCorrect="off"
+            autoComplete="off"
+            style={{ flex: 1, padding: '9px 12px', borderRadius: 8, border: `0.5px solid ${t.border}`, fontSize: 13, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }}
+          />
+          <button
+            onClick={() => rechercherPseudo()}
+            disabled={searching}
+            style={{ background: bleu, color: '#fff', border: 'none', borderRadius: 8, padding: '9px 16px', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}
+          >
+            {searching ? '...' : 'Chercher'}
+          </button>
+        </div>
+
+        {resultatsRecherche.length > 0 && (
+          <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {resultatsRecherche.map(profil => (
+              <div key={profil.user_id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', background: t.bgSecondary, borderRadius: 8, border: `0.5px solid ${t.border}` }}>
+                <div style={{ width: 34, height: 34, borderRadius: '50%', background: '#E8EEF6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 600, color: bleu, flexShrink: 0 }}>
+                  {profil.pseudo[0].toUpperCase()}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 13, fontWeight: 500, color: t.text }}>@{profil.pseudo}</div>
+                </div>
+                {dejaAmi(profil.user_id) ? (
+                  <span style={{ fontSize: 11, color: '#4CAF2E', fontWeight: 500 }}>Déjà ami</span>
+                ) : demandeEnvoyee(profil.user_id) ? (
+                  <span style={{ fontSize: 11, color: t.textMuted }}>Demande envoyée</span>
+                ) : (
+                  <button
+                    onClick={() => envoyerDemande(profil.user_id)}
+                    disabled={actionLoading === profil.user_id}
+                    style={{ background: '#4CAF2E', color: '#fff', border: 'none', borderRadius: 7, padding: '6px 12px', fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}
+                  >
+                    {actionLoading === profil.user_id ? '...' : '+ Ajouter'}
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {resultatsRecherche.length === 0 && recherche.length >= 2 && !searching && (
+          <div style={{ marginTop: 10, fontSize: 12, color: t.textMuted }}>Aucun résultat pour "@{recherche}"</div>
+        )}
+      </div>
+
+      {/* Demandes reçues */}
+      {demandesRecues.length > 0 && (
+        <div style={{ background: t.bgCard, border: `0.5px solid #4CAF2E`, borderRadius: 12, padding: 16 }}>
+          <div style={{ fontSize: 12, fontWeight: 500, color: t.text, marginBottom: 10 }}>
+            Demandes reçues
+            <span style={{ marginLeft: 8, fontSize: 11, background: '#EAF6E4', color: '#2E7D1E', padding: '2px 8px', borderRadius: 20, fontWeight: 500 }}>{demandesRecues.length}</span>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {demandesRecues.map(d => (
+              <div key={d.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', background: t.bgSecondary, borderRadius: 8 }}>
+                <div style={{ width: 34, height: 34, borderRadius: '50%', background: '#EAF6E4', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 600, color: '#2E7D1E', flexShrink: 0 }}>
+                  {d.profil?.pseudo?.[0]?.toUpperCase() || '?'}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 13, fontWeight: 500, color: t.text }}>@{d.profil?.pseudo || 'Inconnu'}</div>
+                  <div style={{ fontSize: 11, color: t.textMuted }}>souhaite t'ajouter</div>
+                </div>
+                <div style={{ display: 'flex', gap: 6 }}>
+                  <button onClick={() => accepterDemande(d.id)} disabled={actionLoading === d.id} style={{ background: '#4CAF2E', color: '#fff', border: 'none', borderRadius: 7, padding: '6px 12px', fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>
+                    {actionLoading === d.id ? '...' : 'Accepter'}
+                  </button>
+                  <button onClick={() => refuserDemande(d.id)} disabled={actionLoading === d.id} style={{ background: '#FCEBEB', color: '#E24B4A', border: 'none', borderRadius: 7, padding: '6px 10px', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>✕</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Liste des amis */}
+      <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, overflow: 'hidden' }}>
+        <div style={{ padding: '12px 16px', borderBottom: `0.5px solid ${t.border}` }}>
+          <div style={{ fontSize: 12, fontWeight: 500, color: t.text }}>Mes amis ({amis.length})</div>
+        </div>
+        {loading ? (
+          <div style={{ padding: '24px', textAlign: 'center', color: t.textMuted, fontSize: 12 }}>Chargement...</div>
+        ) : amis.length === 0 ? (
+          <div style={{ padding: '32px 20px', textAlign: 'center', color: t.textMuted, fontSize: 12 }}>
+            <div style={{ fontSize: 24, marginBottom: 8 }}>👥</div>
+            Aucun ami pour l'instant — recherche un pseudo pour commencer !
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            {amis.map((ami, idx) => {
+              const nbBadges = ami.badges.length
+              const streakAmi = ami.badges.filter(s => s.startsWith('mois-2026-')).length
+              return (
+                <div
+                  key={ami.id}
+                  onClick={() => setAmiOuvert(ami)}
+                  style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', borderBottom: idx < amis.length - 1 ? `0.5px solid ${t.border}` : 'none', cursor: 'pointer', transition: 'background 0.12s' }}
+                  onMouseEnter={e => e.currentTarget.style.background = t.bgSecondary}
+                  onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                >
+                  <div style={{ width: 42, height: 42, borderRadius: '50%', background: '#E8EEF6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 600, color: bleu, flexShrink: 0 }}>
+                    {ami.profil?.pseudo?.[0]?.toUpperCase() || '?'}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 13, fontWeight: 500, color: t.text }}>@{ami.profil?.pseudo || 'Inconnu'}</div>
+                    <div style={{ display: 'flex', gap: 10, marginTop: 3, flexWrap: 'wrap' }}>
+                      <span style={{ fontSize: 11, color: t.textMuted }}>🏆 {nbBadges} badge{nbBadges > 1 ? 's' : ''}</span>
+                      {streakAmi > 0 && <span style={{ fontSize: 11, color: '#FF6B35' }}>🔥 {streakAmi} mois</span>}
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontSize: 12, color: t.textMuted }}>›</span>
+                    <button
+                      onClick={(e) => supprimerAmi(ami.id, e)}
+                      disabled={actionLoading === ami.id}
+                      style={{ background: 'transparent', color: t.textMuted, border: `0.5px solid ${t.border}`, borderRadius: 7, padding: '4px 10px', fontSize: 11, cursor: 'pointer', fontFamily: 'inherit', flexShrink: 0 }}
+                    >
+                      {actionLoading === ami.id ? '...' : 'Retirer'}
+                    </button>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Demandes envoyées */}
+      {demandesEnvoyees.length > 0 && (
+        <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: '12px 16px' }}>
+          <div style={{ fontSize: 12, fontWeight: 500, color: t.textMuted, marginBottom: 8 }}>Demandes envoyées ({demandesEnvoyees.length})</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {demandesEnvoyees.map((d, i) => (
+              <div key={d.id || i} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: t.textMuted }}>
+                <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#BA7517', flexShrink: 0 }} />
+                En attente de réponse
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+    </div>
+  )
+}
+
+// ─── Popup niveaux badge évolutif ─────────────────────────────────────────────
 function NiveauxModal({ acc, gradeActuel, valeurActuelle, onClose }) {
   const t = useTheme()
   const isMetronome = acc.slug === 'metronome'
-  const unite = isMetronome ? 'mois' : '€'
-
   const getSeuil = (g) => isMetronome ? g.mois : g.palier
   const formatSeuil = (g) => isMetronome ? `${g.mois} mois` : `${g.palier.toLocaleString('fr-FR')} €`
-
   const getStatut = (g) => {
-    const seuil = getSeuil(g)
     if (gradeActuel?.niveau === g.niveau) return 'actuel'
-    if (valeurActuelle >= seuil) return 'atteint'
+    if (valeurActuelle >= getSeuil(g)) return 'atteint'
     return 'a-venir'
   }
-
   const prochain = acc.grades.find(g => getStatut(g) === 'a-venir')
   const valeurFormatee = isMetronome ? `${valeurActuelle} mois` : `${Math.round(valeurActuelle).toLocaleString('fr-FR')} €`
 
   return (
     <>
-      <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 998, backdropFilter: 'blur(3px)' }} />
-
-      <div style={{
-        position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
-        zIndex: 999, background: t.bgCard, borderRadius: 20,
-        width: 'calc(100% - 32px)', maxWidth: 420, maxHeight: '88vh',
-        display: 'flex', flexDirection: 'column',
-        boxShadow: '0 20px 60px rgba(0,0,0,0.3)', fontFamily: 'inherit', overflow: 'hidden'
-      }}>
-        {/* HEADER */}
+      <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 998 }} />
+      <div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 999, background: t.bgCard, borderRadius: 20, width: 'calc(100% - 32px)', maxWidth: 420, maxHeight: '88vh', display: 'flex', flexDirection: 'column', boxShadow: '0 20px 60px rgba(0,0,0,0.3)', fontFamily: 'inherit', overflow: 'hidden' }}>
         <div style={{ padding: '16px 20px 12px', borderBottom: `0.5px solid ${t.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexShrink: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={{ width: 44, height: 44, borderRadius: '50%', background: gradeActuel ? gradeActuel.niveauBg : t.bgSecondary, display: 'flex', alignItems: 'center', justifyContent: 'center', border: gradeActuel ? `2px solid ${gradeActuel.niveauColor}` : `1.5px solid ${t.border}`, overflow: 'hidden', flexShrink: 0 }}>
-              {acc.svgIcon ? <img src={METRONOME_URL} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span style={{ fontSize: 22 }}>{acc.emoji}</span>}
+            <div style={{ width: 44, height: 44, borderRadius: 10, background: gradeActuel ? gradeActuel.niveauBg : t.bgSecondary, display: 'flex', alignItems: 'center', justifyContent: 'center', border: gradeActuel ? `2px solid ${gradeActuel.niveauColor}` : `1.5px solid ${t.border}`, overflow: 'hidden', flexShrink: 0 }}>
+              {acc.svgIcon ? <img src={METRONOME_URL} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span style={{ fontSize: 20, color: t.textMuted }}>?</span>}
             </div>
             <div>
               <div style={{ fontSize: 15, fontWeight: 600, color: t.text }}>{acc.nom}</div>
@@ -147,74 +589,37 @@ function NiveauxModal({ acc, gradeActuel, valeurActuelle, onClose }) {
           </div>
           <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: t.textMuted, padding: 0 }}>✕</button>
         </div>
-
-        {/* VALEUR ACTUELLE */}
         <div style={{ padding: '12px 20px', borderBottom: `0.5px solid ${t.border}`, background: t.bgSecondary, flexShrink: 0 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
-              <div style={{ fontSize: 10, color: t.textMuted, textTransform: 'uppercase', letterSpacing: '.05em' }}>
-                {isMetronome ? 'Série actuelle' : 'Total investi'}
-              </div>
+              <div style={{ fontSize: 10, color: t.textMuted, textTransform: 'uppercase', letterSpacing: '.05em' }}>{isMetronome ? 'Série actuelle' : 'Total investi'}</div>
               <div style={{ fontSize: 18, fontWeight: 700, color: t.text }}>{valeurFormatee}</div>
             </div>
-            {gradeActuel && (
-              <span style={{ fontSize: 11, padding: '4px 10px', borderRadius: 20, fontWeight: 600, background: gradeActuel.niveauBg, color: gradeActuel.niveauColor, border: `1px solid ${gradeActuel.niveauColor}` }}>
-                {gradeActuel.niveau}
-              </span>
-            )}
+            {gradeActuel && <span style={{ fontSize: 11, padding: '4px 10px', borderRadius: 20, fontWeight: 600, background: gradeActuel.niveauBg, color: gradeActuel.niveauColor, border: `1px solid ${gradeActuel.niveauColor}` }}>{gradeActuel.niveau}</span>}
           </div>
         </div>
-
-        {/* LISTE DES NIVEAUX */}
         <div style={{ overflowY: 'auto', flex: 1, padding: '14px 20px' }}>
-          <div style={{ fontSize: 11, color: t.textMuted, textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 10 }}>Tous les niveaux</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {acc.grades.map((g, i) => {
               const statut = getStatut(g)
-              const seuil = getSeuil(g)
-              const progression = Math.min(100, Math.round((valeurActuelle / seuil) * 100))
-
+              const progression = Math.min(100, Math.round((valeurActuelle / getSeuil(g)) * 100))
               return (
-                <div key={g.slug} style={{
-                  display: 'flex', alignItems: 'center', gap: 12,
-                  padding: '12px 14px', borderRadius: 10,
-                  background: statut === 'actuel' ? g.niveauBg : (statut === 'atteint' ? g.niveauBg + '80' : 'transparent'),
-                  border: `${statut === 'actuel' ? 2 : 1}px solid ${statut === 'a-venir' ? t.border : g.niveauColor}`,
-                  opacity: statut === 'a-venir' && g !== prochain ? 0.5 : 1,
-                }}>
-                  {/* Puce niveau */}
-                  <div style={{
-                    width: 34, height: 34, borderRadius: '50%',
-                    background: statut === 'a-venir' ? 'transparent' : g.niveauBg,
-                    border: `2px solid ${g.niveauColor}`,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    flexShrink: 0, fontSize: 11, fontWeight: 700, color: g.niveauColor,
-                  }}>
-                    {i + 1}
-                  </div>
-
+                <div key={g.slug} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', borderRadius: 10, background: statut === 'actuel' ? g.niveauBg : statut === 'atteint' ? g.niveauBg + '80' : 'transparent', border: `${statut === 'actuel' ? 2 : 1}px solid ${statut === 'a-venir' ? t.border : g.niveauColor}`, opacity: statut === 'a-venir' && g !== prochain ? 0.5 : 1 }}>
+                  <div style={{ width: 34, height: 34, borderRadius: '50%', background: statut === 'a-venir' ? 'transparent' : g.niveauBg, border: `2px solid ${g.niveauColor}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 11, fontWeight: 700, color: g.niveauColor }}>{i + 1}</div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
-                      <span style={{ fontSize: 13, fontWeight: 600, color: statut === 'a-venir' ? t.textMuted : g.niveauColor }}>
-                        {g.niveau}
-                      </span>
-                      <span style={{ fontSize: 11, fontWeight: 500, color: statut === 'a-venir' ? t.textMuted : g.niveauColor, whiteSpace: 'nowrap' }}>
-                        {formatSeuil(g)}
-                      </span>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: statut === 'a-venir' ? t.textMuted : g.niveauColor }}>{g.niveau}</span>
+                      <span style={{ fontSize: 11, fontWeight: 500, color: statut === 'a-venir' ? t.textMuted : g.niveauColor, whiteSpace: 'nowrap' }}>{formatSeuil(g)}</span>
                     </div>
                     {g === prochain && (
                       <div style={{ marginTop: 6 }}>
                         <div style={{ background: t.bgSecondary, borderRadius: 3, height: 5, overflow: 'hidden' }}>
                           <div style={{ height: '100%', borderRadius: 3, background: g.niveauColor, width: `${progression}%`, transition: 'width 0.5s' }} />
                         </div>
-                        <div style={{ fontSize: 10, color: t.textMuted, marginTop: 3 }}>
-                          Encore {isMetronome ? `${seuil - valeurActuelle} mois` : `${(seuil - valeurActuelle).toLocaleString('fr-FR')} €`}
-                        </div>
+                        <div style={{ fontSize: 10, color: t.textMuted, marginTop: 3 }}>Encore {isMetronome ? `${getSeuil(g) - valeurActuelle} mois` : `${(getSeuil(g) - valeurActuelle).toLocaleString('fr-FR')} €`}</div>
                       </div>
                     )}
                   </div>
-
-                  {/* Icône statut */}
                   {statut === 'atteint' && <span style={{ fontSize: 14, color: g.niveauColor, fontWeight: 700, flexShrink: 0 }}>✓</span>}
                   {statut === 'actuel' && <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 20, background: g.niveauColor, color: '#fff', fontWeight: 600, flexShrink: 0 }}>Actuel</span>}
                   {statut === 'a-venir' && g === prochain && <span style={{ fontSize: 14, color: t.textMuted, flexShrink: 0 }}>→</span>}
@@ -222,13 +627,10 @@ function NiveauxModal({ acc, gradeActuel, valeurActuelle, onClose }) {
               )
             })}
           </div>
-
-          {/* Message si niveau max atteint */}
           {!prochain && gradeActuel && (
             <div style={{ marginTop: 12, padding: '12px 14px', background: '#FBEAF0', borderRadius: 10, textAlign: 'center' }}>
               <div style={{ fontSize: 18, marginBottom: 4 }}>🏆</div>
               <div style={{ fontSize: 12, fontWeight: 600, color: '#993556' }}>Niveau maximum atteint !</div>
-              <div style={{ fontSize: 11, color: '#993556', marginTop: 2 }}>Tu as maîtrisé ce challenge. Félicitations !</div>
             </div>
           )}
         </div>
@@ -237,6 +639,7 @@ function NiveauxModal({ acc, gradeActuel, valeurActuelle, onClose }) {
   )
 }
 
+// ─── Popup position INSEE ─────────────────────────────────────────────────────
 function PositionModal({ totalInvesti, comptes, onClose }) {
   const t = useTheme()
   const canvasRef = useRef(null)
@@ -267,29 +670,11 @@ function PositionModal({ totalInvesti, comptes, onClose }) {
     return () => document.removeEventListener('wheel', handleWheel)
   }, [handleWheel])
 
-  const handleZoomIn = () => {
-    const next = Math.min(3.5, scaleRef.current + 0.2)
-    scaleRef.current = next
-    setScale(next)
-  }
-
-  const handleZoomOut = () => {
-    const next = Math.max(0.3, scaleRef.current - 0.2)
-    scaleRef.current = next
-    setScale(next)
-  }
-
-  const W = 360
-  const H = 320
-  const cx = W / 2
-  const cy = H / 2
-  const BASE_USER = 70
-  const BASE_STEP = 75
+  const W = 360, H = 320, cx = W / 2, cy = H / 2
+  const BASE_USER = 70, BASE_STEP = 75
   const rUser = BASE_USER * scale
   const extRayons = paliersAVenir.map((_, i) => (BASE_USER + BASE_STEP * (i + 1)) * scale)
-  const intRayons = [...paliersAtteints].reverse().map((_, i) => {
-    return Math.max((BASE_USER - BASE_STEP * 0.5 * (i + 1)) * scale, 4)
-  })
+  const intRayons = [...paliersAtteints].reverse().map((_, i) => Math.max((BASE_USER - BASE_STEP * 0.5 * (i + 1)) * scale, 4))
   const couleurUser = palierAtteint ? palierAtteint.couleur : '#4CAF2E'
 
   const handleCanvasClick = (e) => {
@@ -301,36 +686,22 @@ function PositionModal({ totalInvesti, comptes, onClose }) {
       const r = extRayons[i]
       if (r < 10 || r > W * 1.2) continue
       const prev = i === 0 ? rUser : extRayons[i - 1]
-      if (dist >= prev - 8 && dist <= r + 8) {
-        setPalierInfo(palierInfo?.label === paliersAVenir[i].label ? null : paliersAVenir[i])
-        return
-      }
+      if (dist >= prev - 8 && dist <= r + 8) { setPalierInfo(palierInfo?.label === paliersAVenir[i].label ? null : paliersAVenir[i]); return }
     }
     const rev = [...paliersAtteints].reverse()
     for (let i = 0; i < rev.length; i++) {
       const r = intRayons[i]
       if (r < 6) continue
       const prev = i === 0 ? 0 : intRayons[i - 1]
-      if (dist >= prev && dist <= r + 6) {
-        setPalierInfo(palierInfo?.label === rev[i].label ? null : rev[i])
-        return
-      }
+      if (dist >= prev && dist <= r + 6) { setPalierInfo(palierInfo?.label === rev[i].label ? null : rev[i]); return }
     }
     setPalierInfo(null)
   }
 
   return (
     <>
-      <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 998, backdropFilter: 'blur(3px)' }} />
-
-      <div style={{
-        position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
-        zIndex: 999, background: t.bgCard, borderRadius: 20,
-        width: 'calc(100% - 32px)', maxWidth: 420, maxHeight: '88vh',
-        display: 'flex', flexDirection: 'column',
-        boxShadow: '0 20px 60px rgba(0,0,0,0.3)', fontFamily: 'inherit', overflow: 'hidden'
-      }}>
-
+      <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 998 }} />
+      <div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 999, background: t.bgCard, borderRadius: 20, width: 'calc(100% - 32px)', maxWidth: 420, maxHeight: '88vh', display: 'flex', flexDirection: 'column', boxShadow: '0 20px 60px rgba(0,0,0,0.3)', fontFamily: 'inherit', overflow: 'hidden' }}>
         <div style={{ padding: '16px 20px 12px', borderBottom: `0.5px solid ${t.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexShrink: 0 }}>
           <div>
             <div style={{ fontSize: 15, fontWeight: 600, color: t.text }}>Ma position</div>
@@ -338,124 +709,55 @@ function PositionModal({ totalInvesti, comptes, onClose }) {
           </div>
           <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: t.textMuted, padding: 0 }}>✕</button>
         </div>
-
         <div style={{ padding: '10px 20px 12px', borderBottom: `0.5px solid ${t.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
           <div>
             <div style={{ fontSize: 20, fontWeight: 700, color: t.text }}>{patrimoine.toLocaleString('fr-FR')} €</div>
             <div style={{ fontSize: 11, color: t.textMuted }}>Investissements + comptes</div>
           </div>
           <div style={{ textAlign: 'right' }}>
-            {palierAtteint ? (
-              <div style={{ fontSize: 11, fontWeight: 600, color: palierAtteint.couleur, background: palierAtteint.couleur + '15', padding: '3px 10px', borderRadius: 20, border: `0.5px solid ${palierAtteint.couleur}` }}>{palierAtteint.label}</div>
-            ) : (
-              <div style={{ fontSize: 11, color: t.textMuted }}>Aucun palier atteint</div>
-            )}
-            {palierSuivant && (
-              <div style={{ fontSize: 10, color: t.textMuted, marginTop: 4 }}>
-                Prochain : <span style={{ color: palierSuivant.couleur, fontWeight: 500 }}>{palierSuivant.label}</span> −{(palierSuivant.montant - patrimoine).toLocaleString('fr-FR')} €
-              </div>
-            )}
+            {palierAtteint ? <div style={{ fontSize: 11, fontWeight: 600, color: palierAtteint.couleur, background: palierAtteint.couleur + '15', padding: '3px 10px', borderRadius: 20, border: `0.5px solid ${palierAtteint.couleur}` }}>{palierAtteint.label}</div> : <div style={{ fontSize: 11, color: t.textMuted }}>Aucun palier atteint</div>}
+            {palierSuivant && <div style={{ fontSize: 10, color: t.textMuted, marginTop: 4 }}>Prochain : <span style={{ color: palierSuivant.couleur, fontWeight: 500 }}>{palierSuivant.label}</span> −{(palierSuivant.montant - patrimoine).toLocaleString('fr-FR')} €</div>}
           </div>
         </div>
-
         <div style={{ overflowY: 'auto', flex: 1 }}>
-
-          <div style={{ display: 'flex', alignItems: 'stretch' }}>
-
+          <div style={{ display: 'flex' }}>
             <div style={{ width: 20, flexShrink: 0 }} />
-
-            <div
-              ref={canvasRef}
-              onClick={handleCanvasClick}
-              onMouseEnter={() => { isOverCanvas.current = true }}
-              onMouseLeave={() => { isOverCanvas.current = false }}
-              style={{
-                flex: 1,
-                cursor: 'crosshair',
-                userSelect: 'none',
-                background: t.dark ? '#0A0F0A' : '#F6FBF6',
-                borderRadius: 12,
-                margin: '12px 0',
-                overflow: 'hidden',
-                position: 'relative',
-              }}
-            >
-              {/* Boutons de zoom */}
+            <div ref={canvasRef} onClick={handleCanvasClick} onMouseEnter={() => { isOverCanvas.current = true }} onMouseLeave={() => { isOverCanvas.current = false }} style={{ flex: 1, cursor: 'crosshair', userSelect: 'none', background: t.dark ? '#0A0F0A' : '#F6FBF6', borderRadius: 12, margin: '12px 0', overflow: 'hidden', position: 'relative' }}>
               <div style={{ position: 'absolute', top: 8, right: 8, display: 'flex', flexDirection: 'column', gap: 4, zIndex: 2 }}>
-                <button
-                  onClick={(e) => { e.stopPropagation(); handleZoomIn() }}
-                  style={{ width: 32, height: 32, borderRadius: 8, border: `0.5px solid ${t.border}`, background: t.bgCard, color: t.text, fontSize: 18, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}
-                  aria-label="Zoomer"
-                >+</button>
-                <button
-                  onClick={(e) => { e.stopPropagation(); handleZoomOut() }}
-                  style={{ width: 32, height: 32, borderRadius: 8, border: `0.5px solid ${t.border}`, background: t.bgCard, color: t.text, fontSize: 18, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}
-                  aria-label="Dézoomer"
-                >−</button>
+                <button onClick={(e) => { e.stopPropagation(); const n = Math.min(3.5, scaleRef.current + 0.2); scaleRef.current = n; setScale(n) }} style={{ width: 32, height: 32, borderRadius: 8, border: `0.5px solid ${t.border}`, background: t.bgCard, color: t.text, fontSize: 18, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>+</button>
+                <button onClick={(e) => { e.stopPropagation(); const n = Math.max(0.3, scaleRef.current - 0.2); scaleRef.current = n; setScale(n) }} style={{ width: 32, height: 32, borderRadius: 8, border: `0.5px solid ${t.border}`, background: t.bgCard, color: t.text, fontSize: 18, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>−</button>
               </div>
               <svg width="100%" height={H} viewBox={`0 0 ${W} ${H}`}>
-                {[...Array(8)].map((_, i) => (
-                  <line key={`h${i}`} x1="0" y1={i * 46} x2={W} y2={i * 46} stroke={t.dark ? '#fff' : '#000'} strokeWidth="0.5" opacity="0.04" />
-                ))}
-                {[...Array(9)].map((_, i) => (
-                  <line key={`v${i}`} x1={i * 46} y1="0" x2={i * 46} y2={H} stroke={t.dark ? '#fff' : '#000'} strokeWidth="0.5" opacity="0.04" />
-                ))}
-
                 {paliersAVenir.map((palier, i) => {
                   const r = extRayons[i]
                   if (r < 10 || r > W) return null
-                  const estActif = palierInfo?.label === palier.label
                   return (
                     <g key={palier.label}>
-                      <circle cx={cx} cy={cy} r={r} fill={estActif ? palier.couleur + '08' : 'none'} stroke={palier.couleur} strokeWidth={estActif ? 2.5 : 1.5} strokeDasharray="6 4" opacity={0.75} />
-                      {r > 40 && r < W - 10 && (
-                        <text x={cx} y={cy - r + 14} textAnchor="middle" fontSize="9" fontWeight="600" fill={palier.couleur} opacity={0.9}>
-                          {palier.label} · {palier.montant.toLocaleString('fr-FR')} €
-                        </text>
-                      )}
+                      <circle cx={cx} cy={cy} r={r} fill={palierInfo?.label === palier.label ? palier.couleur + '08' : 'none'} stroke={palier.couleur} strokeWidth={palierInfo?.label === palier.label ? 2.5 : 1.5} strokeDasharray="6 4" opacity={0.75} />
+                      {r > 40 && r < W - 10 && <text x={cx} y={cy - r + 14} textAnchor="middle" fontSize="9" fontWeight="600" fill={palier.couleur} opacity={0.9}>{palier.label} · {palier.montant.toLocaleString('fr-FR')} €</text>}
                     </g>
                   )
                 })}
-
                 <circle cx={cx} cy={cy} r={rUser} fill={couleurUser + '18'} stroke={couleurUser} strokeWidth="2.5" />
-
                 {[...paliersAtteints].reverse().map((palier, i) => {
                   const r = intRayons[i]
                   if (r < 6 || r >= rUser - 2) return null
-                  const estActif = palierInfo?.label === palier.label
                   return (
                     <g key={palier.label}>
-                      <circle cx={cx} cy={cy} r={r} fill={palier.couleur + '20'} stroke={palier.couleur} strokeWidth={estActif ? 2 : 1.5} opacity={0.85} />
-                      {r > 20 && (
-                        <text x={cx} y={cy - r + 12} textAnchor="middle" fontSize="8" fontWeight="600" fill={palier.couleur}>
-                          {palier.label}
-                        </text>
-                      )}
+                      <circle cx={cx} cy={cy} r={r} fill={palier.couleur + '20'} stroke={palier.couleur} strokeWidth={palierInfo?.label === palier.label ? 2 : 1.5} opacity={0.85} />
+                      {r > 20 && <text x={cx} y={cy - r + 12} textAnchor="middle" fontSize="8" fontWeight="600" fill={palier.couleur}>{palier.label}</text>}
                     </g>
                   )
                 })}
-
                 <line x1={cx - rUser * 0.42} y1={cy - rUser + 1} x2={cx + rUser * 0.42} y2={cy - rUser + 1} stroke={t.dark ? '#0A0F0A' : '#F6FBF6'} strokeWidth="13" />
                 <text x={cx} y={cy - rUser + 5} textAnchor="middle" fontSize="10" fontWeight="700" fill={couleurUser}>Vous</text>
-
-                <text x={cx} y={cy - 5} textAnchor="middle" fontSize="12" fontWeight="700" fill={t.dark ? '#fff' : '#1B2E4B'}>
-                  {patrimoine.toLocaleString('fr-FR')} €
-                </text>
-                {palierAtteint && (
-                  <text x={cx} y={cy + 12} textAnchor="middle" fontSize="9" fill={palierAtteint.couleur} fontWeight="500">
-                    {palierAtteint.label}
-                  </text>
-                )}
+                <text x={cx} y={cy - 5} textAnchor="middle" fontSize="12" fontWeight="700" fill={t.dark ? '#fff' : '#1B2E4B'}>{patrimoine.toLocaleString('fr-FR')} €</text>
+                {palierAtteint && <text x={cx} y={cy + 12} textAnchor="middle" fontSize="9" fill={palierAtteint.couleur} fontWeight="500">{palierAtteint.label}</text>}
               </svg>
             </div>
-
             <div style={{ width: 20, flexShrink: 0 }} />
           </div>
-
-          <div style={{ textAlign: 'center', fontSize: 10, color: t.textMuted, paddingBottom: 8 }}>
-            Utilise les boutons − / + pour zoomer · Clique sur un cercle
-          </div>
-
+          <div style={{ textAlign: 'center', fontSize: 10, color: t.textMuted, paddingBottom: 8 }}>Utilise les boutons − / + pour zoomer · Clique sur un cercle</div>
           {palierInfo && (
             <div style={{ margin: '0 20px 12px', background: palierInfo.couleur + '12', border: `0.5px solid ${palierInfo.couleur}`, borderRadius: 10, padding: '12px 14px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
@@ -469,8 +771,7 @@ function PositionModal({ totalInvesti, comptes, onClose }) {
               {patrimoine < palierInfo.montant && (
                 <div style={{ marginTop: 8 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: t.textMuted, marginBottom: 3 }}>
-                    <span>Progression</span>
-                    <span>{Math.min(100, Math.round((patrimoine / palierInfo.montant) * 100))}%</span>
+                    <span>Progression</span><span>{Math.min(100, Math.round((patrimoine / palierInfo.montant) * 100))}%</span>
                   </div>
                   <div style={{ background: t.bgSecondary, borderRadius: 3, height: 5, overflow: 'hidden' }}>
                     <div style={{ height: '100%', borderRadius: 3, background: palierInfo.couleur, width: `${Math.min(100, Math.round((patrimoine / palierInfo.montant) * 100))}%` }} />
@@ -478,19 +779,13 @@ function PositionModal({ totalInvesti, comptes, onClose }) {
                   <div style={{ fontSize: 10, color: t.textMuted, marginTop: 3 }}>encore {(palierInfo.montant - patrimoine).toLocaleString('fr-FR')} €</div>
                 </div>
               )}
-              {patrimoine >= palierInfo.montant && (
-                <div style={{ marginTop: 6, fontSize: 11, color: palierInfo.couleur, fontWeight: 600 }}>✓ Palier atteint !</div>
-              )}
+              {patrimoine >= palierInfo.montant && <div style={{ marginTop: 6, fontSize: 11, color: palierInfo.couleur, fontWeight: 600 }}>✓ Palier atteint !</div>}
             </div>
           )}
-
           <div style={{ padding: '0 20px 20px' }}>
-            <button
-              onClick={() => setShowPaliers(p => !p)}
-              style={{ width: '100%', padding: '9px', borderRadius: 9, border: `0.5px solid ${t.border}`, background: t.bgSecondary, color: t.text, fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>
+            <button onClick={() => setShowPaliers(p => !p)} style={{ width: '100%', padding: '9px', borderRadius: 9, border: `0.5px solid ${t.border}`, background: t.bgSecondary, color: t.text, fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>
               {showPaliers ? '▲ Masquer les paliers' : '▼ Afficher tous les paliers'}
             </button>
-
             {showPaliers && (
               <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {[...PALIERS].reverse().map((palier) => {
@@ -522,21 +817,84 @@ function PositionModal({ totalInvesti, comptes, onClose }) {
               </div>
             )}
           </div>
-
         </div>
       </div>
     </>
   )
 }
 
+// ─── Carte badge format diplôme ───────────────────────────────────────────────
+function BadgeCard({ badge, obtenu, onClickNiveaux, gradeActuel, progression }) {
+  const t = useTheme()
+  const [hovered, setHovered] = useState(false)
+  const estEvolutif = badge.evolutif
+  const estCliquable = estEvolutif && obtenu
+  const couleurBadge = badge.categorie === 'guide' ? badge.couleur : badge.categorie === 'mensuel' ? '#3B82F6' : gradeActuel ? gradeActuel.niveauColor : '#4CAF2E'
+  const bgBadge = badge.categorie === 'guide' ? badge.couleur + '15' : badge.categorie === 'mensuel' ? '#E6F1FB' : gradeActuel ? gradeActuel.niveauBg : '#EAF6E4'
+
+  return (
+    <div
+      onClick={estCliquable ? onClickNiveaux : undefined}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{ background: obtenu ? t.bgCard : t.bgSecondary, border: `0.5px solid ${obtenu ? couleurBadge : t.border}`, borderRadius: 14, overflow: 'hidden', cursor: estCliquable ? 'pointer' : 'default', transition: 'transform 0.15s, box-shadow 0.15s', transform: hovered && estCliquable ? 'translateY(-2px)' : 'none', boxShadow: hovered && estCliquable ? '0 6px 20px rgba(0,0,0,0.1)' : 'none', opacity: obtenu ? 1 : 0.7 }}
+    >
+      <div style={{ height: 110, background: obtenu ? bgBadge : t.bgSecondary, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', borderBottom: `0.5px solid ${obtenu ? couleurBadge + '30' : t.border}` }}>
+        {obtenu ? (
+          badge.svgIcon ? <img src={METRONOME_URL} alt={badge.nom} style={{ width: 60, height: 60, objectFit: 'cover', borderRadius: '50%', border: `2px solid ${couleurBadge}` }} />
+          : badge.imageUrl ? <img src={badge.imageUrl} alt={badge.nom} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          : (
+            <div style={{ width: 60, height: 60, borderRadius: '50%', background: bgBadge, border: `2px solid ${couleurBadge}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              {badge.categorie === 'mensuel' ? <div style={{ textAlign: 'center' }}><div style={{ fontSize: 11, fontWeight: 700, color: couleurBadge }}>{MOIS_NOMS[badge.mois - 1]?.substring(0, 3).toUpperCase()}</div><div style={{ fontSize: 9, color: couleurBadge }}>{badge.annee}</div></div>
+              : badge.categorie === 'guide' ? <div style={{ fontSize: 16, fontWeight: 700, color: couleurBadge }}>{badge.chapitre}</div>
+              : <div style={{ fontSize: 10, color: couleurBadge, textAlign: 'center', padding: '0 6px', lineHeight: 1.3 }}>Image<br/>à venir</div>}
+            </div>
+          )
+        ) : (
+          <div style={{ width: 60, height: 60, borderRadius: '50%', background: t.border + '40', border: `2px dashed ${t.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ fontSize: 20, color: t.textMuted, filter: 'blur(1px)' }}>?</div>
+          </div>
+        )}
+        {obtenu && gradeActuel && <div style={{ position: 'absolute', top: 8, right: 8, fontSize: 9, padding: '2px 7px', borderRadius: 20, background: gradeActuel.niveauBg, color: gradeActuel.niveauColor, fontWeight: 600, border: `0.5px solid ${gradeActuel.niveauColor}` }}>{gradeActuel.niveau}</div>}
+        {obtenu && !gradeActuel && <div style={{ position: 'absolute', top: 8, right: 8, fontSize: 9, padding: '2px 7px', borderRadius: 20, background: bgBadge, color: couleurBadge, fontWeight: 600, border: `0.5px solid ${couleurBadge}` }}>✓</div>}
+      </div>
+      <div style={{ padding: '10px 12px', display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <div style={{ fontSize: 12, fontWeight: 600, color: obtenu ? t.text : t.textMuted, lineHeight: 1.3 }}>{badge.nom}</div>
+        {obtenu && badge.message && <div style={{ fontSize: 10, color: t.textSecondary, lineHeight: 1.4, fontStyle: 'italic' }}>"{badge.message}"</div>}
+        {!obtenu && <div style={{ fontSize: 10, color: t.textMuted, lineHeight: 1.4 }}>{badge.quete}</div>}
+        {progression && (
+          <div style={{ marginTop: 4 }}>
+            <div style={{ background: t.bgSecondary, borderRadius: 3, height: 4, overflow: 'hidden' }}>
+              <div style={{ height: '100%', borderRadius: 3, background: couleurBadge, width: `${Math.min(100, Math.round((progression.current / progression.total) * 100))}%`, transition: 'width 0.5s' }} />
+            </div>
+            <div style={{ fontSize: 9, color: t.textMuted, marginTop: 3 }}>
+              {progression.currency ? `${progression.current.toLocaleString('fr-FR')} / ${progression.total.toLocaleString('fr-FR')} €` : `${progression.current} / ${progression.total}`}
+            </div>
+          </div>
+        )}
+        {estCliquable && hovered && <div style={{ fontSize: 9, color: couleurBadge, fontWeight: 500, marginTop: 2 }}>Voir les niveaux →</div>}
+      </div>
+    </div>
+  )
+}
+
+// ─── Page principale ──────────────────────────────────────────────────────────
 export default function Challenge() {
   const t = useTheme()
   const queryClient = useQueryClient()
   const [onglet, setOnglet] = useState('obtenus')
   const [checking, setChecking] = useState(true)
   const [positionOpen, setPositionOpen] = useState(false)
-  const [niveauxOpen, setNiveauxOpen] = useState(null) // slug du badge cliqué
-  const { data, isLoading } = useQuery({ queryKey: ['challenge'], queryFn: fetchChallengeData })
+  const [niveauxOpen, setNiveauxOpen] = useState(null)
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
+  const { data, isLoading } = useQuery({ queryKey: ['challenge'], queryFn: fetchChallengeData, refetchOnMount: true, staleTime: 0 })
 
   useEffect(() => {
     if (!data) return
@@ -557,35 +915,30 @@ export default function Challenge() {
   const streak = calcStreak(transactions)
   const totalInvesti = investissements.reduce((acc, i) => acc + parseFloat(i.quantite) * parseFloat(i.pru || i.prix_achat_unitaire || 0), 0)
   const slugsObtenus = new Set(accomplissements.map(a => a.slug))
+  const streakMensuel = calcStreakMensuel(slugsObtenus)
 
-  const getGradeActuel = (acc) => {
-    if (!acc.evolutif) return null
-    const dbAcc = accomplissements.find(a => a.slug === acc.slug)
+  const getGradeActuel = (badge) => {
+    if (!badge.evolutif) return null
+    const dbAcc = accomplissements.find(a => a.slug === badge.slug)
     if (!dbAcc) return null
-    if (acc.slug === 'metronome') return GRADES_METRONOME.find(g => g.niveau === dbAcc.niveau) || null
-    if (acc.slug === 'cap') return GRADES_CAP.find(g => g.niveau === dbAcc.niveau) || null
+    if (badge.slug === 'metronome') return GRADES_METRONOME.find(g => g.niveau === dbAcc.niveau) || null
+    if (badge.slug === 'cap') return GRADES_CAP.find(g => g.niveau === dbAcc.niveau) || null
     return null
   }
 
-  const getProchainGrade = (acc) => {
-    if (!acc.evolutif) return null
-    const gradeActuel = getGradeActuel(acc)
-    const grades = acc.grades
+  const getProchainGrade = (badge) => {
+    if (!badge.evolutif) return null
+    const gradeActuel = getGradeActuel(badge)
+    const grades = badge.grades
     if (!gradeActuel) return grades[0]
     const idx = grades.findIndex(g => g.niveau === gradeActuel.niveau)
     return idx < grades.length - 1 ? grades[idx + 1] : null
   }
 
-  const getProgression = (acc) => {
-    if (acc.slug === 'grand-saut') {
-      const achats = transactions.filter(t => t.type === 'Achat')
-      return { current: achats.length > 0 ? 1 : 0, total: 1 }
-    }
-    if (acc.slug === 'architecte') {
-      const nb = [...new Set(investissements.map(i => i.ticker))].length
-      return { current: Math.min(nb, 3), total: 3 }
-    }
-    if (acc.slug === 'main-de-fer') {
+  const getProgression = (badge) => {
+    if (badge.slug === 'grand-saut') { const achats = transactions.filter(t => t.type === 'Achat'); return { current: achats.length > 0 ? 1 : 0, total: 1 } }
+    if (badge.slug === 'architecte') { const nb = [...new Set(investissements.map(i => i.ticker))].length; return { current: Math.min(nb, 3), total: 3 } }
+    if (badge.slug === 'main-de-fer') {
       const achats = transactions.filter(t => t.type === 'Achat')
       const ventes = transactions.filter(t => t.type === 'Vente')
       if (ventes.length > 0 || achats.length === 0) return { current: 0, total: 6 }
@@ -594,25 +947,17 @@ export default function Challenge() {
       const mois = (now.getFullYear() - firstAchat.getFullYear()) * 12 + (now.getMonth() - firstAchat.getMonth())
       return { current: Math.min(mois, 6), total: 6 }
     }
-    if (acc.slug === 'metronome') {
-      const prochain = getProchainGrade(acc)
-      if (!prochain) return null
-      return { current: Math.min(streak, prochain.mois), total: prochain.mois }
-    }
-    if (acc.slug === 'cap') {
-      const prochain = getProchainGrade(acc)
-      if (!prochain) return null
-      return { current: Math.round(totalInvesti), total: prochain.palier, currency: true }
-    }
+    if (badge.slug === 'metronome') { const prochain = getProchainGrade(badge); if (!prochain) return null; return { current: Math.min(streak, prochain.mois), total: prochain.mois } }
+    if (badge.slug === 'cap') { const prochain = getProchainGrade(badge); if (!prochain) return null; return { current: Math.round(totalInvesti), total: prochain.palier, currency: true } }
     return null
   }
 
-  const obtenus = ACCOMPLISSEMENTS.filter(a => slugsObtenus.has(a.slug))
-  const aDebloquer = ACCOMPLISSEMENTS.filter(a => !slugsObtenus.has(a.slug))
-
-  // Récupère l'accomplissement actuellement ouvert dans le popup niveaux
-  const accOuvert = niveauxOpen ? ACCOMPLISSEMENTS.find(a => a.slug === niveauxOpen) : null
-  const valeurActuelleAcc = accOuvert?.slug === 'metronome' ? streak : (accOuvert?.slug === 'cap' ? totalInvesti : 0)
+  const badgesObtenus = TOUS_BADGES.filter(b => slugsObtenus.has(b.slug))
+  const badgesADebloquer = TOUS_BADGES.filter(b => !slugsObtenus.has(b.slug))
+  const badgesMensuelsObtenus = badgesObtenus.filter(b => b.categorie === 'mensuel')
+  const anneesAvecBadges = [...new Set(badgesMensuelsObtenus.map(b => b.annee))].sort((a, b) => b - a)
+  const badgeOuvert = niveauxOpen ? TOUS_BADGES.find(b => b.slug === niveauxOpen) : null
+  const valeurActuelleAcc = badgeOuvert?.slug === 'metronome' ? streak : (badgeOuvert?.slug === 'cap' ? totalInvesti : 0)
 
   if (isLoading || checking) return (
     <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -621,114 +966,39 @@ export default function Challenge() {
     </div>
   )
 
-  const BadgeIcon = ({ acc, size = 60 }) => {
-    if (acc.svgIcon) return (
-      <img src={METRONOME_URL} alt="métronome" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
-    )
-    return <span style={{ fontSize: size * 0.45 }}>{acc.emoji}</span>
-  }
-
-  const BadgeCard = ({ acc, obtenu }) => {
-    const [isHovered, setIsHovered] = useState(false)
-    const gradeActuel = obtenu ? getGradeActuel(acc) : null
-    const prochain = getProchainGrade(acc)
-    const prog = getProgression(acc)
-    const pct = prog ? Math.min(Math.round((prog.current / prog.total) * 100), 100) : 0
-    const estMaxLevel = obtenu && acc.evolutif && !prochain
-    const estCliquable = acc.evolutif // uniquement les badges évolutifs sont cliquables
-
-    return (
-      <div
-        onClick={estCliquable ? () => setNiveauxOpen(acc.slug) : undefined}
-        style={{
-          background: obtenu ? (t.dark ? '#0F1F0F' : '#F6FFF3') : t.bgCard,
-          border: `0.5px solid ${obtenu ? '#4CAF2E' : t.border}`,
-          borderRadius: 12,
-          padding: 14,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          textAlign: 'center',
-          gap: 6,
-          cursor: estCliquable ? 'pointer' : 'default',
-          transition: 'transform 0.15s, box-shadow 0.15s',
-          position: 'relative',
-          transform: isHovered ? 'translateY(-2px)' : 'translateY(0)',
-          boxShadow: isHovered ? '0 6px 16px rgba(0,0,0,0.08)' : 'none',
-        }}
-        onMouseEnter={() => { if (estCliquable) setIsHovered(true) }}
-        onMouseLeave={() => setIsHovered(false)}
-      >
-        {estCliquable && isHovered && (
-          <div style={{ position: 'absolute', top: 6, right: 8, fontSize: 9, color: t.textMuted, background: t.bgSecondary, padding: '2px 6px', borderRadius: 4 }}>
-            Voir niveaux
-          </div>
-        )}
-        <div style={{ width: 60, height: 60, borderRadius: '50%', background: obtenu ? (gradeActuel ? gradeActuel.niveauBg : '#EAF6E4') : t.bgSecondary, display: 'flex', alignItems: 'center', justifyContent: 'center', border: obtenu ? `2px solid ${gradeActuel ? gradeActuel.niveauColor : '#4CAF2E'}` : `1.5px dashed ${t.border}`, overflow: 'hidden' }}>
-          {obtenu ? <BadgeIcon acc={acc} size={60} /> : <span style={{ fontSize: 22, color: t.textMuted }}>?</span>}
-        </div>
-        <div style={{ fontSize: 12, fontWeight: 500, color: obtenu ? t.text : t.textMuted, lineHeight: 1.3 }}>{acc.nom}</div>
-        {obtenu && gradeActuel && <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 20, fontWeight: 500, background: gradeActuel.niveauBg, color: gradeActuel.niveauColor }}>{gradeActuel.niveau}</span>}
-        {obtenu && !gradeActuel && <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 20, fontWeight: 500, background: '#EAF6E4', color: '#27500A' }}>Obtenu</span>}
-        {obtenu && <div style={{ fontSize: 11, color: t.textSecondary, lineHeight: 1.4 }}>{acc.message}</div>}
-        {obtenu && acc.evolutif && prochain && prog && (
-          <>
-            <div style={{ fontSize: 10, color: t.textMuted, marginTop: 2 }}>Prochain : <span style={{ fontWeight: 500, color: prochain.niveauColor }}>{prochain.niveau}</span></div>
-            <div style={{ width: '100%', background: t.bgSecondary, borderRadius: 4, height: 5, overflow: 'hidden' }}>
-              <div style={{ height: '100%', borderRadius: 4, background: prochain.niveauColor, width: `${pct}%`, transition: 'width 0.5s' }} />
-            </div>
-            <div style={{ fontSize: 10, color: t.textMuted }}>
-              {prog.currency ? `${prog.current.toLocaleString('fr-FR')} / ${prog.total.toLocaleString('fr-FR')} €` : `${prog.current} / ${prog.total} mois`}
-            </div>
-          </>
-        )}
-        {obtenu && acc.evolutif && estMaxLevel && <div style={{ fontSize: 10, color: '#993556', background: '#FBEAF0', padding: '3px 8px', borderRadius: 20, fontWeight: 500 }}>Niveau max !</div>}
-        {!obtenu && prog && (
-          <>
-            <div style={{ fontSize: 10, color: t.textMuted }}>{acc.quete}</div>
-            <div style={{ width: '100%', background: t.bgSecondary, borderRadius: 4, height: 5, overflow: 'hidden' }}>
-              <div style={{ height: '100%', borderRadius: 4, background: '#4CAF2E', width: `${pct}%`, transition: 'width 0.5s' }} />
-            </div>
-            <div style={{ fontSize: 10, color: t.textMuted }}>
-              {prog.currency ? `${prog.current.toLocaleString('fr-FR')} / ${prog.total.toLocaleString('fr-FR')} €` : `${prog.current} / ${prog.total}`}
-            </div>
-          </>
-        )}
-        {!obtenu && !prog && <div style={{ fontSize: 10, color: t.textMuted }}>{acc.quete}</div>}
-      </div>
-    )
-  }
-
   return (
     <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar page="Challenge" />
-      <div style={{ padding: '16px 20px', flex: 1, display: 'flex', flexDirection: 'column', gap: 14 }}>
+      <div style={{ padding: isMobile ? '16px 12px' : '16px 20px', flex: 1, display: 'flex', flexDirection: 'column', gap: 14, maxWidth: 1000, margin: '0 auto', width: '100%' }}>
 
-        <div style={{ background: bleu, borderRadius: 14, padding: '18px 20px', display: 'flex', alignItems: 'center', gap: 14 }}>
-          <div style={{ width: 48, height: 48, background: 'rgba(255,255,255,0.12)', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>📖</div>
+        {/* HEADER BLEU */}
+        <div style={{ background: '#1B2E4B', borderRadius: 14, padding: isMobile ? '18px 16px' : '20px 24px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+            <div style={{ fontSize: 18, fontWeight: 600, color: '#fff' }}>Livret d'accomplissements</div>
+            <div style={{ background: 'rgba(255,255,255,0.12)', borderRadius: 10, padding: '8px 14px', textAlign: 'center', flexShrink: 0 }}>
+              <div style={{ fontSize: 18, fontWeight: 600, color: '#fff' }}>{badgesObtenus.length}</div>
+              <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)' }}>badges</div>
+            </div>
+          </div>
+        </div>
+
+        {/* STREAK MENSUEL */}
+        <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 14 }}>
+          <div style={{ fontSize: streakMensuel > 0 ? 28 : 22, lineHeight: 1 }}>
+            {streakMensuel > 0 ? '🔥'.repeat(Math.min(streakMensuel, 6)) : '—'}
+          </div>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 15, fontWeight: 500, color: '#fff', marginBottom: 2 }}>Livret d'accomplissements</div>
-            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)' }}>{obtenus.length} / {ACCOMPLISSEMENTS.length} débloqués</div>
-          </div>
-          <div style={{ background: 'rgba(255,255,255,0.12)', borderRadius: 8, padding: '6px 12px', textAlign: 'center' }}>
-            <div style={{ fontSize: 18, fontWeight: 500, color: '#fff' }}>{obtenus.length}</div>
-            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)' }}>badges</div>
-          </div>
-        </div>
-
-        <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: '12px 16px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 12, color: t.textMuted }}>
-            <span>Progression globale</span>
-            <span style={{ fontWeight: 500, color: '#4CAF2E' }}>{Math.round((obtenus.length / ACCOMPLISSEMENTS.length) * 100)}%</span>
-          </div>
-          <div style={{ background: t.bgSecondary, borderRadius: 4, height: 8, overflow: 'hidden' }}>
-            <div style={{ height: '100%', borderRadius: 4, background: '#4CAF2E', width: `${Math.round((obtenus.length / ACCOMPLISSEMENTS.length) * 100)}%`, transition: 'width 0.5s' }} />
+            <div style={{ fontSize: 13, fontWeight: 500, color: t.text }}>
+              {streakMensuel > 0 ? `${streakMensuel} mois de suite investis !` : 'Aucune série en cours'}
+            </div>
+            <div style={{ fontSize: 11, color: t.textMuted, marginTop: 2 }}>
+              {streakMensuel > 0 ? 'Continue chaque mois pour maintenir ta série 🔥' : 'Achète un ETF ce mois-ci pour démarrer ta série'}
+            </div>
           </div>
         </div>
 
-        <button
-          onClick={() => setPositionOpen(true)}
-          style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', borderRadius: 12, border: `0.5px solid ${t.border}`, background: t.bgCard, cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' }}>
+        {/* BOUTON MA POSITION */}
+        <button onClick={() => setPositionOpen(true)} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', borderRadius: 12, border: `0.5px solid ${t.border}`, background: t.bgCard, cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left', width: '100%' }}>
           <div style={{ width: 40, height: 40, borderRadius: 10, background: '#1B2E4B', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>🎯</div>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 13, fontWeight: 500, color: t.text }}>Voir Ma Position</div>
@@ -737,54 +1007,109 @@ export default function Challenge() {
           <span style={{ fontSize: 16, color: t.textMuted }}>›</span>
         </button>
 
+        {/* ONGLETS */}
         <div style={{ display: 'flex', gap: 8 }}>
           {[
-            ['obtenus', `Mes badges (${obtenus.length})`],
-            ['avenirs', `À débloquer (${aDebloquer.length})`],
+            ['obtenus', `Mes badges (${badgesObtenus.length})`],
+            ['aDebloquer', `À débloquer (${badgesADebloquer.length})`],
+            ['amis', 'Amis'],
           ].map(([key, label]) => (
-            <button key={key} onClick={() => setOnglet(key)} style={{ flex: 1, padding: '9px', borderRadius: 9, border: `0.5px solid ${onglet === key ? bleu : t.border}`, background: onglet === key ? bleu : t.bgCard, color: onglet === key ? '#fff' : t.textMuted, fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' }}>
+            <button key={key} onClick={() => setOnglet(key)} style={{ flex: 1, padding: '9px', borderRadius: 9, border: `0.5px solid ${onglet === key ? bleu : t.border}`, background: onglet === key ? bleu : t.bgCard, color: onglet === key ? '#fff' : t.textMuted, fontSize: isMobile ? 11 : 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' }}>
               {label}
             </button>
           ))}
         </div>
 
+        {/* ONGLET MES BADGES */}
         {onglet === 'obtenus' && (
-          obtenus.length === 0 ? (
+          badgesObtenus.length === 0 ? (
             <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: '40px', textAlign: 'center', color: t.textMuted, fontSize: 12 }}>
               Aucun badge obtenu pour l'instant. Commencez votre parcours !
             </div>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 12 }}>
-              {obtenus.map(acc => <BadgeCard key={acc.slug} acc={acc} obtenu={true} />)}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+              {badgesObtenus.filter(b => b.categorie === 'principal').length > 0 && (
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 500, color: t.text, marginBottom: 10 }}>Accomplissements</div>
+                  <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(150px, 1fr))', gap: 12 }}>
+                    {badgesObtenus.filter(b => b.categorie === 'principal').map(badge => (
+                      <BadgeCard key={badge.slug} badge={badge} obtenu={true} onClickNiveaux={() => setNiveauxOpen(badge.slug)} gradeActuel={getGradeActuel(badge)} progression={getProgression(badge)} />
+                    ))}
+                  </div>
+                </div>
+              )}
+              {badgesObtenus.filter(b => b.categorie === 'guide').length > 0 && (
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 500, color: t.text, marginBottom: 10 }}>Guide — Chapitres validés</div>
+                  <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(150px, 1fr))', gap: 12 }}>
+                    {badgesObtenus.filter(b => b.categorie === 'guide').map(badge => (
+                      <BadgeCard key={badge.slug} badge={badge} obtenu={true} gradeActuel={null} progression={null} />
+                    ))}
+                  </div>
+                </div>
+              )}
+              {anneesAvecBadges.map(annee => (
+                <div key={annee}>
+                  <div style={{ fontSize: 13, fontWeight: 500, color: t.text, marginBottom: 10 }}>
+                    Collection {annee}
+                    {streakMensuel > 0 && <span style={{ fontSize: 12, color: '#FF6B35', marginLeft: 8 }}>{streakMensuel} mois de suite</span>}
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(3, 1fr)' : 'repeat(auto-fill, minmax(120px, 1fr))', gap: 10 }}>
+                    {badgesMensuelsObtenus.filter(b => b.annee === annee).map(badge => (
+                      <BadgeCard key={badge.slug} badge={badge} obtenu={true} gradeActuel={null} progression={null} />
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
           )
         )}
 
-        {onglet === 'avenirs' && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 12 }}>
-            {aDebloquer.map(acc => <BadgeCard key={acc.slug} acc={acc} obtenu={false} />)}
+        {/* ONGLET À DÉBLOQUER */}
+        {onglet === 'aDebloquer' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+            {badgesADebloquer.filter(b => b.categorie === 'principal').length > 0 && (
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 500, color: t.text, marginBottom: 10 }}>Accomplissements</div>
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(150px, 1fr))', gap: 12 }}>
+                  {badgesADebloquer.filter(b => b.categorie === 'principal').map(badge => (
+                    <BadgeCard key={badge.slug} badge={badge} obtenu={false} gradeActuel={null} progression={getProgression(badge)} />
+                  ))}
+                </div>
+              </div>
+            )}
+            {badgesADebloquer.filter(b => b.categorie === 'guide').length > 0 && (
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 500, color: t.text, marginBottom: 10 }}>Guide — Chapitres à valider</div>
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(150px, 1fr))', gap: 12 }}>
+                  {badgesADebloquer.filter(b => b.categorie === 'guide').map(badge => (
+                    <BadgeCard key={badge.slug} badge={badge} obtenu={false} gradeActuel={null} progression={null} />
+                  ))}
+                </div>
+              </div>
+            )}
+            {badgesADebloquer.filter(b => b.categorie === 'mensuel').length > 0 && (
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 500, color: t.text, marginBottom: 10 }}>Collection mensuelle 2026</div>
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(3, 1fr)' : 'repeat(auto-fill, minmax(120px, 1fr))', gap: 10 }}>
+                  {badgesADebloquer.filter(b => b.categorie === 'mensuel').map(badge => (
+                    <BadgeCard key={badge.slug} badge={badge} obtenu={false} gradeActuel={null} progression={null} />
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
+        )}
+
+        {/* ONGLET AMIS */}
+        {onglet === 'amis' && data && (
+          <OngletAmis userId={data.user.id} monPseudo={data.pseudo} t={t} isMobile={isMobile} />
         )}
 
       </div>
 
-      {positionOpen && (
-        <PositionModal
-          totalInvesti={totalInvesti}
-          comptes={comptes}
-          onClose={() => setPositionOpen(false)}
-        />
-      )}
-
-      {/* POPUP NIVEAUX DU BADGE */}
-      {accOuvert && (
-        <NiveauxModal
-          acc={accOuvert}
-          gradeActuel={getGradeActuel(accOuvert)}
-          valeurActuelle={valeurActuelleAcc}
-          onClose={() => setNiveauxOpen(null)}
-        />
-      )}
+      {positionOpen && <PositionModal totalInvesti={totalInvesti} comptes={comptes} onClose={() => setPositionOpen(false)} />}
+      {badgeOuvert && <NiveauxModal acc={badgeOuvert} gradeActuel={getGradeActuel(badgeOuvert)} valeurActuelle={valeurActuelleAcc} onClose={() => setNiveauxOpen(null)} />}
 
       <FooterApp />
     </div>

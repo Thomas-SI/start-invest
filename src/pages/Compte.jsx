@@ -13,6 +13,10 @@ export default function Compte() {
   const [nom, setNom] = useState('')
   const [email, setEmail] = useState('')
   const [metier, setMetier] = useState('')
+  const [pseudo, setPseudo] = useState('')
+  const [pseudoInitial, setPseudoInitial] = useState('')
+  const [pseudoDisponible, setPseudoDisponible] = useState(null)
+  const [checkingPseudo, setCheckingPseudo] = useState(false)
   const [loading, setLoading] = useState(false)
   const [succes, setSucces] = useState(false)
   const [erreur, setErreur] = useState(null)
@@ -38,18 +42,65 @@ export default function Compte() {
         setEmail(user.email || '')
         setMetier(user.user_metadata?.metier || '')
         setPhotoUrl(user.user_metadata?.photo_url || null)
+
+        // Charger le pseudo depuis la table profils
+        const { data: profil } = await supabase
+          .from('profils')
+          .select('pseudo')
+          .eq('user_id', user.id)
+          .single()
+        if (profil?.pseudo) {
+          setPseudo(profil.pseudo)
+          setPseudoInitial(profil.pseudo)
+        }
       }
     }
     fetchUser()
   }, [])
 
+  // Vérification disponibilité pseudo en temps réel
+  useEffect(() => {
+    if (!pseudo.trim() || pseudo === pseudoInitial) { setPseudoDisponible(null); return }
+    if (pseudo.length < 3) { setPseudoDisponible(false); return }
+
+    const timer = setTimeout(async () => {
+      setCheckingPseudo(true)
+      const { data } = await supabase
+        .from('profils')
+        .select('pseudo')
+        .eq('pseudo', pseudo.toLowerCase().trim())
+        .single()
+      setPseudoDisponible(!data)
+      setCheckingPseudo(false)
+    }, 500)
+
+    return () => clearTimeout(timer)
+  }, [pseudo, pseudoInitial])
+
   const handleSave = async () => {
     if (loading) return
     if (!prenom.trim() && !nom.trim()) { setErreur('Veuillez saisir au moins un prénom ou un nom.'); return }
+    if (pseudo.trim() && pseudo.length < 3) { setErreur('Le pseudo doit contenir au moins 3 caractères.'); return }
+    if (pseudo.trim() && pseudo !== pseudoInitial && pseudoDisponible === false) { setErreur('Ce pseudo est déjà pris.'); return }
+
     setLoading(true); setErreur(null)
     try {
       const { error } = await supabase.auth.updateUser({ data: { prenom, nom, metier } })
       if (error) throw new Error('Erreur lors de la sauvegarde.')
+
+      // Sauvegarder le pseudo dans la table profils
+      if (pseudo.trim()) {
+        const pseudoFormate = pseudo.toLowerCase().trim()
+        const { data: existing } = await supabase.from('profils').select('id').eq('user_id', user.id).single()
+        if (existing) {
+          await supabase.from('profils').update({ pseudo: pseudoFormate, updated_at: new Date().toISOString() }).eq('user_id', user.id)
+        } else {
+          await supabase.from('profils').insert({ user_id: user.id, pseudo: pseudoFormate })
+        }
+        setPseudoInitial(pseudoFormate)
+        setPseudo(pseudoFormate)
+      }
+
       setSucces(true)
       setTimeout(() => setSucces(false), 3000)
     } catch (e) {
@@ -84,30 +135,17 @@ export default function Compte() {
     setSuppressionLoading(true)
     setSuppressionErreur(null)
     try {
-      // Recuperer la session active pour obtenir le JWT
       const { data: { session } } = await supabase.auth.getSession()
-      if (!session) throw new Error('Session expiree. Reconnecte-toi.')
-
-      // Appeler l'Edge Function delete-account avec le JWT
+      if (!session) throw new Error('Session expirée. Reconnecte-toi.')
       const { data, error } = await supabase.functions.invoke('delete-account', {
         method: 'POST',
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
+        headers: { Authorization: `Bearer ${session.access_token}` },
       })
-
-      if (error) {
-        throw new Error(error.message || 'Erreur lors de la suppression du compte.')
-      }
-      if (data?.error) {
-        throw new Error(data.details || data.error)
-      }
-
-      // Succes : deconnexion + redirection
+      if (error) throw new Error(error.message || 'Erreur lors de la suppression du compte.')
+      if (data?.error) throw new Error(data.details || data.error)
       await supabase.auth.signOut()
       navigate('/')
     } catch (e) {
-      console.error('Erreur suppression compte:', e)
       setSuppressionErreur(e.message || 'Une erreur est survenue.')
       setSuppressionLoading(false)
     }
@@ -142,6 +180,16 @@ export default function Compte() {
     </div>
   )
 
+  // Indicateur disponibilité pseudo
+  const renderPseudoStatus = () => {
+    if (!pseudo.trim() || pseudo === pseudoInitial) return null
+    if (pseudo.length < 3) return <span style={{ fontSize: 11, color: '#E24B4A' }}>Au moins 3 caractères</span>
+    if (checkingPseudo) return <span style={{ fontSize: 11, color: t.textMuted }}>Vérification...</span>
+    if (pseudoDisponible === true) return <span style={{ fontSize: 11, color: '#4CAF2E' }}>✓ Disponible</span>
+    if (pseudoDisponible === false) return <span style={{ fontSize: 11, color: '#E24B4A' }}>✕ Déjà pris</span>
+    return null
+  }
+
   return (
     <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar page="Compte" initiale={initiale} />
@@ -163,6 +211,9 @@ export default function Compte() {
               </label>
               <div>
                 <div style={{ fontSize: 16, fontWeight: 500, color: t.text }}>{prenom} {nom}</div>
+                {pseudoInitial && (
+                  <div style={{ fontSize: 12, color: '#4CAF2E', fontWeight: 500 }}>@{pseudoInitial}</div>
+                )}
                 <div style={{ fontSize: 12, color: t.textMuted }}>{email}</div>
                 <div style={{ fontSize: 11, background: '#EAF6E4', color: '#2E7D1E', padding: '2px 10px', borderRadius: 20, display: 'inline-block', marginTop: 4 }}>Plan gratuit</div>
               </div>
@@ -180,6 +231,7 @@ export default function Compte() {
           <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 14, padding: 20, marginBottom: 12 }}>
             <div style={{ fontSize: 13, fontWeight: 500, color: t.text, marginBottom: 16 }}>Informations personnelles</div>
             {erreur && <div style={{ background: '#FCEBEB', border: '0.5px solid #E24B4A', borderRadius: 8, padding: '8px 12px', fontSize: 12, color: '#E24B4A', marginBottom: 12 }}>⚠️ {erreur}</div>}
+
             <div style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 11, color: t.textMuted, marginBottom: 4 }}>Prénom</div>
@@ -190,14 +242,40 @@ export default function Compte() {
                 <input value={nom} onChange={e => setNom(e.target.value)} style={inputStyle} />
               </div>
             </div>
+
             <div style={{ marginBottom: 12 }}>
               <div style={{ fontSize: 11, color: t.textMuted, marginBottom: 4 }}>Email</div>
               <input value={email} disabled style={{ ...inputStyle, color: t.textMuted }} />
             </div>
-            <div style={{ marginBottom: 16 }}>
+
+            <div style={{ marginBottom: 12 }}>
               <div style={{ fontSize: 11, color: t.textMuted, marginBottom: 4 }}>Description / Métier</div>
               <input value={metier} onChange={e => setMetier(e.target.value)} placeholder="ex: Ingénieur, Étudiant, Entrepreneur..." style={inputStyle} />
             </div>
+
+            {/* PSEUDO */}
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                <div style={{ fontSize: 11, color: t.textMuted }}>Pseudo <span style={{ fontSize: 10, background: '#E8EEF6', color: '#1B2E4B', padding: '1px 7px', borderRadius: 20, marginLeft: 6, fontWeight: 500 }}>Amis</span></div>
+                {renderPseudoStatus()}
+              </div>
+              <div style={{ position: 'relative' }}>
+                <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', fontSize: 13, color: t.textMuted, pointerEvents: 'none' }}>@</span>
+                <input
+                  value={pseudo}
+                  onChange={e => setPseudo(e.target.value.replace(/[^a-zA-Z0-9_]/g, '').toLowerCase())}
+                  placeholder="ton_pseudo"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  autoComplete="off"
+                  style={{ ...inputStyle, paddingLeft: 26, border: `0.5px solid ${pseudoDisponible === false && pseudo !== pseudoInitial ? '#E24B4A' : pseudoDisponible === true ? '#4CAF2E' : t.border}` }}
+                />
+              </div>
+              <div style={{ fontSize: 10, color: t.textMuted, marginTop: 4 }}>
+                Uniquement lettres, chiffres et _ · Utilisé pour rechercher et ajouter des amis
+              </div>
+            </div>
+
             {succes && <div style={{ fontSize: 12, color: '#2E7D1E', background: '#EAF6E4', padding: '8px 12px', borderRadius: 8, marginBottom: 12 }}>✓ Informations sauvegardées !</div>}
             <button onClick={handleSave} disabled={loading} style={{ background: loading ? '#9CA3AF' : '#4CAF2E', color: '#fff', fontSize: 13, fontWeight: 500, padding: '10px 20px', borderRadius: 9, border: 'none', cursor: loading ? 'not-allowed' : 'pointer', fontFamily: 'inherit' }}>
               {loading ? '⏳ Sauvegarde...' : 'Sauvegarder'}
@@ -228,13 +306,10 @@ export default function Compte() {
 
             {showAPropos && (
               <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
-
-                {/* Intro */}
                 <div style={{ fontSize: 12, color: t.textMuted, lineHeight: 1.6, padding: '10px 14px', background: t.bgSecondary, borderRadius: 10 }}>
                   StartInvest est une application d'aide à la gestion de portefeuille d'ETF destinée aux particuliers souhaitant suivre et optimiser leurs investissements long terme.
                 </div>
 
-                {/* MENTIONS LÉGALES */}
                 <SectionLegale titre="Mentions légales" open={showMentions} onToggle={() => setShowMentions(v => !v)}>
                   <Article numero="1" titre="Éditeur du site">
                     Le site www.start-invest.fr est édité par :<br />
@@ -254,7 +329,7 @@ export default function Compte() {
                   </Article>
                   <div style={{ height: 0.5, background: t.border }} />
                   <Article numero="3" titre="Propriété intellectuelle">
-                    L'ensemble de ce site, ainsi que les produits numériques (guides, fichiers Excel, formations) vendus sous la marque Start Invest, relèvent de la législation française et internationale sur le droit d'auteur et la propriété intellectuelle. Tous les droits de reproduction sont réservés. Toute extraction et/ou reproduction de tout ou partie des informations diffusées sur le site est interdite sans l'autorisation expresse et préalable de l'éditeur.
+                    L'ensemble de ce site, ainsi que les produits numériques (guides, fichiers Excel, formations) vendus sous la marque Start Invest, relèvent de la législation française et internationale sur le droit d'auteur et la propriété intellectuelle. Tous les droits de reproduction sont réservés.
                   </Article>
                   <div style={{ height: 0.5, background: t.border }} />
                   <Article numero="4" titre="Données personnelles">
@@ -262,34 +337,33 @@ export default function Compte() {
                   </Article>
                 </SectionLegale>
 
-                {/* CGV */}
                 <SectionLegale titre="Conditions Générales de Vente (CGV)" open={showCGV} onToggle={() => setShowCGV(v => !v)}>
                   <Article numero="1" titre="Objet">
-                    Les présentes CGV régissent de manière exclusive les relations contractuelles entre l'entreprise START_INVEST et toute personne physique ou morale procédant à l'achat de produits numériques (guides, formations vidéo) ou à l'accès à l'application web de gestion financière sur le site www.start-invest.fr.
+                    Les présentes CGV régissent de manière exclusive les relations contractuelles entre l'entreprise START_INVEST et toute personne physique ou morale procédant à l'achat de produits numériques ou à l'accès à l'application web de gestion financière sur le site www.start-invest.fr.
                   </Article>
                   <div style={{ height: 0.5, background: t.border }} />
                   <Article numero="2" titre="Prix et paiement">
-                    Les prix sont indiqués en Euros (€). TVA non applicable en tant qu'Entrepreneur Individuel (article 293 B du CGI). Le paiement est exigible immédiatement à la commande via carte bancaire par les plateformes sécurisées Stripe ou PayPal. L'Éditeur n'a jamais accès aux coordonnées bancaires du Client.
+                    Les prix sont indiqués en Euros (€). TVA non applicable en tant qu'Entrepreneur Individuel (article 293 B du CGI). Le paiement est exigible immédiatement à la commande via carte bancaire par les plateformes sécurisées Stripe ou PayPal.
                   </Article>
                   <div style={{ height: 0.5, background: t.border }} />
                   <Article numero="3" titre="Livraison des produits numériques">
-                    Le contenu (formation, guides et accès à l'application web) est livré par voie électronique immédiatement après la validation du paiement. Le Client reçoit ses accès par e-mail à l'adresse renseignée lors de la commande.
+                    Le contenu est livré par voie électronique immédiatement après la validation du paiement. Le Client reçoit ses accès par e-mail à l'adresse renseignée lors de la commande.
                   </Article>
                   <div style={{ height: 0.5, background: t.border }} />
                   <Article numero="4" titre="Accès et maintenance">
-                    L'Éditeur s'efforce d'assurer un accès à l'application 24h/24 et 7j/7. L'accès peut être temporairement suspendu pour des raisons de maintenance. L'accès est garanti pour une durée illimitée, sauf en cas d'arrêt définitif du service, auquel cas un préavis de 3 mois sera communiqué au Client.
+                    L'Éditeur s'efforce d'assurer un accès à l'application 24h/24 et 7j/7. L'accès peut être temporairement suspendu pour des raisons de maintenance.
                   </Article>
                   <div style={{ height: 0.5, background: t.border }} />
                   <Article numero="5" titre="Droit de rétractation">
-                    Conformément à l'article L221-28 du Code de la consommation, le droit de rétractation ne peut être exercé pour les contenus numériques dont l'exécution a commencé après accord préalable exprès du consommateur. En validant sa commande, le Client accepte l'accès immédiat au contenu et renonce expressément à son droit de rétractation.
+                    Conformément à l'article L221-28 du Code de la consommation, le droit de rétractation ne peut être exercé pour les contenus numériques dont l'exécution a commencé après accord préalable exprès du consommateur.
                   </Article>
                   <div style={{ height: 0.5, background: t.border }} />
                   <Article numero="6" titre="Responsabilité et avertissement légal">
-                    Start Invest fournit des informations, des méthodes et des outils de calcul à titre purement éducatif et pédagogique. L'Éditeur n'est pas Conseiller en Investissement Financier (CIF). Les informations présentées ne constituent en aucun cas un conseil en investissement. L'investissement comporte des risques de perte en capital. Le Client est seul responsable de ses décisions financières.
+                    Start Invest fournit des informations à titre purement éducatif et pédagogique. L'Éditeur n'est pas Conseiller en Investissement Financier (CIF). Les informations présentées ne constituent en aucun cas un conseil en investissement.
                   </Article>
                   <div style={{ height: 0.5, background: t.border }} />
                   <Article numero="7" titre="Propriété intellectuelle">
-                    Tous les éléments du site et de l'application (textes, logos, codes sources, calculateurs, vidéos) sont et restent la propriété intellectuelle exclusive de START_INVEST. Toute reproduction, exploitation ou utilisation sans accord préalable est strictement interdite.
+                    Tous les éléments du site et de l'application sont et restent la propriété intellectuelle exclusive de START_INVEST.
                   </Article>
                   <div style={{ height: 0.5, background: t.border }} />
                   <Article numero="8" titre="Droit applicable">
@@ -297,10 +371,9 @@ export default function Compte() {
                   </Article>
                 </SectionLegale>
 
-                {/* POLITIQUE DE CONFIDENTIALITÉ */}
                 <SectionLegale titre="Politique de confidentialité" open={showConfidentialite} onToggle={() => setShowConfidentialite(v => !v)}>
                   <Article numero="1" titre="Collecte des données">
-                    Les chiffres que vous saisissez dans vos outils de gestion (dépenses, montants d'investissement) sont strictement personnels et ne sont jamais partagés avec des tiers. Ils sont chiffrés et ne servent qu'à votre propre consultation au sein de l'application.
+                    Les chiffres que vous saisissez dans vos outils de gestion sont strictement personnels et ne sont jamais partagés avec des tiers.
                   </Article>
                   <div style={{ height: 0.5, background: t.border }} />
                   <Article numero="2" titre="Utilisation des données">
@@ -308,15 +381,15 @@ export default function Compte() {
                   </Article>
                   <div style={{ height: 0.5, background: t.border }} />
                   <Article numero="3" titre="Données de contact">
-                    Vos informations d'identification (nom, e-mail) sont conservées tant que vous restez inscrit. Pour supprimer définitivement votre compte et l'intégralité de vos données de calcul (budgets, investissements), vous pouvez vous rendre dans l'onglet Paramètres de l'application et cliquer sur "Supprimer mon compte".
+                    Vos informations d'identification sont conservées tant que vous restez inscrit. Pour supprimer définitivement votre compte, rendez-vous dans Paramètres.
                   </Article>
                   <div style={{ height: 0.5, background: t.border }} />
                   <Article numero="4" titre="Données applicatives">
-                    Vos données de calcul (budgets, simulateurs, journal d'investissement) sont conservées pendant toute la durée de vie de votre compte Start Invest. En cas d'inactivité prolongée de plus de 24 mois, ou sur simple demande de votre part, ces données seront définitivement supprimées de nos serveurs sécurisés.
+                    Vos données de calcul sont conservées pendant toute la durée de vie de votre compte Start Invest.
                   </Article>
                   <div style={{ height: 0.5, background: t.border }} />
                   <Article numero="5" titre="Sécurité et stockage">
-                    Vos données d'identification (nom, e-mail) et vos données d'utilisation de l'application (calculs de budget, simulateurs) sont stockées de manière sécurisée. Nous utilisons les services de Supabase Inc. (infrastructure AWS située en Europe, région Frankfurt) pour la base de données, et Vercel Inc. pour l'hébergement de l'interface.
+                    Vos données sont stockées de manière sécurisée via Supabase Inc. (infrastructure AWS, région Frankfurt) et Vercel Inc.
                   </Article>
                 </SectionLegale>
 
@@ -343,7 +416,7 @@ export default function Compte() {
               <div style={{ marginTop: 16, padding: 16, background: '#FCEBEB', borderRadius: 10 }}>
                 <div style={{ fontSize: 13, fontWeight: 600, color: '#E24B4A', marginBottom: 8 }}>⚠️ Suppression definitive du compte</div>
                 <div style={{ fontSize: 12, color: '#E24B4A', marginBottom: 10, lineHeight: 1.5 }}>
-                  Cette action est <strong>irreversible</strong>. Toutes tes donnees (investissements, transactions, comptes, budget, accomplissements, photo) seront supprimees definitivement. Tape ton email ci-dessous pour confirmer.
+                  Cette action est <strong>irreversible</strong>. Toutes tes donnees seront supprimees definitivement. Tape ton email ci-dessous pour confirmer.
                 </div>
                 <input
                   value={confirmSupprimer}
