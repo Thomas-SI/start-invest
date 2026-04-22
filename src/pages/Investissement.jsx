@@ -4,6 +4,8 @@ import { supabase } from '../lib/supabase'
 import Navbar from '../components/Navbar'
 import { useTheme } from '../lib/ThemeContext'
 import FooterApp from '../components/FooterApp'
+import { usePremium } from '../lib/usePremium'
+import PremiumModal from '../components/PremiumModal'
 
 const ENVELOPPES = ['CTO', 'PEA', 'Assurance-vie']
 const TYPES_ETF = ['Capitalisant', 'Distribuant']
@@ -34,6 +36,7 @@ const fetchInvestissementData = async () => {
 
 export default function Investissement() {
   const t = useTheme()
+  const { isPremium, loading: premiumLoading } = usePremium()
   const queryClient = useQueryClient()
   const [showAdd, setShowAdd] = useState(false)
   const [showJournal, setShowJournal] = useState(true)
@@ -254,7 +257,11 @@ export default function Investissement() {
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: t.textMuted, fontSize: 13 }}>Chargement...</div>
     </div>
   )
+if (premiumLoading) return null
 
+if (!isPremium) {
+  return <PremiumModal onClose={() => {}} />
+}
   return (
     <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar page="Investissement" />

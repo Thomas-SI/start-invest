@@ -5,6 +5,15 @@ import Navbar from '../components/Navbar'
 import FooterApp from '../components/FooterApp'
 import { useTheme } from '../lib/ThemeContext'
 
+import { loadStripe } from '@stripe/stripe-js'
+
+const STRIPE_PUBLIC_KEY = 'pk_test_51SvbHg8d4XtkN16mPYl34t3MkOezAt3vUdAs24q1HfJQLBi6YjSY2GGuSNw2yg4FQ21dTO9jpmmP2YXlJtM4UeL300sKwcuyJB' 
+const PRICE_IDS = {
+  mensuel: 'price_1TOMft8d4XtkN16m2Ieibx94', 
+  annuel: 'price_1TOMgb8d4XtkN16mC7Wvsjhc',  
+}
+
+const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 const plans = [
   {
     id: 'gratuit', nom: 'Gratuit', actuel: true,
@@ -49,6 +58,42 @@ export default function Abonnement() {
   const t = useTheme()
   const [user, setUser] = useState(null)
   const [annuel, setAnnuel] = useState(false)
+  const [checkoutLoading, setCheckoutLoading] = useState(false)
+
+  const [alertMsg, setAlertMsg] = useState(null)
+
+useEffect(() => {
+  const params = new URLSearchParams(window.location.search)
+  if (params.get('success') === 'true') {
+    setAlertMsg('🎉 Paiement réussi ! Ton abonnement Premium est actif.')
+    window.history.replaceState({}, '', window.location.pathname)
+  }
+  if (params.get('canceled') === 'true') {
+    setAlertMsg('Paiement annulé.')
+    window.history.replaceState({}, '', window.location.pathname)
+  }
+}, [])
+const handleCheckout = async () => {
+  setCheckoutLoading(true)
+  try {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) throw new Error('Non connecté')
+
+    const priceId = annuel ? PRICE_IDS.annuel : PRICE_IDS.mensuel
+
+  const { data, error } = await supabase.functions.invoke('create-checkout-session', {
+  body: { priceId },
+})
+
+    if (error || !data?.url) throw new Error(error?.message ?? 'Erreur lors de la création de la session')
+
+    window.location.href = data.url
+  } catch (err) {
+    alert(err.message)
+  } finally {
+    setCheckoutLoading(false)
+  }
+}
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
 
   useEffect(() => {
@@ -72,9 +117,29 @@ export default function Abonnement() {
       <Navbar page="Abonnement" initiale={initiale} />
 
       <div style={{ padding: isMobile ? '20px 12px' : '24px 20px', flex: 1 }}>
+        {alertMsg && (
+  <div style={{ background: '#1B2E4B', border: '1px solid #ffffff22', borderRadius: 12, padding: '14px 20px', marginBottom: 24, color: '#ffffff', fontSize: 14, textAlign: 'center' }}>
+    {alertMsg}
+  </div>
+)}
         <div style={{ textAlign: 'center', marginBottom: 28 }}>
-          <div style={{ fontSize: 16, fontWeight: 500, color: t.text, marginBottom: 4 }}>Choisissez votre plan</div>
-          <div style={{ fontSize: 12, color: t.textMuted, marginBottom: 20 }}>Passez à la vitesse supérieure dans votre parcours d'investisseur</div>
+  <div style={{ background: '#1B2E4B', borderRadius: 12, padding: '12px 20px', marginBottom: 16, display: 'inline-block' }}>
+    <div style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>
+      Un abonnement pensé pour récompenser la discipline.
+    </div>
+  </div>
+  <div style={{ fontSize: 13, color: t.textMuted, lineHeight: 1.7, maxWidth: 480, margin: '0 auto 10px', padding: isMobile ? '0 8px' : '0' }}>
+  Après 10 ans, l'app devient gratuite et vos performances s'envolent. Commencez à bâtir votre futur dès aujourd'hui, le temps est votre meilleur allié.
+</div>
+<div style={{ fontSize: 13, color: t.textMuted, lineHeight: 1.7, maxWidth: 480, margin: '0 auto 10px', padding: isMobile ? '0 8px' : '0' }}>
+  Un abonnement juste, pour tout le monde, rentabilisé grâce à vos efforts. Ne laissez pas votre futur entre les mains de personnes qui ne vous aideront pas. Prenez en le contrôle.
+</div>
+<div style={{ fontSize: 13, color: t.textMuted, lineHeight: 1.7, maxWidth: 480, margin: '0 auto 10px', padding: isMobile ? '0 8px' : '0' }}>
+  À 7% de moyenne annuelle, ce qui est très conservateur, votre abonnement est remboursé à partir de 80€/mois investi la 1ère année, et seulement 35€/mois dès la 2ème. C'est un cadeau pour construire votre avenir sans vous ruiner en frais. Aucun frais cachés, juste un abonnement.
+</div>
+<div style={{ fontSize: 13, fontWeight: 600, color: t.text, lineHeight: 1.7, maxWidth: 480, margin: '10px auto 20px', padding: isMobile ? '0 8px' : '0' }}>
+  N'attendez plus ! Et si vous n'êtes pas satisfait, vous pouvez arrêter quand vous voulez.
+</div>
 
           {/* TOGGLE MENSUEL / ANNUEL */}
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 12, background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 30, padding: '6px 8px' }}>
@@ -138,9 +203,13 @@ export default function Abonnement() {
                 </div>
 
                 {/* BOUTON */}
-                <button style={{ width: '100%', padding: '12px', borderRadius: 10, border: actuel ? `0.5px solid ${t.border}` : 'none', background: actuel ? 'transparent' : '#4CAF2E', color: actuel ? t.textMuted : '#fff', fontSize: 13, fontWeight: 500, cursor: actuel ? 'default' : 'pointer', fontFamily: 'inherit' }}>
-                  {actuel ? 'Plan actuel' : `Passer à ${nom} →`}
-                </button>
+                <button
+  onClick={() => !actuel && handleCheckout()}
+  disabled={actuel || checkoutLoading}
+  style={{ width: '100%', padding: '12px', borderRadius: 10, border: actuel ? `0.5px solid ${t.border}` : 'none', background: actuel ? 'transparent' : '#4CAF2E', color: actuel ? t.textMuted : '#fff', fontSize: 13, fontWeight: 500, cursor: actuel ? 'default' : 'pointer', fontFamily: 'inherit', opacity: checkoutLoading ? 0.7 : 1 }}
+>
+  {actuel ? 'Plan actuel' : checkoutLoading ? 'Chargement...' : `Passer à ${nom} →`}
+</button>
 
               </div>
             )

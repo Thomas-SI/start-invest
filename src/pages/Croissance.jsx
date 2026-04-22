@@ -3,6 +3,8 @@ import { supabase } from '../lib/supabase'
 import Navbar from '../components/Navbar'
 import FooterApp from '../components/FooterApp'
 import { useTheme } from '../lib/ThemeContext'
+import { usePremium } from '../lib/usePremium'
+import PremiumModal from '../components/PremiumModal'
 
 function simulerDCA(capitalInitial, versementMensuel, tauxAnnuel, dureeAnnees) {
   const tauxMensuel = tauxAnnuel / 100 / 12
@@ -26,6 +28,7 @@ function simulerDCA(capitalInitial, versementMensuel, tauxAnnuel, dureeAnnees) {
 
 export default function Croissance() {
   const t = useTheme()
+  const { isPremium, loading: premiumLoading } = usePremium()
   const [user, setUser] = useState(null)
   const [investissable, setInvestissable] = useState(0)
   const [capitalInitial, setCapitalInitial] = useState(10000)
@@ -67,6 +70,11 @@ export default function Croissance() {
   const capitalApresFisc = derniere ? Math.round(derniere.capitalInvesti + derniere.interets * (1 - fiscalite)) : 0
   const maxVal = derniere?.capitalTotal || 1
 
+  if (premiumLoading) return null
+
+if (!isPremium) {
+  return <PremiumModal onClose={() => {}} />
+}
   return (
     <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar page="Croissance" initiale={initiale} />

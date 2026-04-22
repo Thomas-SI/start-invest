@@ -4,6 +4,8 @@ import { supabase } from '../lib/supabase'
 import Navbar from '../components/Navbar'
 import FooterApp from '../components/FooterApp'
 import { useTheme } from '../lib/ThemeContext'
+import { usePremium } from '../lib/usePremium'
+import PremiumModal from '../components/PremiumModal'
 
 const COMPTES_PREDEFINIS = [
   { nom: 'Livret A', type: 'sécurité', disponibilite: 'Immédiate' },
@@ -69,6 +71,7 @@ const fetchPortefeuilleData = async () => {
 
 export default function Portefeuille() {
   const t = useTheme()
+  const { isPremium, loading: premiumLoading } = usePremium()
   const queryClient = useQueryClient()
   const canvasRef = useRef(null)
   const chartRef = useRef(null)
@@ -270,7 +273,11 @@ export default function Portefeuille() {
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: t.textMuted, fontSize: 13 }}>Chargement...</div>
     </div>
   )
+if (premiumLoading) return null
 
+if (!isPremium) {
+  return <PremiumModal onClose={() => {}} />
+}
   return (
     <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar page="Portefeuille" />

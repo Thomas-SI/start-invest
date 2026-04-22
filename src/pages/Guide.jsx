@@ -229,8 +229,8 @@ const CHAPITRES = [
         texte: "Tu as ta stratégie, ton ETF et ton courtier. Il est temps de passer ton premier ordre d'achat. Voici exactement comment faire pas à pas.",
         tableau: { cols: ["Type d'ordre", 'Comment ça fonctionne', "Quand l'utiliser"], rows: [['Ordre au marché', 'Tu achètes immédiatement au prix actuel', 'Idéal pour débuter'], ['Ordre limité', 'Tu fixes le prix maximum que tu acceptes', "Pour maîtriser son prix d'achat"]] },
         tableau2: { cols: ['Étape', 'Action'], rows: [['1', 'Connecte-toi à ton courtier'], ['2', 'Recherche ton ETF via son ticker — ex: CW8'], ['3', 'Clique sur Acheter'], ['4', "Choisis l'ordre au marché"], ['5', 'Saisis le montant en euros'], ['6', 'Vérifie le récapitulatif et confirme']] },
-        challenge: "Passe ton premier ordre aujourd'hui. Même 20€. Même 50€. Le montant importe peu — ce qui compte c'est de franchir ce cap psychologique.",
-        app: "Dès ton ordre passé, note-le immédiatement dans le Journal d'investissements — ticker, montant, enveloppe, courtier et frais. C'est ton premier pas dans ton Ascension.",
+        challenge: "Passe ton premier ordre aujourd'hui. Même 20€. Même 50€. Le montant importe peu, ce qui compte c'est de franchir ce cap psychologique.",
+        app: "Dès ton ordre passé, note-le immédiatement dans le Journal d'investissements. Ticker, montant, enveloppe, courtier et frais. C'est ton premier pas dans ton Ascension.",
       },
       {
         id: 22,
