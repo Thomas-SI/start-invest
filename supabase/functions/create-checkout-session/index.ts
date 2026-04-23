@@ -98,6 +98,8 @@ console.log("upsert error:", upsertError)
         mode: "subscription",
         success_url: `${origin}/abonnement?success=true`,
         cancel_url: `${origin}/abonnement?canceled=true`,
+        "subscription_data[trial_period_days]": "15",
+        "allow_promotion_codes": "true",
         locale: "fr",
       }),
     });

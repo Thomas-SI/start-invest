@@ -24,10 +24,10 @@ export function usePremium() {
         .from('abonnements')
         .select('statut, date_fin')
         .eq('user_id', profil.id)
-        .single()
+        .maybeSingle()
 
-      const estActif =
-        abonnement?.statut === 'actif' &&
+    const estActif =
+  (abonnement?.statut === 'actif' || abonnement?.statut === 'trialing') &&
         abonnement?.date_fin &&
         new Date(abonnement.date_fin) > new Date()
 

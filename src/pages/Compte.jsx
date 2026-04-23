@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase'
 import Navbar from '../components/Navbar'
 import FooterApp from '../components/FooterApp'
 import { useTheme } from '../lib/ThemeContext'
+import { usePremium } from '../lib/usePremium'
 
 export default function Compte() {
   const navigate = useNavigate()
@@ -30,6 +31,33 @@ export default function Compte() {
   const [suppressionErreur, setSuppressionErreur] = useState(null)
   const [photoUrl, setPhotoUrl] = useState(null)
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
+  const { isPremium } = usePremium()
+const [abonnement, setAbonnement] = useState(null)
+const [portalUrl, setPortalUrl] = useState(null)
+
+useEffect(() => {
+  const fetchAbonnement = async () => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+
+    const { data: profil } = await supabase
+      .from('profils')
+      .select('id')
+      .eq('user_id', user.id)
+      .single()
+
+    if (!profil) return
+
+    const { data } = await supabase
+      .from('abonnements')
+      .select('statut, plan, date_fin')
+      .eq('user_id', profil.id)
+      .single()
+
+    if (data) setAbonnement(data)
+  }
+  fetchAbonnement()
+}, [])
   const [erreurPhoto, setErreurPhoto] = useState(null)
 
   useEffect(() => {
@@ -57,6 +85,14 @@ export default function Compte() {
     }
     fetchUser()
   }, [])
+useEffect(() => {
+  if (!isPremium) return
+  const preloadPortal = async () => {
+    const { data } = await supabase.functions.invoke('create-portal-session', {})
+    if (data?.url) setPortalUrl(data.url)
+  }
+  preloadPortal()
+}, [isPremium])
 
   // Vérification disponibilité pseudo en temps réel
   useEffect(() => {
@@ -215,7 +251,7 @@ export default function Compte() {
                   <div style={{ fontSize: 12, color: '#4CAF2E', fontWeight: 500 }}>@{pseudoInitial}</div>
                 )}
                 <div style={{ fontSize: 12, color: t.textMuted }}>{email}</div>
-                <div style={{ fontSize: 11, background: '#EAF6E4', color: '#2E7D1E', padding: '2px 10px', borderRadius: 20, display: 'inline-block', marginTop: 4 }}>Plan gratuit</div>
+                
               </div>
             </div>
             <button onClick={() => navigate('/parametres')} style={{ background: t.bgSecondary, color: t.text, fontSize: 12, fontWeight: 500, padding: '8px 16px', borderRadius: 9, border: `0.5px solid ${t.border}`, cursor: 'pointer', fontFamily: 'inherit' }}>
@@ -282,20 +318,60 @@ export default function Compte() {
             </button>
           </div>
 
-          {/* ABONNEMENT */}
-          <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 14, padding: 20, marginBottom: 12 }}>
-            <div style={{ fontSize: 13, fontWeight: 500, color: t.text, marginBottom: 16 }}>Mon abonnement</div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: t.bgSecondary, borderRadius: 10, padding: '12px 16px', marginBottom: 12 }}>
-              <div>
-                <div style={{ fontSize: 13, fontWeight: 500, color: t.text }}>Plan gratuit</div>
-                <div style={{ fontSize: 11, color: t.textMuted }}>Finances de base · ETF actualisés 1x/jour</div>
-              </div>
-              <span style={{ fontSize: 10, background: '#EAF6E4', color: '#2E7D1E', padding: '3px 10px', borderRadius: 20, fontWeight: 500 }}>Actif</span>
-            </div>
-            <button onClick={() => navigate('/abonnement')} style={{ background: '#1B2E4B', color: '#fff', fontSize: 13, fontWeight: 500, padding: '10px 20px', borderRadius: 9, border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
-              Passer à Premium →
-            </button>
+{/* ABONNEMENT */}
+<div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 14, padding: 20, marginBottom: 12 }}>
+  <div style={{ fontSize: 13, fontWeight: 500, color: t.text, marginBottom: 16 }}>Mon abonnement</div>
+
+  {/* STATUT */}
+  <div style={{ background: isPremium ? '#1B2E4B' : t.bgSecondary, borderRadius: 12, padding: '16px', marginBottom: 12 }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: isPremium ? 12 : 0 }}>
+      <div>
+        <div style={{ fontSize: 14, fontWeight: 600, color: isPremium ? '#fff' : t.text }}>
+          {isPremium ? `Premium · ${abonnement?.plan === 'annuel' ? 'Annuel' : 'Mensuel'}` : 'Plan gratuit'}
+        </div>
+        <div style={{ fontSize: 11, color: isPremium ? 'rgba(255,255,255,0.6)' : t.textMuted, marginTop: 2 }}>
+  {!isPremium && 'Finances de base, tes premiers challenges et le guide pour comprendre l\'investissement'}
+</div>
+      </div>
+      <span style={{ fontSize: 10, background: isPremium ? '#4CAF2E' : '#EAF6E4', color: isPremium ? '#fff' : '#2E7D1E', padding: '3px 10px', borderRadius: 20, fontWeight: 600 }}>
+        Actif
+      </span>
+    </div>
+
+    {/* INFOS PREMIUM */}
+    {isPremium && abonnement?.date_fin && (
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        <div style={{ flex: 1, background: 'rgba(255,255,255,0.07)', borderRadius: 8, padding: '8px 12px' }}>
+          <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', marginBottom: 2 }}>Prochain renouvellement</div>
+          <div style={{ fontSize: 12, color: '#fff', fontWeight: 500 }}>
+            {new Date(abonnement.date_fin).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
           </div>
+        </div>
+        <div style={{ flex: 1, background: 'rgba(255,255,255,0.07)', borderRadius: 8, padding: '8px 12px' }}>
+          <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', marginBottom: 2 }}>Plan</div>
+          <div style={{ fontSize: 12, color: '#fff', fontWeight: 500 }}>
+            {abonnement?.plan === 'annuel' ? '67€ / an' : '7,99€ / mois'}
+          </div>
+        </div>
+      </div>
+    )}
+  </div>
+
+  {/* ACTIONS */}
+  {isPremium ? (
+   <button
+  onClick={() => { if (portalUrl) window.location.href = portalUrl }}
+  disabled={!portalUrl}
+  style={{ background: 'transparent', color: t.text, fontSize: 13, fontWeight: 500, padding: '10px 20px', borderRadius: 9, border: `0.5px solid ${t.border}`, cursor: portalUrl ? 'pointer' : 'not-allowed', fontFamily: 'inherit', opacity: portalUrl ? 1 : 0.6 }}
+>
+  {portalUrl ? 'Gérer mon abonnement (factures, résiliation)' : 'Chargement...'}
+</button>
+  ) : (
+    <button onClick={() => navigate('/abonnement')} style={{ background: '#1B2E4B', color: '#fff', fontSize: 13, fontWeight: 500, padding: '10px 20px', borderRadius: 9, border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
+      Essayer Premium 15 jours gratuits →
+    </button>
+  )}
+</div>
 
           {/* À PROPOS */}
           <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 14, padding: 20, marginBottom: 12 }}>

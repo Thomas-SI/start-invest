@@ -138,7 +138,7 @@ const handleCheckout = async () => {
   À 7% de moyenne annuelle, ce qui est très conservateur, votre abonnement est remboursé à partir de 80€/mois investi la 1ère année, et seulement 35€/mois dès la 2ème. C'est un cadeau pour construire votre avenir sans vous ruiner en frais. Aucun frais cachés, juste un abonnement.
 </div>
 <div style={{ fontSize: 13, fontWeight: 600, color: t.text, lineHeight: 1.7, maxWidth: 480, margin: '10px auto 20px', padding: isMobile ? '0 8px' : '0' }}>
-  N'attendez plus ! Et si vous n'êtes pas satisfait, vous pouvez arrêter quand vous voulez.
+  N'attendez plus ! Profitez de 15 jours d'essai gratuit, sans engagement. Et si vous n'êtes pas satisfait, vous pouvez arrêter quand vous voulez.
 </div>
 
           {/* TOGGLE MENSUEL / ANNUEL */}
