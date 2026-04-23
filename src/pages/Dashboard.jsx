@@ -5,6 +5,8 @@ import { supabase } from '../lib/supabase'
 import Navbar from '../components/Navbar'
 import FooterApp from '../components/FooterApp'
 import { useTheme } from '../lib/ThemeContext'
+import PageGuide from '../components/PageGuide'
+import { usePageGuide } from '../lib/usePageGuide'
 
 const moisListe = ['Mensuel', 'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
 const categoriesListe = ['Logement', 'Véhicules', 'Santé', 'Impôts', 'Assurances', 'Autres']
@@ -203,6 +205,26 @@ const fetchDashboardData = async () => {
 export default function Dashboard() {
   const navigate = useNavigate()
   const t = useTheme()
+  const { showGuide, ouvrirGuide, fermerGuide } = usePageGuide()
+
+const GUIDE_FINANCES = [
+  {
+    titre: '⏱️ Prends 1h pour tout saisir',
+    description: 'Une fois que c\'est fait, tu n\'auras plus besoin de consacrer du temps à cette tâche, juste quelques petits ajustements. Rentre tes revenus et dépenses au plus juste. L\'app est volontairement sans connexion bancaire, pour que tu gardes le contrôle total et que tu prennes vraiment conscience de tes habitudes.',
+  },
+  {
+    titre: '📅 Ajoute tes échéances annuelles',
+    description: 'Assurance, impôts, abonnements annuels... Indique le mois où ça tombe. L\'app te rappellera un mois avant pour que tu ne sois jamais surpris.',
+  },
+  {
+    titre: '📊 Découvre ta règle 50/30/20',
+    description: 'Avec tes vraies données, tu vois exactement combien tu peux investir chaque mois. Ce chiffre sera utilisé sur toutes les autres pages.',
+  },
+  {
+    titre: '📈 Visualise ton futur',
+    description: 'La courbe de croissance te montre ce que ton épargne mensuelle peut devenir sur 10, 20 ou 30 ans. Le temps est ton meilleur allié.',
+  },
+]
   const queryClient = useQueryClient()
 
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
@@ -387,7 +409,13 @@ export default function Dashboard() {
 
   return (
     <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-
+<PageGuide
+  pageId="dashboard"
+  titre="Mes Finances"
+  etapes={GUIDE_FINANCES}
+  forceVisible={showGuide}
+  onClose={fermerGuide}
+/>
       {showSimulateur && <PopupSimulateur versement={reelInvestissable} onClose={() => setShowSimulateur(false)} isMobile={isMobile} />}
 
       {showModalDepenses && (
@@ -420,7 +448,19 @@ export default function Dashboard() {
       )}
 
       <Navbar page="Mes Finances" initiale={initiale} />
-
+<button
+  onClick={ouvrirGuide}
+  style={{
+    position: 'fixed', bottom: 80, right: 16, zIndex: 100,
+    width: 36, height: 36, borderRadius: '50%',
+    background: '#1B2E4B', color: '#fff',
+    border: 'none', fontSize: 16, fontWeight: 700,
+    cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+  }}
+>
+  ?
+</button>
       <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '240px 1fr', gap: 12, padding: 12, flex: 1 }}>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>

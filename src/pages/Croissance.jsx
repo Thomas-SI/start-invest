@@ -5,6 +5,8 @@ import FooterApp from '../components/FooterApp'
 import { useTheme } from '../lib/ThemeContext'
 import { usePremium } from '../lib/usePremium'
 import PremiumModal from '../components/PremiumModal'
+import PageGuide from '../components/PageGuide'
+import { usePageGuide } from '../lib/usePageGuide'
 
 function simulerDCA(capitalInitial, versementMensuel, tauxAnnuel, dureeAnnees) {
   const tauxMensuel = tauxAnnuel / 100 / 12
@@ -28,6 +30,22 @@ function simulerDCA(capitalInitial, versementMensuel, tauxAnnuel, dureeAnnees) {
 
 export default function Croissance() {
   const t = useTheme()
+  const { showGuide, ouvrirGuide, fermerGuide } = usePageGuide()
+
+const GUIDE_CROISSANCE = [
+  {
+    titre: '✨ La magie des intérêts composés',
+    description: 'C\'est le principe le plus puissant en investissement — ton argent génère des intérêts, qui génèrent eux-mêmes des intérêts. Sur 20 ou 30 ans, l\'effet est spectaculaire. Cette page te le montre avec tes propres chiffres.',
+  },
+  {
+    titre: '🎛️ Ajuste les paramètres',
+    description: 'Ton montant investissable est directement repris depuis Mes Finances. Ajuste le % de performance annuelle et la durée pour voir différents scénarios. À 7% sur 30 ans, les résultats peuvent surprendre !',
+  },
+  {
+    titre: '💡 PEA vs CTO',
+    description: 'Tu te demandes quelle enveloppe choisir ? Utilise le comparateur de fiscalité pour voir la différence concrète entre PEA et CTO sur ton patrimoine final. La fiscalité, c\'est souvent le détail qui fait toute la différence.',
+  },
+]
   const { isPremium, loading: premiumLoading } = usePremium()
   const [user, setUser] = useState(null)
   const [investissable, setInvestissable] = useState(0)
@@ -78,6 +96,26 @@ if (!isPremium) {
   return (
     <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar page="Croissance" initiale={initiale} />
+      <PageGuide
+  pageId="croissance"
+  titre="Croissance"
+  etapes={GUIDE_CROISSANCE}
+  forceVisible={showGuide}
+  onClose={fermerGuide}
+/>
+<button
+  onClick={ouvrirGuide}
+  style={{
+    position: 'fixed', bottom: 80, right: 16, zIndex: 100,
+    width: 36, height: 36, borderRadius: '50%',
+    background: '#1B2E4B', color: '#fff',
+    border: 'none', fontSize: 16, fontWeight: 700,
+    cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+  }}
+>
+  ?
+</button>
 
       <div style={{ padding: isMobile ? '16px 12px' : '16px 20px', flex: 1 }}>
         <div style={{ marginBottom: 16 }}>

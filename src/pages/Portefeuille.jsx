@@ -6,6 +6,8 @@ import FooterApp from '../components/FooterApp'
 import { useTheme } from '../lib/ThemeContext'
 import { usePremium } from '../lib/usePremium'
 import PremiumModal from '../components/PremiumModal'
+import PageGuide from '../components/PageGuide'
+import { usePageGuide } from '../lib/usePageGuide'
 
 const COMPTES_PREDEFINIS = [
   { nom: 'Livret A', type: 'sécurité', disponibilite: 'Immédiate' },
@@ -71,6 +73,26 @@ const fetchPortefeuilleData = async () => {
 
 export default function Portefeuille() {
   const t = useTheme()
+  const { showGuide, ouvrirGuide, fermerGuide } = usePageGuide()
+
+const GUIDE_PORTEFEUILLE = [
+  {
+    titre: '🛡️ Définis ton matelas de sécurité',
+    description: 'Choisis entre 3 et 12 mois de dépenses fixes selon ton goût du risque. C\'est ton filet de sécurité — il ne s\'investit jamais. Une fois défini, l\'app t\'indique si tu l\'as atteint ou non.',
+  },
+  {
+    titre: '💳 Ajoute tes comptes',
+    description: 'Livret A, PEA, CTO, assurance-vie... Ajoute tous tes comptes pour visualiser la répartition de ton patrimoine en un coup d\'œil.',
+  },
+  {
+    titre: '📋 Définis ton plan de virement mensuel',
+    description: 'Répartis ton montant investissable (calculé dans Mes Finances) en % sur chaque compte. L\'app calcule automatiquement les montants à virer chaque mois.',
+  },
+  {
+    titre: '✅ Coche tes virements',
+    description: 'Une fois un virement effectué, coche-le. La ligne se raye et tout se remet à jour automatiquement le 1er du mois. Simple, visuel, efficace.',
+  },
+]
   const { isPremium, loading: premiumLoading } = usePremium()
   const queryClient = useQueryClient()
   const canvasRef = useRef(null)
@@ -281,6 +303,26 @@ if (!isPremium) {
   return (
     <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar page="Portefeuille" />
+      <PageGuide
+  pageId="portefeuille"
+  titre="Portefeuille"
+  etapes={GUIDE_PORTEFEUILLE}
+  forceVisible={showGuide}
+  onClose={fermerGuide}
+/>
+<button
+  onClick={ouvrirGuide}
+  style={{
+    position: 'fixed', bottom: 80, right: 16, zIndex: 100,
+    width: 36, height: 36, borderRadius: '50%',
+    background: '#1B2E4B', color: '#fff',
+    border: 'none', fontSize: 16, fontWeight: 700,
+    cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+  }}
+>
+  ?
+</button>
       <div style={{ padding: isMobile ? '16px 12px' : '16px 20px', flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
 
         {succesEdit && <div style={{ background: '#EAF6E4', border: '0.5px solid #4CAF2E', borderRadius: 8, padding: '8px 14px', fontSize: 12, color: '#2E7D1E', fontWeight: 500 }}>✓ Compte mis à jour avec succès !</div>}

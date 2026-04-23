@@ -4,97 +4,88 @@ import { supabase } from '../lib/supabase'
 import Navbar from '../components/Navbar'
 import FooterApp from '../components/FooterApp'
 import { useTheme } from '../lib/ThemeContext'
-
 import { loadStripe } from '@stripe/stripe-js'
+import { usePremium } from '../lib/usePremium'
 
-const STRIPE_PUBLIC_KEY = 'pk_test_51SvbHg8d4XtkN16mPYl34t3MkOezAt3vUdAs24q1HfJQLBi6YjSY2GGuSNw2yg4FQ21dTO9jpmmP2YXlJtM4UeL300sKwcuyJB' 
+const STRIPE_PUBLIC_KEY = 'pk_test_51SvbHg8d4XtkN16mPYl34t3MkOezAt3vUdAs24q1HfJQLBi6YjSY2GGuSNw2yg4FQ21dTO9jpmmP2YXlJtM4UeL300sKwcuyJB'
 const PRICE_IDS = {
-  mensuel: 'price_1TOMft8d4XtkN16m2Ieibx94', 
-  annuel: 'price_1TOMgb8d4XtkN16mC7Wvsjhc',  
+  mensuel: 'price_1TOMft8d4XtkN16m2Ieibx94',
+  annuel: 'price_1TOMgb8d4XtkN16mC7Wvsjhc',
 }
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
-const plans = [
-  {
-    id: 'gratuit', nom: 'Gratuit', actuel: true,
-    prixMensuel: '0€', prixAnnuel: '0€',
-    periodeMensuel: 'pour toujours', periodeAnnuel: 'pour toujours',
-    pages: ['Mes Finances', 'Challenge', 'Abonnement', 'Compte'],
-    features: [
-      { label: 'Suivi finances de base', inclus: true },
-      { label: 'Simulateur DCA basique', inclus: true },
-      { label: 'Données ETF actualisées 1x/jour', inclus: true },
-      { label: 'Portefeuille & Investissement', inclus: false },
-      { label: 'Données ETF en temps réel', inclus: false },
-      { label: 'Recommandations IA', inclus: false },
-      { label: 'Rapports journaliers', inclus: false },
-      { label: 'Support prioritaire', inclus: false },
-    ]
-  },
-  {
-    id: 'premium', nom: 'Premium', actuel: false, recommande: true,
-    prixMensuel: '7.99€', prixAnnuel: '67€',
-    periodeMensuel: 'par mois', periodeAnnuel: 'par an · économisez 29%',
-    pages: ['Mes Finances', 'Portefeuille', 'Investissement', 'Croissance', 'Challenge', 'Abonnement', 'Guide', 'Compte'],
-    features: [
-      { label: 'Suivi finances complet', inclus: true },
-      { label: 'Simulateur DCA avancé', inclus: true },
-      { label: 'Données ETF en temps réel', inclus: true },
-      { label: 'Recommandations IA', inclus: true },
-      { label: 'Rapports journaliers', inclus: true },
-      { label: 'IA agent personnalisée', inclus: true },
-      { label: 'Analyse fiscale avancée', inclus: true },
-      { label: 'Accès API personnelle', inclus: true },
-      { label: 'Support prioritaire', inclus: true },
-      { label: 'Webinaires exclusifs', inclus: true },
-      { label: 'Gestionnaire du patrimoine IA', inclus: true },
-      { label: 'Accès communauté', inclus: true },
-    ]
-  },
-]
 
 export default function Abonnement() {
   const navigate = useNavigate()
   const t = useTheme()
   const [user, setUser] = useState(null)
   const [annuel, setAnnuel] = useState(false)
+  const { isPremium } = usePremium()
+  const [portalUrl, setPortalUrl] = useState(null)
   const [checkoutLoading, setCheckoutLoading] = useState(false)
-
   const [alertMsg, setAlertMsg] = useState(null)
-
-useEffect(() => {
-  const params = new URLSearchParams(window.location.search)
-  if (params.get('success') === 'true') {
-    setAlertMsg('🎉 Paiement réussi ! Ton abonnement Premium est actif.')
-    window.history.replaceState({}, '', window.location.pathname)
-  }
-  if (params.get('canceled') === 'true') {
-    setAlertMsg('Paiement annulé.')
-    window.history.replaceState({}, '', window.location.pathname)
-  }
-}, [])
-const handleCheckout = async () => {
-  setCheckoutLoading(true)
-  try {
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!session) throw new Error('Non connecté')
-
-    const priceId = annuel ? PRICE_IDS.annuel : PRICE_IDS.mensuel
-
-  const { data, error } = await supabase.functions.invoke('create-checkout-session', {
-  body: { priceId },
-})
-
-    if (error || !data?.url) throw new Error(error?.message ?? 'Erreur lors de la création de la session')
-
-    window.location.href = data.url
-  } catch (err) {
-    alert(err.message)
-  } finally {
-    setCheckoutLoading(false)
-  }
-}
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
+
+  const plans = [
+    {
+      id: 'gratuit', nom: 'Gratuit', actuel: !isPremium,
+      prixMensuel: '0€', prixAnnuel: '0€',
+      periodeMensuel: 'pour toujours', periodeAnnuel: 'pour toujours',
+      pages: ['Mes Finances', 'Challenge', 'Guide', 'Abonnement', 'Compte'],
+      features: [
+        { label: 'Suivi finances complet', inclus: true },
+        { label: 'Capacité d\'épargne personnalisé', inclus: true },
+        { label: 'Vu des challenges', inclus: true },
+        { label: 'Abonnement avec des amis', inclus: true },
+        { label: 'Guide complet de l\'investissement', inclus: true },
+        { label: 'Tableau d\'allocations', inclus: false },
+        { label: 'Plan de virement par comptes', inclus: false },
+        { label: 'Données ETF en temps réel', inclus: false },
+        { label: 'Projection de croissance', inclus: false },
+        
+      ]
+    },
+    {
+      id: 'premium', nom: 'Premium', actuel: isPremium, recommande: true,
+      prixMensuel: '7.99€', prixAnnuel: '67€',
+      periodeMensuel: 'par mois', periodeAnnuel: 'par an · économisez 29%',
+      pages: ['Mes Finances', 'Portefeuille', 'Investissement', 'Croissance', 'Challenge', 'Guide', 'Abonnement', 'Compte'],
+      features: [
+        { label: 'Suivi finances complet', inclus: true },
+        { label: 'Capacité d\'épargne personnalisé', inclus: true },
+        { label: 'Tableau d\'allocations', inclus: true },
+        { label: 'Plan de virement par comptes', inclus: true },
+        { label: 'Journal suivi d\'investissement', inclus: true },
+        { label: 'Données ETF en temps réel', inclus: true },
+        { label: 'Projection de croissance', inclus: true },
+        { label: 'Accès challenges et récompenses', inclus: true },
+        { label: 'Abonnement avec des amis', inclus: true },
+        { label: 'Guide complet de l\'investissement', inclus: true },
+        
+      ]
+    },
+  ]
+
+  useEffect(() => {
+    if (!isPremium) return
+    const preloadPortal = async () => {
+      const { data } = await supabase.functions.invoke('create-portal-session', {})
+      if (data?.url) setPortalUrl(data.url)
+    }
+    preloadPortal()
+  }, [isPremium])
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('success') === 'true') {
+      setAlertMsg('🎉 Paiement réussi ! Ton abonnement Premium est actif.')
+      window.history.replaceState({}, '', window.location.pathname)
+    }
+    if (params.get('canceled') === 'true') {
+      setAlertMsg('Paiement annulé.')
+      window.history.replaceState({}, '', window.location.pathname)
+    }
+  }, [])
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768)
@@ -110,6 +101,24 @@ const handleCheckout = async () => {
     fetchUser()
   }, [])
 
+  const handleCheckout = async () => {
+    setCheckoutLoading(true)
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) throw new Error('Non connecté')
+      const priceId = annuel ? PRICE_IDS.annuel : PRICE_IDS.mensuel
+      const { data, error } = await supabase.functions.invoke('create-checkout-session', {
+        body: { priceId },
+      })
+      if (error || !data?.url) throw new Error(error?.message ?? 'Erreur lors de la création de la session')
+      window.location.href = data.url
+    } catch (err) {
+      alert(err.message)
+    } finally {
+      setCheckoutLoading(false)
+    }
+  }
+
   const initiale = user?.user_metadata?.prenom?.[0]?.toUpperCase() || '?'
 
   return (
@@ -117,28 +126,46 @@ const handleCheckout = async () => {
       <Navbar page="Abonnement" initiale={initiale} />
 
       <div style={{ padding: isMobile ? '20px 12px' : '24px 20px', flex: 1 }}>
+
         {alertMsg && (
-  <div style={{ background: '#1B2E4B', border: '1px solid #ffffff22', borderRadius: 12, padding: '14px 20px', marginBottom: 24, color: '#ffffff', fontSize: 14, textAlign: 'center' }}>
-    {alertMsg}
-  </div>
-)}
+          <div style={{ background: '#1B2E4B', border: '1px solid #ffffff22', borderRadius: 12, padding: '14px 20px', marginBottom: 24, color: '#ffffff', fontSize: 14, textAlign: 'center' }}>
+            {alertMsg}
+          </div>
+        )}
+
         <div style={{ textAlign: 'center', marginBottom: 28 }}>
-  <div style={{ background: '#1B2E4B', borderRadius: 12, padding: '12px 20px', marginBottom: 16, display: 'inline-block' }}>
-    <div style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>
-      Un abonnement pensé pour récompenser la discipline.
-    </div>
+          <div style={{ background: '#1B2E4B', borderRadius: 12, padding: '12px 20px', marginBottom: 16, display: 'inline-block' }}>
+            <div style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>
+              Un abonnement pensé pour récompenser la discipline.
+            </div>
+          </div>
+         <div style={{ textAlign: 'justify', fontSize: 13, color: t.textMuted, lineHeight: 1.7, maxWidth: 480, margin: '0 auto 10px', padding: isMobile ? '0 8px' : '0' }}>
+  Après 10 ans, l'application devient gratuite et vos performances s'envolent. Commencez à bâtir votre futur dès aujourd'hui, le temps est votre meilleur allié. Une application ludique et éducative, sans être expert. Un abonnement juste, pour toutes les personnes motivés, rentabilisé grâce à vos efforts.
+</div>
+
+{/* TABLEAU DÉGRESSIF */}
+<div style={{ maxWidth: 480, margin: '0 auto 16px', padding: isMobile ? '0 8px' : '0' }}>
+  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+    {[
+      ['Année 1', '67€'], ['Année 6', '30€'],
+      ['Année 2', '59€'], ['Année 7', '22€'],
+      ['Année 3', '52€'], ['Année 8', '15€'],
+      ['Année 4', '45€'], ['Année 9', '7,50€'],
+      ['Année 5', '37€'], ['Année 10', '🎉 Gratuit'],
+    ].map(([annee, prix]) => (
+      <div key={annee} style={{ display: 'flex', justifyContent: 'space-between', background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 8, padding: '6px 12px', fontSize: 12 }}>
+        <span style={{ color: t.textMuted }}>{annee}</span>
+        <span style={{ color: prix === '🎉 Gratuit' ? '#4CAF2E' : t.text, fontWeight: 600 }}>{prix}</span>
+      </div>
+    ))}
   </div>
-  <div style={{ fontSize: 13, color: t.textMuted, lineHeight: 1.7, maxWidth: 480, margin: '0 auto 10px', padding: isMobile ? '0 8px' : '0' }}>
-  Après 10 ans, l'app devient gratuite et vos performances s'envolent. Commencez à bâtir votre futur dès aujourd'hui, le temps est votre meilleur allié.
 </div>
-<div style={{ fontSize: 13, color: t.textMuted, lineHeight: 1.7, maxWidth: 480, margin: '0 auto 10px', padding: isMobile ? '0 8px' : '0' }}>
-  Un abonnement juste, pour tout le monde, rentabilisé grâce à vos efforts. Ne laissez pas votre futur entre les mains de personnes qui ne vous aideront pas. Prenez en le contrôle.
+
+<div style={{ textAlign: 'justify', fontSize: 13, color: t.textMuted, lineHeight: 1.7, maxWidth: 480, margin: '0 auto 10px', padding: isMobile ? '0 8px' : '0' }}>
+  À 7% de moyenne annuelle (ce qui est très conservateur), votre abonnement est remboursé à partir de 80€/mois investi la 1ère année, et seulement 35€/mois dès la 2ème. C'est un cadeau pour construire votre avenir sans vous ruiner en frais. Transparence, aucun frais cachés, juste un abonnement.
 </div>
-<div style={{ fontSize: 13, color: t.textMuted, lineHeight: 1.7, maxWidth: 480, margin: '0 auto 10px', padding: isMobile ? '0 8px' : '0' }}>
-  À 7% de moyenne annuelle, ce qui est très conservateur, votre abonnement est remboursé à partir de 80€/mois investi la 1ère année, et seulement 35€/mois dès la 2ème. C'est un cadeau pour construire votre avenir sans vous ruiner en frais. Aucun frais cachés, juste un abonnement.
-</div>
-<div style={{ fontSize: 13, fontWeight: 600, color: t.text, lineHeight: 1.7, maxWidth: 480, margin: '10px auto 20px', padding: isMobile ? '0 8px' : '0' }}>
-  N'attendez plus ! Profitez de 15 jours d'essai gratuit, sans engagement. Et si vous n'êtes pas satisfait, vous pouvez arrêter quand vous voulez.
+<div style={{ textAlign: 'justify', fontSize: 13, fontWeight: 600, color: t.text, lineHeight: 1.7, maxWidth: 480, margin: '10px auto 20px', padding: isMobile ? '0 8px' : '0' }}>
+  N'attendez plus ! Profitez de 15 jours d'essai gratuit avant l'abonnement.
 </div>
 
           {/* TOGGLE MENSUEL / ANNUEL */}
@@ -168,8 +195,8 @@ const handleCheckout = async () => {
 
                 {/* BADGE */}
                 <div style={{ marginBottom: 16 }}>
-                  {recommande && <div style={{ background: '#4CAF2E', color: '#fff', fontSize: 10, fontWeight: 500, padding: '3px 10px', borderRadius: 20, display: 'inline-block' }}>⭐ Recommandé</div>}
-                  {actuel && <div style={{ background: t.bgSecondary, color: t.textMuted, fontSize: 10, fontWeight: 500, padding: '3px 10px', borderRadius: 20, display: 'inline-block' }}>Plan actuel</div>}
+                  {recommande && !actuel && <div style={{ background: '#4CAF2E', color: '#fff', fontSize: 10, fontWeight: 500, padding: '3px 10px', borderRadius: 20, display: 'inline-block' }}>⭐ Recommandé</div>}
+                  {actuel && <div style={{ background: isPremium ? '#4CAF2E' : t.bgSecondary, color: isPremium ? '#fff' : t.textMuted, fontSize: 10, fontWeight: 500, padding: '3px 10px', borderRadius: 20, display: 'inline-block' }}>✓ Plan actuel</div>}
                 </div>
 
                 {/* NOM + PRIX */}
@@ -204,12 +231,32 @@ const handleCheckout = async () => {
 
                 {/* BOUTON */}
                 <button
-  onClick={() => !actuel && handleCheckout()}
-  disabled={actuel || checkoutLoading}
-  style={{ width: '100%', padding: '12px', borderRadius: 10, border: actuel ? `0.5px solid ${t.border}` : 'none', background: actuel ? 'transparent' : '#4CAF2E', color: actuel ? t.textMuted : '#fff', fontSize: 13, fontWeight: 500, cursor: actuel ? 'default' : 'pointer', fontFamily: 'inherit', opacity: checkoutLoading ? 0.7 : 1 }}
->
-  {actuel ? 'Plan actuel' : checkoutLoading ? 'Chargement...' : `Passer à ${nom} →`}
-</button>
+                  onClick={() => {
+                    if (actuel && !isPremium) return
+                    if (isPremium && id === 'gratuit') { if (portalUrl) window.location.href = portalUrl; return }
+                    if (actuel && isPremium) return
+                    handleCheckout()
+                  }}
+                  disabled={(actuel && !isPremium) || (actuel && isPremium) || (isPremium && id === 'gratuit' && !portalUrl) || checkoutLoading}
+                  style={{
+                    width: '100%', padding: '12px', borderRadius: 10,
+                    border: `0.5px solid ${actuel ? t.border : isPremium && id === 'gratuit' ? t.border : 'transparent'}`,
+                    background: actuel && isPremium ? 'transparent' : actuel ? 'transparent' : isPremium && id === 'gratuit' ? 'transparent' : '#4CAF2E',
+                    color: actuel ? t.textMuted : isPremium && id === 'gratuit' ? t.text : '#fff',
+                    fontSize: 13, fontWeight: 500,
+                    cursor: actuel ? 'default' : 'pointer',
+                    fontFamily: 'inherit',
+                    opacity: checkoutLoading || (isPremium && id === 'gratuit' && !portalUrl) ? 0.7 : 1
+                  }}
+                >
+                  {actuel && isPremium
+                    ? '✓ Plan actuel'
+                    : actuel && !isPremium
+                      ? 'Plan actuel'
+                      : isPremium && id === 'gratuit'
+                        ? portalUrl ? 'Gérer mon abonnement →' : 'Chargement...'
+                        : checkoutLoading ? 'Chargement...' : `Passer à ${nom} →`}
+                </button>
 
               </div>
             )

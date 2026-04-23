@@ -4,6 +4,8 @@ import { supabase } from '../lib/supabase'
 import Navbar from '../components/Navbar'
 import FooterApp from '../components/FooterApp'
 import { useTheme } from '../lib/ThemeContext'
+import PageGuide from '../components/PageGuide'
+import { usePageGuide } from '../lib/usePageGuide'
 
 const METRONOME_URL = 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/AB94501C-5932-4B4C-93F1-D1CD5A4BAA25.png'
 
@@ -881,6 +883,26 @@ function BadgeCard({ badge, obtenu, onClickNiveaux, gradeActuel, progression }) 
 // ─── Page principale ──────────────────────────────────────────────────────────
 export default function Challenge() {
   const t = useTheme()
+  const { showGuide, ouvrirGuide, fermerGuide } = usePageGuide()
+
+const GUIDE_CHALLENGE = [
+  {
+    titre: '🔥 Collecte tes flammes',
+    description: 'À chaque mois où tu investis, tu gagnes une flamme. Plus ta série est longue, plus tu es fort. Ne laisse pas ta flamme s\'éteindre. La discipline est la clé de la richesse sur le long terme.',
+  },
+  {
+    titre: '🎖️ Débloque des badges',
+    description: 'Chaque règle respectée, chaque cap franchi te rapporte un badge. Ils récompensent ta constance, pas la chance. Construis ta collection et prouve-toi que tu es capable.',
+  },
+  {
+    titre: '📊 Situe-toi parmi les épargnants français',
+    description: 'Vois où tu te places par rapport à la moyenne. Ce n\'est pas une compétition, c\'est une motivation pour toujours aller chercher plus haut.',
+  },
+  {
+    titre: '👥 Invite tes amis',
+    description: 'Ajoute tes amis et voyez vos badges respectifs. La force du groupe est décuplée.\'entourer de personnes qui investissent, c\'est le meilleur moyen de ne jamais flancher.',
+  },
+]
   const queryClient = useQueryClient()
   const [onglet, setOnglet] = useState('obtenus')
   const [checking, setChecking] = useState(true)
@@ -967,9 +989,29 @@ export default function Challenge() {
   )
 
   return (
-    <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column', overflowX: 'hidden' }}>
       <Navbar page="Challenge" />
-      <div style={{ padding: isMobile ? '16px 12px' : '16px 20px', flex: 1, display: 'flex', flexDirection: 'column', gap: 14, maxWidth: 1000, margin: '0 auto', width: '100%' }}>
+      <PageGuide
+  pageId="challenge"
+  titre="Challenge"
+  etapes={GUIDE_CHALLENGE}
+  forceVisible={showGuide}
+  onClose={fermerGuide}
+/>
+<button
+  onClick={ouvrirGuide}
+  style={{
+    position: 'fixed', bottom: 80, right: 16, zIndex: 100,
+    width: 36, height: 36, borderRadius: '50%',
+    background: '#1B2E4B', color: '#fff',
+    border: 'none', fontSize: 16, fontWeight: 700,
+    cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+  }}
+>
+  ?
+</button>
+      <div style={{ padding: isMobile ? '16px 12px' : '16px 20px', flex: 1, display: 'flex', flexDirection: 'column', gap: 14, maxWidth: 1000, margin: '0 auto', width: '100%', overflowX: 'hidden', boxSizing: 'border-box' }}>
 
         {/* HEADER BLEU */}
         <div style={{ background: '#1B2E4B', borderRadius: 14, padding: isMobile ? '18px 16px' : '20px 24px' }}>

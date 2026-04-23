@@ -6,6 +6,8 @@ import { useTheme } from '../lib/ThemeContext'
 import FooterApp from '../components/FooterApp'
 import { usePremium } from '../lib/usePremium'
 import PremiumModal from '../components/PremiumModal'
+import PageGuide from '../components/PageGuide'
+import { usePageGuide } from '../lib/usePageGuide'
 
 const ENVELOPPES = ['CTO', 'PEA', 'Assurance-vie']
 const TYPES_ETF = ['Capitalisant', 'Distribuant']
@@ -36,6 +38,22 @@ const fetchInvestissementData = async () => {
 
 export default function Investissement() {
   const t = useTheme()
+  const { showGuide, ouvrirGuide, fermerGuide } = usePageGuide()
+
+const GUIDE_INVESTISSEMENT = [
+  {
+    titre: '🗂️ Définis ta stratégie de diversification',
+    description: 'Répartis tes ETF par enveloppe (PEA, CTO, Assurance-vie) avec un pourcentage pour chacun. L\'objectif : arriver à 100% d\'allocation par compte. C\'est ta feuille de route — tu n\'as plus qu\'à suivre le plan.',
+  },
+  {
+    titre: '📝 Enregistre tes achats',
+    description: 'À chaque achat, tape le ticker de ton ETF (ex: PE500, VUAA). L\'app trouve automatiquement l\'ETF. Renseigne la quantité, le prix et les frais — c\'est tout.',
+  },
+  {
+    titre: '📊 Suis ton allocation en temps réel',
+    description: 'Chaque achat s\'ajoute automatiquement à ton tableau d\'allocation. Tu vois en un coup d\'œil si tu es bien réparti ou si tu dois rééquilibrer.',
+  },
+]
   const { isPremium, loading: premiumLoading } = usePremium()
   const queryClient = useQueryClient()
   const [showAdd, setShowAdd] = useState(false)
@@ -265,6 +283,26 @@ if (!isPremium) {
   return (
     <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar page="Investissement" />
+      <PageGuide
+  pageId="investissement"
+  titre="Investissement"
+  etapes={GUIDE_INVESTISSEMENT}
+  forceVisible={showGuide}
+  onClose={fermerGuide}
+/>
+<button
+  onClick={ouvrirGuide}
+  style={{
+    position: 'fixed', bottom: 80, right: 16, zIndex: 100,
+    width: 36, height: 36, borderRadius: '50%',
+    background: '#1B2E4B', color: '#fff',
+    border: 'none', fontSize: 16, fontWeight: 700,
+    cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+  }}
+>
+  ?
+</button>
       <div style={{ padding: isMobile ? '16px 12px' : '16px 20px', flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
 
         {succes && <div style={{ background: '#EAF6E4', border: '0.5px solid #4CAF2E', borderRadius: 8, padding: '10px 14px', fontSize: 12, color: '#2E7D1E', fontWeight: 500 }}>Transaction modifiee avec succes !</div>}

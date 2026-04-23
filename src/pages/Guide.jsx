@@ -3,6 +3,8 @@ import { useTheme } from '../lib/ThemeContext'
 import { supabase } from '../lib/supabase'
 import Navbar from '../components/Navbar'
 import FooterApp from '../components/FooterApp'
+import PageGuide from '../components/PageGuide'
+import { usePageGuide } from '../lib/usePageGuide'
 
 const CHAPITRES = [
   {
@@ -495,6 +497,26 @@ function PopupFiche({ fiche, chapitre, onClose, onChapitreValide }) {
 // ─── Page principale ──────────────────────────────────────────────────────────
 export default function Guide() {
   const t = useTheme()
+  const { showGuide, ouvrirGuide, fermerGuide } = usePageGuide()
+
+const GUIDE_GUIDE = [
+  {
+    titre: '🎓 Les bases, sans jargon',
+    description: 'Comprends les fondamentaux de l\'investissement simplement et clairement. ETF, PEA, DCA, intérêts composés... Tout est expliqué pour que tu puisses avancer sans te perdre.',
+  },
+  {
+    titre: '🧭 La stratégie',
+    description: 'Investir sans stratégie, c\'est naviguer sans boussole. Découvre comment construire un portefeuille solide, adapté à ton profil et à tes objectifs long terme.',
+  },
+  {
+    titre: '🧠 La bonne mentalité',
+    description: 'La clé du succès en investissement ce n\'est pas de choisir les bonnes actions, c\'est la constance, la patience et la discipline. Apprends à ignorer le bruit du marché et à rester sur ta trajectoire.',
+  },
+  {
+    titre: '🚀 Passe à l\'action',
+    description: 'Tu as les bases, la stratégie et la mentalité. Il ne manque plus qu\'une chose : commencer. Chaque euro investi aujourd\'hui travaille pour ton futur.',
+  },
+]
   const [ficheOuverte, setFicheOuverte] = useState(null)
   const [chapitreOuvert, setChapitreOuvert] = useState(null)
   const [chapitresValides, setChapitresValides] = useState(new Set())
@@ -516,12 +538,32 @@ export default function Guide() {
   const onChapitreValide = (slug) => setChapitresValides(prev => new Set([...prev, slug]))
 
   return (
-    <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column', overflowX: 'hidden' }}>
       {ficheOuverte && <PopupFiche fiche={ficheOuverte} chapitre={chapitreOuvert} onClose={fermerFiche} onChapitreValide={onChapitreValide} />}
 
       <Navbar page="Guide" />
+      <PageGuide
+  pageId="guide"
+  titre="Guide"
+  etapes={GUIDE_GUIDE}
+  forceVisible={showGuide}
+  onClose={fermerGuide}
+/>
+<button
+  onClick={ouvrirGuide}
+  style={{
+    position: 'fixed', bottom: 80, right: 16, zIndex: 100,
+    width: 36, height: 36, borderRadius: '50%',
+    background: '#1B2E4B', color: '#fff',
+    border: 'none', fontSize: 16, fontWeight: 700,
+    cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+  }}
+>
+  ?
+</button>
 
-      <div style={{ padding: '24px 20px', flex: 1, display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 1000, margin: '0 auto', width: '100%' }}>
+      <div style={{ padding: '24px 20px', flex: 1, display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 1000, margin: '0 auto', width: '100%', overflowX: 'hidden', boxSizing: 'border-box' }}>
 
         {/* HEADER BLEU */}
         <div style={{ background: '#1B2E4B', borderRadius: 12, padding: '28px 24px', textAlign: 'center' }}>

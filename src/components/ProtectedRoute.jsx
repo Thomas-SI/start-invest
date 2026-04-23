@@ -7,13 +7,11 @@ export default function ProtectedRoute({ children }) {
   const [user, setUser] = useState(null)
 
   useEffect(() => {
-    // Vérifie la session actuelle
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user || null)
       setLoading(false)
     })
 
-    // Écoute les changements d'authentification
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user || null)
     })
@@ -31,6 +29,12 @@ export default function ProtectedRoute({ children }) {
 
   if (!user) {
     return <Navigate to="/" replace />
+  }
+
+  // Redirection vers onboarding si pas encore fait
+  const onboardingDone = user?.user_metadata?.onboarding_done
+  if (!onboardingDone && window.location.pathname !== '/onboarding') {
+    return <Navigate to="/onboarding" replace />
   }
 
   return children
