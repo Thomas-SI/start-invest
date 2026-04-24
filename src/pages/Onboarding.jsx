@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useTheme } from '../lib/ThemeContext'
@@ -293,14 +293,40 @@ export default function Onboarding() {
   const [prenom, setPrenom] = useState('')
   const [nom, setNom] = useState('')
   const [metier, setMetier] = useState('')
+  const [pseudo, setPseudo] = useState('')
+  const [pseudoDisponible, setPseudoDisponible] = useState(null)
+  const [checkingPseudo, setCheckingPseudo] = useState(false)
   const [loading, setLoading] = useState(false)
   const [erreur, setErreur] = useState(null)
-  const [showTour, setShowTour] = useState(false)
+
+  // Vérification disponibilité pseudo en temps réel
+  useEffect(() => {
+    if (!pseudo.trim() || pseudo.length < 3) { setPseudoDisponible(null); return }
+    const timer = setTimeout(async () => {
+      setCheckingPseudo(true)
+      const { data } = await supabase
+        .from('profils')
+        .select('pseudo')
+        .eq('pseudo', pseudo.toLowerCase().trim())
+        .single()
+      setPseudoDisponible(!data)
+      setCheckingPseudo(false)
+    }, 500)
+    return () => clearTimeout(timer)
+  }, [pseudo])
 
   const handleSubmit = async () => {
     if (loading) return
     if (!prenom.trim() || !nom.trim() || !metier.trim()) {
       setErreur('Veuillez remplir tous les champs obligatoires.')
+      return
+    }
+    if (!pseudo.trim() || pseudo.length < 3) {
+      setErreur('Le pseudo doit contenir au moins 3 caractères.')
+      return
+    }
+    if (pseudoDisponible === false) {
+      setErreur('Ce pseudo est déjà pris.')
       return
     }
     setLoading(true)
@@ -310,7 +336,16 @@ export default function Onboarding() {
         data: { prenom: prenom.trim(), nom: nom.trim(), metier: metier.trim(), onboarding_done: true }
       })
       if (error) throw new Error('Erreur lors de la sauvegarde.')
-      setShowTour(true)
+
+      // Sauvegarder le pseudo dans profils
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        await supabase.from('profils').update({
+          pseudo: pseudo.toLowerCase().trim()
+        }).eq('user_id', user.id)
+      }
+
+      navigate('/dashboard')
     } catch (e) {
       setErreur(e.message)
     } finally {
@@ -318,16 +353,12 @@ export default function Onboarding() {
     }
   }
 
-  const handleTerminerTour = () => {
-    navigate('/dashboard')
-  }
 
   const inputStyle = { width: '100%', padding: '12px 14px', borderRadius: 10, border: `0.5px solid ${t.border}`, fontSize: 16, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text, boxSizing: 'border-box' }
 
   return (
     <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
 
-      {showTour && <TourApp onTerminer={handleTerminerTour} />}
 
       <div style={{ width: '100%', maxWidth: 480, background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 20, padding: 36 }}>
 
@@ -361,6 +392,32 @@ export default function Onboarding() {
             <div style={{ fontSize: 12, fontWeight: 500, color: t.text, marginBottom: 6 }}>Métier *</div>
             <input placeholder="ex: Ingénieur, Étudiant, Entrepreneur..." value={metier} onChange={e => setMetier(e.target.value)} style={inputStyle} />
           </div>
+          <div>
+  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+    <div style={{ fontSize: 12, fontWeight: 500, color: t.text }}>Pseudo * <span style={{ fontSize: 11, color: t.textMuted }}>(utilisé pour les amis)</span></div>
+    {pseudo.length >= 3 && (
+      checkingPseudo
+        ? <span style={{ fontSize: 11, color: t.textMuted }}>Vérification...</span>
+        : pseudoDisponible === true
+          ? <span style={{ fontSize: 11, color: '#4CAF2E' }}>✓ Disponible</span>
+          : pseudoDisponible === false
+            ? <span style={{ fontSize: 11, color: '#E24B4A' }}>✕ Déjà pris</span>
+            : null
+    )}
+  </div>
+  <div style={{ position: 'relative' }}>
+    <span style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', fontSize: 14, color: t.textMuted }}>@</span>
+    <input
+      placeholder="ton_pseudo"
+      value={pseudo}
+      onChange={e => setPseudo(e.target.value.replace(/[^a-zA-Z0-9_]/g, '').toLowerCase())}
+      autoCapitalize="none"
+      autoCorrect="off"
+      autoComplete="off"
+      style={{ ...inputStyle, paddingLeft: 30, border: `0.5px solid ${pseudoDisponible === false ? '#E24B4A' : pseudoDisponible === true ? '#4CAF2E' : t.border}` }}
+    />
+  </div>
+</div>
         </div>
 
         <div style={{ fontSize: 11, color: t.textMuted, marginTop: 12, marginBottom: 20 }}>* Champs obligatoires</div>

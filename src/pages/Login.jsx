@@ -8,6 +8,7 @@ export default function Login() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [resetSent, setResetSent] = useState(false)
 
   const handleLogin = async () => {
     setLoading(true)
@@ -21,6 +22,15 @@ export default function Login() {
     const onboardingDone = data?.user?.user_metadata?.onboarding_done
     navigate(onboardingDone ? '/dashboard' : '/onboarding')
     setLoading(false)
+  }
+
+  const handleResetPassword = async () => {
+    if (!email.trim()) { setError('Entrez votre email pour réinitialiser le mot de passe.'); return }
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    })
+    if (error) { setError(error.message); return }
+    setResetSent(true)
   }
 
   return (
@@ -62,7 +72,17 @@ export default function Login() {
               <div style={{ fontSize: 12, color: '#6B7280', marginBottom: 6 }}>Mot de passe</div>
               <input type="password" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleLogin()} style={{ width: '100%', padding: '11px 14px', borderRadius: 9, border: '0.5px solid #C8D8CE', fontSize: 14, fontFamily: 'inherit', outline: 'none', background: '#fff', color: '#1B2E4B' }} />
             </div>
+            <div style={{ textAlign: 'right', marginTop: -8 }}>
+              <span onClick={handleResetPassword} style={{ fontSize: 12, color: '#4CAF2E', cursor: 'pointer' }}>
+                Mot de passe oublié ?
+              </span>
+            </div>
             {error && <div style={{ fontSize: 12, color: '#E24B4A', background: '#FCEBEB', padding: '8px 12px', borderRadius: 7 }}>{error}</div>}
+            {resetSent && (
+              <div style={{ fontSize: 12, color: '#2E7D1E', background: '#EAF6E4', padding: '8px 12px', borderRadius: 7 }}>
+                ✓ Email de réinitialisation envoyé !
+              </div>
+            )}
             <button onClick={handleLogin} disabled={loading} style={{ width: '100%', padding: '12px', borderRadius: 9, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', marginTop: 4 }}>
               {loading ? 'Connexion...' : 'Se connecter'}
             </button>

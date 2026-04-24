@@ -6,24 +6,28 @@ import FooterPublic from '../components/FooterPublic'
 const LOGO_URL = 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/IMG_2819.jpeg'
 
 const featuresGratuit = [
-  'Suivi finance de base',
-  'Taux d epargne personnalise',
-  'Simulateur de croissance',
-  'Vue des challenges',
+  { label: 'Suivi finances complet', inclus: true },
+  { label: "Capacité d'épargne personnalisé", inclus: true },
+  { label: 'Vu des challenges', inclus: true },
+  { label: 'Abonnement avec des amis', inclus: true },
+  { label: "Guide complet de l'investissement", inclus: true },
+  { label: "Tableau d'allocations", inclus: false },
+  { label: 'Plan de virement par comptes', inclus: false },
+  { label: 'Données ETF en temps réel', inclus: false },
+  { label: 'Projection de croissance', inclus: false },
 ]
 
 const featuresPremium = [
-  'Suivi finance de base',
-  'Capacite d epargne personnalisee',
-  'Simulateur de croissance',
-  'Acces portefeuille',
-  'Vue des challenges',
-  'Tableau des allocations',
-  'Plan virement par compte',
-  'Journal suivi d investissement',
-  'Projection croissance',
-  'Acces challenge et recompense',
-  'Guide complet investissement',
+  { label: 'Suivi finances complet', inclus: true },
+  { label: "Capacité d'épargne personnalisé", inclus: true },
+  { label: "Tableau d'allocations", inclus: true },
+  { label: 'Plan de virement par comptes', inclus: true },
+  { label: "Journal suivi d'investissement", inclus: true },
+  { label: 'Données ETF en temps réel', inclus: true },
+  { label: 'Projection de croissance', inclus: true },
+  { label: 'Accès challenges et récompenses', inclus: true },
+  { label: 'Abonnement avec des amis', inclus: true },
+  { label: "Guide complet de l'investissement", inclus: true },
 ]
 
 function PublicNavbar({ isMobile, openLogin, openSignup, activeLink = 'Abonnement' }) {
@@ -155,7 +159,28 @@ export default function AbonnementPublic() {
         <div style={{ fontSize: 13, color: '#4CAF2E', fontWeight: 500, background: '#EAF6E4', display: 'inline-block', padding: '6px 16px', borderRadius: 20, marginBottom: isMobile ? 28 : 36 }}>
           Essayez gratuitement pendant 15 jours
         </div>
+{/* TEXTE INTRO */}
+<div style={{ textAlign: 'justify', fontSize: isMobile ? 13 : 14, color: '#6B7280', lineHeight: 1.8, maxWidth: 600, margin: '0 auto 24px' }}>
+  Un abonnement pensé pour récompenser la discipline. Après 10 ans, l'app devient gratuite et vos performances s'envolent. À 7% de moyenne annuelle, votre abonnement est remboursé à partir de 80€/mois investi la 1ère année, et seulement 35€/mois dès la 2ème.
+</div>
 
+{/* TABLEAU DÉGRESSIF */}
+<div style={{ maxWidth: 480, margin: '0 auto 32px' }}>
+  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+    {[
+      ['Année 1', '67€'], ['Année 6', '30€'],
+      ['Année 2', '59€'], ['Année 7', '22€'],
+      ['Année 3', '52€'], ['Année 8', '15€'],
+      ['Année 4', '45€'], ['Année 9', '7,50€'],
+      ['Année 5', '37€'], ['Année 10', '🎉 Gratuit'],
+    ].map(([annee, prix]) => (
+      <div key={annee} style={{ display: 'flex', justifyContent: 'space-between', background: '#fff', border: '0.5px solid #E0EAE3', borderRadius: 8, padding: '6px 12px', fontSize: 12 }}>
+        <span style={{ color: '#9CA3AF' }}>{annee}</span>
+        <span style={{ color: prix === '🎉 Gratuit' ? '#4CAF2E' : '#1B2E4B', fontWeight: 600 }}>{prix}</span>
+      </div>
+    ))}
+  </div>
+</div>
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 0, background: '#fff', border: '0.5px solid #E0EAE3', borderRadius: 30, padding: '4px', marginBottom: isMobile ? 36 : 48 }}>
           <button onClick={() => setAnnuel(false)} style={{ padding: '7px 20px', borderRadius: 20, border: 'none', background: !annuel ? '#1B2E4B' : 'transparent', color: !annuel ? '#fff' : '#9CA3AF', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' }}>Mensuel</button>
           <button onClick={() => setAnnuel(true)} style={{ padding: '7px 20px', borderRadius: 20, border: 'none', background: annuel ? '#1B2E4B' : 'transparent', color: annuel ? '#fff' : '#9CA3AF', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s', display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -172,14 +197,14 @@ export default function AbonnementPublic() {
             <div style={{ fontSize: 36, fontWeight: 700, color: '#1B2E4B', marginBottom: 4 }}>0 euros</div>
             <div style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 24 }}>pour toujours</div>
             <div style={{ borderTop: '0.5px solid #E0EAE3', paddingTop: 20, marginBottom: 24 }}>
-              {featuresGratuit.map(f => (
-                <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10, fontSize: 13, color: '#1B2E4B' }}>
-                  <div style={{ width: 18, height: 18, borderRadius: '50%', background: '#EAF6E4', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <svg width="9" height="9" viewBox="0 0 8 8" fill="none"><path d="M1.5 4L3 5.5L6.5 2" stroke="#4CAF2E" strokeWidth="1.2" strokeLinecap="round"/></svg>
-                  </div>
-                  {f}
-                </div>
-              ))}
+              {featuresGratuit.map(({ label, inclus }) => (
+  <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10, fontSize: 13, color: inclus ? '#1B2E4B' : '#9CA3AF' }}>
+    <div style={{ width: 18, height: 18, borderRadius: '50%', background: inclus ? '#EAF6E4' : 'transparent', border: inclus ? 'none' : '0.5px solid #E0EAE3', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+      {inclus && <svg width="9" height="9" viewBox="0 0 8 8" fill="none"><path d="M1.5 4L3 5.5L6.5 2" stroke="#4CAF2E" strokeWidth="1.2" strokeLinecap="round"/></svg>}
+    </div>
+    {label}
+  </div>
+))}
             </div>
             <button onClick={openSignup} style={{ width: '100%', padding: '12px', borderRadius: 10, border: '0.5px solid #E0EAE3', background: '#F4F7F5', color: '#1B2E4B', fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>
               Commencer gratuitement
@@ -194,14 +219,14 @@ export default function AbonnementPublic() {
             <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', marginBottom: 4 }}>{annuel ? 'facture en une fois par an' : 'par mois'}</div>
             <div style={{ fontSize: 11, color: '#4CAF2E', fontWeight: 500, marginBottom: 24 }}>15 jours gratuits pour essayer</div>
             <div style={{ borderTop: '0.5px solid rgba(255,255,255,0.1)', paddingTop: 20, marginBottom: 24 }}>
-              {featuresPremium.map(f => (
-                <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10, fontSize: 13, color: 'rgba(255,255,255,0.85)' }}>
-                  <div style={{ width: 18, height: 18, borderRadius: '50%', background: 'rgba(76,175,46,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <svg width="9" height="9" viewBox="0 0 8 8" fill="none"><path d="M1.5 4L3 5.5L6.5 2" stroke="#4CAF2E" strokeWidth="1.2" strokeLinecap="round"/></svg>
-                  </div>
-                  {f}
-                </div>
-              ))}
+              {featuresPremium.map(({ label, inclus }) => (
+  <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10, fontSize: 13, color: inclus ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.3)' }}>
+    <div style={{ width: 18, height: 18, borderRadius: '50%', background: inclus ? 'rgba(76,175,46,0.25)' : 'transparent', border: inclus ? 'none' : '0.5px solid rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+      {inclus && <svg width="9" height="9" viewBox="0 0 8 8" fill="none"><path d="M1.5 4L3 5.5L6.5 2" stroke="#4CAF2E" strokeWidth="1.2" strokeLinecap="round"/></svg>}
+    </div>
+    {label}
+  </div>
+))}
             </div>
             <button onClick={openSignup} style={{ width: '100%', padding: '12px', borderRadius: 10, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
               Essayer 15 jours gratuitement

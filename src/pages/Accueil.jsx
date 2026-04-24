@@ -262,9 +262,15 @@ export default function Accueil() {
             Prenez une longueur<br />
             <span style={{ color: '#4CAF2E' }}>d'avance.</span>
           </h1>
-          <p style={{ fontSize: isMobile ? 14 : 15, color: '#6B7280', lineHeight: 1.7, margin: '0 0 36px' }}>
-            Suivez vos finances. Atteignez vos objectifs.<br />Ayez un pas dans le futur.
-          </p>
+          <p style={{ fontSize: isMobile ? 13 : 14, color: '#6B7280', lineHeight: 1.8, margin: '0 0 36px', textAlign: 'justify' }}>
+  "La retraite est incertaine. Ton avenir, lui, peut l'être un peu moins."
+  <br /><br />
+  Une nouvelle génération prend les choses en main. Sans tabou, sans jargon, sans prétendre être des experts, juste des gens qui décident de construire quelque chose, euro par euro, mois après mois. Peu importe ton objectif. Peu importe ton point de départ. Ce qui compte, c'est de commencer.
+  <br /><br />
+  Start Invest, c'est l'équivalent d'une grande app de sport très connue, mais appliqué à ton patrimoine. Comme elle t'apprends à te dépasser et à rester régulier, Start Invest t'accompagne pour construire ta liberté financière. Challenges-toi, collectionne tes badges, suis ta progression et celle de tes amis. Ensemble, restez motivés et avancez avec discipline. Le temps est ton meilleur allié, utilise-le à bon escient.
+  <br /><br />
+  <strong style={{ color: '#1B2E4B' }}>"Le chemin commence maintenant. Ensemble, tirons-nous vers les sommets."</strong>
+</p>
           <div style={{ display: 'flex', justifyContent: 'center' }}>
             <button onClick={openSignup} style={{ padding: '12px 28px', borderRadius: 10, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
               Commencer gratuitement

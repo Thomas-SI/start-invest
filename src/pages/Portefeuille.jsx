@@ -8,6 +8,7 @@ import { usePremium } from '../lib/usePremium'
 import PremiumModal from '../components/PremiumModal'
 import PageGuide from '../components/PageGuide'
 import { usePageGuide } from '../lib/usePageGuide'
+import { useNavigate } from 'react-router-dom'
 
 const COMPTES_PREDEFINIS = [
   { nom: 'Livret A', type: 'sécurité', disponibilite: 'Immédiate' },
@@ -73,6 +74,7 @@ const fetchPortefeuilleData = async () => {
 
 export default function Portefeuille() {
   const t = useTheme()
+  const navigate = useNavigate()
   const { showGuide, ouvrirGuide, fermerGuide } = usePageGuide()
 
 const GUIDE_PORTEFEUILLE = [
@@ -298,7 +300,7 @@ const GUIDE_PORTEFEUILLE = [
 if (premiumLoading) return null
 
 if (!isPremium) {
-  return <PremiumModal onClose={() => {}} />
+  return <PremiumModal onClose={() => navigate(-1)} />
 }
   return (
     <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>

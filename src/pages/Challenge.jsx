@@ -54,7 +54,7 @@ const BADGES_GUIDE = [
 ]
 
 const ACCOMPLISSEMENTS = [
-  { slug: 'premier-pas', nom: 'Premier Pas', message: 'Bienvenue chez Start Invest.', quete: "S'inscrire sur StartInvest", categorie: 'principal' },
+  { slug: 'premier-pas', nom: 'Premier Pas', message: 'Bienvenue chez Start Invest, profite d\'un code parrain en cliquant ici', quete: "S'inscrire sur StartInvest", categorie: 'principal' },
   { slug: 'grand-saut', nom: 'Le Grand Saut', message: "Tu n'es plus spectateur, tu es le pilote de ton futur.", quete: 'Acheter votre premier ETF', categorie: 'principal' },
   { slug: 'metronome', nom: 'Le Métronome', svgIcon: true, message: 'La magie des intérêts composés adore ta régularité. Continue !', quete: 'Investir régulièrement chaque mois', evolutif: true, grades: GRADES_METRONOME, categorie: 'principal' },
   { slug: 'main-de-fer', nom: 'Main de Fer', message: 'Le calme est une compétence.', quete: '6 mois sans aucune vente', categorie: 'principal' },
@@ -153,6 +153,21 @@ const checkAndGrant = async (user, investissements, transactions, accomplissemen
   }
   if (toInsert.length > 0) await supabase.from('accomplissements').insert(toInsert)
   for (const u of toUpdate) await supabase.from('accomplissements').update({ niveau: u.niveau }).eq('id', u.id)
+// Enregistrer les nouveaux badges dans badges_non_vus
+if (toInsert.length > 0) {
+  const { data: profil } = await supabase
+    .from('profils')
+    .select('badges_non_vus')
+    .eq('user_id', user.id)
+    .maybeSingle()
+
+  const badgesNonVus = profil?.badges_non_vus ?? []
+  const newSlugs = toInsert.map(b => b.slug)
+  await supabase
+    .from('profils')
+    .update({ badges_non_vus: [...badgesNonVus, ...newSlugs] })
+    .eq('user_id', user.id)
+}
   return toInsert.length + toUpdate.length
 }
 
@@ -830,7 +845,7 @@ function BadgeCard({ badge, obtenu, onClickNiveaux, gradeActuel, progression }) 
   const t = useTheme()
   const [hovered, setHovered] = useState(false)
   const estEvolutif = badge.evolutif
-  const estCliquable = estEvolutif && obtenu
+  const estCliquable = (estEvolutif && obtenu) || (badge.slug === 'premier-pas' && obtenu)
   const couleurBadge = badge.categorie === 'guide' ? badge.couleur : badge.categorie === 'mensuel' ? '#3B82F6' : gradeActuel ? gradeActuel.niveauColor : '#4CAF2E'
   const bgBadge = badge.categorie === 'guide' ? badge.couleur + '15' : badge.categorie === 'mensuel' ? '#E6F1FB' : gradeActuel ? gradeActuel.niveauBg : '#EAF6E4'
 
@@ -874,12 +889,71 @@ function BadgeCard({ badge, obtenu, onClickNiveaux, gradeActuel, progression }) 
             </div>
           </div>
         )}
-        {estCliquable && hovered && <div style={{ fontSize: 9, color: couleurBadge, fontWeight: 500, marginTop: 2 }}>Voir les niveaux →</div>}
+        {estCliquable && hovered && badge.slug !== 'premier-pas' && <div style={{ fontSize: 9, color: couleurBadge, fontWeight: 500, marginTop: 2 }}>Voir les niveaux →</div>}
       </div>
     </div>
   )
 }
+function PopupPremierPas({ onClose }) {
+  const t = useTheme()
+  return (
+    <>
+      <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 998 }} />
+      <div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 999, background: t.bgCard, borderRadius: 20, width: 'calc(100% - 32px)', maxWidth: 420, boxShadow: '0 20px 60px rgba(0,0,0,0.3)', fontFamily: 'inherit', overflow: 'hidden' }}>
+        
+        {/* Header */}
+        <div style={{ padding: '20px 24px 16px', borderBottom: `0.5px solid ${t.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <div style={{ fontSize: 16, fontWeight: 700, color: t.text }}>🎯 Premier Pas</div>
+            <div style={{ fontSize: 12, color: t.textMuted, marginTop: 2 }}>Bienvenue chez Start Invest !</div>
+          </div>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: t.textMuted }}>✕</button>
+        </div>
 
+        {/* Contenu */}
+        <div style={{ padding: '20px 24px 28px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+          
+          {/* Parrainage */}
+          <div style={{ background: '#E8EEF6', borderRadius: 12, padding: '16px 18px' }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: '#1B2E4B', marginBottom: 6 }}>🎁 Cadeau de bienvenue</div>
+            <div style={{ fontSize: 12, color: '#1B2E4B', lineHeight: 1.6, marginBottom: 14 }}>
+              Ouvre ton compte (CTO, PEA ou lez deux) <strong>Bourse Direct</strong> via le code parrain et profite d'avantages exclusifs pour commencer à investir dans les meilleures conditions.
+            </div>
+<a            
+         href="https://www.boursedirect.fr/fr/bourse/ouvrir-un-compte"
+  target="_blank"
+  rel="noopener noreferrer"
+  style={{ display: 'block', textAlign: 'center', background: '#1B2E4B', color: '#fff', padding: '11px', borderRadius: 10, fontSize: 13, fontWeight: 600, textDecoration: 'none' }}
+>
+  Ouvrir un compte Bourse Direct →
+</a>
+          </div>
+
+          {/* Étapes */}
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: t.text, marginBottom: 12 }}>Comment bénéficier du parrainage :</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {[
+                { num: '1', texte: 'À la question "Comment nous avez-avous connu ?" → sélectionne Parrainage' },
+                { num: '2', texte: `Juste en dessous rentre le code parrain : ` },
+                { num: '3', texte: 'Passe ton premier ordre dans un délai de 3 mois pour bénéficer de 200€ de frais de courtage' },
+              ].map(({ num, texte }) => (
+                <div key={num} style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                  <div style={{ width: 24, height: 24, borderRadius: '50%', background: '#1B2E4B', color: '#fff', fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{num}</div>
+                  <div style={{ fontSize: 12, color: t.textMuted, lineHeight: 1.6, paddingTop: 3 }}>
+                    {texte}
+                    {num === '2' && <span style={{ fontWeight: 700, color: '#1B2E4B', fontSize: 14 }}>2023847374</span>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </>
+  )
+}
 // ─── Page principale ──────────────────────────────────────────────────────────
 export default function Challenge() {
   const t = useTheme()
@@ -908,6 +982,8 @@ const GUIDE_CHALLENGE = [
   const [checking, setChecking] = useState(true)
   const [positionOpen, setPositionOpen] = useState(false)
   const [niveauxOpen, setNiveauxOpen] = useState(null)
+  const [premierPasOpen, setPremierPasOpen] = useState(false)
+  const [badgesNouveaux, setBadgesNouveaux] = useState([])
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
 
   useEffect(() => {
@@ -925,9 +1001,32 @@ const GUIDE_CHALLENGE = [
       const nb = await checkAndGrant(data.user, data.investissements, data.transactions, data.accomplissements)
       if (nb > 0) queryClient.invalidateQueries({ queryKey: ['challenge'] })
       setChecking(false)
+    // Vider les badges non vus
+await supabase
+  .from('profils')
+  .update({ badges_non_vus: [] })
+  .eq('user_id', data.user.id)
     }
     run()
   }, [data?.user?.id])
+  useEffect(() => {
+  const fetchBadgesNonVus = async () => {
+    if (!data) return
+    const { data: profil } = await supabase
+      .from('profils')
+      .select('badges_non_vus')
+      .eq('user_id', data.user.id)
+      .maybeSingle()
+    if (profil?.badges_non_vus?.length > 0) {
+      setBadgesNouveaux(profil.badges_non_vus)
+      await supabase
+        .from('profils')
+        .update({ badges_non_vus: [] })
+        .eq('user_id', data.user.id)
+    }
+  }
+  fetchBadgesNonVus()
+}, [data])
 
   const accomplissements = data?.accomplissements || []
   const investissements = data?.investissements || []
@@ -991,6 +1090,19 @@ const GUIDE_CHALLENGE = [
   return (
     <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column', overflowX: 'hidden' }}>
       <Navbar page="Challenge" />
+  {badgesNouveaux.length > 0 && (
+  <div style={{ background: '#4CAF2E', padding: '12px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+    <div style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>
+      🏆 Tu as débloqué {badgesNouveaux.length} nouveau{badgesNouveaux.length > 1 ? 'x' : ''} badge{badgesNouveaux.length > 1 ? 's' : ''} !
+    </div>
+    <button
+      onClick={() => setBadgesNouveaux([])}
+      style={{ background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: 6, padding: '4px 10px', color: '#fff', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}
+    >
+      ✕ Fermer
+    </button>
+  </div>
+)}    
       <PageGuide
   pageId="challenge"
   titre="Challenge"
@@ -1075,7 +1187,7 @@ const GUIDE_CHALLENGE = [
                   <div style={{ fontSize: 13, fontWeight: 500, color: t.text, marginBottom: 10 }}>Accomplissements</div>
                   <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(150px, 1fr))', gap: 12 }}>
                     {badgesObtenus.filter(b => b.categorie === 'principal').map(badge => (
-                      <BadgeCard key={badge.slug} badge={badge} obtenu={true} onClickNiveaux={() => setNiveauxOpen(badge.slug)} gradeActuel={getGradeActuel(badge)} progression={getProgression(badge)} />
+                      <BadgeCard key={badge.slug} badge={badge} obtenu={true} onClickNiveaux={() => badge.slug === 'premier-pas' ? setPremierPasOpen(true) : setNiveauxOpen(badge.slug)} gradeActuel={getGradeActuel(badge)} progression={getProgression(badge)} />
                     ))}
                   </div>
                 </div>
@@ -1152,7 +1264,7 @@ const GUIDE_CHALLENGE = [
 
       {positionOpen && <PositionModal totalInvesti={totalInvesti} comptes={comptes} onClose={() => setPositionOpen(false)} />}
       {badgeOuvert && <NiveauxModal acc={badgeOuvert} gradeActuel={getGradeActuel(badgeOuvert)} valeurActuelle={valeurActuelleAcc} onClose={() => setNiveauxOpen(null)} />}
-
+{premierPasOpen && <PopupPremierPas onClose={() => setPremierPasOpen(false)} />}
       <FooterApp />
     </div>
   )

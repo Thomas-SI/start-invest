@@ -10,6 +10,7 @@ export default function AuthModal({ onClose, defaultMode = 'login' }) {
   const [prenom, setPrenom] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [resetSent, setResetSent] = useState(false)
 
   const handleLogin = async () => {
     setLoading(true)
@@ -38,6 +39,15 @@ export default function AuthModal({ onClose, defaultMode = 'login' }) {
     navigate('/onboarding')
   }
 
+  const handleResetPassword = async () => {
+    if (!email.trim()) { setError('Entrez votre email pour réinitialiser le mot de passe.'); return }
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    })
+    if (error) { setError(error.message); return }
+    setResetSent(true)
+  }
+
   const inputStyle = {
     width: '100%',
     padding: '11px 14px',
@@ -64,12 +74,12 @@ export default function AuthModal({ onClose, defaultMode = 'login' }) {
             <span style={{ fontSize: 20, fontWeight: 800, color: '#4CAF2E', fontStyle: 'italic' }}>INVEST</span>
           </div>
           <div style={{ fontSize: 13, color: '#9CA3AF', marginTop: 6 }}>
-            {mode === 'login' ? 'Bienvenue de retour' : 'Creez votre compte gratuitement'}
+            {mode === 'login' ? 'Hey ! Bon retour' : 'Creez votre compte gratuitement'}
           </div>
         </div>
         <div style={{ display: 'flex', background: '#F4F7F5', borderRadius: 10, padding: 4, marginBottom: 28 }}>
           {[['login', 'Se connecter'], ['signup', 'S inscrire']].map(([key, label]) => (
-            <button key={key} onClick={() => { setMode(key); setError('') }} style={{ flex: 1, padding: '9px', borderRadius: 8, border: 'none', background: mode === key ? '#fff' : 'transparent', color: mode === key ? '#1B2E4B' : '#9CA3AF', fontSize: 13, fontWeight: mode === key ? 600 : 400, cursor: 'pointer', fontFamily: 'inherit', boxShadow: mode === key ? '0 1px 4px rgba(0,0,0,0.08)' : 'none', transition: 'all 0.15s' }}>
+            <button key={key} onClick={() => { setMode(key); setError(''); setResetSent(false) }} style={{ flex: 1, padding: '9px', borderRadius: 8, border: 'none', background: mode === key ? '#fff' : 'transparent', color: mode === key ? '#1B2E4B' : '#9CA3AF', fontSize: 13, fontWeight: mode === key ? 600 : 400, cursor: 'pointer', fontFamily: 'inherit', boxShadow: mode === key ? '0 1px 4px rgba(0,0,0,0.08)' : 'none', transition: 'all 0.15s' }}>
               {label}
             </button>
           ))}
@@ -88,8 +98,20 @@ export default function AuthModal({ onClose, defaultMode = 'login' }) {
           <div>
             <label style={{ fontSize: 12, fontWeight: 500, color: '#6B7280', display: 'block', marginBottom: 6 }}>Mot de passe</label>
             <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" onKeyDown={e => e.key === 'Enter' && (mode === 'login' ? handleLogin() : handleSignup())} style={inputStyle} />
+            {mode === 'login' && (
+              <div style={{ textAlign: 'right', marginTop: 6 }}>
+                <span onClick={handleResetPassword} style={{ fontSize: 12, color: '#4CAF2E', cursor: 'pointer' }}>
+                  Mot de passe oublié ?
+                </span>
+              </div>
+            )}
           </div>
           {error && <div style={{ fontSize: 12, color: '#E24B4A', background: '#FFF0F0', borderRadius: 8, padding: '8px 12px' }}>{error}</div>}
+          {resetSent && (
+            <div style={{ fontSize: 12, color: '#2E7D1E', background: '#EAF6E4', borderRadius: 8, padding: '8px 12px' }}>
+              ✓ Email de réinitialisation envoyé !
+            </div>
+          )}
           <button onClick={mode === 'login' ? handleLogin : handleSignup} disabled={loading} style={{ width: '100%', padding: '13px', borderRadius: 10, border: 'none', background: loading ? '#9CA3AF' : '#4CAF2E', color: '#fff', fontSize: 14, fontWeight: 600, cursor: loading ? 'not-allowed' : 'pointer', fontFamily: 'inherit', marginTop: 4 }}>
             {loading ? 'Chargement...' : mode === 'login' ? 'Se connecter' : 'Creer mon compte'}
           </button>

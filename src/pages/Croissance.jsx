@@ -7,6 +7,7 @@ import { usePremium } from '../lib/usePremium'
 import PremiumModal from '../components/PremiumModal'
 import PageGuide from '../components/PageGuide'
 import { usePageGuide } from '../lib/usePageGuide'
+import { useNavigate } from 'react-router-dom'
 
 function simulerDCA(capitalInitial, versementMensuel, tauxAnnuel, dureeAnnees) {
   const tauxMensuel = tauxAnnuel / 100 / 12
@@ -30,6 +31,7 @@ function simulerDCA(capitalInitial, versementMensuel, tauxAnnuel, dureeAnnees) {
 
 export default function Croissance() {
   const t = useTheme()
+  const navigate = useNavigate()
   const { showGuide, ouvrirGuide, fermerGuide } = usePageGuide()
 
 const GUIDE_CROISSANCE = [
@@ -91,7 +93,7 @@ const GUIDE_CROISSANCE = [
   if (premiumLoading) return null
 
 if (!isPremium) {
-  return <PremiumModal onClose={() => {}} />
+  return <PremiumModal onClose={() => navigate(-1)} />
 }
   return (
     <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>

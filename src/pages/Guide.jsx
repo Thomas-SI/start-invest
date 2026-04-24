@@ -368,32 +368,48 @@ function BoutonValidationChapitre({ chapitre, onValide }) {
     const verifier = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
-      const { data } = await supabase.from('accomplissements').select('id').eq('user_id', user.id).eq('slug', chapitre.badgeSlug).single()
+      const { data } = await supabase.from('accomplissements').select('id').eq('user_id', user.id).eq('slug', chapitre.badgeSlug).maybeSingle()
       if (data) setDeja(true)
     }
     verifier()
   }, [chapitre.badgeSlug])
 
   const valider = async () => {
-    if (loading || deja) return
-    setLoading(true)
-    try {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
-      const { data: existing } = await supabase.from('accomplissements').select('id').eq('user_id', user.id).eq('slug', chapitre.badgeSlug).single()
-      if (!existing) {
-        const { error } = await supabase.from('accomplissements').insert({ user_id: user.id, slug: chapitre.badgeSlug })
-        if (error) throw error
-      }
-      setDeja(true)
-      setSucces(true)
-      if (onValide) onValide(chapitre.badgeSlug)
-    } catch (e) {
-      console.error(e)
-    } finally {
-      setLoading(false)
+  if (loading || deja) return
+  setLoading(true)
+  try {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+    const { data: existing } = await supabase.from('accomplissements').select('id').eq('user_id', user.id).eq('slug', chapitre.badgeSlug).maybeSingle()
+    if (!existing) {
+      const { error } = await supabase.from('accomplissements').insert({ user_id: user.id, slug: chapitre.badgeSlug })
+      if (error) throw error
     }
+    
+    // Mettre à jour badges_non_vus
+    const { data: profil } = await supabase
+      .from('profils')
+      .select('badges_non_vus')
+      .eq('user_id', user.id)
+      .maybeSingle()
+    const badgesNonVus = profil?.badges_non_vus ?? []
+    const { error: updateError } = await supabase
+  .from('profils')
+  .update({ badges_non_vus: [...badgesNonVus, chapitre.badgeSlug] })
+  .eq('user_id', user.id)
+console.log("update error:", updateError)
+console.log("profil trouvé:", profil)
+    console.log("badges_non_vus mis à jour:", chapitre.badgeSlug)
+
+    setDeja(true)
+    setSucces(true)
+    if (onValide) onValide(chapitre.badgeSlug)
+  } catch (e) {
+    console.error(e)
+  } finally {
+    setLoading(false)
   }
+}
 
   if (deja) return (
     <div style={{ background: chapitre.couleur + '15', border: `0.5px solid ${chapitre.couleur}40`, borderRadius: 10, padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 12 }}>

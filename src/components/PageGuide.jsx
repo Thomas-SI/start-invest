@@ -9,38 +9,44 @@ export default function PageGuide({ pageId, titre, etapes, forceVisible, onClose
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-  const check = async () => {
-    // Vérifier d'abord dans localStorage
-    const cache = JSON.parse(localStorage.getItem('pages_vues') || '[]')
-    if (cache.includes(pageId)) { setLoading(false); return }
+    const check = async () => {
+      const cache = JSON.parse(localStorage.getItem('pages_vues') || '[]')
+      if (cache.includes(pageId)) { setLoading(false); return }
 
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) { setLoading(false); return }
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { setLoading(false); return }
 
-    const { data: profil } = await supabase
-      .from('profils')
-      .select('id, pages_vues')
-      .eq('user_id', user.id)
-      .single()
-
-    if (!profil) { setLoading(false); return }
-
-    const pagesVues = profil.pages_vues ?? []
-    if (!pagesVues.includes(pageId)) {
-      setVisible(true)
-      const newPages = [...pagesVues, pageId]
-      await supabase
+      const { data: profil } = await supabase
         .from('profils')
-        .update({ pages_vues: newPages })
+        .select('id, pages_vues')
         .eq('user_id', user.id)
-      localStorage.setItem('pages_vues', JSON.stringify(newPages))
-    } else {
-      localStorage.setItem('pages_vues', JSON.stringify(pagesVues))
+        .maybeSingle()
+
+      console.log("profil trouvé:", profil)
+      console.log("pageId:", pageId)
+
+      if (!profil) {
+        setVisible(true)
+        setLoading(false)
+        return
+      }
+
+      const pagesVues = profil.pages_vues ?? []
+      if (!pagesVues.includes(pageId)) {
+        setVisible(true)
+        const newPages = [...pagesVues, pageId]
+        await supabase
+          .from('profils')
+          .update({ pages_vues: newPages })
+          .eq('user_id', user.id)
+        localStorage.setItem('pages_vues', JSON.stringify(newPages))
+      } else {
+        localStorage.setItem('pages_vues', JSON.stringify(pagesVues))
+      }
+      setLoading(false)
     }
-    setLoading(false)
-  }
-  check()
-}, [pageId])
+    check()
+  }, [pageId])
 
   const handleClose = () => {
     setVisible(false)
@@ -68,7 +74,6 @@ export default function PageGuide({ pageId, titre, etapes, forceVisible, onClose
         overflow: 'hidden',
         boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
       }}>
-        {/* BARRE DE PROGRESSION */}
         <div style={{ display: 'flex', gap: 4, padding: '16px 20px 0' }}>
           {etapes.map((_, i) => (
             <div key={i} style={{
@@ -79,7 +84,6 @@ export default function PageGuide({ pageId, titre, etapes, forceVisible, onClose
           ))}
         </div>
 
-        {/* CONTENU */}
         <div style={{ padding: '20px 28px 28px' }}>
           <div style={{ fontSize: 11, fontWeight: 600, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 8 }}>
             {titre} · Étape {etape + 1}/{etapes.length}
@@ -91,7 +95,6 @@ export default function PageGuide({ pageId, titre, etapes, forceVisible, onClose
             {current.description}
           </div>
 
-          {/* BOUTONS */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <button onClick={handleClose} style={{ fontSize: 12, color: t.textMuted, background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
               Passer

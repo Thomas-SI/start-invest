@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useTheme } from '../lib/ThemeContext'
+import { useBadgesNonVus } from '../lib/useBadgesNonVus'
 
 export default function Navbar({ page, initiale }) {
   const navigate = useNavigate()
   const t = useTheme()
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
   const [menuOpen, setMenuOpen] = useState(false)
+  const { nbNonVus } = useBadgesNonVus()
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768)
@@ -19,7 +21,6 @@ export default function Navbar({ page, initiale }) {
     if (!isMobile) setMenuOpen(false)
   }, [isMobile])
 
-  // Bloque le scroll de la page quand le menu mobile est ouvert
   useEffect(() => {
     document.body.style.overflow = menuOpen ? 'hidden' : ''
     return () => { document.body.style.overflow = '' }
@@ -79,16 +80,13 @@ export default function Navbar({ page, initiale }) {
           </button>
         </nav>
 
-        {/* Menu déroulant plein écran */}
         {menuOpen && (
           <div style={{ position: 'fixed', top: 58, left: 0, right: 0, bottom: 0, background: t.nav, zIndex: 99, display: 'flex', flexDirection: 'column', padding: '20px 0', overflowY: 'auto' }}>
-            {/* En-tête utilisateur */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 24px 20px', borderBottom: `0.5px solid ${t.navBorder}` }}>
               <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#E8F5E1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 500, color: '#2E7D1E' }}>{initiale}</div>
               <div style={{ color: t.text, fontSize: 14, fontWeight: 500 }}>Connecté</div>
             </div>
 
-            {/* Liens */}
             <div style={{ display: 'flex', flexDirection: 'column', padding: '12px 0' }}>
               {liens.map(([l, path]) => (
                 <div
@@ -101,14 +99,21 @@ export default function Navbar({ page, initiale }) {
                     cursor: 'pointer',
                     fontWeight: l === page ? 600 : 400,
                     borderLeft: l === page ? '3px solid #4CAF2E' : '3px solid transparent',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
                   }}
                 >
                   {l}
+                  {l === 'Challenge' && nbNonVus > 0 && (
+                    <span style={{ width: 18, height: 18, borderRadius: '50%', background: '#E24B4A', color: '#fff', fontSize: 10, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      {nbNonVus}
+                    </span>
+                  )}
                 </div>
               ))}
             </div>
 
-            {/* Bouton déconnexion */}
             <div style={{ padding: '20px 24px', marginTop: 'auto', borderTop: `0.5px solid ${t.navBorder}` }}>
               <button
                 onClick={handleLogout}
@@ -123,13 +128,20 @@ export default function Navbar({ page, initiale }) {
     )
   }
 
-  // ============ VERSION DESKTOP (inchangée) ============
+  // ============ VERSION DESKTOP ============
   return (
     <nav style={{ background: t.nav, borderBottom: `0.5px solid ${t.navBorder}`, padding: '0 20px', height: '58px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
       <Logo />
       <div style={{ display: 'flex', gap: 2 }}>
         {liens.map(([l, path]) => (
-          <div key={l} onClick={() => navigate(path)} style={{ fontSize: 12, color: l === page ? '#4CAF2E' : t.textSecondary, padding: '5px 10px', borderRadius: 6, cursor: 'pointer', fontWeight: l === page ? 500 : 400 }}>{l}</div>
+          <div key={l} onClick={() => navigate(path)} style={{ fontSize: 12, color: l === page ? '#4CAF2E' : t.textSecondary, padding: '5px 10px', borderRadius: 6, cursor: 'pointer', fontWeight: l === page ? 500 : 400, position: 'relative' }}>
+            {l}
+            {l === 'Challenge' && nbNonVus > 0 && (
+              <span style={{ position: 'absolute', top: 0, right: 0, width: 14, height: 14, borderRadius: '50%', background: '#E24B4A', color: '#fff', fontSize: 9, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {nbNonVus}
+              </span>
+            )}
+          </div>
         ))}
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>

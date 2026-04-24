@@ -33,17 +33,17 @@ export default function PremiumModal({ onClose }) {
         <div style={{ fontSize: 14, color: t.textMuted, marginBottom: 28, lineHeight: 1.6 }}>
           Cette page est réservée aux membres Premium. Abonne-toi pour débloquer toutes les fonctionnalités.
         </div>
-        <button
-          onClick={() => { navigate('/abonnement'); onClose(); }}
-          style={{
-            width: '100%', padding: '13px', borderRadius: 12,
-            border: 'none', background: '#4CAF2E',
-            color: '#fff', fontSize: 15, fontWeight: 600,
-            cursor: 'pointer', fontFamily: 'inherit', marginBottom: 10,
-          }}
-        >
-          Voir les offres →
-        </button>
+    <button
+  onClick={() => navigate('/abonnement')}
+  style={{
+    width: '100%', padding: '13px', borderRadius: 12,
+    border: 'none', background: '#4CAF2E',
+    color: '#fff', fontSize: 15, fontWeight: 600,
+    cursor: 'pointer', fontFamily: 'inherit', marginBottom: 10,
+  }}
+>
+  Voir les offres →
+</button>
         <button
           onClick={onClose}
           style={{
