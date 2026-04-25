@@ -1227,19 +1227,20 @@ await supabase
         </div>
 
         {/* STREAK MENSUEL */}
-        <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 14 }}>
-          <div style={{ fontSize: streakMensuel > 0 ? 28 : 22, lineHeight: 1 }}>
-            {streakMensuel > 0 ? '🔥'.repeat(Math.min(streakMensuel, 6)) : '—'}
-          </div>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 13, fontWeight: 500, color: t.text }}>
-              {streakMensuel > 0 ? `${streakMensuel} mois de suite investis !` : 'Aucune série en cours'}
-            </div>
-            <div style={{ fontSize: 11, color: t.textMuted, marginTop: 2 }}>
-              {streakMensuel > 0 ? 'Continue chaque mois pour maintenir ta série 🔥' : 'Achète un ETF ce mois-ci pour démarrer ta série'}
-            </div>
-          </div>
-        </div>
+<div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 14 }}>
+  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+    <span style={{ fontSize: 32, lineHeight: 1 }}>{streakMensuel > 0 ? '🔥' : '—'}</span>
+    {streakMensuel > 0 && <span style={{ fontSize: 28, fontWeight: 700, color: t.text }}>{streakMensuel}</span>}
+  </div>
+  <div style={{ flex: 1 }}>
+    <div style={{ fontSize: 13, fontWeight: 500, color: t.text }}>
+      {streakMensuel > 0 ? `${streakMensuel} mois de suite investis !` : 'Aucune série en cours'}
+    </div>
+    <div style={{ fontSize: 11, color: t.textMuted, marginTop: 2 }}>
+      {streakMensuel > 0 ? 'Continue chaque mois pour maintenir ta série 🔥' : 'Achète un ETF ce mois-ci pour démarrer ta série'}
+    </div>
+  </div>
+</div>
 
         {/* BOUTON MA POSITION */}
         <button onClick={() => setPositionOpen(true)} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', borderRadius: 12, border: `0.5px solid ${t.border}`, background: t.bgCard, cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left', width: '100%' }}>
