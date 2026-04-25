@@ -25,6 +25,7 @@ export default function Abonnement() {
   const [checkoutLoading, setCheckoutLoading] = useState(false)
   const [alertMsg, setAlertMsg] = useState(null)
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
+  const [photoUrl, setPhotoUrl] = useState(null)
 
   const plans = [
     {
@@ -94,12 +95,15 @@ export default function Abonnement() {
   }, [])
 
   useEffect(() => {
-    const fetchUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user) setUser(user)
+  const fetchUser = async () => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) {
+      setUser(user)
+      setPhotoUrl(user.user_metadata?.photo_url || null)
     }
-    fetchUser()
-  }, [])
+  }
+  fetchUser()
+}, [])
 
   const handleCheckout = async () => {
     setCheckoutLoading(true)
@@ -123,18 +127,18 @@ export default function Abonnement() {
 
   return (
     <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <Navbar page="Abonnement" initiale={initiale} />
+      <Navbar page="Abonnement" initiale={initiale} photoUrl={photoUrl} />
 
       <div style={{ padding: isMobile ? '20px 12px' : '24px 20px', flex: 1 }}>
 
         {alertMsg && (
-          <div style={{ background: '#1B2E4B', border: '1px solid #ffffff22', borderRadius: 12, padding: '14px 20px', marginBottom: 24, color: '#ffffff', fontSize: 14, textAlign: 'center' }}>
+          <div style={{ background: '#034065', border: '1px solid #ffffff22', borderRadius: 12, padding: '14px 20px', marginBottom: 24, color: '#ffffff', fontSize: 14, textAlign: 'center' }}>
             {alertMsg}
           </div>
         )}
 
         <div style={{ textAlign: 'center', marginBottom: 28 }}>
-          <div style={{ background: '#1B2E4B', borderRadius: 12, padding: '12px 20px', marginBottom: 16, display: 'inline-block' }}>
+          <div style={{ background: '#034065', borderRadius: 12, padding: '12px 20px', marginBottom: 16, display: 'inline-block' }}>
             <div style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>
               Un abonnement pensé pour récompenser la discipline.
             </div>
@@ -172,13 +176,13 @@ export default function Abonnement() {
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 12, background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 30, padding: '6px 8px' }}>
             <button
               onClick={() => setAnnuel(false)}
-              style={{ padding: '6px 16px', borderRadius: 20, border: 'none', background: !annuel ? '#1B2E4B' : 'transparent', color: !annuel ? '#fff' : t.textMuted, fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' }}
+              style={{ padding: '6px 16px', borderRadius: 20, border: 'none', background: !annuel ? '#034065' : 'transparent', color: !annuel ? '#fff' : t.textMuted, fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' }}
             >
               Mensuel
             </button>
             <button
               onClick={() => setAnnuel(true)}
-              style={{ padding: '6px 16px', borderRadius: 20, border: 'none', background: annuel ? '#1B2E4B' : 'transparent', color: annuel ? '#fff' : t.textMuted, fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s', display: 'flex', alignItems: 'center', gap: 6 }}
+              style={{ padding: '6px 16px', borderRadius: 20, border: 'none', background: annuel ? '#034065' : 'transparent', color: annuel ? '#fff' : t.textMuted, fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s', display: 'flex', alignItems: 'center', gap: 6 }}
             >
               Annuel
               <span style={{ fontSize: 9, background: '#4CAF2E', color: '#fff', padding: '2px 6px', borderRadius: 10, fontWeight: 600 }}>-29%</span>
@@ -191,7 +195,7 @@ export default function Abonnement() {
             const prix = annuel ? prixAnnuel : prixMensuel
             const periode = annuel ? periodeAnnuel : periodeMensuel
             return (
-              <div key={id} style={{ background: recommande ? '#1B2E4B' : t.bgCard, border: `${recommande ? '2px' : '0.5px'} solid ${recommande ? '#4CAF2E' : t.border}`, borderRadius: 16, padding: isMobile ? 20 : 24, display: 'flex', flexDirection: 'column' }}>
+              <div key={id} style={{ background: recommande ? '#034065' : t.bgCard, border: `${recommande ? '2px' : '0.5px'} solid ${recommande ? '#4CAF2E' : t.border}`, borderRadius: 16, padding: isMobile ? 20 : 24, display: 'flex', flexDirection: 'column' }}>
 
                 {/* BADGE */}
                 <div style={{ marginBottom: 16 }}>

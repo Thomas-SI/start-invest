@@ -4,7 +4,7 @@ export default function FooterPublic() {
   const navigate = useNavigate()
   
   return (
-    <footer style={{ background: '#1B2E4B', padding: '40px 40px 28px' }}>
+    <footer style={{ background: '#034065', padding: '40px 40px 28px' }}>
       <div style={{ maxWidth: 900, margin: '0 auto' }}>
         
         {/* CONTACT + RÉSEAUX */}

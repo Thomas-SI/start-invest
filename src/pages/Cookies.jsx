@@ -6,7 +6,7 @@ export default function Cookies() {
 
   const Article = ({ numero, titre, children }) => (
     <div style={{ marginBottom: 32 }}>
-      <div style={{ fontSize: 13, fontWeight: 700, color: '#1B2E4B', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 10, paddingBottom: 8, borderBottom: '0.5px solid #E0EAE3' }}>
+      <div style={{ fontSize: 13, fontWeight: 700, color: '#034065', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 10, paddingBottom: 8, borderBottom: '0.5px solid #E0EAE3' }}>
         {numero}. {titre}
       </div>
       <div style={{ fontSize: 14, color: '#4B5563', lineHeight: 1.8, textAlign: 'justify' }}>{children}</div>
@@ -17,7 +17,7 @@ export default function Cookies() {
     <div style={{ fontFamily: 'inherit', background: '#F4F7F5', minHeight: '100vh' }}>
       <nav style={{ background: '#fff', borderBottom: '0.5px solid #E0EAE3', padding: '0 40px', height: 58, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 100 }}>
         <div onClick={() => navigate('/')} style={{ display: 'flex', alignItems: 'baseline', cursor: 'pointer' }}>
-          <span style={{ fontSize: 18, fontWeight: 800, color: '#1B2E4B', fontStyle: 'italic' }}>START</span>
+          <span style={{ fontSize: 18, fontWeight: 800, color: '#034065', fontStyle: 'italic' }}>START</span>
           <span style={{ fontSize: 18, fontWeight: 800, color: '#4CAF2E', fontStyle: 'italic' }}>INVEST</span>
         </div>
         <button onClick={() => navigate(-1)} style={{ padding: '7px 16px', borderRadius: 8, border: '0.5px solid #E0EAE3', background: '#fff', color: '#6B7280', fontSize: 13, cursor: 'pointer', fontFamily: 'inherit' }}>
@@ -28,7 +28,7 @@ export default function Cookies() {
       <div style={{ maxWidth: 780, margin: '0 auto', padding: '60px 40px' }}>
         <div style={{ marginBottom: 48 }}>
           <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 14, background: '#EAF6E4', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Légal</div>
-          <h1 style={{ fontSize: 36, fontWeight: 700, color: '#1B2E4B', margin: '0 0 12px' }}>Politique de Gestion des Cookies</h1>
+          <h1 style={{ fontSize: 36, fontWeight: 700, color: '#034065', margin: '0 0 12px' }}>Politique de Gestion des Cookies</h1>
           <p style={{ fontSize: 13, color: '#9CA3AF' }}>Dernière mise à jour : janvier 2026</p>
         </div>
 
@@ -75,7 +75,7 @@ export default function Cookies() {
           </Article>
 
           <div style={{ marginTop: 40, padding: '20px', background: '#EAF6E4', borderRadius: 12 }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: '#1B2E4B', marginBottom: 8 }}>Questions sur les cookies ?</div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: '#034065', marginBottom: 8 }}>Questions sur les cookies ?</div>
             <div style={{ fontSize: 13, color: '#4B5563' }}>
               Email : <a href="mailto:contact@start-invest.fr" style={{ color: '#4CAF2E' }}>contact@start-invest.fr</a>
             </div>

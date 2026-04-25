@@ -67,6 +67,8 @@ const GUIDE_INVESTISSEMENT = [
   const [editTxForm, setEditTxForm] = useState({})
   const [confirmDeleteId, setConfirmDeleteId] = useState(null)
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
+  const [photoUrl, setPhotoUrl] = useState(null)
+
   const [form, setForm] = useState({
     date: new Date().toISOString().split('T')[0],
     ticker: '', actif: '', enveloppe: 'PEA', type_etf: 'Capitalisant',
@@ -86,12 +88,20 @@ const GUIDE_INVESTISSEMENT = [
   staleTime: 0,
 })
 
+useEffect(() => {
+  if (data?.user) {
+    setPhotoUrl(data.user.user_metadata?.photo_url || null)
+  }
+}, [data])
+
+  const initiale = data?.user?.user_metadata?.prenom?.[0]?.toUpperCase() || '?'
+
   const user = data?.user || null
   const investissements = data?.investissements || []
   const transactions = data?.transactions || []
   const comptes = data?.comptes || []
 
-  const bleu = t.dark ? '#3B82F6' : '#1B2E4B'
+  const bleu = t.dark ? '#3B82F6' : '#034065'
   const totalInvesti = investissements.reduce((acc, i) => acc + (parseFloat(i.quantite) * parseFloat(i.pru || i.prix_achat_unitaire || 0)), 0)
   const valeurActuelle = investissements.reduce((acc, i) => acc + (parseFloat(i.quantite) * parseFloat(i.prix_actuel || i.pru || i.prix_achat_unitaire || 0)), 0)
   const plusValue = valeurActuelle - totalInvesti
@@ -273,7 +283,7 @@ const GUIDE_INVESTISSEMENT = [
 
   if (isLoading) return (
     <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <Navbar page="Investissement" />
+      <Navbar page="Investissement" initiale={initiale} photoUrl={photoUrl} />
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: t.textMuted, fontSize: 13 }}>Chargement...</div>
     </div>
   )
@@ -297,7 +307,7 @@ if (!isPremium) {
   style={{
     position: 'fixed', bottom: 80, right: 16, zIndex: 100,
     width: 36, height: 36, borderRadius: '50%',
-    background: '#1B2E4B', color: '#fff',
+    background: '#034065', color: '#fff',
     border: 'none', fontSize: 16, fontWeight: 700,
     cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -328,7 +338,7 @@ if (!isPremium) {
 
                 return (
                   <div key={env} style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, overflow: 'hidden' }}>
-                    <div style={{ padding: '12px 16px', borderBottom: `0.5px solid ${t.border}`, background: '#1B2E4B', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                    <div style={{ padding: '12px 16px', borderBottom: `0.5px solid ${t.border}`, background: '#034065', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
     <div style={{ fontSize: 13, fontWeight: 500, color: '#fff' }}>{ENVELOPPE_LABELS[env] || env}</div>
                         {/* Courtiers associés à cette enveloppe */}

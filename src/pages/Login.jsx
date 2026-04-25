@@ -35,7 +35,7 @@ export default function Login() {
 
   return (
     <div style={{ minHeight: '100vh', display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
-      <div style={{ background: '#1B2E4B', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: '40px' }}>
+      <div style={{ background: '#034065', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: '40px' }}>
         <div style={{ marginBottom: 32 }}>
           <div style={{ display: 'flex', alignItems: 'baseline', marginBottom: 8 }}>
             <span style={{ fontSize: 48, fontWeight: 500, color: '#fff', fontStyle: 'italic', letterSpacing: '.04em' }}>START</span>
@@ -60,17 +60,17 @@ export default function Login() {
       <div style={{ background: '#F4F7F5', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px' }}>
         <div style={{ width: '100%', maxWidth: 380 }}>
           <div style={{ marginBottom: 32 }}>
-            <div style={{ fontSize: 24, fontWeight: 500, color: '#1B2E4B', marginBottom: 6 }}>Prenez une longueur d'avance</div>
+            <div style={{ fontSize: 24, fontWeight: 500, color: '#034065', marginBottom: 6 }}>Prenez une longueur d'avance</div>
             <div style={{ fontSize: 14, color: '#9CA3AF' }}>Connectez-vous à votre compte</div>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             <div>
               <div style={{ fontSize: 12, color: '#6B7280', marginBottom: 6 }}>Email</div>
-              <input type="email" placeholder="votre@email.com" value={email} onChange={e => setEmail(e.target.value)} style={{ width: '100%', padding: '11px 14px', borderRadius: 9, border: '0.5px solid #C8D8CE', fontSize: 14, fontFamily: 'inherit', outline: 'none', background: '#fff', color: '#1B2E4B' }} />
+              <input type="email" placeholder="votre@email.com" value={email} onChange={e => setEmail(e.target.value)} style={{ width: '100%', padding: '11px 14px', borderRadius: 9, border: '0.5px solid #C8D8CE', fontSize: 14, fontFamily: 'inherit', outline: 'none', background: '#fff', color: '#034065' }} />
             </div>
             <div>
               <div style={{ fontSize: 12, color: '#6B7280', marginBottom: 6 }}>Mot de passe</div>
-              <input type="password" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleLogin()} style={{ width: '100%', padding: '11px 14px', borderRadius: 9, border: '0.5px solid #C8D8CE', fontSize: 14, fontFamily: 'inherit', outline: 'none', background: '#fff', color: '#1B2E4B' }} />
+              <input type="password" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleLogin()} style={{ width: '100%', padding: '11px 14px', borderRadius: 9, border: '0.5px solid #C8D8CE', fontSize: 14, fontFamily: 'inherit', outline: 'none', background: '#fff', color: '#034065' }} />
             </div>
             <div style={{ textAlign: 'right', marginTop: -8 }}>
               <span onClick={handleResetPassword} style={{ fontSize: 12, color: '#4CAF2E', cursor: 'pointer' }}>

@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { ThemeProvider } from './lib/ThemeContext'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import ProtectedRoute from './components/ProtectedRoute'
+import ScrollToTop from './components/ScrollToTop'
 import Accueil from './pages/Accueil'
 import Dashboard from './pages/Dashboard'
 import Portefeuille from './pages/Portefeuille'
@@ -42,6 +43,7 @@ createRoot(document.getElementById('root')).render(
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <BrowserRouter>
+          <ScrollToTop />
           <Routes>
             {/* ROUTES PUBLIQUES */}
             <Route path="/" element={<Accueil />} />
@@ -69,7 +71,7 @@ createRoot(document.getElementById('root')).render(
             <Route path="/compte" element={<ProtectedRoute><Compte /></ProtectedRoute>} />
             <Route path="/parametres" element={<ProtectedRoute><Parametres /></ProtectedRoute>} />
 
-            {/* FALLBACK : toute URL inconnue redirige vers Accueil */}
+            {/* FALLBACK */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </BrowserRouter>

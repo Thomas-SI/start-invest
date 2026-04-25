@@ -47,9 +47,9 @@ function PublicNavbar({ isMobile, openLogin, openSignup, activeLink = 'Challenge
             aria-label={menuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
             style={{ background: 'transparent', border: 'none', padding: 8, cursor: 'pointer', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 5, width: 40, height: 40 }}
           >
-            <span style={{ width: 22, height: 2, background: '#1B2E4B', borderRadius: 2, transition: 'all 0.25s', transform: menuOpen ? 'rotate(45deg) translate(5px, 5px)' : 'none' }} />
-            <span style={{ width: 22, height: 2, background: '#1B2E4B', borderRadius: 2, transition: 'all 0.25s', opacity: menuOpen ? 0 : 1 }} />
-            <span style={{ width: 22, height: 2, background: '#1B2E4B', borderRadius: 2, transition: 'all 0.25s', transform: menuOpen ? 'rotate(-45deg) translate(5px, -5px)' : 'none' }} />
+            <span style={{ width: 22, height: 2, background: '#034065', borderRadius: 2, transition: 'all 0.25s', transform: menuOpen ? 'rotate(45deg) translate(5px, 5px)' : 'none' }} />
+            <span style={{ width: 22, height: 2, background: '#034065', borderRadius: 2, transition: 'all 0.25s', opacity: menuOpen ? 0 : 1 }} />
+            <span style={{ width: 22, height: 2, background: '#034065', borderRadius: 2, transition: 'all 0.25s', transform: menuOpen ? 'rotate(-45deg) translate(5px, -5px)' : 'none' }} />
           </button>
         </nav>
 
@@ -62,7 +62,7 @@ function PublicNavbar({ isMobile, openLogin, openSignup, activeLink = 'Challenge
                   onClick={() => handleNavigate(path)}
                   style={{
                     fontSize: 16,
-                    color: label === activeLink ? '#4CAF2E' : '#1B2E4B',
+                    color: label === activeLink ? '#4CAF2E' : '#034065',
                     padding: '16px 24px',
                     cursor: 'pointer',
                     fontWeight: label === activeLink ? 600 : 400,
@@ -75,7 +75,7 @@ function PublicNavbar({ isMobile, openLogin, openSignup, activeLink = 'Challenge
             </div>
 
             <div style={{ padding: '20px 24px', marginTop: 'auto', borderTop: '0.5px solid #E0EAE3', display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <button onClick={() => { setMenuOpen(false); openLogin() }} style={{ padding: '12px', borderRadius: 8, border: '0.5px solid #1B2E4B', background: 'transparent', color: '#1B2E4B', fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Se connecter</button>
+              <button onClick={() => { setMenuOpen(false); openLogin() }} style={{ padding: '12px', borderRadius: 8, border: '0.5px solid #034065', background: 'transparent', color: '#034065', fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Se connecter</button>
               <button onClick={() => { setMenuOpen(false); openSignup() }} style={{ padding: '12px', borderRadius: 8, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>S'inscrire gratuitement</button>
             </div>
           </div>
@@ -89,15 +89,15 @@ function PublicNavbar({ isMobile, openLogin, openSignup, activeLink = 'Challenge
       <Logo />
       <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
         {links.map(([label, path]) => (
-          <span key={label} onClick={() => navigate(path)} style={{ fontSize: 13, color: label === activeLink ? '#1B2E4B' : '#6B7280', padding: '5px 12px', borderRadius: 6, cursor: 'pointer', fontWeight: label === activeLink ? 500 : 400 }}
-            onMouseEnter={e => e.currentTarget.style.color = '#1B2E4B'}
-            onMouseLeave={e => e.currentTarget.style.color = label === activeLink ? '#1B2E4B' : '#6B7280'}>
+          <span key={label} onClick={() => navigate(path)} style={{ fontSize: 13, color: label === activeLink ? '#034065' : '#6B7280', padding: '5px 12px', borderRadius: 6, cursor: 'pointer', fontWeight: label === activeLink ? 500 : 400 }}
+            onMouseEnter={e => e.currentTarget.style.color = '#034065'}
+            onMouseLeave={e => e.currentTarget.style.color = label === activeLink ? '#034065' : '#6B7280'}>
             {label}
           </span>
         ))}
       </div>
       <div style={{ display: 'flex', gap: 10 }}>
-        <button onClick={openLogin} style={{ padding: '7px 16px', borderRadius: 8, border: '0.5px solid #1B2E4B', background: 'transparent', color: '#1B2E4B', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Se connecter</button>
+        <button onClick={openLogin} style={{ padding: '7px 16px', borderRadius: 8, border: '0.5px solid #034065', background: 'transparent', color: '#034065', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Se connecter</button>
         <button onClick={openSignup} style={{ padding: '7px 16px', borderRadius: 8, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>S'inscrire gratuitement</button>
       </div>
     </nav>
@@ -134,7 +134,7 @@ export default function ChallengePublic() {
       <PublicNavbar isMobile={isMobile} openLogin={openLogin} openSignup={openSignup} activeLink="Challenge" />
 
       {/* HERO */}
-      <section style={{ background: '#1B2E4B', padding: isMobile ? '50px 16px' : '80px 40px' }}>
+      <section style={{ background: '#034065', padding: isMobile ? '50px 16px' : '80px 40px' }}>
         <div style={{ maxWidth: 700, margin: '0 auto', textAlign: 'center' }}>
           <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 20, background: 'rgba(76,175,46,0.15)', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Challenge</div>
           <h1 style={{ fontSize: isMobile ? 26 : 36, fontWeight: 700, color: '#fff', lineHeight: 1.4, margin: '0 0 24px' }}>
@@ -162,7 +162,7 @@ export default function ChallengePublic() {
 <section style={{ padding: isMobile ? '50px 16px' : '80px 40px', maxWidth: 1100, margin: '0 auto' }}>
   <div style={{ textAlign: 'center', marginBottom: isMobile ? 36 : 52 }}>
     <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 12, background: '#EAF6E4', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Accomplissements</div>
-    <h2 style={{ fontSize: isMobile ? 24 : 30, fontWeight: 700, color: '#1B2E4B', margin: '0 0 12px' }}>Le livret d'accomplissements</h2>
+    <h2 style={{ fontSize: isMobile ? 24 : 30, fontWeight: 700, color: '#034065', margin: '0 0 12px' }}>Le livret d'accomplissements</h2>
     <p style={{ fontSize: 14, color: '#6B7280', maxWidth: 480, margin: '0 auto' }}>
       Débloquez des badges en progressant dans votre parcours d'investisseur. Chaque accomplissement récompense une action concrète.
     </p>
@@ -175,7 +175,7 @@ export default function ChallengePublic() {
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6, gap: 8, flexWrap: 'wrap' }}>
-            <div style={{ fontSize: 14, fontWeight: 600, color: '#1B2E4B' }}>{nom}</div>
+            <div style={{ fontSize: 14, fontWeight: 600, color: '#034065' }}>{nom}</div>
             <span style={{ fontSize: 9, padding: '2px 8px', borderRadius: 20, background: tagBg, color: tagColor, fontWeight: 500, whiteSpace: 'nowrap' }}>{tag}</span>
           </div>
           <div style={{ fontSize: 12, color: '#6B7280', marginBottom: 8 }}>{desc}</div>
@@ -187,7 +187,7 @@ export default function ChallengePublic() {
 </section>
 
 {/* STREAK */}
-<section style={{ background: '#1B2E4B', padding: isMobile ? '50px 16px' : '80px 40px' }}>
+<section style={{ background: '#034065', padding: isMobile ? '50px 16px' : '80px 40px' }}>
   <div style={{ maxWidth: 700, margin: '0 auto', textAlign: 'center' }}>
     <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 12, background: 'rgba(76,175,46,0.15)', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Streak</div>
     <h2 style={{ fontSize: isMobile ? 24 : 30, fontWeight: 700, color: '#fff', margin: '0 0 16px' }}>
@@ -220,7 +220,7 @@ export default function ChallengePublic() {
 {/* GUIDE */}
 <section style={{ padding: isMobile ? '50px 16px' : '80px 40px', maxWidth: 700, margin: '0 auto', textAlign: 'center' }}>
   <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 12, background: '#EAF6E4', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Guide</div>
-  <h2 style={{ fontSize: isMobile ? 24 : 30, fontWeight: 700, color: '#1B2E4B', margin: '0 0 16px' }}>
+  <h2 style={{ fontSize: isMobile ? 24 : 30, fontWeight: 700, color: '#034065', margin: '0 0 16px' }}>
     📚 5 chapitres pour devenir investisseur
   </h2>
   <p style={{ fontSize: isMobile ? 14 : 15, color: '#6B7280', lineHeight: 1.8, margin: '0 auto 40px', maxWidth: 500 }}>
@@ -236,14 +236,14 @@ export default function ChallengePublic() {
     ].map(({ num, titre, couleur }) => (
       <div key={num} style={{ background: couleur + '15', border: `0.5px solid ${couleur}40`, borderRadius: 12, padding: '16px 10px', textAlign: 'center' }}>
         <div style={{ fontSize: 18, fontWeight: 700, color: couleur, marginBottom: 6 }}>{num}</div>
-        <div style={{ fontSize: 11, color: '#1B2E4B', lineHeight: 1.4 }}>{titre}</div>
+        <div style={{ fontSize: 11, color: '#034065', lineHeight: 1.4 }}>{titre}</div>
       </div>
     ))}
   </div>
 </section>
 
 {/* COMMUNAUTÉ */}
-<section style={{ background: '#1B2E4B', padding: isMobile ? '50px 16px' : '80px 40px' }}>
+<section style={{ background: '#034065', padding: isMobile ? '50px 16px' : '80px 40px' }}>
   <div style={{ maxWidth: 700, margin: '0 auto', textAlign: 'center' }}>
     <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 12, background: 'rgba(76,175,46,0.15)', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Communauté</div>
     <h2 style={{ fontSize: isMobile ? 24 : 30, fontWeight: 700, color: '#fff', margin: '0 0 16px' }}>
@@ -270,7 +270,7 @@ export default function ChallengePublic() {
 
 {/* CTA */}
 <section style={{ padding: isMobile ? '50px 16px' : '80px 40px', textAlign: 'center', background: '#F4F7F5' }}>
-  <h2 style={{ fontSize: isMobile ? 24 : 30, fontWeight: 700, color: '#1B2E4B', margin: '0 0 16px' }}>Commencez votre parcours</h2>
+  <h2 style={{ fontSize: isMobile ? 24 : 30, fontWeight: 700, color: '#034065', margin: '0 0 16px' }}>Commencez votre parcours</h2>
   <p style={{ fontSize: 14, color: '#9CA3AF', margin: '0 0 32px' }}>Le badge "Premier Pas" vous attend dès l'inscription avec une surprise 🎁 </p>
   <button onClick={openSignup} style={{ padding: isMobile ? '12px 32px' : '14px 40px', borderRadius: 12, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>S'inscrire gratuitement</button>
 </section>

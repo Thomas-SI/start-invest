@@ -58,8 +58,8 @@ export default function AuthModal({ onClose, defaultMode = 'login' }) {
     outline: 'none',
     boxSizing: 'border-box',
     background: '#ffffff',
-    color: '#1B2E4B',
-    WebkitTextFillColor: '#1B2E4B',
+    color: '#034065',
+    WebkitTextFillColor: '#034065',
     opacity: 1
   }
 
@@ -70,7 +70,7 @@ export default function AuthModal({ onClose, defaultMode = 'login' }) {
         <button onClick={onClose} style={{ position: 'absolute', top: 16, right: 16, background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: '#9CA3AF', lineHeight: 1 }}>x</button>
         <div style={{ textAlign: 'center', marginBottom: 24 }}>
           <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center' }}>
-            <span style={{ fontSize: 20, fontWeight: 800, color: '#1B2E4B', fontStyle: 'italic' }}>START</span>
+            <span style={{ fontSize: 20, fontWeight: 800, color: '#034065', fontStyle: 'italic' }}>START</span>
             <span style={{ fontSize: 20, fontWeight: 800, color: '#4CAF2E', fontStyle: 'italic' }}>INVEST</span>
           </div>
           <div style={{ fontSize: 13, color: '#9CA3AF', marginTop: 6 }}>
@@ -79,7 +79,7 @@ export default function AuthModal({ onClose, defaultMode = 'login' }) {
         </div>
         <div style={{ display: 'flex', background: '#F4F7F5', borderRadius: 10, padding: 4, marginBottom: 28 }}>
           {[['login', 'Se connecter'], ['signup', 'S inscrire']].map(([key, label]) => (
-            <button key={key} onClick={() => { setMode(key); setError(''); setResetSent(false) }} style={{ flex: 1, padding: '9px', borderRadius: 8, border: 'none', background: mode === key ? '#fff' : 'transparent', color: mode === key ? '#1B2E4B' : '#9CA3AF', fontSize: 13, fontWeight: mode === key ? 600 : 400, cursor: 'pointer', fontFamily: 'inherit', boxShadow: mode === key ? '0 1px 4px rgba(0,0,0,0.08)' : 'none', transition: 'all 0.15s' }}>
+            <button key={key} onClick={() => { setMode(key); setError(''); setResetSent(false) }} style={{ flex: 1, padding: '9px', borderRadius: 8, border: 'none', background: mode === key ? '#fff' : 'transparent', color: mode === key ? '#034065' : '#9CA3AF', fontSize: 13, fontWeight: mode === key ? 600 : 400, cursor: 'pointer', fontFamily: 'inherit', boxShadow: mode === key ? '0 1px 4px rgba(0,0,0,0.08)' : 'none', transition: 'all 0.15s' }}>
               {label}
             </button>
           ))}

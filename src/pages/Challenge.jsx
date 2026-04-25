@@ -54,7 +54,7 @@ const BADGES_GUIDE = [
 ]
 
 const ACCOMPLISSEMENTS = [
-  { slug: 'premier-pas', nom: 'Premier Pas', message: 'Bienvenue chez Start Invest, profite d\'un code parrain en cliquant ici', quete: "S'inscrire sur StartInvest", categorie: 'principal' },
+  { slug: 'premier-pas', nom: 'Premier Pas', imageUrl: 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/premierpas.png', message: 'Bienvenue chez Start Invest, profite d\'un code parrain en cliquant ici', quete: "S'inscrire sur StartInvest", categorie: 'principal' },
   { slug: 'grand-saut', nom: 'Le Grand Saut', message: "Tu n'es plus spectateur, tu es le pilote de ton futur.", quete: 'Acheter votre premier ETF', categorie: 'principal' },
   { slug: 'metronome', nom: 'Le Métronome', svgIcon: true, message: 'La magie des intérêts composés adore ta régularité. Continue !', quete: 'Investir régulièrement chaque mois', evolutif: true, grades: GRADES_METRONOME, categorie: 'principal' },
   { slug: 'main-de-fer', nom: 'Main de Fer', message: 'Le calme est une compétence.', quete: '6 mois sans aucune vente', categorie: 'principal' },
@@ -186,9 +186,9 @@ function PopupAmi({ ami, onClose }) {
         {/* Header */}
         <div style={{ padding: '18px 20px', borderBottom: `0.5px solid ${t.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={{ width: 46, height: 46, borderRadius: '50%', background: '#E8EEF6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 600, color: '#1B2E4B', flexShrink: 0 }}>
-              {ami.profil?.pseudo?.[0]?.toUpperCase() || '?'}
-            </div>
+            <div style={{ width: 46, height: 46, borderRadius: '50%', background: '#E8EEF6', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 600, color: '#034065', flexShrink: 0 }}>
+  {ami.profil?.photo_url ? <img src={ami.profil.photo_url} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : ami.profil?.pseudo?.[0]?.toUpperCase() || '?'}
+</div>
             <div>
               <div style={{ fontSize: 15, fontWeight: 600, color: t.text }}>@{ami.profil?.pseudo || 'Inconnu'}</div>
               <div style={{ fontSize: 12, color: t.textMuted }}>{ami.badges.length} badge{ami.badges.length > 1 ? 's' : ''} débloqué{ami.badges.length > 1 ? 's' : ''}</div>
@@ -277,7 +277,7 @@ function PopupAmi({ ami, onClose }) {
 
 // ─── Onglet Amis ──────────────────────────────────────────────────────────────
 function OngletAmis({ userId, monPseudo, t, isMobile }) {
-  const bleu = '#1B2E4B'
+  const bleu = '#034065'
   const [recherche, setRecherche] = useState('')
   const [resultatsRecherche, setResultatsRecherche] = useState([])
   const [searching, setSearching] = useState(false)
@@ -287,6 +287,16 @@ function OngletAmis({ userId, monPseudo, t, isMobile }) {
   const [loading, setLoading] = useState(true)
   const [actionLoading, setActionLoading] = useState(null)
   const [amiOuvert, setAmiOuvert] = useState(null)
+
+  const [maPhoto, setMaPhoto] = useState(null)
+
+useEffect(() => {
+  const loadPhoto = async () => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) setMaPhoto(user.user_metadata?.photo_url || null)
+  }
+  loadPhoto()
+}, [])
 
   const chargerAmis = async () => {
     setLoading(true)
@@ -307,7 +317,7 @@ function OngletAmis({ userId, monPseudo, t, isMobile }) {
       const tousLesIds = [...new Set([...amisIds, ...recuesIds])]
 
       const [profils, accs] = await Promise.all([
-        tousLesIds.length > 0 ? supabase.from('profils').select('user_id, pseudo').in('user_id', tousLesIds) : { data: [] },
+        tousLesIds.length > 0 ? supabase.from('profils').select('user_id, pseudo, photo_url').in('user_id', tousLesIds) : { data: [] },
         amisIds.length > 0 ? supabase.from('accomplissements').select('user_id, slug').in('user_id', amisIds) : { data: [] },
       ])
 
@@ -407,9 +417,9 @@ function OngletAmis({ userId, monPseudo, t, isMobile }) {
 
       {/* Mon pseudo */}
       <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
-        <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#E8EEF6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 600, color: bleu, flexShrink: 0 }}>
-          {monPseudo[0].toUpperCase()}
-        </div>
+        <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#E8EEF6', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 600, color: bleu, flexShrink: 0 }}>
+  {maPhoto ? <img src={maPhoto} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : monPseudo[0].toUpperCase()}
+</div>
         <div>
           <div style={{ fontSize: 11, color: t.textMuted }}>Mon pseudo</div>
           <div style={{ fontSize: 14, fontWeight: 600, color: t.text }}>@{monPseudo}</div>
@@ -530,9 +540,9 @@ function OngletAmis({ userId, monPseudo, t, isMobile }) {
                   onMouseEnter={e => e.currentTarget.style.background = t.bgSecondary}
                   onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                 >
-                  <div style={{ width: 42, height: 42, borderRadius: '50%', background: '#E8EEF6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 600, color: bleu, flexShrink: 0 }}>
-                    {ami.profil?.pseudo?.[0]?.toUpperCase() || '?'}
-                  </div>
+                  <div style={{ width: 42, height: 42, borderRadius: '50%', background: '#E8EEF6', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 600, color: bleu, flexShrink: 0 }}>
+  {ami.profil?.photo_url ? <img src={ami.profil.photo_url} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : ami.profil?.pseudo?.[0]?.toUpperCase() || '?'}
+</div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 13, fontWeight: 500, color: t.text }}>@{ami.profil?.pseudo || 'Inconnu'}</div>
                     <div style={{ display: 'flex', gap: 10, marginTop: 3, flexWrap: 'wrap' }}>
@@ -768,7 +778,7 @@ function PositionModal({ totalInvesti, comptes, onClose }) {
                 })}
                 <line x1={cx - rUser * 0.42} y1={cy - rUser + 1} x2={cx + rUser * 0.42} y2={cy - rUser + 1} stroke={t.dark ? '#0A0F0A' : '#F6FBF6'} strokeWidth="13" />
                 <text x={cx} y={cy - rUser + 5} textAnchor="middle" fontSize="10" fontWeight="700" fill={couleurUser}>Vous</text>
-                <text x={cx} y={cy - 5} textAnchor="middle" fontSize="12" fontWeight="700" fill={t.dark ? '#fff' : '#1B2E4B'}>{patrimoine.toLocaleString('fr-FR')} €</text>
+                <text x={cx} y={cy - 5} textAnchor="middle" fontSize="12" fontWeight="700" fill={t.dark ? '#fff' : '#034065'}>{patrimoine.toLocaleString('fr-FR')} €</text>
                 {palierAtteint && <text x={cx} y={cy + 12} textAnchor="middle" fontSize="9" fill={palierAtteint.couleur} fontWeight="500">{palierAtteint.label}</text>}
               </svg>
             </div>
@@ -840,7 +850,6 @@ function PositionModal({ totalInvesti, comptes, onClose }) {
   )
 }
 
-// ─── Carte badge format diplôme ───────────────────────────────────────────────
 function BadgeCard({ badge, obtenu, onClickNiveaux, gradeActuel, progression }) {
   const t = useTheme()
   const [hovered, setHovered] = useState(false)
@@ -849,6 +858,74 @@ function BadgeCard({ badge, obtenu, onClickNiveaux, gradeActuel, progression }) 
   const couleurBadge = badge.categorie === 'guide' ? badge.couleur : badge.categorie === 'mensuel' ? '#3B82F6' : gradeActuel ? gradeActuel.niveauColor : '#4CAF2E'
   const bgBadge = badge.categorie === 'guide' ? badge.couleur + '15' : badge.categorie === 'mensuel' ? '#E6F1FB' : gradeActuel ? gradeActuel.niveauBg : '#EAF6E4'
 
+  // ── Style Strava pour les badges principaux ──
+  if (badge.categorie === 'principal') {
+    return (
+      <div
+        onClick={estCliquable ? onClickNiveaux : undefined}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', padding: '16px 8px', cursor: estCliquable ? 'pointer' : 'default', transition: 'transform 0.15s', transform: hovered && estCliquable ? 'translateY(-3px)' : 'none', opacity: obtenu ? 1 : 0.4 }}
+      >
+        {/* IMAGE RONDE */}
+        <div style={{ width: 80, height: 80, borderRadius: '50%', overflow: 'hidden', marginBottom: 10, background: obtenu ? bgBadge : t.bgSecondary, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          {obtenu ? (
+            badge.svgIcon ? <img src={METRONOME_URL} alt={badge.nom} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            : badge.imageUrl ? <img src={badge.imageUrl} alt={badge.nom} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            : <span style={{ fontSize: 36 }}>
+                {badge.slug === 'premier-pas' ? '🌱'
+                : badge.slug === 'grand-saut' ? '🚀'
+                : badge.slug === 'main-de-fer' ? '🗿'
+                : badge.slug === 'architecte' ? '🏗️'
+                : badge.slug === 'vroum-vroum' ? '⚡'
+                : '🏆'}
+              </span>
+          ) : (
+            <span style={{ fontSize: 28, filter: 'blur(2px)', color: t.textMuted }}>?</span>
+          )}
+        </div>
+
+        {/* NOM */}
+        <div style={{ fontSize: 12, fontWeight: 600, color: obtenu ? couleurBadge : t.textMuted, marginBottom: 4, lineHeight: 1.3 }}>
+          {badge.nom}
+        </div>
+{obtenu && badge.message && (
+  <div style={{ fontSize: 10, color: t.textMuted, lineHeight: 1.4, fontStyle: 'italic', marginBottom: 4 }}>
+    "{badge.message}"
+  </div>
+)}
+{!obtenu && (
+  <div style={{ fontSize: 10, color: t.textMuted, lineHeight: 1.4 }}>
+    {badge.quete}
+  </div>
+)}
+        {/* GRADE ou MESSAGE */}
+        {obtenu && gradeActuel && (
+          <div style={{ fontSize: 10, padding: '2px 8px', borderRadius: 20, background: gradeActuel.niveauBg, color: gradeActuel.niveauColor, fontWeight: 600, border: `0.5px solid ${gradeActuel.niveauColor}`, marginBottom: 4 }}>
+            {gradeActuel.niveau}
+          </div>
+        )}
+
+        {/* PROGRESSION */}
+        {progression && !obtenu && (
+          <div style={{ width: '100%', marginTop: 6 }}>
+            <div style={{ background: t.bgSecondary, borderRadius: 3, height: 4, overflow: 'hidden' }}>
+              <div style={{ height: '100%', borderRadius: 3, background: couleurBadge, width: `${Math.min(100, Math.round((progression.current / progression.total) * 100))}%` }} />
+            </div>
+            <div style={{ fontSize: 9, color: t.textMuted, marginTop: 3 }}>
+              {progression.currency ? `${progression.current.toLocaleString('fr-FR')} / ${progression.total.toLocaleString('fr-FR')} €` : `${progression.current} / ${progression.total}`}
+            </div>
+          </div>
+        )}
+
+        {estCliquable && hovered && badge.slug !== 'premier-pas' && (
+          <div style={{ fontSize: 9, color: couleurBadge, fontWeight: 500, marginTop: 4 }}>Voir les niveaux →</div>
+        )}
+      </div>
+    )
+  }
+
+  // ── Style original pour guide et mensuel ──
   return (
     <div
       onClick={estCliquable ? onClickNiveaux : undefined}
@@ -861,7 +938,7 @@ function BadgeCard({ badge, obtenu, onClickNiveaux, gradeActuel, progression }) 
           badge.svgIcon ? <img src={METRONOME_URL} alt={badge.nom} style={{ width: 60, height: 60, objectFit: 'cover', borderRadius: '50%', border: `2px solid ${couleurBadge}` }} />
           : badge.imageUrl ? <img src={badge.imageUrl} alt={badge.nom} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           : (
-            <div style={{ width: 60, height: 60, borderRadius: '50%', background: bgBadge, border: `2px solid ${couleurBadge}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: 60, height: 60, borderRadius: 8, background: bgBadge, border: `2px solid ${couleurBadge}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               {badge.categorie === 'mensuel' ? <div style={{ textAlign: 'center' }}><div style={{ fontSize: 11, fontWeight: 700, color: couleurBadge }}>{MOIS_NOMS[badge.mois - 1]?.substring(0, 3).toUpperCase()}</div><div style={{ fontSize: 9, color: couleurBadge }}>{badge.annee}</div></div>
               : badge.categorie === 'guide' ? <div style={{ fontSize: 16, fontWeight: 700, color: couleurBadge }}>{badge.chapitre}</div>
               : <div style={{ fontSize: 10, color: couleurBadge, textAlign: 'center', padding: '0 6px', lineHeight: 1.3 }}>Image<br/>à venir</div>}
@@ -915,15 +992,15 @@ function PopupPremierPas({ onClose }) {
           
           {/* Parrainage */}
           <div style={{ background: '#E8EEF6', borderRadius: 12, padding: '16px 18px' }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: '#1B2E4B', marginBottom: 6 }}>🎁 Cadeau de bienvenue</div>
-            <div style={{ fontSize: 12, color: '#1B2E4B', lineHeight: 1.6, marginBottom: 14 }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: '#034065', marginBottom: 6 }}>🎁 Cadeau de bienvenue</div>
+            <div style={{ fontSize: 12, color: '#034065', lineHeight: 1.6, marginBottom: 14 }}>
               Ouvre ton compte (CTO, PEA ou lez deux) <strong>Bourse Direct</strong> via le code parrain et profite d'avantages exclusifs pour commencer à investir dans les meilleures conditions.
             </div>
 <a            
          href="https://www.boursedirect.fr/fr/bourse/ouvrir-un-compte"
   target="_blank"
   rel="noopener noreferrer"
-  style={{ display: 'block', textAlign: 'center', background: '#1B2E4B', color: '#fff', padding: '11px', borderRadius: 10, fontSize: 13, fontWeight: 600, textDecoration: 'none' }}
+  style={{ display: 'block', textAlign: 'center', background: '#034065', color: '#fff', padding: '11px', borderRadius: 10, fontSize: 13, fontWeight: 600, textDecoration: 'none' }}
 >
   Ouvrir un compte Bourse Direct →
 </a>
@@ -939,10 +1016,10 @@ function PopupPremierPas({ onClose }) {
                 { num: '3', texte: 'Passe ton premier ordre dans un délai de 3 mois pour bénéficer de 200€ de frais de courtage' },
               ].map(({ num, texte }) => (
                 <div key={num} style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-                  <div style={{ width: 24, height: 24, borderRadius: '50%', background: '#1B2E4B', color: '#fff', fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{num}</div>
+                  <div style={{ width: 24, height: 24, borderRadius: '50%', background: '#034065', color: '#fff', fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{num}</div>
                   <div style={{ fontSize: 12, color: t.textMuted, lineHeight: 1.6, paddingTop: 3 }}>
                     {texte}
-                    {num === '2' && <span style={{ fontWeight: 700, color: '#1B2E4B', fontSize: 14 }}>2023847374</span>}
+                    {num === '2' && <span style={{ fontWeight: 700, color: '#034065', fontSize: 14 }}>2023847374</span>}
                   </div>
                 </div>
               ))}
@@ -985,6 +1062,7 @@ const GUIDE_CHALLENGE = [
   const [premierPasOpen, setPremierPasOpen] = useState(false)
   const [badgesNouveaux, setBadgesNouveaux] = useState([])
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
+  const [photoUrl, setPhotoUrl] = useState(null)
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768)
@@ -993,6 +1071,18 @@ const GUIDE_CHALLENGE = [
   }, [])
 
   const { data, isLoading } = useQuery({ queryKey: ['challenge'], queryFn: fetchChallengeData, refetchOnMount: true, staleTime: 0 })
+  const initiale = data?.user?.user_metadata?.prenom?.[0]?.toUpperCase() || '?'
+
+ useEffect(() => {
+  const loadPhoto = async () => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) {
+      
+      setPhotoUrl(user.user_metadata?.photo_url || null)
+    }
+  }
+  loadPhoto()
+}, [])
 
   useEffect(() => {
     if (!data) return
@@ -1032,7 +1122,7 @@ await supabase
   const investissements = data?.investissements || []
   const transactions = data?.transactions || []
   const comptes = data?.comptes || []
-  const bleu = t.dark ? '#3B82F6' : '#1B2E4B'
+  const bleu = t.dark ? '#3B82F6' : '#034065'
   const streak = calcStreak(transactions)
   const totalInvesti = investissements.reduce((acc, i) => acc + parseFloat(i.quantite) * parseFloat(i.pru || i.prix_achat_unitaire || 0), 0)
   const slugsObtenus = new Set(accomplissements.map(a => a.slug))
@@ -1082,14 +1172,14 @@ await supabase
 
   if (isLoading || checking) return (
     <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <Navbar page="Challenge" />
+      <Navbar page="Challenge" initiale={initiale} photoUrl={photoUrl} />
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: t.textMuted, fontSize: 13 }}>Vérification des accomplissements...</div>
     </div>
   )
 
   return (
     <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column', overflowX: 'hidden' }}>
-      <Navbar page="Challenge" />
+      <Navbar page="Challenge" initiale={initiale} photoUrl={photoUrl} />
   {badgesNouveaux.length > 0 && (
   <div style={{ background: '#4CAF2E', padding: '12px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
     <div style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>
@@ -1115,7 +1205,7 @@ await supabase
   style={{
     position: 'fixed', bottom: 80, right: 16, zIndex: 100,
     width: 36, height: 36, borderRadius: '50%',
-    background: '#1B2E4B', color: '#fff',
+    background: '#034065', color: '#fff',
     border: 'none', fontSize: 16, fontWeight: 700,
     cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -1126,7 +1216,7 @@ await supabase
       <div style={{ padding: isMobile ? '16px 12px' : '16px 20px', flex: 1, display: 'flex', flexDirection: 'column', gap: 14, maxWidth: 1000, margin: '0 auto', width: '100%', overflowX: 'hidden', boxSizing: 'border-box' }}>
 
         {/* HEADER BLEU */}
-        <div style={{ background: '#1B2E4B', borderRadius: 14, padding: isMobile ? '18px 16px' : '20px 24px' }}>
+        <div style={{ background: '#034065', borderRadius: 14, padding: isMobile ? '18px 16px' : '20px 24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
             <div style={{ fontSize: 18, fontWeight: 600, color: '#fff' }}>Livret d'accomplissements</div>
             <div style={{ background: 'rgba(255,255,255,0.12)', borderRadius: 10, padding: '8px 14px', textAlign: 'center', flexShrink: 0 }}>
@@ -1153,7 +1243,7 @@ await supabase
 
         {/* BOUTON MA POSITION */}
         <button onClick={() => setPositionOpen(true)} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', borderRadius: 12, border: `0.5px solid ${t.border}`, background: t.bgCard, cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left', width: '100%' }}>
-          <div style={{ width: 40, height: 40, borderRadius: 10, background: '#1B2E4B', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>🎯</div>
+          <div style={{ width: 40, height: 40, borderRadius: 10, background: '#034065', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>🎯</div>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 13, fontWeight: 500, color: t.text }}>Voir Ma Position</div>
             <div style={{ fontSize: 11, color: t.textMuted, marginTop: 1 }}>Ta place parmi les épargnants français · INSEE 2024</div>

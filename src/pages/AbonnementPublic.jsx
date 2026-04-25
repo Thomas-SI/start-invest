@@ -74,9 +74,9 @@ function PublicNavbar({ isMobile, openLogin, openSignup, activeLink = 'Abonnemen
             aria-label={menuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
             style={{ background: 'transparent', border: 'none', padding: 8, cursor: 'pointer', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 5, width: 40, height: 40 }}
           >
-            <span style={{ width: 22, height: 2, background: '#1B2E4B', borderRadius: 2, transition: 'all 0.25s', transform: menuOpen ? 'rotate(45deg) translate(5px, 5px)' : 'none' }} />
-            <span style={{ width: 22, height: 2, background: '#1B2E4B', borderRadius: 2, transition: 'all 0.25s', opacity: menuOpen ? 0 : 1 }} />
-            <span style={{ width: 22, height: 2, background: '#1B2E4B', borderRadius: 2, transition: 'all 0.25s', transform: menuOpen ? 'rotate(-45deg) translate(5px, -5px)' : 'none' }} />
+            <span style={{ width: 22, height: 2, background: '#034065', borderRadius: 2, transition: 'all 0.25s', transform: menuOpen ? 'rotate(45deg) translate(5px, 5px)' : 'none' }} />
+            <span style={{ width: 22, height: 2, background: '#034065', borderRadius: 2, transition: 'all 0.25s', opacity: menuOpen ? 0 : 1 }} />
+            <span style={{ width: 22, height: 2, background: '#034065', borderRadius: 2, transition: 'all 0.25s', transform: menuOpen ? 'rotate(-45deg) translate(5px, -5px)' : 'none' }} />
           </button>
         </nav>
 
@@ -89,7 +89,7 @@ function PublicNavbar({ isMobile, openLogin, openSignup, activeLink = 'Abonnemen
                   onClick={() => handleNavigate(path)}
                   style={{
                     fontSize: 16,
-                    color: label === activeLink ? '#4CAF2E' : '#1B2E4B',
+                    color: label === activeLink ? '#4CAF2E' : '#034065',
                     padding: '16px 24px',
                     cursor: 'pointer',
                     fontWeight: label === activeLink ? 600 : 400,
@@ -102,7 +102,7 @@ function PublicNavbar({ isMobile, openLogin, openSignup, activeLink = 'Abonnemen
             </div>
 
             <div style={{ padding: '20px 24px', marginTop: 'auto', borderTop: '0.5px solid #E0EAE3', display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <button onClick={() => { setMenuOpen(false); openLogin() }} style={{ padding: '12px', borderRadius: 8, border: '0.5px solid #1B2E4B', background: 'transparent', color: '#1B2E4B', fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Se connecter</button>
+              <button onClick={() => { setMenuOpen(false); openLogin() }} style={{ padding: '12px', borderRadius: 8, border: '0.5px solid #034065', background: 'transparent', color: '#034065', fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Se connecter</button>
               <button onClick={() => { setMenuOpen(false); openSignup() }} style={{ padding: '12px', borderRadius: 8, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>S'inscrire gratuitement</button>
             </div>
           </div>
@@ -116,15 +116,15 @@ function PublicNavbar({ isMobile, openLogin, openSignup, activeLink = 'Abonnemen
       <Logo />
       <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
         {links.map(([label, path]) => (
-          <span key={label} onClick={() => navigate(path)} style={{ fontSize: 13, color: label === activeLink ? '#1B2E4B' : '#6B7280', padding: '5px 12px', borderRadius: 6, cursor: 'pointer', fontWeight: label === activeLink ? 500 : 400 }}
-            onMouseEnter={e => e.currentTarget.style.color = '#1B2E4B'}
-            onMouseLeave={e => e.currentTarget.style.color = label === activeLink ? '#1B2E4B' : '#6B7280'}>
+          <span key={label} onClick={() => navigate(path)} style={{ fontSize: 13, color: label === activeLink ? '#034065' : '#6B7280', padding: '5px 12px', borderRadius: 6, cursor: 'pointer', fontWeight: label === activeLink ? 500 : 400 }}
+            onMouseEnter={e => e.currentTarget.style.color = '#034065'}
+            onMouseLeave={e => e.currentTarget.style.color = label === activeLink ? '#034065' : '#6B7280'}>
             {label}
           </span>
         ))}
       </div>
       <div style={{ display: 'flex', gap: 10 }}>
-        <button onClick={openLogin} style={{ padding: '7px 16px', borderRadius: 8, border: '0.5px solid #1B2E4B', background: 'transparent', color: '#1B2E4B', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Se connecter</button>
+        <button onClick={openLogin} style={{ padding: '7px 16px', borderRadius: 8, border: '0.5px solid #034065', background: 'transparent', color: '#034065', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Se connecter</button>
         <button onClick={openSignup} style={{ padding: '7px 16px', borderRadius: 8, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>S'inscrire gratuitement</button>
       </div>
     </nav>
@@ -138,7 +138,7 @@ function FaqItem({ question, reponse }) {
         onClick={() => setOpen(o => !o)}
         style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '18px 20px', cursor: 'pointer' }}
       >
-        <div style={{ fontSize: 14, fontWeight: 500, color: '#1B2E4B', paddingRight: 16 }}>{question}</div>
+        <div style={{ fontSize: 14, fontWeight: 500, color: '#034065', paddingRight: 16 }}>{question}</div>
         <div style={{ fontSize: 18, color: '#4CAF2E', flexShrink: 0 }}>{open ? '▲' : '▼'}</div>
       </div>
       {open && (
@@ -169,7 +169,7 @@ export default function AbonnementPublic() {
 
       <section style={{ padding: isMobile ? '40px 16px 30px' : '60px 40px 40px', textAlign: 'center' }}>
         <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 16, background: '#EAF6E4', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Abonnement</div>
-        <h1 style={{ fontSize: isMobile ? 28 : 38, fontWeight: 700, color: '#1B2E4B', lineHeight: 1.2, margin: '0 0 16px' }}>
+        <h1 style={{ fontSize: isMobile ? 28 : 38, fontWeight: 700, color: '#034065', lineHeight: 1.2, margin: '0 0 16px' }}>
           Simple, transparent, sans surprise.
         </h1>
         <p style={{ fontSize: isMobile ? 14 : 15, color: '#6B7280', maxWidth: 440, margin: '0 auto 12px' }}>
@@ -195,14 +195,14 @@ export default function AbonnementPublic() {
     ].map(([annee, prix]) => (
       <div key={annee} style={{ display: 'flex', justifyContent: 'space-between', background: '#fff', border: '0.5px solid #E0EAE3', borderRadius: 8, padding: '6px 12px', fontSize: 12 }}>
         <span style={{ color: '#9CA3AF' }}>{annee}</span>
-        <span style={{ color: prix === '🎉 Gratuit' ? '#4CAF2E' : '#1B2E4B', fontWeight: 600 }}>{prix}</span>
+        <span style={{ color: prix === '🎉 Gratuit' ? '#4CAF2E' : '#034065', fontWeight: 600 }}>{prix}</span>
       </div>
     ))}
   </div>
 </div>
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 0, background: '#fff', border: '0.5px solid #E0EAE3', borderRadius: 30, padding: '4px', marginBottom: isMobile ? 36 : 48 }}>
-          <button onClick={() => setAnnuel(false)} style={{ padding: '7px 20px', borderRadius: 20, border: 'none', background: !annuel ? '#1B2E4B' : 'transparent', color: !annuel ? '#fff' : '#9CA3AF', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' }}>Mensuel</button>
-          <button onClick={() => setAnnuel(true)} style={{ padding: '7px 20px', borderRadius: 20, border: 'none', background: annuel ? '#1B2E4B' : 'transparent', color: annuel ? '#fff' : '#9CA3AF', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s', display: 'flex', alignItems: 'center', gap: 6 }}>
+          <button onClick={() => setAnnuel(false)} style={{ padding: '7px 20px', borderRadius: 20, border: 'none', background: !annuel ? '#034065' : 'transparent', color: !annuel ? '#fff' : '#9CA3AF', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' }}>Mensuel</button>
+          <button onClick={() => setAnnuel(true)} style={{ padding: '7px 20px', borderRadius: 20, border: 'none', background: annuel ? '#034065' : 'transparent', color: annuel ? '#fff' : '#9CA3AF', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s', display: 'flex', alignItems: 'center', gap: 6 }}>
             Annuel
             <span style={{ fontSize: 9, background: '#4CAF2E', color: '#fff', padding: '2px 6px', borderRadius: 10, fontWeight: 600 }}>-29%</span>
           </button>
@@ -213,11 +213,11 @@ export default function AbonnementPublic() {
           {/* GRATUIT */}
           <div style={{ background: '#fff', border: '0.5px solid #E0EAE3', borderRadius: 20, padding: isMobile ? '28px 22px' : '32px 28px', textAlign: 'left' }}>
             <div style={{ fontSize: 13, fontWeight: 600, color: '#6B7280', marginBottom: 8 }}>Gratuit</div>
-            <div style={{ fontSize: 36, fontWeight: 700, color: '#1B2E4B', marginBottom: 4 }}>0 euros</div>
+            <div style={{ fontSize: 36, fontWeight: 700, color: '#034065', marginBottom: 4 }}>0 euros</div>
             <div style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 24 }}>pour toujours</div>
             <div style={{ borderTop: '0.5px solid #E0EAE3', paddingTop: 20, marginBottom: 24 }}>
               {featuresGratuit.map(({ label, inclus }) => (
-  <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10, fontSize: 13, color: inclus ? '#1B2E4B' : '#9CA3AF' }}>
+  <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10, fontSize: 13, color: inclus ? '#034065' : '#9CA3AF' }}>
     <div style={{ width: 18, height: 18, borderRadius: '50%', background: inclus ? '#EAF6E4' : 'transparent', border: inclus ? 'none' : '0.5px solid #E0EAE3', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
       {inclus && <svg width="9" height="9" viewBox="0 0 8 8" fill="none"><path d="M1.5 4L3 5.5L6.5 2" stroke="#4CAF2E" strokeWidth="1.2" strokeLinecap="round"/></svg>}
     </div>
@@ -225,13 +225,13 @@ export default function AbonnementPublic() {
   </div>
 ))}
             </div>
-            <button onClick={openSignup} style={{ width: '100%', padding: '12px', borderRadius: 10, border: '0.5px solid #E0EAE3', background: '#F4F7F5', color: '#1B2E4B', fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>
+            <button onClick={openSignup} style={{ width: '100%', padding: '12px', borderRadius: 10, border: '0.5px solid #E0EAE3', background: '#F4F7F5', color: '#034065', fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>
               Commencer gratuitement
             </button>
           </div>
 
           {/* PREMIUM */}
-          <div style={{ background: '#1B2E4B', border: '2px solid #4CAF2E', borderRadius: 20, padding: isMobile ? '28px 22px' : '32px 28px', textAlign: 'left', position: 'relative' }}>
+          <div style={{ background: '#034065', border: '2px solid #4CAF2E', borderRadius: 20, padding: isMobile ? '28px 22px' : '32px 28px', textAlign: 'left', position: 'relative' }}>
             <div style={{ position: 'absolute', top: -14, left: '50%', transform: 'translateX(-50%)', background: '#4CAF2E', color: '#fff', fontSize: 11, fontWeight: 600, padding: '4px 16px', borderRadius: 20, whiteSpace: 'nowrap' }}>Recommandé</div>
             <div style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.6)', marginBottom: 8 }}>Premium</div>
             <div style={{ fontSize: 36, fontWeight: 700, color: '#fff', marginBottom: 4 }}>{annuel ? '67 euros' : '7.99 euros'}</div>
@@ -257,7 +257,7 @@ export default function AbonnementPublic() {
 
       {/* FAQ */}
 <section style={{ padding: isMobile ? '40px 16px 60px' : '60px 40px', maxWidth: 720, margin: '0 auto' }}>
-  <h2 style={{ fontSize: isMobile ? 22 : 26, fontWeight: 700, color: '#1B2E4B', textAlign: 'center', marginBottom: isMobile ? 28 : 40 }}>Questions fréquentes</h2>
+  <h2 style={{ fontSize: isMobile ? 22 : 26, fontWeight: 700, color: '#034065', textAlign: 'center', marginBottom: isMobile ? 28 : 40 }}>Questions fréquentes</h2>
   {[
     {
       q: 'En quoi c\'est différent des autres applications ?',

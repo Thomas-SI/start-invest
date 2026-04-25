@@ -495,8 +495,8 @@ function PopupFiche({ fiche, chapitre, onClose, onChapitreValide }) {
 
           {fiche.app && (
             <div style={{ background: '#E8EEF6', border: '0.5px solid rgba(27,46,75,0.15)', borderRadius: 8, padding: '12px 14px' }}>
-              <div style={{ fontSize: 11, fontWeight: 500, color: '#1B2E4B', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Dans Start Invest</div>
-              <div style={{ fontSize: 12, color: '#1B2E4B', lineHeight: 1.6 }}>{fiche.app}</div>
+              <div style={{ fontSize: 11, fontWeight: 500, color: '#034065', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Dans Start Invest</div>
+              <div style={{ fontSize: 12, color: '#034065', lineHeight: 1.6 }}>{fiche.app}</div>
             </div>
           )}
 
@@ -514,7 +514,21 @@ function PopupFiche({ fiche, chapitre, onClose, onChapitreValide }) {
 export default function Guide() {
   const t = useTheme()
   const { showGuide, ouvrirGuide, fermerGuide } = usePageGuide()
+  const [user, setUser] = useState(null)
+  const [photoUrl, setPhotoUrl] = useState(null)
 
+useEffect(() => {
+  const loadUser = async () => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) {
+      setUser(user)
+      setPhotoUrl(user.user_metadata?.photo_url || null)
+    }
+  }
+  loadUser()
+}, [])
+
+const initiale = user?.user_metadata?.prenom?.[0]?.toUpperCase() || '?'
 const GUIDE_GUIDE = [
   {
     titre: '🎓 Les bases, sans jargon',
@@ -557,7 +571,7 @@ const GUIDE_GUIDE = [
     <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column', overflowX: 'hidden' }}>
       {ficheOuverte && <PopupFiche fiche={ficheOuverte} chapitre={chapitreOuvert} onClose={fermerFiche} onChapitreValide={onChapitreValide} />}
 
-      <Navbar page="Guide" />
+      <Navbar page="Guide" initiale={initiale} photoUrl={photoUrl} />
       <PageGuide
   pageId="guide"
   titre="Guide"
@@ -570,7 +584,7 @@ const GUIDE_GUIDE = [
   style={{
     position: 'fixed', bottom: 80, right: 16, zIndex: 100,
     width: 36, height: 36, borderRadius: '50%',
-    background: '#1B2E4B', color: '#fff',
+    background: '#034065', color: '#fff',
     border: 'none', fontSize: 16, fontWeight: 700,
     cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -582,7 +596,7 @@ const GUIDE_GUIDE = [
       <div style={{ padding: '24px 20px', flex: 1, display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 1000, margin: '0 auto', width: '100%', overflowX: 'hidden', boxSizing: 'border-box' }}>
 
         {/* HEADER BLEU */}
-        <div style={{ background: '#1B2E4B', borderRadius: 12, padding: '28px 24px', textAlign: 'center' }}>
+        <div style={{ background: '#034065', borderRadius: 12, padding: '28px 24px', textAlign: 'center' }}>
           <div style={{ fontSize: 22, fontWeight: 600, color: '#fff', marginBottom: 8 }}>
             De zéro à investisseur : Le guide complet
           </div>

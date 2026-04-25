@@ -39,12 +39,16 @@ const conseils = [
 export default function Concentration() {
   const t = useTheme()
   const [user, setUser] = useState(null)
+  const [photoUrl, setPhotoUrl] = useState(null)
   const [ouvert, setOuvert] = useState(null)
 
   useEffect(() => {
     const fetchUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
-      if (user) setUser(user)
+      if (user) {
+        setUser(user)
+        setPhotoUrl(user.user_metadata?.photo_url || null)
+      }
     }
     fetchUser()
   }, [])
@@ -53,7 +57,7 @@ export default function Concentration() {
 
   return (
     <div style={{ background: t.bg, height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-      <Navbar page="Concentration" initiale={initiale} />
+      <Navbar page="Concentration" initiale={initiale} photoUrl={photoUrl} />
 
       <div style={{ padding: '16px 20px', flex: 1, overflow: 'auto' }}>
         <div style={{ marginBottom: 16 }}>

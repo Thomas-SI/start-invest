@@ -35,12 +35,12 @@ const VIREMENTS_DEFAULT = [
 
 const TYPES_DISPONIBILITE = {
   'sécurité': { color: '#4CAF2E' },
-  'investissement': { color: '#1B2E4B' },
+  'investissement': { color: '#034065' },
   'immobilier': { color: '#BA7517' },
   'autre': { color: '#9CA3AF' },
 }
 
-const COULEURS = ['#1B2E4B', '#4CAF2E', '#BA7517', '#3B82F6', '#E24B4A', '#8B5CF6', '#06B6D4', '#F59E0B', '#10B981', '#EC4899']
+const COULEURS = ['#034065', '#4CAF2E', '#BA7517', '#3B82F6', '#E24B4A', '#8B5CF6', '#06B6D4', '#F59E0B', '#10B981', '#EC4899']
 
 const fetchPortefeuilleData = async () => {
   const { data: { user } } = await supabase.auth.getUser()
@@ -116,6 +116,7 @@ const GUIDE_PORTEFEUILLE = [
   const [succesEdit, setSuccesEdit] = useState(false)
   const [confirmDeleteIdx, setConfirmDeleteIdx] = useState(null)
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
+  const [photoUrl, setPhotoUrl] = useState(null)
 
   // États pour le plan de virement
   const [editingVirIdx, setEditingVirIdx] = useState(null)
@@ -135,6 +136,14 @@ const GUIDE_PORTEFEUILLE = [
     queryFn: fetchPortefeuilleData,
   })
 
+  useEffect(() => {
+  if (data?.user) {
+    setPhotoUrl(data.user.user_metadata?.photo_url || null)
+  }
+}, [data])
+
+  const initiale = data?.user?.user_metadata?.prenom?.[0]?.toUpperCase() || '?'
+
   const user = data?.user || null
   const comptes = data?.comptes || COMPTES_DEFAULT
   const virements = data?.virements || VIREMENTS_DEFAULT
@@ -145,7 +154,7 @@ const GUIDE_PORTEFEUILLE = [
   const totalSecurite = comptes.filter(c => c.type === 'sécurité').reduce((acc, c) => acc + (parseFloat(c.solde) || 0), 0)
   const objectifMatelas = depensesFixes * nbMoisMatelas
   const remplissageMatelas = objectifMatelas > 0 ? Math.min(Math.round((totalSecurite / objectifMatelas) * 100), 100) : 0
-  const bleu = t.dark ? '#3B82F6' : '#1B2E4B'
+  const bleu = t.dark ? '#3B82F6' : '#034065'
   const totalPourcentage = virements.reduce((acc, v) => acc + (parseFloat(v.pourcentage) || 0), 0)
   const predefiniSelectionne = COMPTES_PREDEFINIS.find(c => c.nom === selectedPredefini)
 
@@ -293,7 +302,7 @@ const GUIDE_PORTEFEUILLE = [
 
   if (isLoading) return (
     <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <Navbar page="Portefeuille" />
+      <Navbar page="Portefeuille" initiale={initiale} photoUrl={photoUrl} />
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: t.textMuted, fontSize: 13 }}>Chargement...</div>
     </div>
   )
@@ -317,7 +326,7 @@ if (!isPremium) {
   style={{
     position: 'fixed', bottom: 80, right: 16, zIndex: 100,
     width: 36, height: 36, borderRadius: '50%',
-    background: '#1B2E4B', color: '#fff',
+    background: '#034065', color: '#fff',
     border: 'none', fontSize: 16, fontWeight: 700,
     cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
     display: 'flex', alignItems: 'center', justifyContent: 'center',

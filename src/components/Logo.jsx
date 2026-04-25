@@ -1,7 +1,7 @@
 export default function Logo({ size = 'md', theme = 'light' }) {
   const scales = { sm: 0.55, md: 1, lg: 1.8 }
   const s = scales[size] || 1
-  const startColor = theme === 'dark' ? 'rgba(255,255,255,0.9)' : '#1B2E4B'
+  const startColor = theme === 'dark' ? 'rgba(255,255,255,0.9)' : '#034065'
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1 }}>

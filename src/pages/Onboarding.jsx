@@ -60,7 +60,7 @@ function AnimationWelcome() {
         <div style={{ fontSize: 64, marginBottom: 16, animationName: 'pulse', animationDuration: '2s', animationTimingFunction: 'ease-in-out', animationIterationCount: 'infinite' }}>📊</div>
         <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
           {['Finances', 'ETF', 'Croissance', 'DCA'].map((l, i) => (
-            <div key={l} style={{ background: i % 2 === 0 ? '#EAF6E4' : '#E8EEF6', color: i % 2 === 0 ? '#2E7D1E' : '#1B2E4B', fontSize: 11, fontWeight: 500, padding: '4px 10px', borderRadius: 20, animationName: 'fadeIn', animationDuration: '0.5s', animationTimingFunction: 'ease', animationDelay: `${i * 0.15}s`, animationFillMode: 'both' }}>
+            <div key={l} style={{ background: i % 2 === 0 ? '#EAF6E4' : '#E8EEF6', color: i % 2 === 0 ? '#2E7D1E' : '#034065', fontSize: 11, fontWeight: 500, padding: '4px 10px', borderRadius: 20, animationName: 'fadeIn', animationDuration: '0.5s', animationTimingFunction: 'ease', animationDelay: `${i * 0.15}s`, animationFillMode: 'both' }}>
               {l}
             </div>
           ))}
@@ -79,7 +79,7 @@ function AnimationFinances() {
       <div style={{ width: '100%', maxWidth: 280 }}>
         <div style={{ fontSize: 11, fontWeight: 500, color: '#9CA3AF', marginBottom: 12, textAlign: 'center' }}>Règle 50 / 30 / 20</div>
         {[
-          { label: 'Besoins', pct: 50, color: '#1B2E4B', w: '50%' },
+          { label: 'Besoins', pct: 50, color: '#034065', w: '50%' },
           { label: 'Envies', pct: 28, color: '#BA7517', w: '28%' },
           { label: 'Investissement', pct: 22, color: '#4CAF2E', w: '22%' },
         ].map(({ label, pct, color, w }, i) => (
@@ -112,12 +112,12 @@ function AnimationPortefeuille() {
       <div style={{ width: '100%', maxWidth: 280 }}>
         {[
           { nom: 'Livret A', solde: '8 200 €', color: '#4CAF2E', w: '82%', delay: '0s' },
-          { nom: 'PEA', solde: '15 400 €', color: '#1B2E4B', w: '100%', delay: '0.2s' },
+          { nom: 'PEA', solde: '15 400 €', color: '#034065', w: '100%', delay: '0.2s' },
           { nom: 'CTO', solde: '6 800 €', color: '#3B82F6', w: '68%', delay: '0.4s' },
         ].map(({ nom, solde, color, w, delay }) => (
           <div key={nom} style={{ marginBottom: 12, animationName: 'slideIn', animationDuration: '0.5s', animationTimingFunction: 'ease', animationDelay: delay, animationFillMode: 'both' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 4 }}>
-              <span style={{ fontWeight: 500, color: '#1B2E4B' }}>{nom}</span>
+              <span style={{ fontWeight: 500, color: '#034065' }}>{nom}</span>
               <span style={{ color: '#6B7280' }}>{solde}</span>
             </div>
             <div style={{ background: '#F0F0F0', borderRadius: 4, height: 6, overflow: 'hidden' }}>
@@ -127,7 +127,7 @@ function AnimationPortefeuille() {
         ))}
         <div style={{ marginTop: 14, background: '#F4F7F5', borderRadius: 10, padding: '8px 12px', display: 'flex', justifyContent: 'space-between' }}>
           <span style={{ fontSize: 11, color: '#6B7280' }}>Total patrimoine</span>
-          <span style={{ fontSize: 13, fontWeight: 700, color: '#1B2E4B' }}>30 400 €</span>
+          <span style={{ fontSize: 13, fontWeight: 700, color: '#034065' }}>30 400 €</span>
         </div>
       </div>
     </div>
@@ -144,7 +144,7 @@ function AnimationInvestissement() {
       <div style={{ width: '100%', maxWidth: 280 }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 12 }}>
           {[
-            { label: 'Total investi', val: '12 400 €', color: '#1B2E4B' },
+            { label: 'Total investi', val: '12 400 €', color: '#034065' },
             { label: 'Valeur actuelle', val: '14 820 €', color: '#4CAF2E' },
             { label: 'Plus-value', val: '+2 420 €', color: '#4CAF2E' },
             { label: 'Positions', val: '4', color: '#3B82F6' },
@@ -163,11 +163,11 @@ function AnimationInvestissement() {
           ].map(({ ticker, enveloppe, val, pv, color }, i) => (
             <div key={ticker} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '7px 10px', borderBottom: '0.5px solid #E0EAE3', animationName: 'slideUp', animationDuration: '0.4s', animationTimingFunction: 'ease', animationDelay: `${0.4 + i * 0.1}s`, animationFillMode: 'both' }}>
               <div>
-                <div style={{ fontSize: 11, fontWeight: 600, color: '#1B2E4B' }}>{ticker}</div>
+                <div style={{ fontSize: 11, fontWeight: 600, color: '#034065' }}>{ticker}</div>
                 <div style={{ fontSize: 9, color: '#9CA3AF' }}>{enveloppe}</div>
               </div>
               <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: 11, fontWeight: 500, color: '#1B2E4B' }}>{val}</div>
+                <div style={{ fontSize: 11, fontWeight: 500, color: '#034065' }}>{val}</div>
                 <div style={{ fontSize: 10, fontWeight: 600, color }}>{pv}</div>
               </div>
             </div>
@@ -188,13 +188,13 @@ function AnimationChallenge() {
       <div style={{ width: '100%', maxWidth: 280, display: 'flex', flexDirection: 'column', gap: 8 }}>
         {[
           { titre: 'Premier pas', emoji: '🎯', statut: 'Débloqué', color: '#EAF6E4', text: '#2E7D1E', delay: '0s' },
-          { titre: 'Ascension', emoji: '⛰️', statut: 'En cours', color: '#E8EEF6', text: '#1B2E4B', delay: '0.2s' },
+          { titre: 'Ascension', emoji: '⛰️', statut: 'En cours', color: '#E8EEF6', text: '#034065', delay: '0.2s' },
           { titre: 'Loin et Vite', emoji: '🚀', statut: 'À débloquer', color: '#F4F7F5', text: '#9CA3AF', delay: '0.4s' },
         ].map(({ titre, emoji, statut, color, text, delay }) => (
           <div key={titre} style={{ background: '#F4F7F5', borderRadius: 10, padding: '10px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', animationName: 'fadeSlide', animationDuration: '0.5s', animationTimingFunction: 'ease', animationDelay: delay, animationFillMode: 'both' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1 }}>
               <span style={{ fontSize: 18, animationName: 'badgePop', animationDuration: '0.5s', animationTimingFunction: 'ease', animationDelay: delay, animationFillMode: 'both' }}>{emoji}</span>
-              <span style={{ fontSize: 11, fontWeight: 500, color: '#1B2E4B' }}>{titre}</span>
+              <span style={{ fontSize: 11, fontWeight: 500, color: '#034065' }}>{titre}</span>
             </div>
             <span style={{ fontSize: 9, padding: '2px 7px', borderRadius: 20, background: color, color: text, whiteSpace: 'nowrap' }}>{statut}</span>
           </div>
@@ -257,7 +257,7 @@ function TourApp({ onTerminer }) {
 
         {/* CONTENU - avec key pour forcer le remount aussi */}
         <div key={`content-${etape}`} style={{ padding: '0 28px 24px' }}>
-          <div style={{ fontSize: 20, fontWeight: 700, color: '#1B2E4B', marginBottom: 8 }}>
+          <div style={{ fontSize: 20, fontWeight: 700, color: '#034065', marginBottom: 8 }}>
             {current.emoji} {current.titre}
           </div>
           <div style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.65, marginBottom: 24 }}>

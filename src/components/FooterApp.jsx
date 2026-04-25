@@ -4,7 +4,7 @@ export default function FooterApp() {
   const navigate = useNavigate()
 
   return (
-    <footer style={{ background: '#1B2E4B', padding: '24px 20px', marginTop: 'auto' }}>
+    <footer style={{ background: '#034065', padding: '24px 20px', marginTop: 'auto' }}>
       <div style={{ maxWidth: 900, margin: '0 auto' }}>
         
         {/* AVERTISSEMENT */}

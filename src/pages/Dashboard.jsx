@@ -93,18 +93,18 @@ function PopupSimulateur({ versement, onClose, isMobile }) {
       <div style={{ background: '#fff', borderRadius: 16, padding: isMobile ? 16 : 24, width: '100%', maxWidth: 560, border: '0.5px solid #E0EAE3', maxHeight: '90vh', overflow: 'auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
           <div>
-            <div style={{ fontSize: 15, fontWeight: 500, color: '#1B2E4B' }}>Projection de croissance</div>
+            <div style={{ fontSize: 15, fontWeight: 500, color: '#034065' }}>Projection de croissance</div>
             <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>Basé sur {versement.toLocaleString('fr-FR')} €/mois · taux 7%/an</div>
           </div>
           <button onClick={onClose} style={{ background: '#F4F7F5', border: 'none', borderRadius: 8, padding: '6px 10px', fontSize: 14, cursor: 'pointer', color: '#6B7280' }}>×</button>
         </div>
         <div style={{ display: 'flex', gap: 6, marginBottom: 16 }}>
           {[10, 20, 30].map(d => (
-            <div key={d} onClick={() => setDuree(d)} style={{ fontSize: 12, fontWeight: 500, padding: '5px 14px', borderRadius: 20, cursor: 'pointer', background: duree === d ? '#1B2E4B' : '#F4F7F5', color: duree === d ? '#fff' : '#6B7280', border: '0.5px solid #E0EAE3' }}>{d} ans</div>
+            <div key={d} onClick={() => setDuree(d)} style={{ fontSize: 12, fontWeight: 500, padding: '5px 14px', borderRadius: 20, cursor: 'pointer', background: duree === d ? '#034065' : '#F4F7F5', color: duree === d ? '#fff' : '#6B7280', border: '0.5px solid #E0EAE3' }}>{d} ans</div>
           ))}
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, minmax(0,1fr))', gap: 10, marginBottom: 16 }}>
-          {[['Total investi', `${totalInvesti.toLocaleString('fr-FR')} €`, '#1B2E4B'], ['Capital final', `${final.toLocaleString('fr-FR')} €`, '#4CAF2E'], ['Intérêts générés', `+${totalInterets.toLocaleString('fr-FR')} €`, '#4CAF2E']].map(([l, v, c]) => (
+          {[['Total investi', `${totalInvesti.toLocaleString('fr-FR')} €`, '#034065'], ['Capital final', `${final.toLocaleString('fr-FR')} €`, '#4CAF2E'], ['Intérêts générés', `+${totalInterets.toLocaleString('fr-FR')} €`, '#4CAF2E']].map(([l, v, c]) => (
             <div key={l} style={{ background: '#F4F7F5', borderRadius: 10, padding: 12 }}>
               <div style={{ fontSize: 10, color: '#9CA3AF', marginBottom: 4 }}>{l}</div>
               <div style={{ fontSize: 16, fontWeight: 500, color: c }}>{v}</div>
@@ -228,12 +228,21 @@ const GUIDE_FINANCES = [
   const queryClient = useQueryClient()
 
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
+  const [photoUrl, setPhotoUrl] = useState(null)
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768)
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
   }, [])
+
+  useEffect(() => {
+  const loadPhoto = async () => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) setPhotoUrl(user.user_metadata?.photo_url || null)
+  }
+  loadPhoto()
+}, [])
 
   const { data, isLoading } = useQuery({
     queryKey: ['dashboard'],
@@ -287,10 +296,10 @@ const GUIDE_FINANCES = [
     if (moisActuel === 12 && moisEch === 1) alertes.push({ ...e, type: '1 mois' })
   })
 
-  const bleu = t.dark ? '#3B82F6' : '#1B2E4B'
+  const bleu = t.dark ? '#3B82F6' : '#034065'
   const bleuBg = t.dark ? 'rgba(59,130,246,0.15)' : '#E8EEF6'
   const bleuAlerte = t.dark ? 'rgba(59,130,246,0.15)' : '#E8EEF6'
-  const bleuAlerteText = t.dark ? '#3B82F6' : '#1B2E4B'
+  const bleuAlerteText = t.dark ? '#3B82F6' : '#034065'
   const bleuAlerteBorder = t.dark ? 'rgba(59,130,246,0.3)' : '#B8CCE4'
 
   const regle5030 = totalRevenus > 0 ? {
@@ -402,7 +411,7 @@ const GUIDE_FINANCES = [
 
   if (isLoading) return (
     <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <Navbar page="Mes Finances" initiale="?" />
+      <Navbar page="Mes Finances" initiale={initiale} photoUrl={photoUrl} />
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: t.textMuted, fontSize: 13 }}>Chargement...</div>
     </div>
   )
@@ -447,13 +456,13 @@ const GUIDE_FINANCES = [
         </div>
       )}
 
-      <Navbar page="Mes Finances" initiale={initiale} />
+      <Navbar page="Mes Finances" initiale={initiale} photoUrl={photoUrl} />
 <button
   onClick={ouvrirGuide}
   style={{
     position: 'fixed', bottom: 80, right: 16, zIndex: 100,
     width: 36, height: 36, borderRadius: '50%',
-    background: '#1B2E4B', color: '#fff',
+    background: '#034065', color: '#fff',
     border: 'none', fontSize: 16, fontWeight: 700,
     cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
     display: 'flex', alignItems: 'center', justifyContent: 'center',

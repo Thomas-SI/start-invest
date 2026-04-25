@@ -39,7 +39,7 @@ export function ThemeProvider({ children }) {
     bgCard: dark ? '#131820' : '#fff',
     bgSecondary: dark ? '#0F1319' : '#F4F7F5',
     border: dark ? '#1E2535' : '#E0EAE3',
-    text: dark ? '#E8E8E8' : '#1B2E4B',
+    text: dark ? '#E8E8E8' : '#034065',
     textSecondary: dark ? '#A0A0A0' : '#6B7280',
     textMuted: dark ? '#505A6A' : '#9CA3AF',
     nav: dark ? '#0C0F14' : '#fff',

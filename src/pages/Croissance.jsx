@@ -57,12 +57,20 @@ const GUIDE_CROISSANCE = [
   const [duree, setDuree] = useState(25)
   const [enveloppe, setEnveloppe] = useState('PEA')
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
+  const [photoUrl, setPhotoUrl] = useState(null)
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768)
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
   }, [])
+  useEffect(() => {
+  const loadPhoto = async () => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) setPhotoUrl(user.user_metadata?.photo_url || null)
+  }
+  loadPhoto()
+}, [])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -97,7 +105,7 @@ if (!isPremium) {
 }
   return (
     <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <Navbar page="Croissance" initiale={initiale} />
+      <Navbar page="Croissance" initiale={initiale} photoUrl={photoUrl} />
       <PageGuide
   pageId="croissance"
   titre="Croissance"
@@ -110,7 +118,7 @@ if (!isPremium) {
   style={{
     position: 'fixed', bottom: 80, right: 16, zIndex: 100,
     width: 36, height: 36, borderRadius: '50%',
-    background: '#1B2E4B', color: '#fff',
+    background: '#034065', color: '#fff',
     border: 'none', fontSize: 16, fontWeight: 700,
     cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -173,7 +181,7 @@ if (!isPremium) {
                 <div style={{ fontSize: 11, color: t.textMuted, marginBottom: 6 }}>Enveloppe fiscale</div>
                 <div style={{ display: 'flex', gap: 8 }}>
                   {['PEA', 'CTO'].map(e => (
-                    <div key={e} onClick={() => setEnveloppe(e)} style={{ flex: 1, textAlign: 'center', padding: '7px', borderRadius: 8, background: enveloppe === e ? '#1B2E4B' : t.bgSecondary, color: enveloppe === e ? '#fff' : t.textSecondary, fontSize: 12, fontWeight: enveloppe === e ? 500 : 400, cursor: 'pointer', border: `0.5px solid ${t.border}` }}>{e}</div>
+                    <div key={e} onClick={() => setEnveloppe(e)} style={{ flex: 1, textAlign: 'center', padding: '7px', borderRadius: 8, background: enveloppe === e ? '#034065' : t.bgSecondary, color: enveloppe === e ? '#fff' : t.textSecondary, fontSize: 12, fontWeight: enveloppe === e ? 500 : 400, cursor: 'pointer', border: `0.5px solid ${t.border}` }}>{e}</div>
                   ))}
                 </div>
               </div>

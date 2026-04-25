@@ -27,7 +27,7 @@ export default function Signup() {
   return (
     <div style={{ minHeight: '100vh', display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
 
-      <div style={{ background: '#1B2E4B', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: '40px' }}>
+      <div style={{ background: '#034065', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: '40px' }}>
         <div style={{ marginBottom: 32 }}>
           <div style={{ display: 'flex', alignItems: 'baseline', marginBottom: 8 }}>
             <span style={{ fontSize: 48, fontWeight: 500, color: '#fff', fontStyle: 'italic', letterSpacing: '.04em' }}>START</span>
@@ -52,7 +52,7 @@ export default function Signup() {
       <div style={{ background: '#F4F7F5', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px' }}>
         <div style={{ width: '100%', maxWidth: 380 }}>
           <div style={{ marginBottom: 32 }}>
-            <div style={{ fontSize: 24, fontWeight: 500, color: '#1B2E4B', marginBottom: 6 }}>Créer un compte</div>
+            <div style={{ fontSize: 24, fontWeight: 500, color: '#034065', marginBottom: 6 }}>Créer un compte</div>
             <div style={{ fontSize: 14, color: '#9CA3AF' }}>Commencez votre parcours d'investisseur</div>
           </div>
 
@@ -60,20 +60,20 @@ export default function Signup() {
             <div style={{ display: 'flex', gap: 12 }}>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 12, color: '#6B7280', marginBottom: 6 }}>Prénom</div>
-                <input placeholder="Jean" value={prenom} onChange={e => setPrenom(e.target.value)} style={{ width: '100%', padding: '11px 14px', borderRadius: 9, border: '0.5px solid #C8D8CE', fontSize: 14, fontFamily: 'inherit', outline: 'none', background: '#fff', color: '#1B2E4B' }} />
+                <input placeholder="Jean" value={prenom} onChange={e => setPrenom(e.target.value)} style={{ width: '100%', padding: '11px 14px', borderRadius: 9, border: '0.5px solid #C8D8CE', fontSize: 14, fontFamily: 'inherit', outline: 'none', background: '#fff', color: '#034065' }} />
               </div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 12, color: '#6B7280', marginBottom: 6 }}>Nom</div>
-                <input placeholder="Dupont" value={nom} onChange={e => setNom(e.target.value)} style={{ width: '100%', padding: '11px 14px', borderRadius: 9, border: '0.5px solid #C8D8CE', fontSize: 14, fontFamily: 'inherit', outline: 'none', background: '#fff', color: '#1B2E4B' }} />
+                <input placeholder="Dupont" value={nom} onChange={e => setNom(e.target.value)} style={{ width: '100%', padding: '11px 14px', borderRadius: 9, border: '0.5px solid #C8D8CE', fontSize: 14, fontFamily: 'inherit', outline: 'none', background: '#fff', color: '#034065' }} />
               </div>
             </div>
             <div>
               <div style={{ fontSize: 12, color: '#6B7280', marginBottom: 6 }}>Email</div>
-              <input type="email" placeholder="votre@email.com" value={email} onChange={e => setEmail(e.target.value)} style={{ width: '100%', padding: '11px 14px', borderRadius: 9, border: '0.5px solid #C8D8CE', fontSize: 14, fontFamily: 'inherit', outline: 'none', background: '#fff', color: '#1B2E4B' }} />
+              <input type="email" placeholder="votre@email.com" value={email} onChange={e => setEmail(e.target.value)} style={{ width: '100%', padding: '11px 14px', borderRadius: 9, border: '0.5px solid #C8D8CE', fontSize: 14, fontFamily: 'inherit', outline: 'none', background: '#fff', color: '#034065' }} />
             </div>
             <div>
               <div style={{ fontSize: 12, color: '#6B7280', marginBottom: 6 }}>Mot de passe</div>
-              <input type="password" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSignup()} style={{ width: '100%', padding: '11px 14px', borderRadius: 9, border: '0.5px solid #C8D8CE', fontSize: 14, fontFamily: 'inherit', outline: 'none', background: '#fff', color: '#1B2E4B' }} />
+              <input type="password" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSignup()} style={{ width: '100%', padding: '11px 14px', borderRadius: 9, border: '0.5px solid #C8D8CE', fontSize: 14, fontFamily: 'inherit', outline: 'none', background: '#fff', color: '#034065' }} />
             </div>
             {error && <div style={{ fontSize: 12, color: '#E24B4A', background: '#FCEBEB', padding: '8px 12px', borderRadius: 7 }}>{error}</div>}
             <button onClick={handleSignup} disabled={loading} style={{ width: '100%', padding: '12px', borderRadius: 9, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', marginTop: 4 }}>

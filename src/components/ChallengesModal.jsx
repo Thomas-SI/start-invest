@@ -36,7 +36,7 @@ export default function ChallengesModal({ onClose }) {
 
         <div style={{ padding: '24px 28px 20px', borderBottom: '0.5px solid #E0EAE3', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
           <div>
-            <div style={{ fontSize: 16, fontWeight: 700, color: '#1B2E4B' }}>Livret d'accomplissements</div>
+            <div style={{ fontSize: 16, fontWeight: 700, color: '#034065' }}>Livret d'accomplissements</div>
             <div style={{ fontSize: 12, color: '#9CA3AF', marginTop: 2 }}>
               {loading ? 'Chargement...' : slugsObtenus.size + ' / ' + BADGES_DATA.length + ' debloques'}
             </div>
@@ -69,7 +69,7 @@ export default function ChallengesModal({ onClose }) {
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: '#1B2E4B' }}>{nom}</div>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: '#034065' }}>{nom}</div>
                     <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
                       {obtenu && (
                         <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 20, background: '#EAF6E4', color: '#2E7D1E', fontWeight: 600 }}>
