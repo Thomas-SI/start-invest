@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import AuthModal from '../components/AuthModal'
 import ChallengesModal from '../components/ChallengesModal'
 import FooterPublic from '../components/FooterPublic'
+import CookieBanner from '../components/CookieBanner'
 
 const METRONOME_URL = 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/AB94501C-5932-4B4C-93F1-D1CD5A4BAA25.png'
 const LOGO_URL = 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/IMG_2819.jpeg'
@@ -503,6 +504,8 @@ export default function Accueil() {
           </div>
         </div>
       </section>
+
+      <CookieBanner />
 
       <FooterPublic />
 

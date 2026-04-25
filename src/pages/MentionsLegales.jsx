@@ -9,7 +9,7 @@ export default function MentionsLegales() {
       <div style={{ fontSize: 13, fontWeight: 700, color: '#1B2E4B', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 10, paddingBottom: 8, borderBottom: '0.5px solid #E0EAE3' }}>
         {numero}. {titre}
       </div>
-      <div style={{ fontSize: 14, color: '#4B5563', lineHeight: 1.8 }}>{children}</div>
+      <div style={{ fontSize: 14, color: '#4B5563', lineHeight: 1.8, textAlign: 'justify' }}>{children}</div>
     </div>
   )
 
@@ -29,33 +29,56 @@ export default function MentionsLegales() {
         <div style={{ marginBottom: 48 }}>
           <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 14, background: '#EAF6E4', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Légal</div>
           <h1 style={{ fontSize: 36, fontWeight: 700, color: '#1B2E4B', margin: '0 0 12px' }}>Mentions Légales</h1>
-          <p style={{ fontSize: 13, color: '#9CA3AF' }}>Dernière mise à jour : {new Date().toLocaleDateString('fr-FR')}</p>
+          <p style={{ fontSize: 13, color: '#9CA3AF' }}>Dernière mise à jour : janvier 2026</p>
         </div>
 
         <div style={{ background: '#fff', borderRadius: 16, border: '0.5px solid #E0EAE3', padding: '40px' }}>
           <Article numero="1" titre="Éditeur du site">
             Le site <strong>www.start-invest.fr</strong> est édité par :<br /><br />
-            <strong>Nom de la société :</strong> START_INVEST<br />
-            <strong>Statut juridique :</strong> Entrepreneur Individuel<br />
-            <strong>Siège social :</strong> 44 Rue Pasquier, 75008 PARIS, FRANCE<br />
-            <strong>Adresse e-mail :</strong> contact@start-invest.fr<br />
-            <strong>Numéro de SIRET :</strong> 90915142500024<br />
+            <strong>Nom :</strong> Thomas BOUCHARD<br />
+            <strong>Statut juridique :</strong> Micro-entrepreneur<br />
+            <strong>Siège social :</strong> 44 Rue Pasquier, 75008 Paris, France<br />
+            <strong>SIRET :</strong> 90915142500024<br />
+            <strong>Année de création :</strong> 2026<br />
+            <strong>TVA :</strong> Non applicable (article 293 B du CGI)<br />
+            <strong>Email :</strong> contact@start-invest.fr<br />
             <strong>Directeur de la publication :</strong> Thomas BOUCHARD
           </Article>
 
-          <Article numero="2" titre="Hébergeur du site">
+          <Article numero="2" titre="Hébergement">
             Le site est hébergé par la société <strong>Vercel Inc.</strong><br />
             Siège social : 440 N Barranca Ave #4133, Covina, CA 91723, États-Unis.<br />
             Site web : https://vercel.com<br /><br />
-            Les données applicatives sont stockées via la plateforme <strong>Supabase Inc.</strong> sur des serveurs situés en Union Européenne (Région Frankfurt, Allemagne), garantissant ainsi la conformité avec le Règlement Général sur la Protection des Données (RGPD).
+            Les données applicatives sont stockées via la plateforme <strong>Supabase Inc.</strong> sur des serveurs situés en Union Européenne (Région Frankfurt, Allemagne), garantissant ainsi la conformité avec le RGPD.
           </Article>
 
-          <Article numero="3" titre="Propriété intellectuelle">
-            L'ensemble de ce site, ainsi que les produits numériques (guides, fichiers Excel, formations) vendus sous la marque Start Invest, relèvent de la législation française et internationale sur le droit d'auteur et la propriété intellectuelle. Tous les droits de reproduction sont réservés. Toute extraction et/ou reproduction de tout ou partie des informations diffusées sur le site est interdite sans l'autorisation expresse et préalable de l'éditeur.
+          <Article numero="3" titre="Description du service">
+            Start Invest est une application web de gestion financière personnelle et d'éducation à l'investissement. Elle permet aux utilisateurs de suivre leurs finances, gérer leur portefeuille d'ETF, simuler leur croissance patrimoniale et progresser grâce à un système de challenges et de badges.<br /><br />
+            L'application ne dispose d'aucune connexion bancaire directe — toutes les données sont saisies manuellement par l'utilisateur. Start Invest ne vend aucun produit financier et n'affiche aucune publicité.
           </Article>
 
-          <Article numero="4" titre="Données personnelles">
-            Le stockage des données applicatives (calculs de budget et investissements) est assuré par la société Supabase Inc. dont les serveurs sont situés en Europe (Région AWS Frankfurt). Ces données sont strictement confidentielles et ne sont jamais partagées avec des tiers à des fins commerciales.
+          <Article numero="4" titre="Avertissement financier">
+            Start Invest est un outil purement éducatif et pédagogique. Thomas BOUCHARD n'est pas Conseiller en Investissement Financier (CIF) agréé. Les informations, simulations et contenus présentés ne constituent en aucun cas un conseil en investissement, une recommandation d'achat ou de vente de titres financiers.<br /><br />
+            L'investissement en bourse comporte des risques de perte en capital. Les performances passées ne préjugent pas des performances futures. L'utilisateur est seul responsable de ses décisions d'investissement.
+          </Article>
+
+          <Article numero="5" titre="Propriété intellectuelle">
+            L'ensemble des éléments composant le site et l'application Start Invest (textes, graphiques, logos, icônes, code source) sont protégés par les dispositions du Code de la propriété intellectuelle et appartiennent exclusivement à Thomas BOUCHARD.<br /><br />
+            Toute reproduction, représentation, modification ou adaptation de tout ou partie des éléments du site est interdite sans autorisation écrite préalable.
+          </Article>
+
+          <Article numero="6" titre="Protection des données personnelles">
+            Conformément au RGPD et à la loi Informatique et Libertés, vous disposez d'un droit d'accès, de rectification, de suppression et de portabilité de vos données personnelles.<br /><br />
+            Les données collectées sont : email, prénom, nom, métier, pseudo, photo de profil et données financières saisies manuellement. Ces données sont hébergées sur des serveurs sécurisés en Europe (Supabase, Frankfurt) et ne sont jamais vendues ou partagées avec des tiers à des fins commerciales.<br /><br />
+            Pour exercer vos droits : <strong>contact@start-invest.fr</strong>
+          </Article>
+
+          <Article numero="7" titre="Responsabilité">
+            Start Invest s'efforce d'assurer l'exactitude des informations diffusées. Cependant, Start Invest ne pourra être tenu responsable des dommages directs ou indirects résultant de l'utilisation de l'application, des décisions d'investissement prises par l'utilisateur, ou de l'impossibilité d'accéder au service.
+          </Article>
+
+          <Article numero="8" titre="Droit applicable">
+            Les présentes mentions légales sont soumises au droit français. En cas de litige, et après tentative de résolution amiable, compétence est donnée aux tribunaux français compétents.
           </Article>
         </div>
       </div>

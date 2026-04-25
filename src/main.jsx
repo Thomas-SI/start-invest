@@ -22,6 +22,9 @@ import MentionsLegales from './pages/MentionsLegales'
 import Confidentialite from './pages/Confidentialite'
 import CGV from './pages/CGV'
 import './index.css'
+import CGU from './pages/CGU'
+import Reclamation from './pages/Reclamation'
+import Cookies from './pages/Cookies'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -50,6 +53,9 @@ createRoot(document.getElementById('root')).render(
             <Route path="/mentions-legales" element={<MentionsLegales />} />
             <Route path="/confidentialite" element={<Confidentialite />} />
             <Route path="/cgv" element={<CGV />} />
+            <Route path="/cgu" element={<CGU />} />
+            <Route path="/reclamation" element={<Reclamation />} />
+            <Route path="/cookies" element={<Cookies />} />
 
             {/* ROUTES PROTÉGÉES */}
             <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />

@@ -178,9 +178,9 @@ export default function Fonctionnalites() {
         <h1 style={{ fontSize: h1Size, fontWeight: 700, color: '#1B2E4B', lineHeight: 1.2, margin: '0 0 16px' }}>
           Tout ce dont vous avez besoin pour investir intelligemment.
         </h1>
-        <p style={{ fontSize: isMobile ? 14 : 15, color: '#6B7280', lineHeight: 1.7, maxWidth: 540, margin: '0 auto 48px' }}>
-          StartInvest regroupe tous les outils pour analyser vos finances, suivre vos investissements et construire votre avenir.
-        </p>
+       <p style={{ fontSize: isMobile ? 14 : 15, color: '#6B7280', lineHeight: 1.7, maxWidth: 540, margin: '0 auto 48px', textAlign: 'justify' }}>
+  Start Invest regroupe tous les outils pour analyser vos finances, suivre vos investissements et construire votre avenir. Mais investir seul, c'est plus difficile. C'est pourquoi on a pensé la communauté au cœur de l'app : Challenges, badges, motivation entre amis. Parce que se tirer vers le haut ensemble, c'est toujours plus puissant.
+</p>
       </section>
 
       {/* FINANCES */}

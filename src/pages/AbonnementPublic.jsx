@@ -13,8 +13,11 @@ const featuresGratuit = [
   { label: "Guide complet de l'investissement", inclus: true },
   { label: "Tableau d'allocations", inclus: false },
   { label: 'Plan de virement par comptes', inclus: false },
+  { label: "Journal suivi d'investissement", inclus: false },
   { label: 'Données ETF en temps réel', inclus: false },
   { label: 'Projection de croissance', inclus: false },
+  { label: 'Accès challenges et récompenses', inclus: false },
+  
 ]
 
 const featuresPremium = [
@@ -127,7 +130,23 @@ function PublicNavbar({ isMobile, openLogin, openSignup, activeLink = 'Abonnemen
     </nav>
   )
 }
-
+function FaqItem({ question, reponse }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div style={{ background: '#fff', border: '0.5px solid #E0EAE3', borderRadius: 12, marginBottom: 10, overflow: 'hidden' }}>
+      <div
+        onClick={() => setOpen(o => !o)}
+        style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '18px 20px', cursor: 'pointer' }}
+      >
+        <div style={{ fontSize: 14, fontWeight: 500, color: '#1B2E4B', paddingRight: 16 }}>{question}</div>
+        <div style={{ fontSize: 18, color: '#4CAF2E', flexShrink: 0 }}>{open ? '▲' : '▼'}</div>
+      </div>
+      {open && (
+        <div style={{ padding: '0 20px 18px', fontSize: 13, color: '#6B7280', lineHeight: 1.7 }}>{reponse}</div>
+      )}
+    </div>
+  )
+}
 export default function AbonnementPublic() {
   const [annuel, setAnnuel] = useState(false)
   const [authOpen, setAuthOpen] = useState(false)
@@ -237,20 +256,37 @@ export default function AbonnementPublic() {
       </section>
 
       {/* FAQ */}
-      <section style={{ padding: isMobile ? '40px 16px 60px' : '60px 40px', maxWidth: 720, margin: '0 auto' }}>
-        <h2 style={{ fontSize: isMobile ? 22 : 26, fontWeight: 700, color: '#1B2E4B', textAlign: 'center', marginBottom: isMobile ? 28 : 40 }}>Questions fréquentes</h2>
-        {[
-          { q: 'Comment fonctionne les 15 jours gratuits ?', r: 'Vous accès a toutes les fonctionnalités Premium pendant 15 jours sans carte bancaire requise. A la fin de la periode, vous choisissez de continuer ou de rester sur le plan gratuit.' },
-          { q: 'Puis-je annuler à tout moment ?', r: 'Oui, vous pouvez annuler votre abonnement à tout moment depuis votre espace compte. Aucun engagement.' },
-          { q: 'Le plan gratuit est-il vraiment gratuit ?', r: 'Oui, sans limite de temps et sans carte bancaire requise.' },
-          { q: 'Mes données sont-elles sécurisées ?', r: 'Vos données sont chiffrees et hébergées sur des serveurs sécurisés Supabase en Europe (Frankfurt).' },
-        ].map(({ q, r }) => (
-          <div key={q} style={{ background: '#fff', border: '0.5px solid #E0EAE3', borderRadius: 12, padding: '18px 20px', marginBottom: 10 }}>
-            <div style={{ fontSize: 14, fontWeight: 500, color: '#1B2E4B', marginBottom: 6 }}>{q}</div>
-            <div style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6 }}>{r}</div>
-          </div>
-        ))}
-      </section>
+<section style={{ padding: isMobile ? '40px 16px 60px' : '60px 40px', maxWidth: 720, margin: '0 auto' }}>
+  <h2 style={{ fontSize: isMobile ? 22 : 26, fontWeight: 700, color: '#1B2E4B', textAlign: 'center', marginBottom: isMobile ? 28 : 40 }}>Questions fréquentes</h2>
+  {[
+    {
+      q: 'En quoi c\'est différent des autres applications ?',
+      r: 'Start Invest est la seule application qui combine suivi financier, investissement ETF, challenges et communauté entre amis. Pas de pub, pas de conflits d\'intérêts, pas de produits financiers à vendre. Juste des outils transparents pour construire ton patrimoine à ton rythme.'
+    },
+    {
+      q: 'À qui l\'application s\'adresse-t-elle ?',
+      r: 'À tout le monde. Que tu démarres de zéro ou que tu aies déjà un portefeuille, Start Invest s\'adapte à ton niveau. Étudiant, salarié, entrepreneur, parent — peu importe si tu es stressé, fatigué ou que tu n\'as pas le temps. L\'objectif : rendre l\'investissement accessible, ludique et motivant pour tous. La seule condition : être majeur.'
+    },
+    {
+      q: 'Puis-je annuler à tout moment ?',
+      r: 'Oui, sans engagement et sans condition. Tu peux résilier ton abonnement à tout moment depuis ton espace compte. Tu gardes l\'accès jusqu\'à la fin de ta période payée.'
+    },
+    {
+      q: 'L\'app remplace-t-elle un conseiller financier ?',
+      r: 'Non. Start Invest est un outil éducatif et de suivi. Nous ne sommes pas Conseillers en Investissement Financier (CIF). Les informations fournies sont à titre pédagogique uniquement et ne constituent pas un conseil en investissement. Les performances passées ne préjugent pas des performances futures.'
+    },
+    {
+      q: 'Comment fonctionne l\'abonnement dégressif sur 10 ans ?',
+      r: 'C\'est notre façon de récompenser ta fidélité et ta discipline. Le prix de l\'abonnement annuel baisse chaque année : 67€ la 1ère année, 59€ la 2ème, jusqu\'à devenir complètement gratuit à partir de la 10ème année. Parce que la discipline mérite d\'être récompensée.'
+    },
+    {
+      q: 'Mes données sont-elles sécurisées ?',
+      r: 'Oui. Tes données sont chiffrées et hébergées sur des serveurs sécurisés en Europe (Frankfurt). Nous n\'utilisons aucun traceur publicitaire et ne revendons jamais tes informations à des tiers.'
+    },
+  ].map(({ q, r }) => (
+    <FaqItem key={q} question={q} reponse={r} />
+  ))}
+</section>
 
       <FooterPublic />
 

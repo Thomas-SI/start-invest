@@ -1,9 +1,15 @@
+import { useNavigate } from 'react-router-dom'
+
 export default function FooterPublic() {
+  const navigate = useNavigate()
+  
   return (
     <footer style={{ background: '#1B2E4B', padding: '40px 40px 28px' }}>
       <div style={{ maxWidth: 900, margin: '0 auto' }}>
+        
+        {/* CONTACT + RÉSEAUX */}
         <div style={{ textAlign: 'center', marginBottom: 28 }}>
-          <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.7)', marginBottom: 8 }}>Une question ? Contactez moi :</div>
+          <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.7)', marginBottom: 8 }}>Une question ? Contactez-nous :</div>
           <a href="mailto:contact@start-invest.fr" style={{ fontSize: 16, fontWeight: 600, color: '#fff', textDecoration: 'none' }}>contact@start-invest.fr</a>
           <div style={{ marginTop: 12 }}>
             <a href="https://instagram.com/startinvest.fr" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.08)', border: '0.5px solid rgba(255,255,255,0.15)', borderRadius: 20, padding: '6px 16px', textDecoration: 'none' }}>
@@ -14,26 +20,46 @@ export default function FooterPublic() {
             </a>
           </div>
         </div>
+
+        {/* AVERTISSEMENT LÉGAL */}
         <div style={{ background: 'rgba(255,255,255,0.05)', border: '0.5px solid rgba(255,255,255,0.1)', borderRadius: 12, padding: '16px 20px', marginBottom: 24 }}>
-          <div style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 8 }}>Avertissement legal</div>
+          <div style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 8 }}>Avertissement légal</div>
           <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', lineHeight: 1.7 }}>
-            Les informations presentees dans cette application sont partagees a titre purement educatif et pedagogique. Elles ne constituent en aucun cas un conseil en investissement, une sollicitation a l achat ou a la vente d instruments financiers. L investissement comporte des risques de perte en capital. Les performances passees ne prejudgent pas des performances futures. Thomas Start-Invest ne pourra etre tenu responsable des decisions prises par l utilisateur. Les simulations et calculs presentes sont bases sur des hypotheses et ne garantissent aucun resultat reel.
+            Les informations présentées dans cette application sont partagées à titre purement éducatif et pédagogique. Elles ne constituent en aucun cas un conseil en investissement, une sollicitation à l'achat ou à la vente d'instruments financiers. L'investissement comporte des risques de perte en capital. Les performances passées ne préjugent pas des performances futures. Start Invest ne pourra être tenu responsable des décisions prises par l'utilisateur.
           </div>
         </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12, paddingTop: 16, borderTop: '0.5px solid rgba(255,255,255,0.1)' }}>
+
+        {/* LIENS LÉGAUX */}
+        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 16, marginBottom: 20, paddingBottom: 20, borderBottom: '0.5px solid rgba(255,255,255,0.1)' }}>
+          {[
+            ['Mentions légales', '/mentions-legales'],
+            ['CGV', '/cgv'],
+            ['CGU', '/cgu'],
+            ['Politique de confidentialité', '/confidentialite'],
+            ['Politique de réclamation', '/reclamation'],
+            ['Gestion des cookies', '/cookies'],
+          ].map(([label, path], i, arr) => (
+            <span key={label} style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+              <span
+                onClick={() => navigate(path)}
+                style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', textDecoration: 'underline', cursor: 'pointer' }}
+              >
+                {label}
+              </span>
+              {i < arr.length - 1 && <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: 12 }}>|</span>}
+            </span>
+          ))}
+        </div>
+
+        {/* COPYRIGHT */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
           <div style={{ display: 'flex', alignItems: 'baseline' }}>
             <span style={{ fontSize: 14, fontWeight: 800, color: '#fff', fontStyle: 'italic' }}>START</span>
             <span style={{ fontSize: 14, fontWeight: 800, color: '#4CAF2E', fontStyle: 'italic' }}>INVEST</span>
           </div>
-          <div style={{ display: 'flex', gap: 20, alignItems: 'center', flexWrap: 'wrap' }}>
-            <a href="/mentions-legales" style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', textDecoration: 'underline', cursor: 'pointer' }}>Mentions Legales</a>
-            <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: 12 }}>|</span>
-            <a href="/confidentialite" style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', textDecoration: 'underline', cursor: 'pointer' }}>Politique de Confidentialite</a>
-            <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: 12 }}>|</span>
-            <a href="/cgv" style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', textDecoration: 'underline', cursor: 'pointer' }}>CGV</a>
-          </div>
-          <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)' }}>Copyright {new Date().getFullYear()} StartInvest</div>
+          <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)' }}>© {new Date().getFullYear()} Start Invest — Tous droits réservés</div>
         </div>
+
       </div>
     </footer>
   )

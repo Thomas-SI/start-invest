@@ -138,16 +138,16 @@ export default function ChallengePublic() {
         <div style={{ maxWidth: 700, margin: '0 auto', textAlign: 'center' }}>
           <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 20, background: 'rgba(76,175,46,0.15)', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Challenge</div>
           <h1 style={{ fontSize: isMobile ? 26 : 36, fontWeight: 700, color: '#fff', lineHeight: 1.4, margin: '0 0 24px' }}>
-            Parce que l investissement se court comme un <span style={{ color: '#4CAF2E' }}>marathon</span> et non comme un sprint,
+            Parce que l'investissement se court comme un <span style={{ color: '#4CAF2E' }}>marathon</span> et non comme un sprint,
           </h1>
           <p style={{ fontSize: isMobile ? 14 : 16, color: 'rgba(255,255,255,0.6)', lineHeight: 1.8, margin: '0 auto 40px', maxWidth: 560 }}>
-            nous avons cree les challenges pour vous tirer vers le haut.
+            Nous avons créé les challenges pour vous tirer vers les sommets, comme dans le sport, avec une communauté qui nous pousse à nous dépasser.
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: isMobile ? 10 : 14, maxWidth: 600, margin: '0 auto' }}>
             {[
               { val: 'Long terme', label: 'La clé de la richesse' },
-              { val: 'Regularite', label: 'Plus que le timing' },
-              { val: 'Discipline', label: "L'arme secrete" },
+              { val: 'Régularité', label: 'Plus que le timing' },
+              { val: 'Discipline', label: "L'arme secrète" },
             ].map(({ val, label }) => (
               <div key={val} style={{ background: 'rgba(255,255,255,0.06)', border: '0.5px solid rgba(255,255,255,0.1)', borderRadius: 12, padding: isMobile ? '14px' : '16px' }}>
                 <div style={{ fontSize: 15, fontWeight: 700, color: '#4CAF2E', marginBottom: 4 }}>{val}</div>
@@ -158,40 +158,122 @@ export default function ChallengePublic() {
         </div>
       </section>
 
-      {/* BADGES */}
-      <section style={{ padding: isMobile ? '50px 16px' : '80px 40px', maxWidth: 1100, margin: '0 auto' }}>
-        <div style={{ textAlign: 'center', marginBottom: isMobile ? 36 : 52 }}>
-          <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 12, background: '#EAF6E4', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Accomplissements</div>
-          <h2 style={{ fontSize: isMobile ? 24 : 30, fontWeight: 700, color: '#1B2E4B', margin: '0 0 12px' }}>Le livret d'accomplissements</h2>
-          <p style={{ fontSize: 14, color: '#6B7280', maxWidth: 480, margin: '0 auto' }}>
-            Debloquez des badges en progressant dans votre parcours d investisseur. Chaque accomplissement recompense une action concrete.
-          </p>
+      {/* ACCOMPLISSEMENTS */}
+<section style={{ padding: isMobile ? '50px 16px' : '80px 40px', maxWidth: 1100, margin: '0 auto' }}>
+  <div style={{ textAlign: 'center', marginBottom: isMobile ? 36 : 52 }}>
+    <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 12, background: '#EAF6E4', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Accomplissements</div>
+    <h2 style={{ fontSize: isMobile ? 24 : 30, fontWeight: 700, color: '#1B2E4B', margin: '0 0 12px' }}>Le livret d'accomplissements</h2>
+    <p style={{ fontSize: 14, color: '#6B7280', maxWidth: 480, margin: '0 auto' }}>
+      Débloquez des badges en progressant dans votre parcours d'investisseur. Chaque accomplissement récompense une action concrète.
+    </p>
+  </div>
+  <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(300px, 1fr))', gap: isMobile ? 12 : 16 }}>
+    {BADGES.map(({ emoji, img, nom, desc, message, tag, tagColor, tagBg }) => (
+      <div key={nom} style={{ background: '#fff', border: '0.5px solid #E0EAE3', borderRadius: 16, padding: '20px', display: 'flex', gap: 16, alignItems: 'flex-start' }}>
+        <div style={{ width: 56, height: 56, borderRadius: '50%', background: tagBg, border: `2px solid ${tagColor}`, flexShrink: 0, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          {img ? <img src={img} alt={nom} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span style={{ fontSize: 26 }}>{emoji}</span>}
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(300px, 1fr))', gap: isMobile ? 12 : 16 }}>
-          {BADGES.map(({ emoji, img, nom, desc, message, tag, tagColor, tagBg }) => (
-            <div key={nom} style={{ background: '#fff', border: '0.5px solid #E0EAE3', borderRadius: 16, padding: '20px', display: 'flex', gap: 16, alignItems: 'flex-start' }}>
-              <div style={{ width: 56, height: 56, borderRadius: '50%', background: tagBg, border: `2px solid ${tagColor}`, flexShrink: 0, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                {img ? <img src={img} alt={nom} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span style={{ fontSize: 26 }}>{emoji}</span>}
-              </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6, gap: 8, flexWrap: 'wrap' }}>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: '#1B2E4B' }}>{nom}</div>
-                  <span style={{ fontSize: 9, padding: '2px 8px', borderRadius: 20, background: tagBg, color: tagColor, fontWeight: 500, whiteSpace: 'nowrap' }}>{tag}</span>
-                </div>
-                <div style={{ fontSize: 12, color: '#6B7280', marginBottom: 8 }}>{desc}</div>
-                <div style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic', borderLeft: `2px solid ${tagColor}`, paddingLeft: 8 }}>{message}</div>
-              </div>
-            </div>
-          ))}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6, gap: 8, flexWrap: 'wrap' }}>
+            <div style={{ fontSize: 14, fontWeight: 600, color: '#1B2E4B' }}>{nom}</div>
+            <span style={{ fontSize: 9, padding: '2px 8px', borderRadius: 20, background: tagBg, color: tagColor, fontWeight: 500, whiteSpace: 'nowrap' }}>{tag}</span>
+          </div>
+          <div style={{ fontSize: 12, color: '#6B7280', marginBottom: 8 }}>{desc}</div>
+          <div style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic', borderLeft: `2px solid ${tagColor}`, paddingLeft: 8 }}>{message}</div>
         </div>
-      </section>
+      </div>
+    ))}
+  </div>
+</section>
 
-      {/* CTA */}
-      <section style={{ padding: isMobile ? '50px 16px' : '80px 40px', textAlign: 'center', background: '#F4F7F5' }}>
-        <h2 style={{ fontSize: isMobile ? 24 : 30, fontWeight: 700, color: '#1B2E4B', margin: '0 0 16px' }}>Commencez votre parcours</h2>
-        <p style={{ fontSize: 14, color: '#9CA3AF', margin: '0 0 32px' }}>Premier Pas vous attend des l'inscription.</p>
-        <button onClick={openSignup} style={{ padding: isMobile ? '12px 32px' : '14px 40px', borderRadius: 12, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>S'inscrire gratuitement</button>
-      </section>
+{/* STREAK */}
+<section style={{ background: '#1B2E4B', padding: isMobile ? '50px 16px' : '80px 40px' }}>
+  <div style={{ maxWidth: 700, margin: '0 auto', textAlign: 'center' }}>
+    <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 12, background: 'rgba(76,175,46,0.15)', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Streak</div>
+    <h2 style={{ fontSize: isMobile ? 24 : 30, fontWeight: 700, color: '#fff', margin: '0 0 16px' }}>
+      🔥 Collecte tes flammes
+    </h2>
+    <p style={{ fontSize: isMobile ? 14 : 15, color: 'rgba(255,255,255,0.6)', lineHeight: 1.8, margin: '0 auto 40px', maxWidth: 500 }}>
+      À chaque mois où tu investis, tu gagnes une flamme. Plus ta série est longue, plus tu es fort. Ne laisse pas ta flamme s'éteindre — la discipline est la clé de la richesse sur le long terme.
+    </p>
+    <div style={{ display: 'flex', justifyContent: 'center', gap: 8, fontSize: 36 }}>
+      {[1,2,3,4,5,6].map((i) => (
+        <span key={i} style={{ opacity: 1 - (i - 1) * 0.12 }}>🔥</span>
+      ))}
+    </div>
+    <div style={{ marginTop: 16, fontSize: 13, color: 'rgba(255,255,255,0.4)' }}>6 mois de suite investis</div>
+    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: 16, marginTop: 40 }}>
+      {[
+        { mois: '3 mois', niveau: 'Bronze 🥉', color: '#854F0B', bg: '#FFF0DC' },
+        { mois: '6 mois', niveau: 'Argent 🥈', color: '#444441', bg: '#F0F0F0' },
+        { mois: '12 mois', niveau: 'Or 🥇', color: '#633806', bg: '#FFF8DC' },
+      ].map(({ mois, niveau, color, bg }) => (
+        <div key={mois} style={{ background: 'rgba(255,255,255,0.06)', border: '0.5px solid rgba(255,255,255,0.1)', borderRadius: 12, padding: '16px', textAlign: 'center' }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: '#fff', marginBottom: 6 }}>{mois}</div>
+          <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, background: bg, color, fontWeight: 600 }}>{niveau}</span>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+{/* GUIDE */}
+<section style={{ padding: isMobile ? '50px 16px' : '80px 40px', maxWidth: 700, margin: '0 auto', textAlign: 'center' }}>
+  <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 12, background: '#EAF6E4', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Guide</div>
+  <h2 style={{ fontSize: isMobile ? 24 : 30, fontWeight: 700, color: '#1B2E4B', margin: '0 0 16px' }}>
+    📚 5 chapitres pour devenir investisseur
+  </h2>
+  <p style={{ fontSize: isMobile ? 14 : 15, color: '#6B7280', lineHeight: 1.8, margin: '0 auto 40px', maxWidth: 500 }}>
+    Valide chaque chapitre du guide et débloque ton badge. De zéro à investisseur autonome — sans jargon, sans prise de tête.
+  </p>
+  <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(5, 1fr)', gap: 12 }}>
+    {[
+      { num: '01', titre: "Comprendre l'environnement", couleur: '#3B82F6' },
+      { num: '02', titre: "Stratégies d'investissement", couleur: '#4CAF2E' },
+      { num: '03', titre: 'Choisir sa banque', couleur: '#F59E0B' },
+      { num: '04', titre: 'Les bases essentielles', couleur: '#8B5CF6' },
+      { num: '05', titre: "Passer à l'action", couleur: '#EC4899' },
+    ].map(({ num, titre, couleur }) => (
+      <div key={num} style={{ background: couleur + '15', border: `0.5px solid ${couleur}40`, borderRadius: 12, padding: '16px 10px', textAlign: 'center' }}>
+        <div style={{ fontSize: 18, fontWeight: 700, color: couleur, marginBottom: 6 }}>{num}</div>
+        <div style={{ fontSize: 11, color: '#1B2E4B', lineHeight: 1.4 }}>{titre}</div>
+      </div>
+    ))}
+  </div>
+</section>
+
+{/* COMMUNAUTÉ */}
+<section style={{ background: '#1B2E4B', padding: isMobile ? '50px 16px' : '80px 40px' }}>
+  <div style={{ maxWidth: 700, margin: '0 auto', textAlign: 'center' }}>
+    <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 12, background: 'rgba(76,175,46,0.15)', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Communauté</div>
+    <h2 style={{ fontSize: isMobile ? 24 : 30, fontWeight: 700, color: '#fff', margin: '0 0 16px' }}>
+      👥 Ensemble, on va plus loin
+    </h2>
+    <p style={{ fontSize: isMobile ? 14 : 15, color: 'rgba(255,255,255,0.6)', lineHeight: 1.8, margin: '0 auto 40px', maxWidth: 500 }}>
+      Ajoute tes amis, suis leurs badges et leur progression. La force du groupe est décuplée — s'entourer de personnes qui investissent, c'est le meilleur moyen de ne jamais flancher.
+    </p>
+    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: 16 }}>
+      {[
+        { emoji: '🏆', titre: 'Badges partagés', desc: 'Vois les accomplissements de tes amis' },
+        { emoji: '🔥', titre: 'Streak de tes amis', desc: 'Reste motivé en voyant leur régularité' },
+        { emoji: '💪', titre: 'Motivation collective', desc: 'Tire-toi vers le haut ensemble' },
+      ].map(({ emoji, titre, desc }) => (
+        <div key={titre} style={{ background: 'rgba(255,255,255,0.06)', border: '0.5px solid rgba(255,255,255,0.1)', borderRadius: 16, padding: '20px', textAlign: 'center' }}>
+          <div style={{ fontSize: 32, marginBottom: 10 }}>{emoji}</div>
+          <div style={{ fontSize: 14, fontWeight: 600, color: '#fff', marginBottom: 6 }}>{titre}</div>
+          <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', lineHeight: 1.6 }}>{desc}</div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+{/* CTA */}
+<section style={{ padding: isMobile ? '50px 16px' : '80px 40px', textAlign: 'center', background: '#F4F7F5' }}>
+  <h2 style={{ fontSize: isMobile ? 24 : 30, fontWeight: 700, color: '#1B2E4B', margin: '0 0 16px' }}>Commencez votre parcours</h2>
+  <p style={{ fontSize: 14, color: '#9CA3AF', margin: '0 0 32px' }}>Le badge "Premier Pas" vous attend dès l'inscription avec une surprise 🎁 </p>
+  <button onClick={openSignup} style={{ padding: isMobile ? '12px 32px' : '14px 40px', borderRadius: 12, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>S'inscrire gratuitement</button>
+</section>
 
       <FooterPublic />
 
