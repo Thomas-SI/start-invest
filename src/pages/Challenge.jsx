@@ -6,6 +6,7 @@ import FooterApp from '../components/FooterApp'
 import { useTheme } from '../lib/ThemeContext'
 import PageGuide from '../components/PageGuide'
 import { usePageGuide } from '../lib/usePageGuide'
+import { checkAndGrant } from '../lib/checkAndGrant'
 
 const METRONOME_URL = 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/AB94501C-5932-4B4C-93F1-D1CD5A4BAA25.png'
 
@@ -36,31 +37,43 @@ const PALIERS = [
 
 const MOIS_NOMS = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
 
-const BADGES_MENSUELS_2026 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(m => ({
+const IMAGES_MENSUELS = {
+  4: 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/avril-vignettes-challenge%202.jpg',
+  5: 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/mai-vignettes-challenge.jpg',
+  6: 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/juin-vignettes-challenge.jpg',
+  7: 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/juillet-vignettes-challenge.jpg',
+  8: 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/aout-vignettes-challenge.jpg',
+  9: 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/sept-vignettes-challenge.jpg',
+  10: 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/oct-vignettes-challenge.jpg',
+  11: 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/nov-vignettes-challenge.jpg',
+}
+
+const BADGES_MENSUELS_2026 = [4, 5, 6, 7, 8, 9, 10, 11, 12].map(m => ({
   slug: `mois-2026-${String(m).padStart(2, '0')}`,
   nom: `${MOIS_NOMS[m - 1]} 2026`,
   annee: 2026,
   mois: m,
+  imageUrl: IMAGES_MENSUELS[m] || null,
   quete: `Acheter un ETF en ${MOIS_NOMS[m - 1]} 2026`,
   categorie: 'mensuel',
 }))
 
 const BADGES_GUIDE = [
-  { slug: 'guide-ch01', nom: "Comprendre l'environnement", chapitre: '01', couleur: '#3B82F6', quete: 'Terminer la Partie 01 du Guide', categorie: 'guide' },
-  { slug: 'guide-ch02', nom: "Stratégies d'investissement", chapitre: '02', couleur: '#4CAF2E', quete: 'Terminer la Partie 02 du Guide', categorie: 'guide' },
-  { slug: 'guide-ch03', nom: 'Choisir sa banque', chapitre: '03', couleur: '#F59E0B', quete: 'Terminer la Partie 03 du Guide', categorie: 'guide' },
-  { slug: 'guide-ch04', nom: 'Les bases essentielles', chapitre: '04', couleur: '#8B5CF6', quete: 'Terminer la Partie 04 du Guide', categorie: 'guide' },
-  { slug: 'guide-ch05', nom: "Passer à l'action", chapitre: '05', couleur: '#EC4899', quete: 'Terminer la Partie 05 du Guide', categorie: 'guide' },
+  { slug: 'guide-ch01', nom: "Comprendre l'environnement", chapitre: '01', couleur: '#3B82F6', imageUrl: 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/1-vignettes-challenge.jpg', quete: 'Terminer la Partie 01 du Guide', categorie: 'guide' },
+  { slug: 'guide-ch02', nom: "Stratégies d'investissement", chapitre: '02', couleur: '#4CAF2E', imageUrl: 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/2-vignettes-challenge.jpg', quete: 'Terminer la Partie 02 du Guide', categorie: 'guide' },
+  { slug: 'guide-ch03', nom: 'Choisir sa banque', chapitre: '03', couleur: '#F59E0B', imageUrl: 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/3-vignettes-challenge.jpg', quete: 'Terminer la Partie 03 du Guide', categorie: 'guide' },
+  { slug: 'guide-ch04', nom: 'Les bases essentielles', chapitre: '04', couleur: '#8B5CF6', imageUrl: 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/4-vignettes-challenge.jpg', quete: 'Terminer la Partie 04 du Guide', categorie: 'guide' },
+  { slug: 'guide-ch05', nom: "Passer à l'action", chapitre: '05', couleur: '#EC4899', imageUrl: 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/5-vignettes-challenge.jpg', quete: 'Terminer la Partie 05 du Guide', categorie: 'guide' },
 ]
 
 const ACCOMPLISSEMENTS = [
-  { slug: 'premier-pas', nom: 'Premier Pas', imageUrl: 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/premierpas.png', message: 'Bienvenue chez Start Invest, profite d\'un code parrain en cliquant ici', quete: "S'inscrire sur StartInvest", categorie: 'principal' },
-  { slug: 'grand-saut', nom: 'Le Grand Saut', message: "Tu n'es plus spectateur, tu es le pilote de ton futur.", quete: 'Acheter votre premier ETF', categorie: 'principal' },
-  { slug: 'metronome', nom: 'Le Métronome', svgIcon: true, message: 'La magie des intérêts composés adore ta régularité. Continue !', quete: 'Investir régulièrement chaque mois', evolutif: true, grades: GRADES_METRONOME, categorie: 'principal' },
-  { slug: 'main-de-fer', nom: 'Main de Fer', message: 'Le calme est une compétence.', quete: '6 mois sans aucune vente', categorie: 'principal' },
-  { slug: 'architecte', nom: "L'Architecte", message: 'Ton patrimoine est maintenant solide et diversifié. Beau travail !', quete: 'Posséder 3 ETF différents', categorie: 'principal' },
-  { slug: 'cap', nom: 'Ascension', imageUrl: 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/IMG_1212_2.jpeg', message: 'Le premier palier est le plus dur. La machine est lancée.', quete: "Atteindre un palier d'investissement", evolutif: true, grades: GRADES_CAP, categorie: 'principal' },
-  { slug: 'vroum-vroum', nom: 'Loin et Vite', message: "Je vois déjà l'avenir.", quete: "S'abonner à StartInvest Premium", categorie: 'principal' },
+  { slug: 'premier-pas', nom: 'Premier Pas', imageUrl: 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/Premier%20Pas.png', message: 'Bienvenue chez Start Invest, profite d\'un code parrain en cliquant ici', quete: "S'inscrire sur StartInvest", categorie: 'principal' },
+  { slug: 'grand-saut', nom: 'Le Grand Saut', imageUrl: 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/Le%20grand%20saut.png', message: "Tu n'es plus spectateur, tu es le pilote de ton futur.", quete: 'Acheter votre premier ETF', categorie: 'principal' },
+  { slug: 'metronome', nom: 'Le Métronome', svgIcon: true, imageUrl: 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/Metronome.png', message: 'La magie des intérêts composés adore ta régularité. Continue !', quete: 'Investir régulièrement chaque mois', evolutif: true, grades: GRADES_METRONOME, categorie: 'principal' },
+  { slug: 'main-de-fer', nom: 'Main de Fer', imageUrl: 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/Main%20de%20fer.png', message: 'Le calme est une compétence.', quete: '6 mois sans aucune vente', categorie: 'principal' },
+  { slug: 'architecte', nom: "L'Architecte", imageUrl: 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/Larchitecte.png', message: 'Ton patrimoine est maintenant solide et diversifié. Beau travail !', quete: 'Posséder 3 ETF différents', categorie: 'principal' },
+  { slug: 'cap', nom: 'Ascension', imageUrl: 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/Ascension.png', message: 'Le premier palier est le plus dur. La machine est lancée.', quete: "Atteindre un palier d'investissement", evolutif: true, grades: GRADES_CAP, categorie: 'principal' },
+  { slug: 'vroum-vroum', nom: "L'ambitieux", imageUrl: 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/Lambitieux.png', message: "Je vois déjà l'avenir.", quete: "S'abonner à StartInvest Premium", categorie: 'principal' },
 ]
 
 const TOUS_BADGES = [...ACCOMPLISSEMENTS, ...BADGES_GUIDE, ...BADGES_MENSUELS_2026]
@@ -112,63 +125,6 @@ const calcStreakMensuel = (slugsObtenus) => {
     else break
   }
   return streak
-}
-
-const checkAndGrant = async (user, investissements, transactions, accomplissements) => {
-  const slugsObtenus = new Set(accomplissements.map(a => a.slug))
-  const toInsert = []
-  const toUpdate = []
-  const totalInvesti = investissements.reduce((acc, i) => acc + parseFloat(i.quantite) * parseFloat(i.pru || i.prix_achat_unitaire || 0), 0)
-  const nbEtfDifferents = [...new Set(investissements.map(i => i.ticker))].length
-  const achats = transactions.filter(t => t.type === 'Achat')
-  const ventes = transactions.filter(t => t.type === 'Vente')
-  const streak = calcStreak(transactions)
-
-  if (!slugsObtenus.has('premier-pas')) toInsert.push({ user_id: user.id, slug: 'premier-pas' })
-  if (!slugsObtenus.has('grand-saut') && achats.length > 0) toInsert.push({ user_id: user.id, slug: 'grand-saut' })
-  if (!slugsObtenus.has('architecte') && nbEtfDifferents >= 3) toInsert.push({ user_id: user.id, slug: 'architecte' })
-  if (!slugsObtenus.has('main-de-fer') && ventes.length === 0 && achats.length > 0) {
-    const firstAchat = new Date(achats[0].date)
-    const now = new Date()
-    const mois = (now.getFullYear() - firstAchat.getFullYear()) * 12 + (now.getMonth() - firstAchat.getMonth())
-    if (mois >= 6) toInsert.push({ user_id: user.id, slug: 'main-de-fer' })
-  }
-  const gradeMetronome = [...GRADES_METRONOME].reverse().find(g => streak >= g.mois)
-  if (gradeMetronome) {
-    const existing = accomplissements.find(a => a.slug === 'metronome')
-    if (!existing) toInsert.push({ user_id: user.id, slug: 'metronome', niveau: gradeMetronome.niveau })
-    else if (existing.niveau !== gradeMetronome.niveau) toUpdate.push({ id: existing.id, niveau: gradeMetronome.niveau })
-  }
-  const gradeCap = [...GRADES_CAP].reverse().find(g => totalInvesti >= g.palier)
-  if (gradeCap) {
-    const existing = accomplissements.find(a => a.slug === 'cap')
-    if (!existing) toInsert.push({ user_id: user.id, slug: 'cap', niveau: gradeCap.niveau })
-    else if (existing.niveau !== gradeCap.niveau) toUpdate.push({ id: existing.id, niveau: gradeCap.niveau })
-  }
-  for (const badge of BADGES_MENSUELS_2026) {
-    if (slugsObtenus.has(badge.slug)) continue
-    const moisStr = `${badge.annee}-${String(badge.mois).padStart(2, '0')}`
-    const achatCeMois = achats.some(t => t.date.substring(0, 7) === moisStr)
-    if (achatCeMois) toInsert.push({ user_id: user.id, slug: badge.slug })
-  }
-  if (toInsert.length > 0) await supabase.from('accomplissements').insert(toInsert)
-  for (const u of toUpdate) await supabase.from('accomplissements').update({ niveau: u.niveau }).eq('id', u.id)
-// Enregistrer les nouveaux badges dans badges_non_vus
-if (toInsert.length > 0) {
-  const { data: profil } = await supabase
-    .from('profils')
-    .select('badges_non_vus')
-    .eq('user_id', user.id)
-    .maybeSingle()
-
-  const badgesNonVus = profil?.badges_non_vus ?? []
-  const newSlugs = toInsert.map(b => b.slug)
-  await supabase
-    .from('profils')
-    .update({ badges_non_vus: [...badgesNonVus, ...newSlugs] })
-    .eq('user_id', user.id)
-}
-  return toInsert.length + toUpdate.length
 }
 
 // ─── Popup profil ami ─────────────────────────────────────────────────────────
@@ -854,7 +810,7 @@ function BadgeCard({ badge, obtenu, onClickNiveaux, gradeActuel, progression }) 
   const t = useTheme()
   const [hovered, setHovered] = useState(false)
   const estEvolutif = badge.evolutif
-  const estCliquable = (estEvolutif && obtenu) || (badge.slug === 'premier-pas' && obtenu)
+  const estCliquable = (estEvolutif && obtenu) || (badge.slug === 'premier-pas' && obtenu) || (badge.slug === 'vroum-vroum' && obtenu)
   const couleurBadge = badge.categorie === 'guide' ? badge.couleur : badge.categorie === 'mensuel' ? '#3B82F6' : gradeActuel ? gradeActuel.niveauColor : '#4CAF2E'
   const bgBadge = badge.categorie === 'guide' ? badge.couleur + '15' : badge.categorie === 'mensuel' ? '#E6F1FB' : gradeActuel ? gradeActuel.niveauBg : '#EAF6E4'
 
@@ -918,9 +874,9 @@ function BadgeCard({ badge, obtenu, onClickNiveaux, gradeActuel, progression }) 
           </div>
         )}
 
-        {estCliquable && hovered && badge.slug !== 'premier-pas' && (
-          <div style={{ fontSize: 9, color: couleurBadge, fontWeight: 500, marginTop: 4 }}>Voir les niveaux →</div>
-        )}
+        {estCliquable && hovered && badge.slug !== 'premier-pas' && badge.slug !== 'vroum-vroum' && (
+  <div style={{ fontSize: 9, color: couleurBadge, fontWeight: 500, marginTop: 4 }}>Voir les niveaux →</div>
+)}
       </div>
     )
   }
@@ -966,7 +922,7 @@ function BadgeCard({ badge, obtenu, onClickNiveaux, gradeActuel, progression }) 
             </div>
           </div>
         )}
-        {estCliquable && hovered && badge.slug !== 'premier-pas' && <div style={{ fontSize: 9, color: couleurBadge, fontWeight: 500, marginTop: 2 }}>Voir les niveaux →</div>}
+        {estCliquable && hovered && badge.slug !== 'premier-pas' && badge.slug !== 'vroum-vroum' && <div style={{ fontSize: 9, color: couleurBadge, fontWeight: 500, marginTop: 2 }}>Voir les niveaux →</div>}
       </div>
     </div>
   )
@@ -1031,6 +987,54 @@ function PopupPremierPas({ onClose }) {
     </>
   )
 }
+function PopupAmbitieux({ onClose }) {
+  const t = useTheme()
+  return (
+    <>
+      <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 998 }} />
+      <div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 999, background: t.bgCard, borderRadius: 20, width: 'calc(100% - 32px)', maxWidth: 420, boxShadow: '0 20px 60px rgba(0,0,0,0.3)', fontFamily: 'inherit', overflow: 'hidden' }}>
+        <div style={{ padding: '20px 24px 16px', borderBottom: `0.5px solid ${t.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <div style={{ fontSize: 16, fontWeight: 700, color: t.text }}>⚡ L'Ambitieux</div>
+            <div style={{ fontSize: 12, color: t.textMuted, marginTop: 2 }}>Tu es passé Premium !</div>
+          </div>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: t.textMuted }}>✕</button>
+        </div>
+        <div style={{ padding: '20px 24px 28px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+          <div style={{ background: '#E8EEF6', borderRadius: 12, padding: '16px 18px' }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: '#034065', marginBottom: 6 }}>🎁 Cadeau de bienvenue</div>
+            <div style={{ fontSize: 12, color: '#034065', lineHeight: 1.6, marginBottom: 14 }}>
+              J'investis avec <strong>DEGIRO</strong>, le premier courtier en ligne d'Europe. En ouvrant ton compte via le lien de parrainage, tu bénéficies d'un bon de transaction offert !
+            </div>
+            <a
+              href="https://www.degiro.fr/parrainage/commencez-a-investir?id=40B07B83&utm_source=mgm"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ display: 'block', textAlign: 'center', background: '#034065', color: '#fff', padding: '11px', borderRadius: 10, fontSize: 13, fontWeight: 600, textDecoration: 'none' }}
+            >
+              Ouvrir un compte DEGIRO →
+            </a>
+          </div>
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: t.text, marginBottom: 12 }}>Pourquoi DEGIRO ?</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {[
+                { num: '1', texte: "Frais de courtage parmi les plus bas d'Europe" },
+                { num: '2', texte: 'Accès à plus de 50 bourses mondiales' },
+                { num: '3', texte: 'Interface simple et intuitive, idéale pour débuter' },
+              ].map(({ num, texte }) => (
+                <div key={num} style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                  <div style={{ width: 24, height: 24, borderRadius: '50%', background: '#034065', color: '#fff', fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{num}</div>
+                  <div style={{ fontSize: 12, color: t.textMuted, lineHeight: 1.6, paddingTop: 3 }}>{texte}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  )
+}
 // ─── Page principale ──────────────────────────────────────────────────────────
 export default function Challenge() {
   const t = useTheme()
@@ -1060,6 +1064,7 @@ const GUIDE_CHALLENGE = [
   const [positionOpen, setPositionOpen] = useState(false)
   const [niveauxOpen, setNiveauxOpen] = useState(null)
   const [premierPasOpen, setPremierPasOpen] = useState(false)
+  const [ambitieuxOpen, setAmbitieuxOpen] = useState(false)
   const [badgesNouveaux, setBadgesNouveaux] = useState([])
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
   const [photoUrl, setPhotoUrl] = useState(null)
@@ -1091,11 +1096,7 @@ const GUIDE_CHALLENGE = [
       const nb = await checkAndGrant(data.user, data.investissements, data.transactions, data.accomplissements)
       if (nb > 0) queryClient.invalidateQueries({ queryKey: ['challenge'] })
       setChecking(false)
-    // Vider les badges non vus
-await supabase
-  .from('profils')
-  .update({ badges_non_vus: [] })
-  .eq('user_id', data.user.id)
+
     }
     run()
   }, [data?.user?.id])
@@ -1278,8 +1279,9 @@ await supabase
                   <div style={{ fontSize: 13, fontWeight: 500, color: t.text, marginBottom: 10 }}>Accomplissements</div>
                   <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(150px, 1fr))', gap: 12 }}>
                     {badgesObtenus.filter(b => b.categorie === 'principal').map(badge => (
-                      <BadgeCard key={badge.slug} badge={badge} obtenu={true} onClickNiveaux={() => badge.slug === 'premier-pas' ? setPremierPasOpen(true) : setNiveauxOpen(badge.slug)} gradeActuel={getGradeActuel(badge)} progression={getProgression(badge)} />
+                     <BadgeCard key={badge.slug} badge={badge} obtenu={true} onClickNiveaux={() => badge.slug === 'premier-pas' ? setPremierPasOpen(true) : badge.slug === 'vroum-vroum' ? setAmbitieuxOpen(true) : setNiveauxOpen(badge.slug)} gradeActuel={getGradeActuel(badge)} progression={getProgression(badge)} />
                     ))}
+
                   </div>
                 </div>
               )}
@@ -1355,8 +1357,9 @@ await supabase
 
       {positionOpen && <PositionModal totalInvesti={totalInvesti} comptes={comptes} onClose={() => setPositionOpen(false)} />}
       {badgeOuvert && <NiveauxModal acc={badgeOuvert} gradeActuel={getGradeActuel(badgeOuvert)} valeurActuelle={valeurActuelleAcc} onClose={() => setNiveauxOpen(null)} />}
-{premierPasOpen && <PopupPremierPas onClose={() => setPremierPasOpen(false)} />}
-      <FooterApp />
+      {premierPasOpen && <PopupPremierPas onClose={() => setPremierPasOpen(false)} />}
+      {ambitieuxOpen && <PopupAmbitieux onClose={() => setAmbitieuxOpen(false)} />} 
+<FooterApp />
     </div>
   )
 }

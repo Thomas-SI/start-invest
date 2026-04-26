@@ -9,6 +9,7 @@ import PremiumModal from '../components/PremiumModal'
 import PageGuide from '../components/PageGuide'
 import { usePageGuide } from '../lib/usePageGuide'
 import { useNavigate } from 'react-router-dom'
+import { checkAndGrant } from '../lib/checkAndGrant'
 
 const ENVELOPPES = ['CTO', 'PEA', 'Assurance-vie']
 const TYPES_ETF = ['Capitalisant', 'Distribuant']
@@ -177,6 +178,13 @@ useEffect(() => {
         if (error) throw new Error('Erreur lors de la creation de la position.')
       }
       queryClient.invalidateQueries({ queryKey: ['investissement'] })
+      // Déclencher checkAndGrant pour les badges
+const { data: freshInv } = await supabase.from('investissements').select('*').eq('user_id', user.id)
+const { data: freshTx } = await supabase.from('transactions').select('*').eq('user_id', user.id)
+const { data: freshAcc } = await supabase.from('accomplissements').select('*').eq('user_id', user.id)
+if (freshInv && freshTx && freshAcc) {
+  await checkAndGrant(user, freshInv, freshTx, freshAcc)
+}
       setForm({ date: new Date().toISOString().split('T')[0], ticker: '', actif: '', enveloppe: 'PEA', type_etf: 'Capitalisant', type: 'Achat', quantite: '', prix_achat_unitaire: '', ter: '', frais_courtage: '', courtier: '' })
       setShowAdd(false); setSucces(true)
       setTimeout(() => setSucces(false), 3000)
@@ -287,14 +295,18 @@ useEffect(() => {
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: t.textMuted, fontSize: 13 }}>Chargement...</div>
     </div>
   )
-if (premiumLoading) return null
+if (premiumLoading) return (
+  <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <Navbar page="Investissement" initiale={initiale} photoUrl={photoUrl} />
+  </div>
+)
 
 if (!isPremium) {
   return <PremiumModal onClose={() => navigate(-1)} />
 }
   return (
     <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <Navbar page="Investissement" />
+      <Navbar page="Investissement" initiale={initiale} photoUrl={photoUrl} />
       <PageGuide
   pageId="investissement"
   titre="Investissement"

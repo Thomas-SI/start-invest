@@ -36,10 +36,7 @@ export default function FooterApp() {
 
         {/* COPYRIGHT */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8, paddingTop: 12, borderTop: '0.5px solid rgba(255,255,255,0.1)' }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 1 }}>
-            <span style={{ fontSize: 13, fontWeight: 800, color: '#fff', fontStyle: 'italic' }}>START</span>
-            <span style={{ fontSize: 13, fontWeight: 800, color: '#4CAF2E', fontStyle: 'italic' }}>INVEST</span>
-          </div>
+          <img src="https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/logo-bleu-start-invest.png" alt="StartInvest" style={{ height: 40, width: 'auto' }} />
           <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)' }}>© {new Date().getFullYear()} Start Invest — Tous droits réservés</div>
         </div>
 

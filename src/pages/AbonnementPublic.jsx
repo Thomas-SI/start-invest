@@ -60,14 +60,14 @@ function PublicNavbar({ isMobile, openLogin, openSignup, activeLink = 'Abonnemen
 
   const Logo = () => (
     <div onClick={() => handleNavigate('/')} style={{ cursor: 'pointer' }}>
-      <img src={LOGO_URL} alt="StartInvest" style={{ height: 38, width: 38, borderRadius: '50%', objectFit: 'cover' }} />
+      <img src={LOGO_URL} alt="StartInvest" style={{ height: 105, width: 105, borderRadius: '50%', objectFit: 'cover' }} />
     </div>
   )
 
   if (isMobile) {
     return (
       <>
-        <nav style={{ background: '#fff', borderBottom: '0.5px solid #E0EAE3', padding: '0 16px', height: 58, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 100 }}>
+        <nav style={{ background: '#fff', borderBottom: '0.5px solid #E0EAE3', padding: '0 16px', height: 100, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 100 }}>
           <Logo />
           <button
             onClick={() => setMenuOpen(!menuOpen)}
@@ -112,11 +112,11 @@ function PublicNavbar({ isMobile, openLogin, openSignup, activeLink = 'Abonnemen
   }
 
   return (
-    <nav style={{ background: '#fff', borderBottom: '0.5px solid #E0EAE3', padding: '0 40px', height: 58, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 100 }}>
+    <nav style={{ background: '#fff', borderBottom: '0.5px solid #E0EAE3', padding: '0 40px', height: 100, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 100 }}>
       <Logo />
       <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
         {links.map(([label, path]) => (
-          <span key={label} onClick={() => navigate(path)} style={{ fontSize: 13, color: label === activeLink ? '#034065' : '#6B7280', padding: '5px 12px', borderRadius: 6, cursor: 'pointer', fontWeight: label === activeLink ? 500 : 400 }}
+          <span key={label} onClick={() => navigate(path)} style={{ fontSize: 15, color: label === activeLink ? '#034065' : '#6B7280', padding: '5px 12px', borderRadius: 6, cursor: 'pointer', fontWeight: label === activeLink ? 500 : 400 }}
             onMouseEnter={e => e.currentTarget.style.color = '#034065'}
             onMouseLeave={e => e.currentTarget.style.color = label === activeLink ? '#034065' : '#6B7280'}>
             {label}
@@ -124,8 +124,8 @@ function PublicNavbar({ isMobile, openLogin, openSignup, activeLink = 'Abonnemen
         ))}
       </div>
       <div style={{ display: 'flex', gap: 10 }}>
-        <button onClick={openLogin} style={{ padding: '7px 16px', borderRadius: 8, border: '0.5px solid #034065', background: 'transparent', color: '#034065', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Se connecter</button>
-        <button onClick={openSignup} style={{ padding: '7px 16px', borderRadius: 8, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>S'inscrire gratuitement</button>
+        <button onClick={openLogin} style={{ padding: '9px 20px', borderRadius: 8, border: '0.5px solid #034065', background: 'transparent', color: '#034065', fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Se connecter</button>
+        <button onClick={openSignup} style={{ padding: '9px 20px', borderRadius: 8, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>S'inscrire gratuitement</button>
       </div>
     </nav>
   )

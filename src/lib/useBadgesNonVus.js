@@ -22,7 +22,7 @@ export function useBadgesNonVus() {
     fetchNonVus()
 
     // Rafraîchir toutes les 10 secondes
-    const interval = setInterval(fetchNonVus, 10000)
+    const interval = setInterval(fetchNonVus, 5000)
     return () => clearInterval(interval)
   }, [])
 

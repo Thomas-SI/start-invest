@@ -98,7 +98,11 @@ const GUIDE_CROISSANCE = [
   const capitalApresFisc = derniere ? Math.round(derniere.capitalInvesti + derniere.interets * (1 - fiscalite)) : 0
   const maxVal = derniere?.capitalTotal || 1
 
-  if (premiumLoading) return null
+  if (premiumLoading) return (
+    <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <Navbar page="Croissance" initiale={initiale} photoUrl={photoUrl} />
+    </div>
+  )
 
 if (!isPremium) {
   return <PremiumModal onClose={() => navigate(-1)} />

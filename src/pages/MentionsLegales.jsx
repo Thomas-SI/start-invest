@@ -24,10 +24,9 @@ export default function MentionsLegales() {
   return (
     <div style={{ fontFamily: 'inherit', background: '#F4F7F5', minHeight: '100vh' }}>
       <nav style={{ background: '#fff', borderBottom: '0.5px solid #E0EAE3', padding: '0 20px', height: 58, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 100 }}>
-        <div onClick={() => navigate('/')} style={{ display: 'flex', alignItems: 'baseline', cursor: 'pointer' }}>
-          <span style={{ fontSize: 18, fontWeight: 800, color: '#034065', fontStyle: 'italic' }}>START</span>
-          <span style={{ fontSize: 18, fontWeight: 800, color: '#4CAF2E', fontStyle: 'italic' }}>INVEST</span>
-        </div>
+        <div onClick={() => navigate('/dashboard')} style={{ cursor: 'pointer' }}>
+  <img src="/logo-clair.jpeg" alt="StartInvest" style={{ height: 48, width: 'auto' }} />
+</div>
         <button onClick={() => navigate(-1)} style={{ padding: '7px 16px', borderRadius: 8, border: '0.5px solid #E0EAE3', background: '#fff', color: '#6B7280', fontSize: 13, cursor: 'pointer', fontFamily: 'inherit' }}>
           ← Retour
         </button>

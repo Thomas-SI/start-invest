@@ -135,7 +135,7 @@ const CHAPITRES = [
     num: '04',
     titre: 'Les bases essentielles',
     couleur: '#8B5CF6',
-    resume: "Ce que tout investisseur débutant doit absolument maîtriser avant de passer à l'action.",
+    resume: "Ce que tout investisseur débutant doit absolument maîtriser avant de passez à l'action.",
     badgeSlug: 'guide-ch04',
     fiches: [
       {
@@ -194,7 +194,7 @@ const CHAPITRES = [
   },
   {
     num: '05',
-    titre: "Passer à l'action",
+    titre: "Passez à l'action",
     couleur: '#EC4899',
     resume: "Investir intelligemment ne prend pas des heures. Avec la bonne méthode, 15 minutes par mois suffisent.",
     badgeSlug: 'guide-ch05',

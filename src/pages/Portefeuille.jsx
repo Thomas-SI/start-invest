@@ -137,10 +137,12 @@ const GUIDE_PORTEFEUILLE = [
   })
 
   useEffect(() => {
-  if (data?.user) {
-    setPhotoUrl(data.user.user_metadata?.photo_url || null)
+  const loadPhoto = async () => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) setPhotoUrl(user.user_metadata?.photo_url || null)
   }
-}, [data])
+  loadPhoto()
+}, [])
 
   const initiale = data?.user?.user_metadata?.prenom?.[0]?.toUpperCase() || '?'
 
@@ -306,14 +308,18 @@ const GUIDE_PORTEFEUILLE = [
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: t.textMuted, fontSize: 13 }}>Chargement...</div>
     </div>
   )
-if (premiumLoading) return null
+if (premiumLoading) return (
+  <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <Navbar page="Portefeuille" initiale={initiale} photoUrl={photoUrl} />
+  </div>
+)
 
 if (!isPremium) {
   return <PremiumModal onClose={() => navigate(-1)} />
 }
   return (
     <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <Navbar page="Portefeuille" />
+      <Navbar page="Portefeuille" initiale={initiale} photoUrl={photoUrl} />
       <PageGuide
   pageId="portefeuille"
   titre="Portefeuille"
@@ -563,8 +569,8 @@ if (!isPremium) {
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, minWidth: 680 }}>
               <thead>
                 <tr style={{ background: t.bgSecondary }}>
-                  {['', 'Destination', 'Compte bancaire', 'Répartition (%)', 'Montant à virer ce mois', ''].map(h => (
-                    <th key={h} style={{ padding: '8px 14px', textAlign: 'left', fontSize: 10, color: t.textMuted, fontWeight: 500, borderBottom: `0.5px solid ${t.border}`, whiteSpace: 'nowrap' }}>{h}</th>
+                {['', 'Destination', 'Compte bancaire', 'Répartition (%)', 'Montant à virer ce mois', ''].map((h, i) => (
+  <th key={i} style={{ padding: '8px 14px', textAlign: 'left', fontSize: 10, color: t.textMuted, fontWeight: 500, borderBottom: `0.5px solid ${t.border}`, whiteSpace: 'nowrap' }}>{h}</th>
                   ))}
                 </tr>
               </thead>
