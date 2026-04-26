@@ -74,7 +74,7 @@ const ACCOMPLISSEMENTS = [
   { slug: 'main-de-fer', nom: 'Main de Fer', imageUrl: 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/Main%20de%20fer.png', message: 'Le calme est une compétence.', quete: '6 mois sans aucune vente', categorie: 'principal' },
   { slug: 'architecte', nom: "L'Architecte", imageUrl: 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/Larchitecte.png', message: 'Ton patrimoine est maintenant solide et diversifié. Beau travail !', quete: 'Posséder 3 ETF différents', categorie: 'principal' },
   { slug: 'cap', nom: 'Ascension', imageUrl: 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/Ascension.png', message: 'Le premier palier est le plus dur. La machine est lancée.', quete: "Atteindre un palier d'investissement", evolutif: true, grades: GRADES_CAP, categorie: 'principal' },
-  { slug: 'vroum-vroum', nom: "L'ambitieux", imageUrl: 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/Lambitieux.png', message: "Je vois déjà l'avenir.", quete: "S'abonner à StartInvest Premium", categorie: 'principal' },
+  { slug: 'vroum-vroum', nom: "L'ambitieux", imageUrl: 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/Lambitieux.png', message: "Je vois déjà l'avenir. Profite d\'un code parrain en cliquant ici", quete: "S'abonner à StartInvest Premium", categorie: 'principal' },
 ]
 
 const TOUS_BADGES = [...ACCOMPLISSEMENTS, ...BADGES_GUIDE, ...BADGES_MENSUELS_2026]
@@ -1239,7 +1239,7 @@ const GUIDE_CHALLENGE = [
       {streakMensuel > 0 ? `${streakMensuel} mois de suite investis !` : 'Aucune série en cours'}
     </div>
     <div style={{ fontSize: 11, color: t.textMuted, marginTop: 2 }}>
-      {streakMensuel > 0 ? 'Continue chaque mois pour maintenir ta série 🔥' : 'Achète un ETF ce mois-ci pour démarrer ta série'}
+      {streakMensuel > 0 ? 'Continue chaque mois pour maintenir ta série' : 'Achète un ETF ce mois-ci pour démarrer ta série'}
     </div>
   </div>
 </div>

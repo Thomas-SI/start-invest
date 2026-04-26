@@ -4,13 +4,13 @@ import { supabase } from '../lib/supabase'
 const METRONOME_URL = 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/AB94501C-5932-4B4C-93F1-D1CD5A4BAA25.png'
 
 const BADGES_DATA = [
-  { slug: 'premier-pas', nom: 'Premier Pas', emoji: '🌱', desc: "Dès l'inscription sur StartInvest.", message: 'Bienvenue chez Start Invest.', tag: 'Automatique', tagColor: '#2E7D1E', tagBg: '#EAF6E4' },
-  { slug: 'grand-saut', nom: 'Le Grand Saut', emoji: '🚀', desc: 'Acheter son premier ETF.', message: "Tu n'es plus spectateur, tu es le pilote de ton futur.", tag: 'Premier achat', tagColor: '#2E7D1E', tagBg: '#EAF6E4' },
-  { slug: 'metronome', img: METRONOME_URL, nom: 'Le Métronome', desc: 'Investir régulièrement chaque mois.', message: 'La magie des intérêts composes adore ta régularité.', tag: 'Bronze vers Platine', tagColor: '#854F0B', tagBg: '#FFF0DC' },
-  { slug: 'main-de-fer', nom: 'Main de Fer', emoji: '🗿', desc: '6 mois sans aucune vente.', message: 'Le calme est une competence.', tag: 'Discipline', tagColor: '#444441', tagBg: '#F0F0F0' },
-  { slug: 'architecte', nom: "L'Architecte", emoji: '🏗️', desc: 'Posséder 3 ETF différents.', message: 'Ton patrimoine est maintenant solide et diversifie.', tag: 'Diversification', tagColor: '#185FA5', tagBg: '#E6F1FB' },
-  { slug: 'cap', nom: 'Ascension', emoji: '💰', desc: "Atteindre un palier d'investissement.", message: 'Le premier palier est le plus dur. La machine est lancee.', tag: 'Bronze vers Légendaire', tagColor: '#633806', tagBg: '#FFF8DC' },
-  { slug: 'vroum-vroum', nom: 'Loin et Vite', emoji: '⚡', desc: "S'abonner a StartInvest Premium.", message: "Je vois déjà l'avenir.", tag: 'Premium', tagColor: '#534AB7', tagBg: '#EEEDFE' },
+  { slug: 'premier-pas', nom: 'Premier Pas', img: 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/Premier%20Pas.png', desc: "Dès l'inscription sur StartInvest.", message: 'Bienvenue chez Start Invest.', tag: 'Automatique', tagColor: '#2E7D1E', tagBg: '#EAF6E4' },
+  { slug: 'grand-saut', nom: 'Le Grand Saut', img: 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/Le%20grand%20saut.png', desc: 'Acheter son premier ETF.', message: "Tu n'es plus spectateur, tu es le pilote de ton futur.", tag: 'Premier achat', tagColor: '#2E7D1E', tagBg: '#EAF6E4' },
+  { slug: 'metronome', img: 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/Metronome.png', nom: 'Le Métronome', desc: 'Investir régulièrement chaque mois.', message: 'La magie des intérêts composés adore ta régularité.', tag: 'Bronze vers Platine', tagColor: '#854F0B', tagBg: '#FFF0DC' },
+  { slug: 'main-de-fer', nom: 'Main de Fer', img: 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/Main%20de%20fer.png', desc: '6 mois sans aucune vente.', message: 'Le calme est une compétence.', tag: 'Discipline', tagColor: '#444441', tagBg: '#F0F0F0' },
+  { slug: 'architecte', nom: "L'Architecte", img: 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/Larchitecte.png', desc: 'Posséder 3 ETF différents.', message: 'Ton patrimoine est maintenant solide et diversifié.', tag: 'Diversification', tagColor: '#185FA5', tagBg: '#E6F1FB' },
+  { slug: 'cap', nom: 'Ascension', img: 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/Ascension.png', desc: "Atteindre un palier d'investissement.", message: 'Le premier palier est le plus dur. La machine est lancée.', tag: 'Bronze vers Légendaire', tagColor: '#633806', tagBg: '#FFF8DC' },
+  { slug: 'vroum-vroum', nom: "L'Ambitieux", img: 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/Lambitieux.png', desc: "S'abonner à StartInvest Premium.", message: "Je vois déjà l'avenir.", tag: 'Premium', tagColor: '#534AB7', tagBg: '#EEEDFE' },
 ]
 
 export default function ChallengesModal({ onClose }) {

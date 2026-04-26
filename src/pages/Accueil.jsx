@@ -322,9 +322,11 @@ export default function Accueil() {
             </div>
           </div>
           <div style={{ position: 'absolute', bottom: isMobile ? -15 : -20, right: isMobile ? 10 : -20, background: '#fff', border: '0.5px solid #185FA5', borderRadius: 14, padding: isMobile ? '8px 10px' : '10px 14px', display: 'flex', alignItems: 'center', gap: isMobile ? 8 : 10, boxShadow: '0 4px 16px rgba(24,95,165,0.12)' }}>
-            <div style={{ width: isMobile ? 30 : 36, height: isMobile ? 30 : 36, borderRadius: '50%', background: '#E6F1FB', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: isMobile ? 15 : 18, border: '2px solid #185FA5', flexShrink: 0 }}>🏗️</div>
+            <div style={{ width: isMobile ? 30 : 36, height: isMobile ? 30 : 36, borderRadius: '50%', overflow: 'hidden', border: '2px solid #185FA5', flexShrink: 0 }}>
+              <img src="https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/Larchitecte.png" alt="Architecte" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            </div>
             <div>
-              <div style={{ fontSize: isMobile ? 10 : 11, fontWeight: 600, color: '#034065' }}>L'Architecte</div>
+              <div style={{ fontSize: isMobile ? 10 : 11, fontWeight: 600, color: '#034065' }}>{"L'Architecte"}</div>
               <div style={{ fontSize: isMobile ? 9 : 10, color: '#185FA5' }}>Accomplissement débloqué !</div>
             </div>
           </div>
