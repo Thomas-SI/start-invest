@@ -8,7 +8,7 @@ import PageGuide from '../components/PageGuide'
 import { usePageGuide } from '../lib/usePageGuide'
 import { checkAndGrant } from '../lib/checkAndGrant'
 
-const METRONOME_URL = 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/AB94501C-5932-4B4C-93F1-D1CD5A4BAA25.png'
+const METRONOME_URL = 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/Metronome.png'
 
 const GRADES_CAP = [
   { slug: 'cap-bronze', palier: 100, niveau: 'Bronze', niveauColor: '#854F0B', niveauBg: '#FFF0DC' },
@@ -46,6 +46,7 @@ const IMAGES_MENSUELS = {
   9: 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/sept-vignettes-challenge.jpg',
   10: 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/oct-vignettes-challenge.jpg',
   11: 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/nov-vignettes-challenge.jpg',
+  12: 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/dec-vignettes-challenge.png',
 }
 
 const BADGES_MENSUELS_2026 = [4, 5, 6, 7, 8, 9, 10, 11, 12].map(m => ({
