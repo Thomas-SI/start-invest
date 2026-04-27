@@ -69,6 +69,8 @@ const GUIDE_INVESTISSEMENT = [
   const [confirmDeleteId, setConfirmDeleteId] = useState(null)
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
   const [photoUrl, setPhotoUrl] = useState(null)
+  const [prixCache, setPrixCache] = useState({})
+  const [derniereMAJ, setDerniereMAJ] = useState(null)
 
   const [form, setForm] = useState({
     date: new Date().toISOString().split('T')[0],
@@ -81,6 +83,26 @@ const GUIDE_INVESTISSEMENT = [
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
   }, [])
+  
+  useEffect(() => {
+  const loadCache = async () => {
+    const { data } = await supabase
+      .from('etf_price_cache')
+      .select('ticker, prix_actuel, change_p, updated_at')
+    if (data?.length) {
+      const map = {}
+      data.forEach(d => { map[d.ticker] = d })
+      setPrixCache(map)
+      const latest = data.reduce((a, b) =>
+        new Date(a.updated_at) > new Date(b.updated_at) ? a : b
+      )
+      setDerniereMAJ(new Date(latest.updated_at))
+    }
+  }
+  loadCache()
+  const interval = setInterval(loadCache, 5 * 60 * 1000)
+  return () => clearInterval(interval)
+}, []) 
 
   const { data, isLoading } = useQuery({
   queryKey: ['investissement'],
@@ -116,20 +138,89 @@ useEffect(() => {
   const calcValeurActuelle = (inv) => parseFloat(inv.quantite) * parseFloat(inv.prix_actuel || inv.pru || inv.prix_achat_unitaire || 0)
 
   const handleTickerChange = async (val) => {
-    const upper = val.toUpperCase().trim()
-    setForm(prev => ({ ...prev, ticker: val }))
-    if (upper.length < 2) return
-    const existingPos = investissements.find(i => i.ticker === upper)
-    if (existingPos) {
-      setForm(prev => ({ ...prev, ticker: upper, actif: existingPos.actif || prev.actif, enveloppe: existingPos.enveloppe || prev.enveloppe, type_etf: existingPos.type_etf || prev.type_etf, ter: existingPos.ter?.toString() || prev.ter, courtier: existingPos.courtier || prev.courtier }))
-      return
-    }
-    const tickerBase = upper.split('.')[0]
-    const { data: ref } = await supabase.from('etf_reference').select('*').or(`ticker.eq.${upper},ticker.eq.${tickerBase}`).single()
-    if (ref) {
-      setForm(prev => ({ ...prev, ticker: upper, actif: ref.nom || prev.actif, enveloppe: ref.enveloppe_defaut || prev.enveloppe, ter: ref.ter?.toString() || prev.ter, type_etf: ref.type_etf || prev.type_etf || 'Capitalisant' }))
-    }
+  const upper = val.toUpperCase().trim()
+  setForm(prev => ({ ...prev, ticker: val }))
+  if (upper.length < 2) return
+
+  const existingPos = investissements.find(i => i.ticker === upper)
+  if (existingPos) {
+    setForm(prev => ({
+      ...prev,
+      ticker: upper,
+      actif: existingPos.actif || prev.actif,
+      enveloppe: existingPos.enveloppe || prev.enveloppe,
+      type_etf: existingPos.type_etf || prev.type_etf,
+      ter: existingPos.ter?.toString() || prev.ter,
+      courtier: existingPos.courtier || prev.courtier,
+      prix_achat_unitaire: existingPos.prix_actuel?.toString() || prev.prix_achat_unitaire,
+    }))
+    return
   }
+
+  const tickerBase = upper.split('.')[0]
+
+  // 1. etf_reference → nom, enveloppe, ter
+  const { data: ref } = await supabase
+    .from('etf_reference')
+    .select('*')
+    .or(`ticker.eq.${upper},ticker.eq.${tickerBase}`)
+    .single()
+
+  if (ref) {
+    setForm(prev => ({
+      ...prev,
+      ticker: upper,
+      actif: ref.nom || prev.actif,
+      enveloppe: ref.enveloppe_defaut || prev.enveloppe,
+      ter: ref.ter?.toString() || prev.ter,
+      type_etf: ref.type_etf || 'Capitalisant',
+    }))
+  }
+
+  // 2. Prix dans le cache
+  const cache = prixCache[tickerBase]
+  if (cache?.prix_actuel) {
+    setForm(prev => ({
+      ...prev,
+      prix_achat_unitaire: cache.prix_actuel.toString(),
+    }))
+    return
+  }
+
+  // 3. Pas dans le cache → appel Edge Function à la demande
+  try {
+    const { data: { session } } = await supabase.auth.getSession()
+    const res = await fetch(
+      'https://ylxxdhwakdtmidtqpacj.supabase.co/functions/v1/refresh-etf-prices',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ tickers: [tickerBase] }),
+      }
+    )
+    if (res.ok) {
+      const { data: freshCache } = await supabase
+        .from('etf_price_cache')
+        .select('ticker, prix_actuel, nom')
+        .eq('ticker', tickerBase)
+        .single()
+
+      if (freshCache?.prix_actuel) {
+        setForm(prev => ({
+          ...prev,
+          prix_achat_unitaire: freshCache.prix_actuel.toString(),
+          actif: prev.actif || freshCache.nom || prev.actif,
+        }))
+        setPrixCache(prev => ({ ...prev, [tickerBase]: freshCache }))
+      }
+    }
+  } catch (e) {
+    console.error('Erreur récupération prix:', e)
+  }
+}
 
   const handleCibleChange = async (inv, value) => {
     const cible = parseFloat(value) || 0
@@ -332,6 +423,19 @@ if (!isPremium) {
         {succes && <div style={{ background: '#EAF6E4', border: '0.5px solid #4CAF2E', borderRadius: 8, padding: '10px 14px', fontSize: 12, color: '#2E7D1E', fontWeight: 500 }}>Transaction modifiee avec succes !</div>}
         {erreur && <div style={{ background: '#FCEBEB', border: '0.5px solid #E24B4A', borderRadius: 8, padding: '10px 14px', fontSize: 12, color: '#E24B4A' }}>⚠️ {erreur}</div>}
 
+        {derniereMAJ && (
+  <div style={{
+    fontSize: 10, color: t.textMuted,
+    display: 'flex', alignItems: 'center', gap: 6,
+  }}>
+    <span style={{
+      width: 6, height: 6, borderRadius: '50%',
+      background: (new Date() - derniereMAJ) < 35 * 60 * 1000 ? '#4CAF2E' : '#F59E0B',
+      display: 'inline-block',
+    }} />
+    Prix mis à jour le {derniereMAJ.toLocaleDateString('fr-FR')} à {derniereMAJ.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+  </div>
+)}
         {/* ALLOCATIONS PAR ENVELOPPE */}
         {enveloppesActives.length > 0 && (
           <>
