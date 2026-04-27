@@ -26,6 +26,7 @@ import './index.css'
 import CGU from './pages/CGU'
 import Reclamation from './pages/Reclamation'
 import Cookies from './pages/Cookies'
+import ResetPassword from './pages/ResetPassword'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -58,7 +59,8 @@ createRoot(document.getElementById('root')).render(
             <Route path="/cgu" element={<CGU />} />
             <Route path="/reclamation" element={<Reclamation />} />
             <Route path="/cookies" element={<Cookies />} />
-
+            <Route path="/reset-password" element={<ResetPassword />} />
+            
             {/* ROUTES PROTÉGÉES */}
             <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
