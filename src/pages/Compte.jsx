@@ -39,6 +39,7 @@ export default function Compte() {
   const { isPremium } = usePremium()
   const [abonnement, setAbonnement] = useState(null)
   const [portalUrl, setPortalUrl] = useState(null)
+  const [showInstallGuide, setShowInstallGuide] = useState(false)
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -370,7 +371,64 @@ export default function Compte() {
 
         </div>
       </div>
-      <FooterApp />
+
+      <button
+  onClick={() => setShowInstallGuide(true)}
+  style={{
+    position: 'fixed', bottom: 80, right: 16, zIndex: 100,
+    width: 36, height: 36, borderRadius: '50%',
+    background: '#034065', color: '#fff',
+    border: 'none', fontSize: 16, fontWeight: 700,
+    cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+  }}
+>
+  ?
+</button>
+
+{showInstallGuide && (
+  <>
+    <div onClick={() => setShowInstallGuide(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 998 }} />
+    <div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 999, background: t.bgCard, borderRadius: 20, width: 'calc(100% - 32px)', maxWidth: 420, boxShadow: '0 20px 60px rgba(0,0,0,0.3)', fontFamily: 'inherit', overflow: 'hidden' }}>
+      <div style={{ padding: '20px 24px 16px', borderBottom: `0.5px solid ${t.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ fontSize: 16, fontWeight: 700, color: t.text }}>📱 Ajouter l'App sur ton écran d'accueil</div>
+        <button onClick={() => setShowInstallGuide(false)} style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: t.textMuted }}>✕</button>
+      </div>
+      <div style={{ padding: '20px 24px 28px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+        <div style={{ background: '#E8EEF6', borderRadius: 12, padding: '16px 18px' }}>
+          <div style={{ fontSize: 13, fontWeight: 600, color: '#034065', marginBottom: 12 }}>🍎 Sur iPhone (Safari)</div>
+          {[
+            { num: '1', texte: 'Ouvre start-invest.fr dans Safari' },
+            { num: '2', texte: 'Appuie sur le bouton partager (carré avec flèche ↑)' },
+            { num: '3', texte: "Sélectionne \"Sur l'écran d'accueil\"" },
+            { num: '4', texte: 'Appuie sur "Ajouter"' },
+          ].map(({ num, texte }) => (
+            <div key={num} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginBottom: 8 }}>
+              <div style={{ width: 22, height: 22, borderRadius: '50%', background: '#034065', color: '#fff', fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{num}</div>
+              <div style={{ fontSize: 12, color: '#034065', lineHeight: 1.6, paddingTop: 2 }}>{texte}</div>
+            </div>
+          ))}
+        </div>
+        <div style={{ background: '#EAF6E4', borderRadius: 12, padding: '16px 18px' }}>
+          <div style={{ fontSize: 13, fontWeight: 600, color: '#2E7D1E', marginBottom: 12 }}>🤖 Sur Android (Chrome)</div>
+          {[
+            { num: '1', texte: 'Ouvre start-invest.fr dans Chrome' },
+            { num: '2', texte: 'Appuie sur les 3 points en haut à droite' },
+            { num: '3', texte: "Sélectionne \"Ajouter à l'écran d'accueil\"" },
+            { num: '4', texte: 'Appuie sur "Ajouter"' },
+          ].map(({ num, texte }) => (
+            <div key={num} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginBottom: 8 }}>
+              <div style={{ width: 22, height: 22, borderRadius: '50%', background: '#4CAF2E', color: '#fff', fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{num}</div>
+              <div style={{ fontSize: 12, color: '#2E7D1E', lineHeight: 1.6, paddingTop: 2 }}>{texte}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </>
+)}
+<FooterApp />
+     
     </div>
   )
 }
