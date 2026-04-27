@@ -564,7 +564,9 @@ function NiveauxModal({ acc, gradeActuel, valeurActuelle, onClose }) {
         <div style={{ padding: '16px 20px 12px', borderBottom: `0.5px solid ${t.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexShrink: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <div style={{ width: 44, height: 44, borderRadius: 10, background: gradeActuel ? gradeActuel.niveauBg : t.bgSecondary, display: 'flex', alignItems: 'center', justifyContent: 'center', border: gradeActuel ? `2px solid ${gradeActuel.niveauColor}` : `1.5px solid ${t.border}`, overflow: 'hidden', flexShrink: 0 }}>
-              {acc.svgIcon ? <img src={METRONOME_URL} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span style={{ fontSize: 20, color: t.textMuted }}>?</span>}
+              {acc.svgIcon ? <img src={METRONOME_URL} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> 
+              : acc.slug === 'cap' ? <img src="https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/Ascension.png" alt="Ascension" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              : <span style={{ fontSize: 20, color: t.textMuted }}>?</span>}
             </div>
             <div>
               <div style={{ fontSize: 15, fontWeight: 600, color: t.text }}>{acc.nom}</div>
@@ -1110,12 +1112,14 @@ const GUIDE_CHALLENGE = [
       .eq('user_id', data.user.id)
       .maybeSingle()
     if (profil?.badges_non_vus?.length > 0) {
-      setBadgesNouveaux(profil.badges_non_vus)
-      await supabase
-        .from('profils')
-        .update({ badges_non_vus: [] })
-        .eq('user_id', data.user.id)
-    }
+  setBadgesNouveaux(profil.badges_non_vus)
+  setTimeout(async () => {
+    await supabase
+      .from('profils')
+      .update({ badges_non_vus: [] })
+      .eq('user_id', data.user.id)
+  }, 6000)
+}
   }
   fetchBadgesNonVus()
 }, [data])

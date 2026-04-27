@@ -11,6 +11,7 @@ export default function AuthModal({ onClose, defaultMode = 'login' }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [resetSent, setResetSent] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
   const [signupDone, setSignupDone] = useState(false)
 
   const handleLogin = async () => {
@@ -36,6 +37,7 @@ export default function AuthModal({ onClose, defaultMode = 'login' }) {
     })
     setLoading(false)
     if (error) { setError(error.message); return }
+    localStorage.clear()
     setSignupDone(true)
   }
 
@@ -94,10 +96,7 @@ export default function AuthModal({ onClose, defaultMode = 'login' }) {
         ) : (
           <>
             <div style={{ textAlign: 'center', marginBottom: 24 }}>
-              <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center' }}>
-                <span style={{ fontSize: 20, fontWeight: 800, color: '#034065', fontStyle: 'italic' }}>START</span>
-                <span style={{ fontSize: 20, fontWeight: 800, color: '#4CAF2E', fontStyle: 'italic' }}>INVEST</span>
-              </div>
+              <img src="https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/IMG_2819.jpeg" alt="StartInvest" style={{ height: 110, width: 'auto' }} />
               <div style={{ fontSize: 13, color: '#9CA3AF', marginTop: 6 }}>
                 {mode === 'login' ? 'Hey ! Bon retour' : 'Créez votre compte gratuitement'}
               </div>
@@ -122,7 +121,12 @@ export default function AuthModal({ onClose, defaultMode = 'login' }) {
               </div>
               <div>
                 <label style={{ fontSize: 12, fontWeight: 500, color: '#6B7280', display: 'block', marginBottom: 6 }}>Mot de passe</label>
-                <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" onKeyDown={e => e.key === 'Enter' && (mode === 'login' ? handleLogin() : handleSignup())} style={inputStyle} />
+                <div style={{ position: 'relative' }}>
+  <input type={showPassword ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" onKeyDown={e => e.key === 'Enter' && (mode === 'login' ? handleLogin() : handleSignup())} style={{ ...inputStyle, paddingRight: 40 }} />
+  <button onClick={() => setShowPassword(v => !v)} type="button" style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#9CA3AF', fontSize: 16, padding: 0 }}>
+    {showPassword ? '🙈' : '👁️'}
+  </button>
+</div>
                 {mode === 'login' && (
                   <div style={{ textAlign: 'right', marginTop: 6 }}>
                     <span onClick={handleResetPassword} style={{ fontSize: 12, color: '#4CAF2E', cursor: 'pointer' }}>
