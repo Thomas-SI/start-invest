@@ -34,6 +34,7 @@ const supabaseAdmin = createClient(
     }
 
     const { priceId } = await req.json();
+    console.log("priceId reçu:", priceId);
     if (!priceId) {
       return new Response(
         JSON.stringify({ error: "priceId manquant" }),
