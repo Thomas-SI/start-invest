@@ -365,11 +365,11 @@ export default function Onboarding() {
         {/* LOGO */}
         <div style={{ textAlign: 'center', marginBottom: 28 }}>
   <div style={{ marginBottom: 6 }}>
-    <img src="https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/IMG_2819.jpeg" alt="Start Invest" style={{ width: 60, height: 60, borderRadius: '50%', objectFit: 'cover' }} />
+    <img src="https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/IMG_2819.jpeg" alt="Start Invest" style={{ width: 100, height: 100, borderRadius: '50%', objectFit: 'cover' }} />
   </div>
           <div style={{ fontSize: 15, fontWeight: 500, color: t.text, marginBottom: 4 }}>Bienvenue ! 👋</div>
           <div style={{ fontSize: 13, color: t.textMuted, lineHeight: 1.5 }}>
-            Avant de commencer, dites-nous en un peu plus sur vous.
+            Avant de commencer, remplis ces quelques informations.
           </div>
         </div>
 
