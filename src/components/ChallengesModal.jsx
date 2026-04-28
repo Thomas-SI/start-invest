@@ -44,18 +44,6 @@ export default function ChallengesModal({ onClose }) {
           <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: '#9CA3AF' }}>x</button>
         </div>
 
-        {!loading && (
-          <div style={{ padding: '12px 28px', borderBottom: '0.5px solid #E0EAE3', flexShrink: 0 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: '#9CA3AF', marginBottom: 6 }}>
-              <span>Progression globale</span>
-              <span style={{ color: '#4CAF2E', fontWeight: 500 }}>{Math.round((slugsObtenus.size / BADGES_DATA.length) * 100)}%</span>
-            </div>
-            <div style={{ background: '#F0F0F0', borderRadius: 4, height: 6, overflow: 'hidden' }}>
-              <div style={{ height: '100%', borderRadius: 4, background: '#4CAF2E', width: Math.round((slugsObtenus.size / BADGES_DATA.length) * 100) + '%', transition: 'width 0.5s' }} />
-            </div>
-          </div>
-        )}
-
         <div style={{ overflowY: 'auto', padding: '20px 28px', display: 'flex', flexDirection: 'column', gap: 12 }}>
           {BADGES_DATA.map(({ slug, emoji, img, nom, desc, message, tag, tagColor, tagBg }) => {
             const obtenu = slugsObtenus.has(slug)
@@ -76,9 +64,7 @@ export default function ChallengesModal({ onClose }) {
                           Obtenu
                         </span>
                       )}
-                      <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 20, background: tagBg, color: tagColor, fontWeight: 500 }}>
-                        {tag}
-                      </span>
+                      
                     </div>
                   </div>
                   <div style={{ fontSize: 12, color: '#6B7280', marginBottom: 6 }}>{desc}</div>

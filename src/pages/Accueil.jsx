@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import AuthModal from '../components/AuthModal'
 import ChallengesModal from '../components/ChallengesModal'
 import FooterPublic from '../components/FooterPublic'
@@ -241,6 +241,15 @@ export default function Accueil() {
   const [abonnementAnnuel, setAbonnementAnnuel] = useState(false)
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
 
+  const [searchParams] = useSearchParams()
+
+useEffect(() => {
+  if (searchParams.get('login') === 'true') {
+    setAuthMode('login')
+    setAuthOpen(true)
+  }
+}, [])
+
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768)
     window.addEventListener('resize', handleResize)
@@ -437,9 +446,6 @@ export default function Accueil() {
               </div>
               <div style={{ fontSize: 15, fontWeight: 600, color: '#fff' }}>Le Métronome</div>
               <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, background: '#FFF0DC', color: '#854F0B', fontWeight: 500 }}>Bronze 3 mois</span>
-              <div style={{ width: '100%', background: 'rgba(255,255,255,0.1)', borderRadius: 4, height: 5, overflow: 'hidden' }}>
-                <div style={{ height: '100%', borderRadius: 4, background: '#854F0B', width: '50%' }} />
-              </div>
               <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>3 / 6 mois vers Argent</div>
             </div>
             <div style={{ background: 'rgba(255,255,255,0.06)', border: '0.5px solid rgba(255,255,255,0.1)', borderRadius: 16, padding: '24px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 12 }}>
@@ -448,9 +454,6 @@ export default function Accueil() {
 </div>
               <div style={{ fontSize: 15, fontWeight: 600, color: '#fff' }}>Ascension</div>
               <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, background: '#FFF8DC', color: '#633806', fontWeight: 500 }}>Or 1 000 euros</span>
-              <div style={{ width: '100%', background: 'rgba(255,255,255,0.1)', borderRadius: 4, height: 5, overflow: 'hidden' }}>
-                <div style={{ height: '100%', borderRadius: 4, background: '#BA7517', width: '60%' }} />
-              </div>
               <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>1 200 / 2 000 euros vers Platine</div>
             </div>
           </div>

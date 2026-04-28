@@ -27,6 +27,7 @@ import CGU from './pages/CGU'
 import Reclamation from './pages/Reclamation'
 import Cookies from './pages/Cookies'
 import ResetPassword from './pages/ResetPassword'
+import AuthCallback from './pages/AuthCallback'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -60,6 +61,7 @@ createRoot(document.getElementById('root')).render(
             <Route path="/reclamation" element={<Reclamation />} />
             <Route path="/cookies" element={<Cookies />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
             
             {/* ROUTES PROTÉGÉES */}
             <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
