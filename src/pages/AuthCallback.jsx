@@ -7,13 +7,20 @@ export default function AuthCallback() {
 
   useEffect(() => {
     const handleCallback = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (session) {
-        navigate('/dashboard', { replace: true })
-      } else {
-        // Pas de session → redirige vers accueil avec popup login ouvert
-        navigate('/?login=true', { replace: true })
+      const params = new URLSearchParams(window.location.search)
+      const token_hash = params.get('token_hash')
+      const type = params.get('type')
+
+      if (token_hash && type) {
+        const { error } = await supabase.auth.verifyOtp({ token_hash, type })
+        if (!error) {
+          navigate('/dashboard', { replace: true })
+          return
+        }
       }
+
+      // Fallback si pas de token
+      navigate('/?login=true', { replace: true })
     }
     handleCallback()
   }, [])
