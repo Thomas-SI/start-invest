@@ -7,10 +7,10 @@ import { useTheme } from '../lib/ThemeContext'
 import { loadStripe } from '@stripe/stripe-js'
 import { usePremium } from '../lib/usePremium'
 
-const STRIPE_PUBLIC_KEY = 'pk_test_51SvbHg8d4XtkN16mPYl34t3MkOezAt3vUdAs24q1HfJQLBi6YjSY2GGuSNw2yg4FQ21dTO9jpmmP2YXlJtM4UeL300sKwcuyJB'
+const STRIPE_PUBLIC_KEY = 'pk_live_51SvbH1GMNsMdNOBmdNWY6SVPNYlcNEfA8m0cZDO82JaDqFg3AaYeMRfIlAcQcNOWG3aaEvmYGRQcyf7gv39lOUY200Xh9800Es'
 const PRICE_IDS = {
-  mensuel: 'price_1TOMft8d4XtkN16m2Ieibx94',
-  annuel: 'price_1TOMgb8d4XtkN16mC7Wvsjhc',
+  mensuel: 'price_1TOLROGMNsMdNOBmk8HGZWfh',
+  annuel: 'price_1TOLSfGMNsMdNOBmG0Ta3VM9',
 }
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
