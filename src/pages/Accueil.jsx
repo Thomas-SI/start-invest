@@ -4,6 +4,7 @@ import AuthModal from '../components/AuthModal'
 import ChallengesModal from '../components/ChallengesModal'
 import FooterPublic from '../components/FooterPublic'
 import CookieBanner from '../components/CookieBanner'
+import { supabase } from '../lib/supabase'
 
 const METRONOME_URL = 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/AB94501C-5932-4B4C-93F1-D1CD5A4BAA25.png'
 const LOGO_URL = 'https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/IMG_2819.jpeg'
@@ -240,6 +241,14 @@ export default function Accueil() {
   const [challengesOpen, setChallengesOpen] = useState(false)
   const [abonnementAnnuel, setAbonnementAnnuel] = useState(false)
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
+
+  useEffect(() => {
+  const checkSession = async () => {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (session) navigate('/dashboard')
+  }
+  checkSession()
+}, [])
 
   const [searchParams] = useSearchParams()
 
