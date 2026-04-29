@@ -151,6 +151,8 @@ const CHAPITRES = [
         app: "Dans le Journal d'investissements, renseigne l'enveloppe — PEA, CTO ou AV — le courtier et tes frais de courtage réels. L'app calcule automatiquement l'impact sur ta performance nette.",
         derniereFiche: true,
       },
+    ],
+  },
   {
     num: '04',
     titre: 'Les bases essentielles',
