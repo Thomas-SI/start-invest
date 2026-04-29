@@ -15,76 +15,66 @@ serve(async (req) => {
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_ANON_KEY") ?? "",
-      {
-        global: {
-          headers: { Authorization: req.headers.get("Authorization") ?? "" },
-        },
-      }
+      { global: { headers: { Authorization: req.headers.get("Authorization") ?? "" } } }
     );
-const supabaseAdmin = createClient(
-  Deno.env.get("SUPABASE_URL") ?? "",
-  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
-);
+    const supabaseAdmin = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+    );
+
     const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
     if (userError || !user) {
-      return new Response(
-        JSON.stringify({ error: "Utilisateur non authentifié" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return new Response(JSON.stringify({ error: "Non authentifié" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     const { priceId } = await req.json();
-    console.log("priceId reçu:", priceId);
     if (!priceId) {
-      return new Response(
-        JSON.stringify({ error: "priceId manquant" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return new Response(JSON.stringify({ error: "priceId manquant" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
+    const { data: profil } = await supabaseClient
+      .from("profils").select("id").eq("user_id", user.id).single();
+    if (!profil) {
+      return new Response(JSON.stringify({ error: "Profil introuvable" }), { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY") ?? "";
-    const origin = req.headers.get("origin") ?? "https://ton-app.vercel.app";
+    const origin = req.headers.get("origin") ?? "https://start-invest.fr";
 
-    // Créer le customer Stripe via l'API REST
-    const customerRes = await fetch("https://api.stripe.com/v1/customers", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${stripeKey}`,
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: new URLSearchParams({
-        email: user.email ?? "",
-        "metadata[supabase_user_id]": user.id,
-      }),
-    });
-    const customer = await customerRes.json();
+    // Vérifie si un customer existe déjà
+    const { data: aboExistant } = await supabaseAdmin
+      .from("abonnements")
+      .select("stripe_customer_id")
+      .eq("user_id", profil.id)
+      .maybeSingle();
 
-    // Récupérer l'id du profil
-const { data: profil } = await supabaseClient
-  .from("profils")
-  .select("id")
-  .eq("user_id", user.id)
-  .single();
+    let customerId = aboExistant?.stripe_customer_id
 
-if (!profil) {
-  return new Response(
-    JSON.stringify({ error: "Profil introuvable" }),
-    { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-  );
-}
+    // Crée un customer seulement si pas déjà existant
+    if (!customerId) {
+      const customerRes = await fetch("https://api.stripe.com/v1/customers", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${stripeKey}`,
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({
+          email: user.email ?? "",
+          "metadata[supabase_user_id]": user.id,
+        }),
+      });
+      const customer = await customerRes.json();
+      customerId = customer.id;
+    }
 
-console.log("user.id:", user.id)
-console.log("profil:", profil)
+    // Upsert dans abonnements
+    await supabaseAdmin.from("abonnements").upsert({
+      user_id: profil.id,
+      stripe_customer_id: customerId,
+      statut: "inactif",
+    }, { onConflict: "user_id" });
 
-    // Sauvegarder le customer dans abonnements
-    const { error: upsertError } = await supabaseAdmin.from("abonnements").upsert({
-  user_id: profil.id,
-  stripe_customer_id: customer.id,
-  statut: "inactif",
-});
-console.log("upsert error:", upsertError)
-
-    // Créer la session Checkout via l'API REST
+    // Crée la session Checkout
     const sessionRes = await fetch("https://api.stripe.com/v1/checkout/sessions", {
       method: "POST",
       headers: {
@@ -92,7 +82,7 @@ console.log("upsert error:", upsertError)
         "Content-Type": "application/x-www-form-urlencoded",
       },
       body: new URLSearchParams({
-        customer: customer.id,
+        customer: customerId,
         "payment_method_types[0]": "card",
         "line_items[0][price]": priceId,
         "line_items[0][quantity]": "1",
@@ -110,15 +100,9 @@ console.log("upsert error:", upsertError)
       throw new Error(session.error?.message ?? "Impossible de créer la session Stripe");
     }
 
-    return new Response(
-      JSON.stringify({ url: session.url }),
-      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ url: session.url }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (err) {
     console.error(err);
-    return new Response(
-      JSON.stringify({ error: err instanceof Error ? err.message : "Erreur inconnue" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ error: err instanceof Error ? err.message : "Erreur inconnue" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   }
 });

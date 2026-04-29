@@ -78,16 +78,22 @@ console.log("update error:", updateError)
       }
 
       case "customer.subscription.updated": {
-        const sub = event.data.object;
-        const priceId = sub.items?.data[0]?.price?.id ?? null;
+  const sub = event.data.object;
+  const priceId = sub.items?.data[0]?.price?.id ?? null;
 
-        await supabaseAdmin.from("abonnements").update({
-          stripe_price_id: priceId,
-          statut: sub.status === "active" ? "actif" : sub.status,
-          date_fin: toISO(sub.current_period_end),
-        }).eq("stripe_customer_id", sub.customer);
-        break;
-      }
+  let statut = sub.status
+  if (sub.status === "active") statut = "actif"
+  else if (sub.status === "trialing") statut = "actif"
+  else if (sub.status === "canceled") statut = "annulé"
+  else if (sub.status === "past_due") statut = "paiement_échoué"
+
+  await supabaseAdmin.from("abonnements").update({
+    stripe_price_id: priceId,
+    statut,
+    date_fin: toISO(sub.current_period_end),
+  }).eq("stripe_customer_id", sub.customer);
+  break;
+}
 
       case "customer.subscription.deleted": {
         const sub = event.data.object;
