@@ -120,31 +120,37 @@ const CHAPITRES = [
         challenge: "Tu as un PEA ouvert ? Si non, c'est ton prochain objectif. L'ouvrir ne coûte rien et le compteur des 5 ans commence dès l'ouverture, même avec 1€ dessus.",
         app: "Dans le Journal d'investissements, indique l'enveloppe utilisée (PEA ou CTO) ainsi que le courtier associé pour chaque achat.",
       },
-      {
         {
-  id: 11,
-  titre: 'Comparatif des meilleures plateformes',
-  texte: `Un courtier est l'intermédiaire qui te permet d'acheter et de vendre des actifs financiers en bourse. Sans lui, impossible d'investir. Concrètement, c'est lui qui détient tes titres, exécute tes ordres et te fournit les enveloppes fiscales comme le PEA ou le CTO. En France, tous les courtiers sont régulés par l'AMF, ce qui garantit la sécurité de tes fonds. Mais au-delà de la sécurité, les différences sont énormes : frais de courtage, gamme de produits, qualité de l'interface, enveloppes proposées, service client... Un mauvais choix peut te coûter des milliers d'euros sur 10 ou 20 ans. Un bon choix, c'est celui qui colle à ton profil, ton niveau et ta stratégie.`,
-  tableau: {
-    cols: ['Plateforme', 'Enveloppes', 'Frais ETF', 'Profil idéal', 'Points forts', 'Points faibles'],
-    rows: [
-      ['Trade Republic', 'PEA + CTO', '1€/ordre (gratuit en DCA)', 'Débutant / Mobile', 'Ultra simple, DCA auto, fractions dès 1€', 'Univers limité, spreads possibles'],
-      ['XTB', 'PEA + CTO', "0% jusqu'à 100k€/mois", 'Débutant / Intermédiaire', 'Frais imbattables, screener intégré', 'Interface complexe pour débutants'],
-      ['Revolut', 'CTO uniquement', '0% (quota mensuel selon abonnement)', 'Débutant / Nomade', 'App simple, DCA auto, fractions dès 1€', 'Pas de PEA, quota limité, régulé en Lituanie'],
-      ['Bourse Direct', 'PEA + CTO', '0,99€/ordre', 'Investisseur régulier', 'Le moins cher de France, fiable, idéal PEA', 'Interface vieillissante, service client lent'],
-      ['Bourso Bank', 'PEA + CTO', '0% ETF sélectionnés', 'Banque principale', 'Gratuit sur ETF sélectionnés, banque complète', 'Frais élevés marchés étrangers (min. 50€)'],
-      ['Fortuneo', 'PEA + CTO', '0,20% (min. 20€)', 'Intermédiaire', 'Bon équilibre frais/service, PEA-PME, IFU fiable', 'Frais élevés pour gros ordres'],
-      ['Degiro', 'CTO uniquement', 'Dès 0,50€', 'Intermédiaire / CTO', 'Grande gamme internationale, frais bas', 'Pas de PEA, régulé aux Pays-Bas'],
-      ['Interactive Brokers', 'PEA + CTO', 'Dès 1,25€ (0,05%)', 'Expérimenté / Gros capital', 'Marchés mondiaux, frais dégressifs, le plus complet', 'Interface complexe, pas pour débutants'],
-      ['Saxo Bank', 'PEA + CTO', '0,08% (min. 2€)', 'Expérimenté', 'Frais bas sur gros ordres, levier SRD disponible', 'Complexe, orienté professionnel'],
-      ['Linxea Spirit', 'Assurance-vie', '0% UC', 'Épargne long terme', 'Meilleure AV en ligne, fonds euros + ETF', 'Pas de PEA ni CTO, uniquement AV'],
-    ]
-  },
-  texte2: `Choisir son courtier, c'est une décision que tu prendras une seule fois — et qui t'accompagnera pendant des années. Voici les 5 critères essentiels pour faire le bon choix.\n\n**Tes convictions et ta stratégie.** Tu veux investir uniquement en ETF en mode DCA passif ? Ou tu comptes aussi acheter des actions en direct, diversifier sur des marchés étrangers ? Définis ta stratégie avant de choisir ton courtier — pas l'inverse.\n\n**Ton niveau et l'interface.** Si tu débutes, une interface simple et mobile-first comme Trade Republic ou XTB sera bien plus adaptée qu'une plateforme pro comme Interactive Brokers. Teste les apps avant de te décider.\n\n**Les enveloppes proposées.** PEA, CTO, Assurance-vie — tous les courtiers ne proposent pas toutes les enveloppes. Si tu veux un PEA (et tu devrais, pour la fiscalité), assure-toi que le courtier le propose.\n\n**Les frais de courtage.** C'est le critère le plus impactant sur le long terme. Un frais fixe de 1€/ordre est idéal pour les petits investisseurs réguliers. Calcule toujours le coût réel selon le montant que tu investis chaque mois.\n\n**La fiabilité et le service client.** Un courtier français comme Bourse Direct ou Fortuneo a l'avantage de fournir un IFU fiable et un service client francophone.`,
-  challenge: null,
-  app: "Dans le Journal d'investissements, renseigne l'enveloppe — PEA, CTO ou AV — le courtier et tes frais de courtage réels. L'app calcule automatiquement l'impact sur ta performance nette.",
-  derniereFiche: true,
-},
+        id: 11,
+        titre: 'Comparatif des meilleures plateformes',
+        texte: "Un courtier est l'intermédiaire qui te permet d'acheter et de vendre des actifs financiers en bourse. Sans lui, impossible d'investir. Concrètement, c'est lui qui détient tes titres, exécute tes ordres et te fournit les enveloppes fiscales comme le PEA ou le CTO. En France, tous les courtiers sont régulés par l'AMF, ce qui garantit la sécurité de tes fonds. Mais au-delà de la sécurité, les différences sont énormes : frais de courtage, gamme de produits, qualité de l'interface, enveloppes proposées, service client. Un mauvais choix peut te coûter des milliers d'euros sur 10 ou 20 ans. Un bon choix, c'est celui qui colle à ton profil, ton niveau et ta stratégie.",
+        tableau: {
+          cols: ['Plateforme', 'Enveloppes', 'Frais ETF', 'Profil idéal', 'Points forts', 'Points faibles'],
+          rows: [
+            ['Trade Republic', 'PEA + CTO', '1€/ordre (gratuit en DCA)', 'Débutant / Mobile', 'Ultra simple, DCA auto, fractions dès 1€', 'Univers limité, spreads possibles'],
+            ['XTB', 'PEA + CTO', '0% jusqu\'à 100k€/mois', 'Débutant / Intermédiaire', 'Frais imbattables, screener intégré', 'Interface complexe pour débutants'],
+            ['Revolut', 'CTO uniquement', '0% (quota mensuel selon abonnement)', 'Débutant / Nomade', 'App simple, DCA auto, fractions dès 1€', 'Pas de PEA, quota limité, régulé en Lituanie'],
+            ['Bourse Direct', 'PEA + CTO', '0,99€/ordre', 'Investisseur régulier', 'Le moins cher de France, fiable, idéal PEA', 'Interface vieillissante, service client lent'],
+            ['Bourso Bank', 'PEA + CTO', '0% ETF sélectionnés', 'Banque principale', 'Gratuit sur ETF sélectionnés, banque complète', 'Frais élevés marchés étrangers (min. 50€)'],
+            ['Fortuneo', 'PEA + CTO', '0,20% (min. 20€)', 'Intermédiaire', 'Bon équilibre frais/service, PEA-PME, IFU fiable', 'Frais élevés pour gros ordres'],
+            ['Degiro', 'CTO uniquement', 'Dès 0,50€', 'Intermédiaire / CTO', 'Grande gamme internationale, frais bas', 'Pas de PEA, régulé aux Pays-Bas'],
+            ['Interactive Brokers', 'PEA + CTO', 'Dès 1,25€ (0,05%)', 'Expérimenté / Gros capital', 'Marchés mondiaux, frais dégressifs, le plus complet', 'Interface complexe, pas pour débutants'],
+            ['Saxo Bank', 'PEA + CTO', '0,08% (min. 2€)', 'Expérimenté', 'Frais bas sur gros ordres, levier SRD disponible', 'Complexe, orienté professionnel'],
+            ['Linxea Spirit', 'Assurance-vie', '0% UC', 'Épargne long terme', 'Meilleure AV en ligne, fonds euros + ETF', 'Pas de PEA ni CTO, uniquement AV'],
+          ]
+        },
+        texte2: [
+          "Choisir son courtier, c'est une décision que tu prendras une seule fois — et qui t'accompagnera pendant des années. Voici les 5 critères essentiels pour faire le bon choix.",
+          "Tes convictions et ta stratégie. Tu veux investir uniquement en ETF en mode DCA passif ? Ou tu comptes aussi acheter des actions en direct ? Définis ta stratégie avant de choisir ton courtier — pas l'inverse.",
+          "Ton niveau et l'interface. Si tu débutes, une interface simple comme Trade Republic ou XTB sera bien plus adaptée qu'une plateforme pro comme Interactive Brokers. Teste les apps avant de te décider.",
+          "Les enveloppes proposées. PEA, CTO, Assurance-vie — tous les courtiers ne proposent pas toutes les enveloppes. Si tu veux un PEA (et tu devrais, pour la fiscalité), assure-toi que le courtier le propose.",
+          "Les frais de courtage. C'est le critère le plus impactant sur le long terme. Un frais fixe de 1€/ordre est idéal pour les petits investisseurs réguliers. Calcule toujours le coût réel selon ton montant mensuel.",
+          "La fiabilité et le service client. Un courtier français comme Bourse Direct ou Fortuneo a l'avantage de fournir un IFU fiable et un service client francophone.",
+        ],
+        challenge: null,
+        app: "Dans le Journal d'investissements, renseigne l'enveloppe — PEA, CTO ou AV — le courtier et tes frais de courtage réels. L'app calcule automatiquement l'impact sur ta performance nette.",
+        derniereFiche: true,
+      },
   {
     num: '04',
     titre: 'Les bases essentielles',
@@ -489,10 +495,8 @@ function PopupFiche({ fiche, chapitre, onClose, onChapitreValide }) {
 {fiche.texte2 && (
   <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 4 }}>
     <div style={{ fontSize: 12, fontWeight: 600, color: t.text, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Comment bien choisir son courtier ?</div>
-    {fiche.texte2.split('\n\n').map((para, i) => (
-      <p key={i} style={{ fontSize: 13, color: t.textSecondary, lineHeight: 1.7, margin: 0 }}>
-        {para.replace(/\*\*(.*?)\*\*/g, '$1')}
-      </p>
+    {fiche.texte2.map((para, i) => (
+      <p key={i} style={{ fontSize: 13, color: t.textSecondary, lineHeight: 1.7, margin: 0 }}>{para}</p>
     ))}
   </div>
 )}
