@@ -13,7 +13,7 @@ const plansData = [
     id: 'gratuit', nom: 'Gratuit',
     prixMensuel: '0 euros', prixAnnuel: '0 euros',
     periodeMensuel: 'pour toujours', periodeAnnuel: 'pour toujours',
-    pages: ['Mes Finances', 'Challenge', 'Abonnement', 'Compte'],
+    pages: ['Mes Finances', 'Challenge', 'Guide', 'Abonnement', 'Compte'],
     features: [
       { label: 'Suivi finance de base', inclus: true },
       { label: "Taux d'épargne personnalisé", inclus: true },
@@ -29,7 +29,7 @@ const plansData = [
     id: 'premium', nom: 'Premium', recommande: true,
     prixMensuel: '7.99 euros', prixAnnuel: '67 euros',
     periodeMensuel: 'par mois', periodeAnnuel: 'par an économisez 29%',
-    pages: ['Mes Finances', 'Portefeuille', 'Investissement', 'Croissance', 'Challenge', 'Abonnement', 'Guide', 'Compte'],
+    pages: ['Mes Finances', 'Portefeuille', 'Investissement', 'Croissance', 'Challenge', 'Guide', 'Abonnement', 'Compte'],
     features: [
       { label: 'Suivi finance de base', inclus: true },
       { label: "Capacite d'épargne personnalisée", inclus: true },
