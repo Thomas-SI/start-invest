@@ -14,7 +14,7 @@ import { checkAndGrant } from '../lib/checkAndGrant'
 const ENVELOPPES = ['CTO', 'PEA', 'Assurance-vie']
 const TYPES_ETF = ['Capitalisant', 'Distribuant']
 const TYPES = ['Achat', 'Vente']
-const COURTIERS = ['Bourso Bank', 'Bourse Direct', 'Trade Republic', 'Degiro', 'Interactive Brokers', 'Linxea', 'Autre']
+const COURTIERS = ['Bourso Bank', 'Bourse Direct', 'Trade Republic', 'Revolut', 'XTB', 'Degiro', 'Interactive Brokers', 'Fortuneo', 'Saxo Bank', 'Linxea Spirit', 'Autre']
 
 const ENVELOPPE_LABELS = {
   'CTO': 'Compte-Titres Ordinaire (CTO)',
@@ -597,10 +597,22 @@ if (!isPremium) {
               </div>
               <div>
                 <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Courtier</div>
-                <select value={form.courtier} onChange={e => setForm({ ...form, courtier: e.target.value })} style={inputStyle}>
-                  <option value="">Sélectionner</option>
-                  {COURTIERS.map(c => <option key={c} value={c}>{c}</option>)}
-                </select>
+                <select 
+  value={COURTIERS.includes(form.courtier) ? form.courtier : 'Autre'} 
+  onChange={e => setForm({ ...form, courtier: e.target.value === 'Autre' ? '' : e.target.value })} 
+  style={inputStyle}
+>
+  <option value="">Sélectionner</option>
+  {COURTIERS.map(c => <option key={c} value={c}>{c}</option>)}
+</select>
+{!COURTIERS.slice(0,-1).includes(form.courtier) && (
+  <input
+    placeholder="Précise le courtier"
+    value={form.courtier}
+    onChange={e => setForm({ ...form, courtier: e.target.value })}
+    style={{ ...inputStyle, marginTop: 4 }}
+  />
+)}
               </div>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(5, minmax(0,1fr))', gap: 10, marginBottom: 12 }}>
