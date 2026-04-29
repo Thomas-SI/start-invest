@@ -83,7 +83,9 @@ export default function Navbar({ page, initiale, photoUrl }) {
         {menuOpen && (
           <div style={{ position: 'fixed', top: 100, left: 0, right: 0, bottom: 0, background: t.nav, zIndex: 99, display: 'flex', flexDirection: 'column', padding: '20px 0', overflowY: 'auto' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 24px 20px', borderBottom: `0.5px solid ${t.navBorder}` }}>
-              <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#E8F5E1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 500, color: '#2E7D1E' }}>{initiale}</div>
+              <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#E8F5E1', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 500, color: '#2E7D1E', flexShrink: 0 }}>
+  {photoUrl ? <img src={photoUrl} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : initiale}
+</div>
               <div style={{ color: t.text, fontSize: 14, fontWeight: 500 }}>Connecté</div>
             </div>
 
