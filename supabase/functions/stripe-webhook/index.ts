@@ -71,6 +71,7 @@ const periodEnd = sub.items?.data[0]?.current_period_end ?? null;
   annee_abonnement: 1,
   date_debut: toISO(periodStart),
   date_fin: toISO(periodEnd),
+date_debut_abonnement: toISO(periodStart),
 }).eq("stripe_customer_id", customerId);
 console.log("update error:", updateError)
         break;
