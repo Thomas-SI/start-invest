@@ -269,8 +269,17 @@ export default function Compte() {
                     <div style={{ fontSize: 12, color: '#fff', fontWeight: 500 }}>{new Date(abonnement.date_fin).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
                   </div>
                   <div style={{ flex: 1, background: 'rgba(255,255,255,0.07)', borderRadius: 8, padding: '8px 12px' }}>
-                    <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', marginBottom: 2 }}>Plan</div>
-                    <div style={{ fontSize: 12, color: '#fff', fontWeight: 500 }}>{abonnement?.plan === 'annuel' ? '67€ / an' : '7,99€ / mois'}</div>
+                    <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', marginBottom: 2 }}>Plan actuel</div>
+<div style={{ fontSize: 12, color: '#fff', fontWeight: 500 }}>
+  {abonnement?.plan === 'annuel'
+    ? `${[67,59,52,45,37,30,22,15,7.5][Math.min((abonnement?.annee_abonnement || 1) - 1, 8)]}€ / an`
+    : '7,99€ / mois'}
+</div>
+{abonnement?.plan === 'annuel' && (abonnement?.annee_abonnement || 1) < 10 && (
+  <div style={{ fontSize: 10, color: '#4CAF2E', marginTop: 4 }}>
+    ↓ Prochain renouvellement : {[67,59,52,45,37,30,22,15,7.5][Math.min((abonnement?.annee_abonnement || 1), 8)]}€ / an
+  </div>
+)}
                   </div>
                 </div>
               )}
