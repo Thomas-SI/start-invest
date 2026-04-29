@@ -13,7 +13,9 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 
 // Redirection automatique si session expirée
 supabase.auth.onAuthStateChange((event, session) => {
-  if (event === 'SIGNED_OUT' || (event === 'TOKEN_REFRESHED' && !session)) {
-    window.location.href = '/login'
+  supabase.auth.onAuthStateChange((event, session) => {
+  if (event === 'SIGNED_OUT') {
+    window.location.href = '/'
   }
+})
 })
