@@ -10,6 +10,17 @@ export default function Navbar({ page, initiale, photoUrl }) {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
   const [menuOpen, setMenuOpen] = useState(false)
   const { nbNonVus } = useBadgesNonVus()
+  const [pseudo, setPseudo] = useState('')
+
+useEffect(() => {
+  const fetchPseudo = async () => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+    const { data } = await supabase.from('profils').select('pseudo').eq('user_id', user.id).single()
+    if (data?.pseudo) setPseudo(data.pseudo)
+  }
+  fetchPseudo()
+}, [])
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768)
@@ -86,7 +97,9 @@ export default function Navbar({ page, initiale, photoUrl }) {
               <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#E8F5E1', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 500, color: '#2E7D1E', flexShrink: 0 }}>
   {photoUrl ? <img src={photoUrl} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : initiale}
 </div>
-              <div style={{ color: t.text, fontSize: 14, fontWeight: 500 }}>Connecté</div>
+              <div>
+  <div style={{ color: t.text, fontSize: 14, fontWeight: 500 }}>{pseudo ? `@${pseudo}` : 'Connecté'}</div>
+</div>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', padding: '12px 0' }}>
