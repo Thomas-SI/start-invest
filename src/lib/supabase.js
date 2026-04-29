@@ -8,14 +8,13 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     persistSession: true,
     autoRefreshToken: true,
     detectSessionInUrl: true,
+    storage: window.localStorage,
+    storageKey: 'startinvest-session',
   }
 })
 
-// Redirection automatique si session expirée
 supabase.auth.onAuthStateChange((event, session) => {
-  supabase.auth.onAuthStateChange((event, session) => {
   if (event === 'SIGNED_OUT') {
     window.location.href = '/'
   }
-})
 })
