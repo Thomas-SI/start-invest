@@ -19,7 +19,7 @@ export default function Abonnement() {
   const navigate = useNavigate()
   const t = useTheme()
   const [user, setUser] = useState(null)
-  const [annuel, setAnnuel] = useState(false)
+  const [annuel, setAnnuel] = useState(true)
   const { isPremium } = usePremium()
   const [portalUrl, setPortalUrl] = useState(null)
   const [checkoutLoading, setCheckoutLoading] = useState(false)
@@ -172,18 +172,12 @@ export default function Abonnement() {
   N'attendez plus ! Profitez de 15 jours d'essai gratuit avant l'abonnement.
 </div>
 
-          {/* TOGGLE MENSUEL / ANNUEL */}
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 12, background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 30, padding: '6px 8px' }}>
-            <button
-              onClick={() => setAnnuel(false)}
-              style={{ padding: '6px 16px', borderRadius: 20, border: 'none', background: !annuel ? '#034065' : 'transparent', color: !annuel ? '#fff' : t.textMuted, fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' }}
-            >
-              Mensuel
-            </button>
-            <button
-              onClick={() => setAnnuel(true)}
-              style={{ padding: '6px 16px', borderRadius: 20, border: 'none', background: annuel ? '#034065' : 'transparent', color: annuel ? '#fff' : t.textMuted, fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s', display: 'flex', alignItems: 'center', gap: 6 }}
-            >
+            <button onClick={() => setAnnuel(false)} style={{ padding: '6px 16px', borderRadius: 20, border: 'none', background: !annuel ? '#034065' : 'transparent', color: !annuel ? '#fff' : t.textMuted, fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' }}>Mensuel</button>
+            <button onClick={() => setAnnuel(true)} style={{ padding: '6px 16px', borderRadius: 20, border: 'none', background: annuel ? '#034065' : 'transparent', color: annuel ? '#fff' : t.textMuted, fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s', display: 'flex', alignItems: 'center', gap: 6 }}>
               Annuel
               <span style={{ fontSize: 9, background: '#4CAF2E', color: '#fff', padding: '2px 6px', borderRadius: 10, fontWeight: 600 }}>-29%</span>
             </button>
@@ -191,6 +185,7 @@ export default function Abonnement() {
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, minmax(0,1fr))', gap: 20, maxWidth: 780, margin: '0 auto' }}>
+
           {plans.map(({ id, nom, actuel, recommande, features, pages, prixMensuel, prixAnnuel, periodeMensuel, periodeAnnuel }) => {
             const prix = annuel ? prixAnnuel : prixMensuel
             const periode = annuel ? periodeAnnuel : periodeMensuel
@@ -199,7 +194,6 @@ export default function Abonnement() {
 
                 {/* BADGE */}
                 <div style={{ marginBottom: 16 }}>
-                  {recommande && !actuel && <div style={{ background: '#4CAF2E', color: '#fff', fontSize: 10, fontWeight: 500, padding: '3px 10px', borderRadius: 20, display: 'inline-block' }}>⭐ Recommandé</div>}
                   {actuel && <div style={{ background: isPremium ? '#4CAF2E' : t.bgSecondary, color: isPremium ? '#fff' : t.textMuted, fontSize: 10, fontWeight: 500, padding: '3px 10px', borderRadius: 20, display: 'inline-block' }}>✓ Plan actuel</div>}
                 </div>
 
