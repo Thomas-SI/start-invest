@@ -562,9 +562,9 @@ const totalRevenus = revenus.length > 0
               <div style={{ fontSize: 10, color: '#fff', background: bleu, padding: '5px 8px', borderRadius: 6, fontWeight: 500 }}>🎉 Bravo ! Vous investissez {pourcentageReel}% de vos revenus !</div>
             ) : pourcentageReel > 0 ? (
               <div style={{ fontSize: 10, color: '#E24B4A', background: '#FCEBEB', padding: '5px 8px', borderRadius: 6 }}>⚠️ Seulement {pourcentageReel}% investis — objectif : 20%</div>
-            ) : (
-              <div style={{ fontSize: 10, color: '#E24B4A', background: '#FCEBEB', padding: '5px 8px', borderRadius: 6 }}>⚠️ Vos dépenses dépassent vos revenus !</div>
-            )}
+            ) : totalRevenus > 0 ? (
+  <div style={{ fontSize: 10, color: '#E24B4A', background: '#FCEBEB', padding: '5px 8px', borderRadius: 6 }}>⚠️ Vos dépenses dépassent vos revenus !</div>
+) : null}
             {reelInvestissable > 0 && (
               <button onClick={() => setShowSimulateur(true)} style={{ width: '100%', marginTop: 10, background: '#EAF6E4', color: '#2E7D1E', fontSize: 11, fontWeight: 500, padding: 7, borderRadius: 7, border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
                 📈 Voir ma projection de croissance

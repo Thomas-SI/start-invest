@@ -10,9 +10,6 @@ export default function PageGuide({ pageId, titre, etapes, forceVisible, onClose
 
   useEffect(() => {
     const check = async () => {
-      const cache = JSON.parse(localStorage.getItem('pages_vues') || '[]')
-      if (cache.includes(pageId)) { setLoading(false); return }
-
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { setLoading(false); return }
 
@@ -21,9 +18,6 @@ export default function PageGuide({ pageId, titre, etapes, forceVisible, onClose
         .select('id, pages_vues')
         .eq('user_id', user.id)
         .maybeSingle()
-
-      console.log("profil trouvé:", profil)
-      console.log("pageId:", pageId)
 
       if (!profil) {
         setVisible(true)
@@ -39,9 +33,6 @@ export default function PageGuide({ pageId, titre, etapes, forceVisible, onClose
           .from('profils')
           .update({ pages_vues: newPages })
           .eq('user_id', user.id)
-        localStorage.setItem('pages_vues', JSON.stringify(newPages))
-      } else {
-        localStorage.setItem('pages_vues', JSON.stringify(pagesVues))
       }
       setLoading(false)
     }
