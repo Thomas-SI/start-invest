@@ -45,12 +45,13 @@ const COULEURS = ['#034065', '#4CAF2E', '#BA7517', '#3B82F6', '#E24B4A', '#8B5CF
 const fetchPortefeuilleData = async () => {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Non connecté')
-  const [finRes, depRes, echRes, comptesRes, virementsRes] = await Promise.all([
+  const [finRes, depRes, echRes, comptesRes, virementsRes, prefRes] = await Promise.all([
     supabase.from('finances').select('*').eq('user_id', user.id).single(),
     supabase.from('depenses').select('*').eq('user_id', user.id),
     supabase.from('echeances').select('*').eq('user_id', user.id),
     supabase.from('comptes').select('*').eq('user_id', user.id).order('created_at', { ascending: true }),
     supabase.from('virements').select('*').eq('user_id', user.id).order('ordre', { ascending: true }),
+    supabase.from('profils').select('nb_mois_matelas').eq('user_id', user.id).single(),
   ])
   const fin = finRes.data
   let depensesFixes = 0, investissable = 0
@@ -143,6 +144,10 @@ const GUIDE_PORTEFEUILLE = [
   }
   loadPhoto()
 }, [])
+
+  useEffect(() => {
+  if (data?.nbMoisMatelas) setNbMoisMatelas(data.nbMoisMatelas)
+}, [data])
 
   const initiale = data?.user?.user_metadata?.prenom?.[0]?.toUpperCase() || '?'
 
@@ -351,7 +356,11 @@ if (!isPremium) {
               <div style={{ fontSize: 13, fontWeight: 500, color: t.text }}>Matelas de sécurité</div>
               <div style={{ fontSize: 11, color: t.textMuted, marginTop: 2 }}>
                 Couvrir{' '}
-                <select value={nbMoisMatelas} onChange={e => setNbMoisMatelas(parseInt(e.target.value))} style={{ padding: '2px 6px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }}>
+                <select value={nbMoisMatelas} onChange={async e => {
+  const val = parseInt(e.target.value)
+  setNbMoisMatelas(val)
+  await supabase.from('profils').update({ nb_mois_matelas: val }).eq('user_id', user.id)
+}} style={{ padding: '2px 6px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }}>
                   {[3,4,5,6,7,8,9,10,11,12].map(m => <option key={m} value={m}>{m}</option>)}
                 </select>
                 {' '}mois de dépenses fixes
