@@ -146,8 +146,13 @@ const GUIDE_PORTEFEUILLE = [
   loadPhoto()
 }, [])
 
-  useEffect(() => {
-  if (data?.nbMoisMatelas !== undefined) setNbMoisMatelas(data.nbMoisMatelas)
+  const [moisInitialise, setMoisInitialise] = useState(false)
+
+useEffect(() => {
+  if (data?.nbMoisMatelas !== undefined && !moisInitialise) {
+    setNbMoisMatelas(data.nbMoisMatelas)
+    setMoisInitialise(true)
+  }
 }, [data?.nbMoisMatelas])
 
   const initiale = data?.user?.user_metadata?.prenom?.[0]?.toUpperCase() || '?'
