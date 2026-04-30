@@ -188,10 +188,11 @@ const fetchDashboardData = async () => {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Non connecté')
 
-  const [finRes, depRes, echRes] = await Promise.all([
+  const [finRes, depRes, echRes, revRes] = await Promise.all([
     supabase.from('finances').select('*').eq('user_id', user.id).single(),
     supabase.from('depenses').select('*').eq('user_id', user.id),
     supabase.from('echeances').select('*').eq('user_id', user.id),
+    supabase.from('revenus').select('*').eq('user_id', user.id).order('created_at', { ascending: true }),
   ])
 
   return {
@@ -199,6 +200,7 @@ const fetchDashboardData = async () => {
     finances: finRes.data || { revenus: 0, autre_revenu: 0, depenses_fixes: 0, depenses_variables: 0 },
     depenses: depRes.data || [],
     echeances: echRes.data || [],
+    revenus: revRes.data || [],
   }
 }
 
@@ -275,8 +277,14 @@ const GUIDE_FINANCES = [
   const [editingId, setEditingId] = useState(null)
   const [editForm, setEditForm] = useState({ libelle: '', mois: '', montant_annuel: '' })
   const [showSimulateur, setShowSimulateur] = useState(false)
+  const [formRevenus, setFormRevenus] = useState([])
+  const [newRevenuLibelle, setNewRevenuLibelle] = useState('')
+  const [newRevenuMontant, setNewRevenuMontant] = useState('')
 
-  const totalRevenus = (parseFloat(finances.revenus) || 0) + (parseFloat(finances.autre_revenu) || 0)
+  const revenus = data?.revenus || []
+const totalRevenus = revenus.length > 0 
+  ? revenus.reduce((acc, r) => acc + (parseFloat(r.montant) || 0), 0)
+  : (parseFloat(finances.revenus) || 0) + (parseFloat(finances.autre_revenu) || 0)
   const totalDepensesFixes = depensesFixesDetail.reduce((acc, d) => acc + (parseFloat(d.montant) || 0), 0)
   const totalDepensesVariables = depensesVariablesDetail.reduce((acc, d) => acc + (parseFloat(d.montant) || 0), 0)
   const totalDepenses = totalDepensesFixes + totalDepensesVariables
@@ -313,25 +321,42 @@ const GUIDE_FINANCES = [
   const couleurInvest = regle5030.invest < 20 ? '#E24B4A' : bleu
 
   const handleSaveRevenu = async () => {
-    if (loading) return
-    if (!formRevenu.revenus && !formRevenu.autre_revenu) { setErreurRevenu('Veuillez saisir au moins un revenu.'); return }
-    setLoading(true); setErreurRevenu(null)
-    try {
-      const { data: { user: currentUser } } = await supabase.auth.getUser()
-      const payload = { user_id: currentUser.id, revenus: parseFloat(formRevenu.revenus) || 0, autre_revenu: parseFloat(formRevenu.autre_revenu) || 0, depenses_fixes: totalDepensesFixes, depenses_variables: totalDepensesVariables }
-      const { data: existing } = await supabase.from('finances').select('*').eq('user_id', currentUser.id).single()
-      const { error } = existing ? await supabase.from('finances').update(payload).eq('user_id', currentUser.id) : await supabase.from('finances').insert(payload)
-      if (error) throw new Error('Erreur lors de la sauvegarde des revenus.')
-      queryClient.invalidateQueries({ queryKey: ['dashboard'] })
-      setShowModalRevenu(false)
-      setSuccesRevenu(true)
-      setTimeout(() => setSuccesRevenu(false), 3000)
-    } catch (e) {
-      setErreurRevenu(e.message || 'Une erreur est survenue.')
-    } finally {
-      setLoading(false)
+  if (loading) return
+  if (formRevenus.length === 0) { setErreurRevenu('Ajoutez au moins un revenu.'); return }
+  setLoading(true); setErreurRevenu(null)
+  try {
+    const { data: { user: currentUser } } = await supabase.auth.getUser()
+    
+    // Supprime les anciens revenus
+    await supabase.from('revenus').delete().eq('user_id', currentUser.id)
+    
+    // Insère les nouveaux
+    const toInsert = formRevenus
+      .filter(r => r.libelle.trim())
+      .map(r => ({ user_id: currentUser.id, libelle: r.libelle, montant: parseFloat(r.montant) || 0 }))
+    
+    if (toInsert.length > 0) {
+      const { error } = await supabase.from('revenus').insert(toInsert)
+      if (error) throw new Error('Erreur lors de la sauvegarde.')
     }
+
+    // Met à jour finances pour compatibilité
+    const total = toInsert.reduce((acc, r) => acc + r.montant, 0)
+    const { data: existing } = await supabase.from('finances').select('*').eq('user_id', currentUser.id).single()
+    const payload = { user_id: currentUser.id, revenus: total, autre_revenu: 0, depenses_fixes: totalDepensesFixes, depenses_variables: totalDepensesVariables }
+    if (existing) await supabase.from('finances').update(payload).eq('user_id', currentUser.id)
+    else await supabase.from('finances').insert(payload)
+
+    queryClient.invalidateQueries({ queryKey: ['dashboard'] })
+    setShowModalRevenu(false)
+    setSuccesRevenu(true)
+    setTimeout(() => setSuccesRevenu(false), 3000)
+  } catch (e) {
+    setErreurRevenu(e.message || 'Une erreur est survenue.')
+  } finally {
+    setLoading(false)
   }
+}
 
   const handleSaveDepenses = async (fixes, variables) => {
     if (loading) return
@@ -432,29 +457,74 @@ const GUIDE_FINANCES = [
       )}
 
       {showModalRevenu && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: isMobile ? 12 : 0 }}>
-          <div style={{ background: t.bgCard, borderRadius: 16, padding: isMobile ? '24px 20px' : '32px 28px', width: '100%', maxWidth: 380, border: `0.5px solid ${t.border}`, maxHeight: '90vh', overflow: 'auto' }}>
-            <div style={{ fontSize: 15, fontWeight: 500, color: t.text, marginBottom: 20 }}>Modifier mes revenus</div>
-            {erreurRevenu && <div style={{ background: '#FCEBEB', border: '0.5px solid #E24B4A', borderRadius: 8, padding: '8px 12px', fontSize: 12, color: '#E24B4A', marginBottom: 12 }}>⚠️ {erreurRevenu}</div>}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <div>
-                <div style={{ fontSize: 11, color: t.textMuted, marginBottom: 4 }}>Salaire / Revenus principaux (€)</div>
-                <input type="number" min="0" placeholder="ex: 3 400" value={formRevenu.revenus} onChange={e => setFormRevenu({ ...formRevenu, revenus: e.target.value })} style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `0.5px solid ${t.border}`, fontSize: 14, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text, boxSizing: 'border-box' }} />
-              </div>
-              <div>
-                <div style={{ fontSize: 11, color: t.textMuted, marginBottom: 4 }}>Autres revenus (€)</div>
-                <input type="number" min="0" placeholder="Supplément ou complément de salaire" value={formRevenu.autre_revenu} onChange={e => setFormRevenu({ ...formRevenu, autre_revenu: e.target.value })} style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `0.5px solid ${t.border}`, fontSize: 14, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text, boxSizing: 'border-box' }} />
-              </div>
-            </div>
-            <div style={{ display: 'flex', gap: 8, marginTop: 20 }}>
-              <button onClick={() => { setShowModalRevenu(false); setErreurRevenu(null) }} style={{ flex: 1, padding: '9px', borderRadius: 8, border: `0.5px solid ${t.border}`, background: t.bgSecondary, fontSize: 13, cursor: 'pointer', fontFamily: 'inherit', color: t.text }}>Annuler</button>
-              <button onClick={handleSaveRevenu} disabled={loading} style={{ flex: 1, padding: '9px', borderRadius: 8, border: 'none', background: loading ? '#9CA3AF' : '#4CAF2E', color: '#fff', fontSize: 13, fontWeight: 500, cursor: loading ? 'not-allowed' : 'pointer', fontFamily: 'inherit' }}>
-                {loading ? '⏳ Sauvegarde...' : 'Sauvegarder'}
-              </button>
-            </div>
+  <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: isMobile ? 12 : 0 }}>
+    <div style={{ background: t.bgCard, borderRadius: 16, padding: isMobile ? '24px 20px' : '32px 28px', width: '100%', maxWidth: 420, border: `0.5px solid ${t.border}`, maxHeight: '90vh', overflow: 'auto' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+        <div style={{ fontSize: 15, fontWeight: 500, color: t.text }}>Mes revenus</div>
+        <button onClick={() => { setShowModalRevenu(false); setErreurRevenu(null) }} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: t.textMuted }}>×</button>
+      </div>
+      {erreurRevenu && <div style={{ background: '#FCEBEB', border: '0.5px solid #E24B4A', borderRadius: 8, padding: '8px 12px', fontSize: 12, color: '#E24B4A', marginBottom: 12 }}>⚠️ {erreurRevenu}</div>}
+      
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 16 }}>
+        {formRevenus.map((r, i) => (
+          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <input
+              placeholder="ex: Salaire"
+              value={r.libelle}
+              onChange={e => { const u = [...formRevenus]; u[i] = { ...u[i], libelle: e.target.value }; setFormRevenus(u) }}
+              style={{ flex: 1, padding: '8px 10px', borderRadius: 7, border: `0.5px solid ${t.border}`, fontSize: 12, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }}
+            />
+            <input
+              type="number"
+              min="0"
+              placeholder="0"
+              value={r.montant || ''}
+              onChange={e => { const u = [...formRevenus]; u[i] = { ...u[i], montant: e.target.value }; setFormRevenus(u) }}
+              style={{ width: 90, padding: '8px 10px', borderRadius: 7, border: `0.5px solid ${t.border}`, fontSize: 12, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text, textAlign: 'right' }}
+            />
+            <span style={{ fontSize: 12, color: t.textMuted }}>€</span>
+            <button onClick={() => setFormRevenus(formRevenus.filter((_, j) => j !== i))} style={{ background: '#FCEBEB', color: '#E24B4A', border: 'none', borderRadius: 5, padding: '4px 8px', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>×</button>
           </div>
-        </div>
-      )}
+        ))}
+      </div>
+
+      <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+        <input
+          placeholder="ex: Freelance, Loyer perçu..."
+          value={newRevenuLibelle}
+          onChange={e => setNewRevenuLibelle(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && newRevenuLibelle.trim() && (setFormRevenus([...formRevenus, { libelle: newRevenuLibelle, montant: newRevenuMontant }]), setNewRevenuLibelle(''), setNewRevenuMontant(''))}
+          style={{ flex: 1, padding: '8px 10px', borderRadius: 7, border: `0.5px solid ${t.border}`, fontSize: 12, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }}
+        />
+        <input
+          type="number"
+          min="0"
+          placeholder="0"
+          value={newRevenuMontant}
+          onChange={e => setNewRevenuMontant(e.target.value)}
+          style={{ width: 80, padding: '8px 10px', borderRadius: 7, border: `0.5px solid ${t.border}`, fontSize: 12, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text, textAlign: 'right' }}
+        />
+        <button
+          onClick={() => newRevenuLibelle.trim() && (setFormRevenus([...formRevenus, { libelle: newRevenuLibelle, montant: newRevenuMontant }]), setNewRevenuLibelle(''), setNewRevenuMontant(''))}
+          style={{ background: t.bgSecondary, color: t.text, border: `0.5px solid ${t.border}`, borderRadius: 7, padding: '8px 12px', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}
+        >
+          + Ajouter
+        </button>
+      </div>
+
+      <div style={{ fontSize: 12, fontWeight: 500, color: '#4CAF2E', textAlign: 'right', marginBottom: 16 }}>
+        Total : {formRevenus.reduce((acc, r) => acc + (parseFloat(r.montant) || 0), 0).toLocaleString('fr-FR')} €
+      </div>
+
+      <div style={{ display: 'flex', gap: 8 }}>
+        <button onClick={() => { setShowModalRevenu(false); setErreurRevenu(null) }} style={{ flex: 1, padding: '9px', borderRadius: 8, border: `0.5px solid ${t.border}`, background: t.bgSecondary, fontSize: 13, cursor: 'pointer', fontFamily: 'inherit', color: t.text }}>Annuler</button>
+        <button onClick={handleSaveRevenu} disabled={loading} style={{ flex: 1, padding: '9px', borderRadius: 8, border: 'none', background: loading ? '#9CA3AF' : '#4CAF2E', color: '#fff', fontSize: 13, fontWeight: 500, cursor: loading ? 'not-allowed' : 'pointer', fontFamily: 'inherit' }}>
+          {loading ? '⏳ Sauvegarde...' : 'Sauvegarder'}
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
       <Navbar page="Mes Finances" initiale={initiale} photoUrl={photoUrl} />
 <button
@@ -499,26 +569,31 @@ const GUIDE_FINANCES = [
             {succesRevenu && <div style={{ fontSize: 11, color: '#2E7D1E', background: '#EAF6E4', padding: '5px 8px', borderRadius: 6, marginBottom: 8 }}>✓ Revenus sauvegardés !</div>}
             {succesDepenses && <div style={{ fontSize: 11, color: '#2E7D1E', background: '#EAF6E4', padding: '5px 8px', borderRadius: 6, marginBottom: 8 }}>✓ Dépenses sauvegardées !</div>}
             {[
-              ['Revenus', `${finances.revenus || 0} €`, '#4CAF2E'],
-              ['Autres revenus', `${finances.autre_revenu || 0} €`, '#4CAF2E'],
-              ['Dép. fixes', `-${Math.round(totalDepensesFixes)} €`, '#E24B4A'],
-              ['Dép. variables', `-${Math.round(totalDepensesVariables)} €`, '#BA7517'],
-              ['Échéances', `-${Math.round(totalEcheances)} €`, '#BA7517'],
-              ['Investissable', `${reelInvestissable} €`, reelInvestissable >= investissable20 ? '#4CAF2E' : '#E24B4A'],
-            ].map(([l, v, c]) => (
+  ...(revenus.length > 0 
+    ? revenus.map(r => [r.libelle, `${parseFloat(r.montant).toLocaleString('fr-FR')} €`, '#4CAF2E'])
+    : [['Revenus', `${finances.revenus || 0} €`, '#4CAF2E']]),
+  ['Dép. fixes', `-${Math.round(totalDepensesFixes)} €`, '#E24B4A'],
+  ['Dép. variables', `-${Math.round(totalDepensesVariables)} €`, '#BA7517'],
+  ['Échéances', `-${Math.round(totalEcheances)} €`, '#BA7517'],
+  ['Investissable', `${reelInvestissable} €`, reelInvestissable >= investissable20 ? '#4CAF2E' : '#E24B4A'],
+].map(([l, v, c]) => (
               <div key={l} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 0', borderBottom: `0.5px solid ${t.border}` }}>
                 <span style={{ fontSize: 12, color: t.textSecondary }}>{l}</span>
                 <span style={{ fontSize: 13, fontWeight: 500, color: c }}>{v}</span>
               </div>
             ))}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 10 }}>
-              <button onClick={() => { setFormRevenu({ revenus: finances.revenus || '', autre_revenu: finances.autre_revenu || '' }); setErreurRevenu(null); setShowModalRevenu(true) }} style={{ width: '100%', background: bleu, color: '#fff', fontSize: 11, fontWeight: 500, padding: 7, borderRadius: 7, border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
-                + Modifier mes revenus
-              </button>
-              <button onClick={() => { setErreurDepenses(null); setShowModalDepenses(true) }} style={{ width: '100%', background: t.bgSecondary, color: t.text, fontSize: 11, fontWeight: 500, padding: 7, borderRadius: 7, border: `0.5px solid ${t.border}`, cursor: 'pointer', fontFamily: 'inherit' }}>
-                + Modifier mes dépenses
-              </button>
-            </div>
+  <button onClick={() => { 
+    setFormRevenus(revenus.length > 0 ? revenus.map(r => ({ libelle: r.libelle, montant: r.montant })) : [{ libelle: 'Salaire', montant: finances.revenus || '' }])
+    setErreurRevenu(null)
+    setShowModalRevenu(true) 
+  }} style={{ width: '100%', background: bleu, color: '#fff', fontSize: 11, fontWeight: 500, padding: 7, borderRadius: 7, border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
+    + Modifier mes revenus
+  </button>
+  <button onClick={() => { setErreurDepenses(null); setShowModalDepenses(true) }} style={{ width: '100%', background: t.bgSecondary, color: t.text, fontSize: 11, fontWeight: 500, padding: 7, borderRadius: 7, border: `0.5px solid ${t.border}`, cursor: 'pointer', fontFamily: 'inherit' }}>
+    + Modifier mes dépenses
+  </button>
+</div>
           </div>
         </div>
 
