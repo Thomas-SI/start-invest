@@ -114,7 +114,6 @@ export default function Portefeuille() {
   const [chartReady, setChartReady] = useState(false)
   const [saving, setSaving] = useState(false)
   const [nbMoisMatelas, setNbMoisMatelas] = useState(6)
-  const [nbMoisInitialise, setNbMoisInitialise] = useState(false)
   const [erreurAdd, setErreurAdd] = useState(null)
   const [erreurEdit, setErreurEdit] = useState(null)
   const [succesEdit, setSuccesEdit] = useState(false)
@@ -150,11 +149,14 @@ export default function Portefeuille() {
 
   // ✅ Initialise nbMoisMatelas UNE SEULE FOIS depuis Supabase
   useEffect(() => {
-    if (!nbMoisInitialise && data?.nbMoisMatelas !== undefined) {
-      setNbMoisMatelas(data.nbMoisMatelas)
-      setNbMoisInitialise(true)
-    }
-  }, [data])
+  const chargerMois = async () => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+    const { data } = await supabase.from('profils').select('nb_mois_matelas').eq('user_id', user.id).single()
+    if (data?.nb_mois_matelas) setNbMoisMatelas(data.nb_mois_matelas)
+  }
+  chargerMois()
+}, [])
 
   const initiale = data?.user?.user_metadata?.prenom?.[0]?.toUpperCase() || '?'
 
