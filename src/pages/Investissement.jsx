@@ -263,7 +263,7 @@ useEffect(() => {
           user_id: user.id, date: form.date, ticker, actif: form.actif,
           enveloppe: form.enveloppe, type_etf: form.type_etf, type: form.type,
           quantite, prix_achat_unitaire: prixUnitaire, pru: prixUnitaire,
-          prix_actuel: prixUnitaire, ter: parseFloat(form.ter) || 0,
+          prix_actuel: prixCache[ticker.split('.')[0]]?.prix_actuel || prixUnitaire,
           frais_courtage: frais, cible: 0, courtier,
         })
         if (error) throw new Error('Erreur lors de la creation de la position.')
@@ -479,7 +479,7 @@ if (!isPremium) {
                             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, minWidth: 700 }}>
                               <thead>
                                 <tr style={{ background: t.bgSecondary }}>
-                                  {['Ticker', 'Actif', 'Prix actuel', 'Position', 'Valeur EUR', '% Actuel', '% Cible', 'Achat/Vente'].map(h => (
+                                  {['Ticker', 'Actif', 'PRU', 'Prix actuel', 'Position', 'Valeur EUR', '% Actuel', '% Cible', 'Achat/Vente'].map(h => (
                                     <th key={h} style={{ padding: '8px 14px', textAlign: 'left', fontSize: 10, color: t.textMuted, fontWeight: 500, borderBottom: `0.5px solid ${t.border}`, whiteSpace: 'nowrap' }}>{h}</th>
                                   ))}
                                 </tr>
@@ -495,6 +495,7 @@ if (!isPremium) {
                                     <tr key={inv.id} style={{ borderBottom: `0.5px solid ${t.border}`, background: 'transparent' }}>
                                       <td style={{ padding: '10px 14px', fontWeight: 500, color: bleu }}>{inv.ticker}</td>
                                       <td style={{ padding: '10px 14px', color: t.text, maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{inv.actif}</td>
+                                      <td style={{ padding: '10px 14px', color: t.textMuted }}>{parseFloat(inv.pru || inv.prix_achat_unitaire || 0).toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €</td>
                                       <td style={{ padding: '10px 14px', color: t.text }}>{prixActuel.toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €</td>
                                       <td style={{ padding: '10px 14px', color: t.text }}>{inv.quantite}</td>
                                       <td style={{ padding: '10px 14px', fontWeight: 500, color: t.text }}>{Math.round(valAct).toLocaleString('fr-FR')} €</td>
@@ -633,7 +634,7 @@ if (!isPremium) {
                 <input type="number" min="0" placeholder="ex: 10" value={form.quantite} onChange={e => setForm({ ...form, quantite: e.target.value })} style={inputStyle} />
               </div>
               <div style={{ gridColumn: isMobile ? '1 / -1' : 'auto' }}>
-                <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Prix unitaire (euros) *</div>
+                <div style={{ fontSize: 10, color: t.textMuted, marginBottom: 4 }}>Prix d'achat (€) *</div>
                 <input type="number" min="0" placeholder="ex: 48.10" value={form.prix_achat_unitaire} onChange={e => setForm({ ...form, prix_achat_unitaire: e.target.value })} style={inputStyle} />
               </div>
               <div>
