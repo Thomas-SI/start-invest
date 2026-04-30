@@ -467,54 +467,49 @@ const totalRevenus = revenus.length > 0
       
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 16 }}>
         {formRevenus.map((r, i) => (
-          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <input
-              placeholder="ex: Salaire"
-              value={r.libelle}
-              onChange={e => { const u = [...formRevenus]; u[i] = { ...u[i], libelle: e.target.value }; setFormRevenus(u) }}
-              style={{ flex: 1, padding: '8px 10px', borderRadius: 7, border: `0.5px solid ${t.border}`, fontSize: 12, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }}
-            />
-            <input
-              type="number"
-              min="0"
-              placeholder="0"
-              value={r.montant || ''}
-              onChange={e => { const u = [...formRevenus]; u[i] = { ...u[i], montant: e.target.value }; setFormRevenus(u) }}
-              style={{ width: 90, padding: '8px 10px', borderRadius: 7, border: `0.5px solid ${t.border}`, fontSize: 12, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text, textAlign: 'right' }}
-            />
-            <span style={{ fontSize: 12, color: t.textMuted }}>€</span>
-            <button onClick={() => setFormRevenus(formRevenus.filter((_, j) => j !== i))} style={{ background: '#FCEBEB', color: '#E24B4A', border: 'none', borderRadius: 5, padding: '4px 8px', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>×</button>
-          </div>
-        ))}
+  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+    <input
+      placeholder="ex: Salaire"
+      value={r.libelle}
+      onChange={e => { const u = [...formRevenus]; u[i] = { ...u[i], libelle: e.target.value }; setFormRevenus(u) }}
+      style={{ flex: 1, minWidth: 0, padding: '8px 8px', borderRadius: 7, border: `0.5px solid ${t.border}`, fontSize: 12, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }}
+    />
+    <input
+      type="number"
+      min="0"
+      placeholder="0"
+      value={r.montant || ''}
+      onChange={e => { const u = [...formRevenus]; u[i] = { ...u[i], montant: e.target.value }; setFormRevenus(u) }}
+      style={{ width: 70, padding: '8px 6px', borderRadius: 7, border: `0.5px solid ${t.border}`, fontSize: 12, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text, textAlign: 'right' }}
+    />
+    <span style={{ fontSize: 12, color: t.textMuted }}>€</span>
+    <button onClick={() => setFormRevenus(formRevenus.filter((_, j) => j !== i))} style={{ background: '#FCEBEB', color: '#E24B4A', border: 'none', borderRadius: 5, padding: '4px 7px', fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>×</button>
+  </div>
+))}
       </div>
 
-      <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-        <input
-          placeholder="ex: Freelance, Loyer perçu..."
-          value={newRevenuLibelle}
-          onChange={e => setNewRevenuLibelle(e.target.value)}
-          onKeyDown={e => e.key === 'Enter' && newRevenuLibelle.trim() && (setFormRevenus([...formRevenus, { libelle: newRevenuLibelle, montant: newRevenuMontant }]), setNewRevenuLibelle(''), setNewRevenuMontant(''))}
-          style={{ flex: 1, padding: '8px 10px', borderRadius: 7, border: `0.5px solid ${t.border}`, fontSize: 12, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }}
-        />
-        <input
-          type="number"
-          min="0"
-          placeholder="0"
-          value={newRevenuMontant}
-          onChange={e => setNewRevenuMontant(e.target.value)}
-          style={{ width: 80, padding: '8px 10px', borderRadius: 7, border: `0.5px solid ${t.border}`, fontSize: 12, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text, textAlign: 'right' }}
-        />
-        <button
-          onClick={() => newRevenuLibelle.trim() && (setFormRevenus([...formRevenus, { libelle: newRevenuLibelle, montant: newRevenuMontant }]), setNewRevenuLibelle(''), setNewRevenuMontant(''))}
-          style={{ background: t.bgSecondary, color: t.text, border: `0.5px solid ${t.border}`, borderRadius: 7, padding: '8px 12px', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}
-        >
-          + Ajouter
-        </button>
-      </div>
-
-      <div style={{ fontSize: 12, fontWeight: 500, color: '#4CAF2E', textAlign: 'right', marginBottom: 16 }}>
-        Total : {formRevenus.reduce((acc, r) => acc + (parseFloat(r.montant) || 0), 0).toLocaleString('fr-FR')} €
-      </div>
+      <div style={{ display: 'flex', gap: 6, marginBottom: 16 }}>
+  <input
+    placeholder="Libellé..."
+    value={newRevenuLibelle}
+    onChange={e => setNewRevenuLibelle(e.target.value)}
+    style={{ flex: 1, minWidth: 0, padding: '8px 8px', borderRadius: 7, border: `0.5px solid ${t.border}`, fontSize: 12, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }}
+  />
+  <input
+    type="number"
+    min="0"
+    placeholder="0"
+    value={newRevenuMontant}
+    onChange={e => setNewRevenuMontant(e.target.value)}
+    style={{ width: 70, padding: '8px 6px', borderRadius: 7, border: `0.5px solid ${t.border}`, fontSize: 12, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text, textAlign: 'right' }}
+  />
+  <button
+    onClick={() => newRevenuLibelle.trim() && (setFormRevenus([...formRevenus, { libelle: newRevenuLibelle, montant: newRevenuMontant }]), setNewRevenuLibelle(''), setNewRevenuMontant(''))}
+    style={{ background: t.bgSecondary, color: t.text, border: `0.5px solid ${t.border}`, borderRadius: 7, padding: '8px 10px', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}
+  >
+    + Ajouter
+  </button>
+</div>
 
       <div style={{ display: 'flex', gap: 8 }}>
         <button onClick={() => { setShowModalRevenu(false); setErreurRevenu(null) }} style={{ flex: 1, padding: '9px', borderRadius: 8, border: `0.5px solid ${t.border}`, background: t.bgSecondary, fontSize: 13, cursor: 'pointer', fontFamily: 'inherit', color: t.text }}>Annuler</button>
