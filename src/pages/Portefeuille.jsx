@@ -146,8 +146,8 @@ const GUIDE_PORTEFEUILLE = [
 }, [])
 
   useEffect(() => {
-  if (data?.nbMoisMatelas) setNbMoisMatelas(data.nbMoisMatelas)
-}, [data])
+  if (data?.nbMoisMatelas !== undefined) setNbMoisMatelas(data.nbMoisMatelas)
+}, [data?.nbMoisMatelas])
 
   const initiale = data?.user?.user_metadata?.prenom?.[0]?.toUpperCase() || '?'
 
