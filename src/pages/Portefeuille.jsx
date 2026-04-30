@@ -486,7 +486,13 @@ else setNbMoisMatelas(6)
                           <td style={{ padding: '10px 14px', fontWeight: 500, color: t.text }}>{c.nom}</td>
                           <td style={{ padding: '10px 14px' }}><span style={{ fontSize: 10, fontWeight: 500, padding: '2px 8px', borderRadius: 20, background: couleurType(c.type) + '20', color: couleurType(c.type) }}>{c.type}</span></td>
                           <td style={{ padding: '10px 14px', color: t.textSecondary, fontSize: 11 }}>{c.disponibilite}</td>
-                          <td style={{ padding: '6px 8px' }}><input type="number" min="0" value={editForm.solde} onChange={e => setEditForm({ ...editForm, solde: e.target.value })} style={{ ...inputStyle, width: 90 }} /></td>
+                          <td style={{ padding: '6px 8px' }}>
+  {comptes[editingIdx]?.type === 'investissement' ? (
+    <div style={{ padding: '6px 8px', fontSize: 11, color: t.textMuted, width: 90 }}>{editForm.solde} €</div>
+  ) : (
+    <input type="number" min="0" value={editForm.solde} onChange={e => setEditForm({ ...editForm, solde: e.target.value })} style={{ ...inputStyle, width: 90 }} />
+  )}
+</td>
                           <td style={{ padding: '6px 8px' }}><input type="number" min="0" value={editForm.objectif} onChange={e => setEditForm({ ...editForm, objectif: e.target.value })} style={{ ...inputStyle, width: 90 }} /></td>
                           <td style={{ padding: '6px 8px', color: t.textMuted }}>—</td>
                           <td style={{ padding: '6px 8px', color: t.textMuted }}>—</td>
