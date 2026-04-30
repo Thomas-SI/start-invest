@@ -23,6 +23,7 @@ const placeholders = {
 const DEPENSES_FIXES_DEFAULT = [
   { categorie: 'Loyer / Prêt', montant: 0, defaut: true },
   { categorie: 'Électricité / Eau', montant: 0, defaut: true },
+  { categorie: 'Assurances', montant: 0, defaut: true },
   { categorie: 'Abonnements', montant: 0, defaut: true },
   { categorie: 'Frais bancaires', montant: 0, defaut: true },
   { categorie: 'Courses', montant: 0, defaut: true },
