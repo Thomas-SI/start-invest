@@ -180,7 +180,7 @@ export default function AbonnementPublic() {
         </div>
 {/* TEXTE INTRO */}
 <div style={{ textAlign: 'justify', fontSize: isMobile ? 13 : 14, color: '#6B7280', lineHeight: 1.8, maxWidth: 600, margin: '0 auto 24px' }}>
-  Un abonnement pensé pour récompenser la discipline. Après 10 ans, l'app devient gratuite et vos performances s'envolent. À 7% de moyenne annuelle, votre abonnement est remboursé à partir de 80€/mois investi la 1ère année, et seulement 35€/mois dès la 2ème.
+  Un abonnement pensé pour récompenser la discipline. Après 10 ans, l'application devient gratuite et vos performances s'envolent. À 7% de moyenne annuelle, votre abonnement est remboursé à partir de 80€/mois investi la 1ère année, et seulement 35€/mois dès la 2ème.
 </div>
 
 {/* TABLEAU DÉGRESSIF */}
@@ -264,7 +264,7 @@ export default function AbonnementPublic() {
     },
     {
       q: 'À qui l\'application s\'adresse-t-elle ?',
-      r: 'À tout le monde. Que tu démarres de zéro ou que tu aies déjà un portefeuille, Start Invest s\'adapte à ton niveau. Étudiant, salarié, entrepreneur, parent — peu importe si tu es stressé, fatigué ou que tu n\'as pas le temps. L\'objectif : rendre l\'investissement accessible, ludique et motivant pour tous. La seule condition : être majeur.'
+      r: 'À tout le monde. Que tu démarres de zéro ou que tu aies déjà un portefeuille, Start Invest s\'adapte à ton niveau. Étudiant, salarié, entrepreneur, parent... Peu importe si tu es stressé, fatigué ou que tu n\'as pas le temps. L\'objectif : rendre l\'investissement accessible, ludique et motivant pour tous. La seule condition : être majeur.'
     },
     {
       q: 'Puis-je annuler à tout moment ?',

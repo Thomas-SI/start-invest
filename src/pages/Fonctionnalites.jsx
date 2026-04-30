@@ -226,7 +226,7 @@ export default function Fonctionnalites() {
           <div>
             <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 12, background: '#EAF6E4', display: 'inline-block', padding: '3px 10px', borderRadius: 20 }}>Portefeuille</div>
             <h2 style={{ fontSize: h2Size, fontWeight: 700, color: '#034065', lineHeight: 1.3, margin: '0 0 14px' }}>Gérez tous vos comptes au même endroit</h2>
-            <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.8, margin: '0 0 20px' }}>Livret A, PEA, CTO, Assurance-vie — visualisez votre patrimoine complet, suivez votre matelas de sécurité et planifiez vos virements mensuels.</p>
+            <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.8, margin: '0 0 20px' }}>Livret A, PEA, CTO, Assurance-vie,etc... Visualisez votre patrimoine complet, suivez votre matelas de sécurité et planifiez vos virements mensuels.</p>
             {['Suivi multi-comptes', 'Matelas de securite', 'Plan de virement mensuel automatique', 'Repartition du patrimoine', 'Objectif d epargne par compte'].map(f => (
               <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, fontSize: 13, color: '#6B7280' }}>
                 <span style={{ color: '#4CAF2E' }}>✓</span>{f}

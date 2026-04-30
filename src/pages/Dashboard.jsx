@@ -95,7 +95,7 @@ function PopupSimulateur({ versement, onClose, isMobile }) {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
           <div>
             <div style={{ fontSize: 15, fontWeight: 500, color: '#034065' }}>Projection de croissance</div>
-            <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>Basé sur {versement.toLocaleString('fr-FR')} €/mois · taux 7%/an</div>
+            <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>Basé sur {versement.toLocaleString('fr-FR')} €/mois · Avec un taux conservateur de 7%/an</div>
           </div>
           <button onClick={onClose} style={{ background: '#F4F7F5', border: 'none', borderRadius: 8, padding: '6px 10px', fontSize: 14, cursor: 'pointer', color: '#6B7280' }}>×</button>
         </div>
@@ -580,10 +580,10 @@ const totalRevenus = revenus.length > 0
   ...(revenus.length > 0 
     ? revenus.map(r => [r.libelle, `${parseFloat(r.montant).toLocaleString('fr-FR')} €`, '#4CAF2E'])
     : [['Revenus', `${finances.revenus || 0} €`, '#4CAF2E']]),
-  ['Dép. fixes', `-${Math.round(totalDepensesFixes)} €`, '#E24B4A'],
-  ['Dép. variables', `-${Math.round(totalDepensesVariables)} €`, '#BA7517'],
+  ['Dépenses fixes', `-${Math.round(totalDepensesFixes)} €`, '#E24B4A'],
+  ['Dépenses variables', `-${Math.round(totalDepensesVariables)} €`, '#BA7517'],
   ['Échéances', `-${Math.round(totalEcheances)} €`, '#BA7517'],
-  ['Investissable', `${reelInvestissable} €`, reelInvestissable >= investissable20 ? '#4CAF2E' : '#E24B4A'],
+  ["Capacité d'investissement", `${reelInvestissable} €`, reelInvestissable >= investissable20 ? '#4CAF2E' : '#E24B4A'],
 ].map(([l, v, c]) => (
               <div key={l} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 0', borderBottom: `0.5px solid ${t.border}` }}>
                 <span style={{ fontSize: 12, color: t.textSecondary }}>{l}</span>
@@ -623,9 +623,9 @@ const totalRevenus = revenus.length > 0
             <div style={{ fontSize: 11, color: t.textMuted, marginBottom: 12 }}>50% besoins · 30% envies · 20% investissement</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {[
-                ['Besoins (dép. fixes)', regle5030.besoins, 50, couleurBesoins],
-                ['Envies (dép. variables)', regle5030.envies, 30, couleurEnvies],
-                ['Investissement', regle5030.invest, 20, couleurInvest],
+                ['Besoins (dépenses fixes)', regle5030.besoins, 50, couleurBesoins],
+                ['Envies (dépenses variables)', regle5030.envies, 30, couleurEnvies],
+                ["Capacité d'investissement", regle5030.invest, 20, couleurInvest],
               ].map(([label, val, objectif, couleur]) => (
                 <div key={label}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 4 }}>
@@ -685,7 +685,7 @@ const totalRevenus = revenus.length > 0
             )}
 
             {echeances.length === 0 ? (
-              <div style={{ padding: '24px', textAlign: 'center', color: t.textMuted, fontSize: 12 }}>Aucune échéance — cliquez sur "+ Ajouter" pour commencer</div>
+              <div style={{ padding: '24px', textAlign: 'center', color: t.textMuted, fontSize: 12 }}>Aucune échéance. Cliquez sur "+ Ajouter" pour commencer</div>
             ) : (
               <div style={{ overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, minWidth: 640 }}>

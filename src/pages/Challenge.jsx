@@ -1046,7 +1046,7 @@ export default function Challenge() {
 const GUIDE_CHALLENGE = [
   {
     titre: '🔥 Collecte tes flammes',
-    description: 'À chaque mois où tu investis, tu gagnes une flamme. Plus ta série est longue, plus tu es fort. Ne laisse pas ta flamme s\'éteindre. La discipline est la clé de la richesse sur le long terme.',
+    description: 'À chaque mois où tu investis, tu gagnes une flamme. Plus ta série est longue, plus tu es discipliné. Ne laisse pas ta flamme s\'éteindre. La régularité est la clé de la richesse sur le long terme.',
   },
   {
     titre: '🎖️ Débloque des badges',
@@ -1054,11 +1054,11 @@ const GUIDE_CHALLENGE = [
   },
   {
     titre: '📊 Situe-toi parmi les épargnants français',
-    description: 'Vois où tu te places par rapport à la moyenne. Ce n\'est pas une compétition, c\'est une motivation pour toujours aller chercher plus haut.',
+    description: 'Vois où tu te places par rapport à la moyenne. Ce n\'est pas une compétition, c\'est une motivation pour toujours aller chercher plus haut. Fixe-toi de grands objectifs.',
   },
   {
     titre: '👥 Invite tes amis',
-    description: 'Ajoute tes amis et voyez vos badges respectifs. La force du groupe est décuplée.\'entourer de personnes qui investissent, c\'est le meilleur moyen de ne jamais flancher.',
+    description: 'Ajoute tes amis et voyez vos badges respectifs. La force du groupe est décuplée. Entourer de personnes disciplinées, motivées et qui investissent, c\'est le meilleur moyen de ne jamais flancher.',
   },
 ]
   const queryClient = useQueryClient()
@@ -1240,10 +1240,10 @@ const GUIDE_CHALLENGE = [
   </div>
   <div style={{ flex: 1 }}>
     <div style={{ fontSize: 13, fontWeight: 500, color: t.text }}>
-      {streakMensuel > 0 ? `${streakMensuel} mois de suite investis !` : 'Aucune série en cours'}
+      {streakMensuel > 0 ? `${streakMensuel} mois de suite investis : ne perds plus la flamme que tu as allumée !` : 'Aucune série en cours'}
     </div>
     <div style={{ fontSize: 11, color: t.textMuted, marginTop: 2 }}>
-      {streakMensuel > 0 ? 'Continue chaque mois pour maintenir ta série' : 'Achète un ETF ce mois-ci pour démarrer ta série'}
+      {streakMensuel > 0 ? "Continue chaque mois pour maintenir ta série. N’oublie jamais ta discipline et tes objectifs ! GO GO " : 'Achète un ETF ce mois-ci pour démarrer ta série'}
     </div>
   </div>
 </div>
@@ -1332,7 +1332,7 @@ const GUIDE_CHALLENGE = [
             )}
             {badgesADebloquer.filter(b => b.categorie === 'guide').length > 0 && (
               <div>
-                <div style={{ fontSize: 13, fontWeight: 500, color: t.text, marginBottom: 10 }}>Guide — Chapitres à valider</div>
+                <div style={{ fontSize: 13, fontWeight: 500, color: t.text, marginBottom: 10 }}>Guide. Chapitres à valider</div>
                 <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(150px, 1fr))', gap: 12 }}>
                   {badgesADebloquer.filter(b => b.categorie === 'guide').map(badge => (
                     <BadgeCard key={badge.slug} badge={badge} obtenu={false} gradeActuel={null} progression={null} />

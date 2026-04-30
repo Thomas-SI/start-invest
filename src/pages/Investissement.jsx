@@ -46,11 +46,11 @@ export default function Investissement() {
 const GUIDE_INVESTISSEMENT = [
   {
     titre: '🗂️ Définis ta stratégie de diversification',
-    description: 'Répartis tes ETF par enveloppe (PEA, CTO, Assurance-vie) avec un pourcentage pour chacun. L\'objectif : arriver à 100% d\'allocation par compte. C\'est ta feuille de route — tu n\'as plus qu\'à suivre le plan.',
+    description: 'Répartis tes ETF par enveloppe (PEA, CTO, Assurance-vie) avec un pourcentage pour chacun. L\'objectif : arriver à 100% d\'allocation par compte. C\'est ta feuille de route. Une fois définis, tu n\'as plus qu\'à suivre le plan.',
   },
   {
     titre: '📝 Enregistre tes achats',
-    description: 'À chaque achat, tape le ticker de ton ETF (ex: PE500, VUAA). L\'app trouve automatiquement l\'ETF. Renseigne la quantité, le prix et les frais — c\'est tout.',
+    description: 'À chaque achat, tape le ticker de ton ETF (ex: PE500, VUAA). L\'application trouve automatiquement l\'ETF. Renseigne la quantité, le prix, les frais et c\'est tout.',
   },
   {
     titre: '📊 Suis ton allocation en temps réel',
@@ -529,7 +529,7 @@ if (!isPremium) {
                           ['Total investi', `${Math.round(totalInvestiEnv).toLocaleString('fr-FR')} €`, t.text],
                           ['Valeur actuelle', `${Math.round(totalEnv).toLocaleString('fr-FR')} €`, '#4CAF2E'],
                           ['Plus-value latente', `${plusValueEnv >= 0 ? '+' : ''}${Math.round(plusValueEnv).toLocaleString('fr-FR')} €`, plusValueEnv >= 0 ? '#4CAF2E' : '#E24B4A'],
-                          ['Nb positions', nbPositionsEnv.toString(), bleu],
+                          ['Nombres de positions', nbPositionsEnv.toString(), bleu],
                         ].map(([l, v, c], idx) => (
                           <div key={l} style={{ padding: isMobile ? '12px' : '16px', background: t.bgSecondary, borderBottom: idx < 2 ? `0.5px solid ${t.border}` : 'none', borderRight: idx % 2 === 0 ? `0.5px solid ${t.border}` : 'none', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                             <div style={{ fontSize: 9, color: t.textMuted, textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 6 }}>{l}</div>
@@ -551,7 +551,7 @@ if (!isPremium) {
             ['Total investi', `${Math.round(totalInvesti).toLocaleString('fr-FR')} €`, t.text],
             ['Valeur actuelle', `${Math.round(valeurActuelle).toLocaleString('fr-FR')} €`, '#4CAF2E'],
             ['Plus-value latente', `${plusValue >= 0 ? '+' : ''}${Math.round(plusValue).toLocaleString('fr-FR')} €`, plusValue >= 0 ? '#4CAF2E' : '#E24B4A'],
-            ['Nb positions', nbPositions.toString(), bleu],
+            ['Nombres de positions', nbPositions.toString(), bleu],
           ].map(([l, v, c]) => (
             <div key={l} style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: isMobile ? 12 : 16 }}>
               <div style={{ fontSize: 10, color: t.textMuted, textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 8 }}>{l}</div>

@@ -37,11 +37,11 @@ export default function Croissance() {
 const GUIDE_CROISSANCE = [
   {
     titre: '✨ La magie des intérêts composés',
-    description: 'C\'est le principe le plus puissant en investissement — ton argent génère des intérêts, qui génèrent eux-mêmes des intérêts. Sur 20 ou 30 ans, l\'effet est spectaculaire. Cette page te le montre avec tes propres chiffres.',
+    description: 'C\'est le principe le plus puissant en investissement. Ton argent génère des intérêts, qui génèrent eux-mêmes des intérêts. Sur 20 ou 30 ans, l\'effet est spectaculaire. Cette page te le montre avec tes propres chiffres. L\'effet boule de neige !',
   },
   {
     titre: '🎛️ Ajuste les paramètres',
-    description: 'Ton montant investissable est directement repris depuis Mes Finances. Ajuste le % de performance annuelle et la durée pour voir différents scénarios. À 7% sur 30 ans, les résultats peuvent surprendre !',
+    description: 'Ta capacité d\'investissement est directement repris depuis "Mes Finances". Ajuste le % de performance annuelle et la durée pour voir différents scénarios. À 7% sur 30 ans, les résultats peuvent surprendre !',
   },
   {
     titre: '💡 PEA vs CTO',
@@ -134,7 +134,7 @@ if (!isPremium) {
       <div style={{ padding: isMobile ? '16px 12px' : '16px 20px', flex: 1 }}>
         <div style={{ marginBottom: 16 }}>
           <div style={{ fontSize: isMobile ? 18 : 16, fontWeight: 500, color: t.text }}>Simulateur de croissance</div>
-          <div style={{ fontSize: 12, color: t.textMuted, marginTop: 2 }}>Projetez votre patrimoine sur le long terme</div>
+          <div style={{ fontSize: 12, color: t.textMuted, marginTop: 2 }}>Projetez votre patrimoine sur le long terme, de manière personnalisée selon votre capacité d’investissement.</div>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '300px 1fr', gap: isMobile ? 12 : 16 }}>
@@ -158,7 +158,7 @@ if (!isPremium) {
                 <input type="range" min={0} max={5000} step={50} value={versement} onChange={e => setVersement(Number(e.target.value))} style={{ width: '100%' }} />
                 {investissable > 0 && (
                   <div style={{ fontSize: 10, color: t.textMuted, marginTop: 4 }}>
-                    Investissable : <span style={{ color: '#4CAF2E', fontWeight: 500 }}>{investissable} €</span>
+                    Capacité d'investissement : <span style={{ color: '#4CAF2E', fontWeight: 500 }}>{investissable} €</span>
                     {versement !== investissable && <span onClick={() => setVersement(investissable)} style={{ color: '#1565C0', cursor: 'pointer', marginLeft: 6 }}>Réinitialiser</span>}
                   </div>
                 )}

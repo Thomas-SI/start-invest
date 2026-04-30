@@ -138,16 +138,16 @@ export default function ChallengePublic() {
         <div style={{ maxWidth: 700, margin: '0 auto', textAlign: 'center' }}>
           <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 20, background: 'rgba(76,175,46,0.15)', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Challenge</div>
           <h1 style={{ fontSize: isMobile ? 26 : 36, fontWeight: 700, color: '#fff', lineHeight: 1.4, margin: '0 0 24px' }}>
-            Parce que l'investissement se court comme un <span style={{ color: '#4CAF2E' }}>marathon</span> et non comme un sprint,
+            Parce que l'investissement se court comme un <span style={{ color: '#4CAF2E' }}>marathon</span> et non comme un sprint
           </h1>
           <p style={{ fontSize: isMobile ? 14 : 16, color: 'rgba(255,255,255,0.6)', lineHeight: 1.8, margin: '0 auto 40px', maxWidth: 560 }}>
             Nous avons créé les challenges pour vous tirer vers les sommets, comme dans le sport, avec une communauté qui nous pousse à nous dépasser.
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: isMobile ? 10 : 14, maxWidth: 600, margin: '0 auto' }}>
             {[
-              { val: 'Long terme', label: 'La clé de la richesse' },
-              { val: 'Régularité', label: 'Plus que le timing' },
-              { val: 'Discipline', label: "L'arme secrète" },
+              { val: 'LONG TERME', label: 'La clé de la richesse' },
+              { val: 'RÉGULARITÉ', label: 'Plus que le timing' },
+              { val: 'DISCIPLINE', label: "L'arme secrète" },
             ].map(({ val, label }) => (
               <div key={val} style={{ background: 'rgba(255,255,255,0.06)', border: '0.5px solid rgba(255,255,255,0.1)', borderRadius: 12, padding: isMobile ? '14px' : '16px' }}>
                 <div style={{ fontSize: 15, fontWeight: 700, color: '#4CAF2E', marginBottom: 4 }}>{val}</div>
@@ -191,10 +191,10 @@ export default function ChallengePublic() {
   <div style={{ maxWidth: 700, margin: '0 auto', textAlign: 'center' }}>
     <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 12, background: 'rgba(76,175,46,0.15)', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Streak</div>
     <h2 style={{ fontSize: isMobile ? 24 : 30, fontWeight: 700, color: '#fff', margin: '0 0 16px' }}>
-      🔥 Collecte tes flammes
+      🔥 Collecte tes flammes !
     </h2>
     <p style={{ fontSize: isMobile ? 14 : 15, color: 'rgba(255,255,255,0.6)', lineHeight: 1.8, margin: '0 auto 40px', maxWidth: 500 }}>
-      À chaque mois où tu investis, tu gagnes une flamme. Plus ta série est longue, plus tu es fort. Ne laisse pas ta flamme s'éteindre — la discipline est la clé de la richesse sur le long terme.
+      À chaque mois où tu investis, tu gagnes une flamme. Plus ta série est longue, plus tu es discipliné. Ne laisse pas ta flamme s'éteindre, la  est la clé de la richesse sur le long terme.
     </p>
     <div style={{ display: 'flex', justifyContent: 'center', gap: 8, fontSize: 36 }}>
       {[1,2,3,4,5,6].map((i) => (
@@ -224,7 +224,7 @@ export default function ChallengePublic() {
     📚 5 chapitres pour devenir investisseur
   </h2>
   <p style={{ fontSize: isMobile ? 14 : 15, color: '#6B7280', lineHeight: 1.8, margin: '0 auto 40px', maxWidth: 500 }}>
-    Valide chaque chapitre du guide et débloque ton badge. De zéro à investisseur autonome — sans jargon, sans prise de tête.
+    Valide chaque chapitre du guide et débloque ton badge. De zéro à investisseur autonome. Sans jargon, sans prise de tête.
   </p>
   <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(5, 1fr)', gap: 12 }}>
     {[
@@ -250,7 +250,7 @@ export default function ChallengePublic() {
       👥 Ensemble, on va plus loin
     </h2>
     <p style={{ fontSize: isMobile ? 14 : 15, color: 'rgba(255,255,255,0.6)', lineHeight: 1.8, margin: '0 auto 40px', maxWidth: 500 }}>
-      Ajoute tes amis, suis leurs badges et leur progression. La force du groupe est décuplée — s'entourer de personnes qui investissent, c'est le meilleur moyen de ne jamais flancher.
+      Ajoute tes amis, suis leurs badges et leur progression. La force du groupe est décuplée. S'entourer de personnes disciplinées, motivées et qui investissent, c'est le meilleur moyen de ne jamais flancher.
     </p>
     <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: 16 }}>
       {[

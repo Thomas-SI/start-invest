@@ -82,7 +82,7 @@ export default function Portefeuille() {
   const GUIDE_PORTEFEUILLE = [
     {
       titre: '🛡️ Définis ton matelas de sécurité',
-      description: 'Choisis entre 3 et 12 mois de dépenses fixes selon ton goût du risque. C\'est ton filet de sécurité — il ne s\'investit jamais. Une fois défini, l\'app t\'indique si tu l\'as atteint ou non.',
+      description: 'Choisis entre 3 et 12 mois de dépenses fixes selon ton rapport au risque. C\'est ton filet de sécurité, il ne s\'investit jamais. Une fois défini, l\'application t\'indique si tu l\'as atteint ou non.',
     },
     {
       titre: '💳 Ajoute tes comptes',
@@ -90,7 +90,7 @@ export default function Portefeuille() {
     },
     {
       titre: '📋 Définis ton plan de virement mensuel',
-      description: 'Répartis ton montant investissable (calculé dans Mes Finances) en % sur chaque compte. L\'app calcule automatiquement les montants à virer chaque mois.',
+      description: 'Répartis ton montant investissable (calculé dans "Mes Finances") en % sur chaque compte. L\'application calcule automatiquement les montants à virer chaque mois.',
     },
     {
       titre: '✅ Coche tes virements',
@@ -556,7 +556,7 @@ else setNbMoisMatelas(6)
           <div style={{ padding: '12px 16px', borderBottom: `0.5px solid ${t.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
             <div>
               <div style={{ fontSize: 13, fontWeight: 500, color: t.text }}>Plan de virement mensuel</div>
-              <div style={{ fontSize: 11, color: t.textMuted, marginTop: 2 }}>Basé sur votre investissable : <span style={{ fontWeight: 500, color: '#4CAF2E' }}>{investissable.toLocaleString('fr-FR')} €/mois</span></div>
+              <div style={{ fontSize: 11, color: t.textMuted, marginTop: 2 }}>Basé sur votre capacité d'investissement de : <span style={{ fontWeight: 500, color: '#4CAF2E' }}>{investissable.toLocaleString('fr-FR')} €/mois</span></div>
             </div>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
               {tousCoches && <div style={{ fontSize: 11, color: '#2E7D1E', background: '#EAF6E4', padding: '5px 10px', borderRadius: 7, fontWeight: 500 }}>✓ Tous les virements effectués ce mois !</div>}
