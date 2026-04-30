@@ -45,33 +45,49 @@ const COULEURS = ['#034065', '#4CAF2E', '#BA7517', '#3B82F6', '#E24B4A', '#8B5CF
 const fetchPortefeuilleData = async () => {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Non connecté')
-  const [finRes, depRes, echRes, comptesRes, virementsRes, prefRes] = await Promise.all([
+  const [finRes, depRes, echRes, comptesRes, virementsRes, prefRes, invRes] = await Promise.all([
     supabase.from('finances').select('*').eq('user_id', user.id).single(),
     supabase.from('depenses').select('*').eq('user_id', user.id),
     supabase.from('echeances').select('*').eq('user_id', user.id),
     supabase.from('comptes').select('*').eq('user_id', user.id).order('created_at', { ascending: true }),
     supabase.from('virements').select('*').eq('user_id', user.id).order('ordre', { ascending: true }),
     supabase.from('profils').select('nb_mois_matelas').eq('user_id', user.id).single(),
+    supabase.from('investissements').select('*').eq('user_id', user.id),
   ])
   const fin = finRes.data
-  let depensesFixes = 0, investissable = 0
-  if (fin) {
-    const dep = depRes.data || []
-    const totalDepFixes = dep.filter(d => d.type === 'fixes').reduce((acc, d) => acc + (parseFloat(d.montant) || 0), 0)
-    const totalDep = dep.reduce((acc, d) => acc + (parseFloat(d.montant) || 0), 0)
-    const totalEch = (echRes.data || []).reduce((acc, e) => acc + (parseFloat(e.montant_annuel) || 0) / 12, 0)
-    const totalRev = (fin.revenus || 0) + (fin.autre_revenu || 0)
-    depensesFixes = Math.round(totalDepFixes)
-    investissable = Math.round(totalRev - totalDep - totalEch)
+let depensesFixes = 0, investissable = 0
+if (fin) {
+  const dep = depRes.data || []
+  const totalDepFixes = dep.filter(d => d.type === 'fixes').reduce((acc, d) => acc + (parseFloat(d.montant) || 0), 0)
+  const totalDep = dep.reduce((acc, d) => acc + (parseFloat(d.montant) || 0), 0)
+  const totalEch = (echRes.data || []).reduce((acc, e) => acc + (parseFloat(e.montant_annuel) || 0) / 12, 0)
+  const totalRev = (fin.revenus || 0) + (fin.autre_revenu || 0)
+  depensesFixes = Math.round(totalDepFixes)
+  investissable = Math.round(totalRev - totalDep - totalEch)
+}
+
+const investissements = invRes.data || []
+const valeurParEnveloppe = {}
+investissements.forEach(inv => {
+  const valeur = parseFloat(inv.quantite) * parseFloat(inv.prix_actuel || inv.pru || inv.prix_achat_unitaire || 0)
+  valeurParEnveloppe[inv.enveloppe] = (valeurParEnveloppe[inv.enveloppe] || 0) + valeur
+})
+
+const comptesAvecSolde = (comptesRes.data?.length > 0 ? comptesRes.data : COMPTES_DEFAULT).map(c => {
+  if (valeurParEnveloppe[c.nom] !== undefined) {
+    return { ...c, solde: Math.round(valeurParEnveloppe[c.nom]) }
   }
-  return {
-    user,
-    comptes: comptesRes.data?.length > 0 ? comptesRes.data : COMPTES_DEFAULT,
-    virements: virementsRes.data?.length > 0 ? virementsRes.data : VIREMENTS_DEFAULT,
-    depensesFixes,
-    investissable,
-    nbMoisMatelas: prefRes.data?.nb_mois_matelas ?? 6,
-  }
+  return c
+})
+
+return {
+  user,
+  comptes: comptesAvecSolde,
+  virements: virementsRes.data?.length > 0 ? virementsRes.data : VIREMENTS_DEFAULT,
+  depensesFixes,
+  investissable,
+  nbMoisMatelas: prefRes.data?.nb_mois_matelas ?? 6,
+}
 }
 
 export default function Portefeuille() {
