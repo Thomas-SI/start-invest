@@ -65,12 +65,13 @@ const fetchPortefeuilleData = async () => {
     investissable = Math.round(totalRev - totalDep - totalEch)
   }
   return {
-    user,
-    comptes: comptesRes.data?.length > 0 ? comptesRes.data : COMPTES_DEFAULT,
-    virements: virementsRes.data?.length > 0 ? virementsRes.data : VIREMENTS_DEFAULT,
-    depensesFixes,
-    investissable,
-  }
+  user,
+  comptes: comptesRes.data?.length > 0 ? comptesRes.data : COMPTES_DEFAULT,
+  virements: virementsRes.data?.length > 0 ? virementsRes.data : VIREMENTS_DEFAULT,
+  depensesFixes,
+  investissable,
+  nbMoisMatelas: prefRes.data?.nb_mois_matelas || 6,
+}
 }
 
 export default function Portefeuille() {
