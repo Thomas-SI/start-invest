@@ -256,9 +256,21 @@ const GUIDE_FINANCES = [
   const finances = data?.finances || { revenus: 0, autre_revenu: 0, depenses_fixes: 0, depenses_variables: 0 }
   const echeances = data?.echeances || []
 
-  const depensesFixesDetail = data?.depenses?.length > 0
-    ? data.depenses.filter(d => d.type === 'fixes').map(d => ({ categorie: d.categorie, montant: d.montant, defaut: DEPENSES_FIXES_DEFAULT.some(df => df.categorie === d.categorie) }))
-    : DEPENSES_FIXES_DEFAULT
+  const ordreDefaut = DEPENSES_FIXES_DEFAULT.map(d => d.categorie)
+
+const depensesFixesDetail = data?.depenses?.length > 0
+  ? data.depenses
+      .filter(d => d.type === 'fixes')
+      .map(d => ({ categorie: d.categorie, montant: d.montant, defaut: DEPENSES_FIXES_DEFAULT.some(df => df.categorie === d.categorie) }))
+      .sort((a, b) => {
+        const ia = ordreDefaut.indexOf(a.categorie)
+        const ib = ordreDefaut.indexOf(b.categorie)
+        if (ia === -1 && ib === -1) return 0
+        if (ia === -1) return 1
+        if (ib === -1) return -1
+        return ia - ib
+      })
+  : DEPENSES_FIXES_DEFAULT
 
   const depensesVariablesDetail = data?.depenses?.length > 0
     ? data.depenses.filter(d => d.type === 'variables').map(d => ({ categorie: d.categorie, montant: d.montant, defaut: DEPENSES_VARIABLES_DEFAULT.some(dv => dv.categorie === d.categorie) }))
