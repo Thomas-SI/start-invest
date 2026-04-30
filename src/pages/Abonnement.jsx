@@ -174,16 +174,6 @@ export default function Abonnement() {
 
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 12, background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 30, padding: '6px 8px' }}>
-            <button onClick={() => setAnnuel(false)} style={{ padding: '6px 16px', borderRadius: 20, border: 'none', background: !annuel ? '#034065' : 'transparent', color: !annuel ? '#fff' : t.textMuted, fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' }}>Mensuel</button>
-            <button onClick={() => setAnnuel(true)} style={{ padding: '6px 16px', borderRadius: 20, border: 'none', background: annuel ? '#034065' : 'transparent', color: annuel ? '#fff' : t.textMuted, fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s', display: 'flex', alignItems: 'center', gap: 6 }}>
-              Annuel
-              <span style={{ fontSize: 9, background: '#4CAF2E', color: '#fff', padding: '2px 6px', borderRadius: 10, fontWeight: 600 }}>-29%</span>
-            </button>
-          </div>
-        </div>
-
         <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, minmax(0,1fr))', gap: 20, maxWidth: 780, margin: '0 auto' }}>
 
           {plans.map(({ id, nom, actuel, recommande, features, pages, prixMensuel, prixAnnuel, periodeMensuel, periodeAnnuel }) => {
@@ -198,8 +188,17 @@ export default function Abonnement() {
                 </div>
 
                 {/* NOM + PRIX */}
-                <div style={{ fontSize: 18, fontWeight: 600, color: recommande ? '#fff' : t.text, marginBottom: 4 }}>{nom}</div>
-                <div style={{ fontSize: 32, fontWeight: 700, color: recommande ? '#fff' : t.text, marginBottom: 2 }}>{prix}</div>
+<div style={{ fontSize: 18, fontWeight: 600, color: recommande ? '#fff' : t.text, marginBottom: 4 }}>{nom}</div>
+{recommande && (
+  <div style={{ display: 'inline-flex', alignSelf: 'flex-start', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.1)', border: '0.5px solid rgba(255,255,255,0.2)', borderRadius: 30, padding: '4px 6px', marginBottom: 10 }}>
+    <button onClick={() => setAnnuel(false)} style={{ padding: '4px 12px', borderRadius: 20, border: 'none', background: !annuel ? '#fff' : 'transparent', color: !annuel ? '#034065' : 'rgba(255,255,255,0.7)', fontSize: 11, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' }}>Mensuel</button>
+    <button onClick={() => setAnnuel(true)} style={{ padding: '4px 12px', borderRadius: 20, border: 'none', background: annuel ? '#fff' : 'transparent', color: annuel ? '#034065' : 'rgba(255,255,255,0.7)', fontSize: 11, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s', display: 'flex', alignItems: 'center', gap: 4 }}>
+      Annuel
+      <span style={{ fontSize: 9, background: '#4CAF2E', color: '#fff', padding: '1px 5px', borderRadius: 10, fontWeight: 600 }}>-29%</span>
+    </button>
+  </div>
+)}
+<div style={{ fontSize: 32, fontWeight: 700, color: recommande ? '#fff' : t.text, marginBottom: 2 }}>{prix}</div>
                 <div style={{ fontSize: 11, color: recommande ? 'rgba(255,255,255,0.5)' : t.textMuted, marginBottom: 20 }}>{periode}</div>
 
                 {/* PAGES ACCESSIBLES */}
