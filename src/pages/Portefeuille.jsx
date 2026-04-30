@@ -65,13 +65,13 @@ const fetchPortefeuilleData = async () => {
     investissable = Math.round(totalRev - totalDep - totalEch)
   }
   return {
-  user,
-  comptes: comptesRes.data?.length > 0 ? comptesRes.data : COMPTES_DEFAULT,
-  virements: virementsRes.data?.length > 0 ? virementsRes.data : VIREMENTS_DEFAULT,
-  depensesFixes,
-  investissable,
-  nbMoisMatelas: prefRes.data?.nb_mois_matelas || 6,
-}
+    user,
+    comptes: comptesRes.data?.length > 0 ? comptesRes.data : COMPTES_DEFAULT,
+    virements: virementsRes.data?.length > 0 ? virementsRes.data : VIREMENTS_DEFAULT,
+    depensesFixes,
+    investissable,
+    nbMoisMatelas: prefRes.data?.nb_mois_matelas ?? 6,
+  }
 }
 
 export default function Portefeuille() {
@@ -79,24 +79,25 @@ export default function Portefeuille() {
   const navigate = useNavigate()
   const { showGuide, ouvrirGuide, fermerGuide } = usePageGuide()
 
-const GUIDE_PORTEFEUILLE = [
-  {
-    titre: '🛡️ Définis ton matelas de sécurité',
-    description: 'Choisis entre 3 et 12 mois de dépenses fixes selon ton goût du risque. C\'est ton filet de sécurité — il ne s\'investit jamais. Une fois défini, l\'app t\'indique si tu l\'as atteint ou non.',
-  },
-  {
-    titre: '💳 Ajoute tes comptes',
-    description: 'Livret A, PEA, CTO, assurance-vie... Ajoute tous tes comptes pour visualiser la répartition de ton patrimoine en un coup d\'œil.',
-  },
-  {
-    titre: '📋 Définis ton plan de virement mensuel',
-    description: 'Répartis ton montant investissable (calculé dans Mes Finances) en % sur chaque compte. L\'app calcule automatiquement les montants à virer chaque mois.',
-  },
-  {
-    titre: '✅ Coche tes virements',
-    description: 'Une fois un virement effectué, coche-le. La ligne se raye et tout se remet à jour automatiquement le 1er du mois. Simple, visuel, efficace.',
-  },
-]
+  const GUIDE_PORTEFEUILLE = [
+    {
+      titre: '🛡️ Définis ton matelas de sécurité',
+      description: 'Choisis entre 3 et 12 mois de dépenses fixes selon ton goût du risque. C\'est ton filet de sécurité — il ne s\'investit jamais. Une fois défini, l\'app t\'indique si tu l\'as atteint ou non.',
+    },
+    {
+      titre: '💳 Ajoute tes comptes',
+      description: 'Livret A, PEA, CTO, assurance-vie... Ajoute tous tes comptes pour visualiser la répartition de ton patrimoine en un coup d\'œil.',
+    },
+    {
+      titre: '📋 Définis ton plan de virement mensuel',
+      description: 'Répartis ton montant investissable (calculé dans Mes Finances) en % sur chaque compte. L\'app calcule automatiquement les montants à virer chaque mois.',
+    },
+    {
+      titre: '✅ Coche tes virements',
+      description: 'Une fois un virement effectué, coche-le. La ligne se raye et tout se remet à jour automatiquement le 1er du mois. Simple, visuel, efficace.',
+    },
+  ]
+
   const { isPremium, loading: premiumLoading } = usePremium()
   const queryClient = useQueryClient()
   const canvasRef = useRef(null)
@@ -113,6 +114,7 @@ const GUIDE_PORTEFEUILLE = [
   const [chartReady, setChartReady] = useState(false)
   const [saving, setSaving] = useState(false)
   const [nbMoisMatelas, setNbMoisMatelas] = useState(6)
+  const [nbMoisInitialise, setNbMoisInitialise] = useState(false)
   const [erreurAdd, setErreurAdd] = useState(null)
   const [erreurEdit, setErreurEdit] = useState(null)
   const [succesEdit, setSuccesEdit] = useState(false)
@@ -139,21 +141,20 @@ const GUIDE_PORTEFEUILLE = [
   })
 
   useEffect(() => {
-  const loadPhoto = async () => {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (user) setPhotoUrl(user.user_metadata?.photo_url || null)
-  }
-  loadPhoto()
-}, [])
+    const loadPhoto = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) setPhotoUrl(user.user_metadata?.photo_url || null)
+    }
+    loadPhoto()
+  }, [])
 
-  const [moisInitialise, setMoisInitialise] = useState(false)
-
-useEffect(() => {
-  if (data?.nbMoisMatelas !== undefined && !moisInitialise) {
-    setNbMoisMatelas(data.nbMoisMatelas)
-    setMoisInitialise(true)
-  }
-}, [data?.nbMoisMatelas])
+  // ✅ Initialise nbMoisMatelas UNE SEULE FOIS depuis Supabase
+  useEffect(() => {
+    if (!nbMoisInitialise && data?.nbMoisMatelas !== undefined) {
+      setNbMoisMatelas(data.nbMoisMatelas)
+      setNbMoisInitialise(true)
+    }
+  }, [data])
 
   const initiale = data?.user?.user_metadata?.prenom?.[0]?.toUpperCase() || '?'
 
@@ -277,7 +278,6 @@ useEffect(() => {
     await saveVirements(updated)
   }
 
-  // Handlers plan de virement
   const handleEditVirStart = (i) => {
     setEditingVirIdx(i)
     setEditVirForm({ destination: virements[i].destination, compte: virements[i].compte, pourcentage: virements[i].pourcentage })
@@ -319,38 +319,40 @@ useEffect(() => {
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: t.textMuted, fontSize: 13 }}>Chargement...</div>
     </div>
   )
-if (premiumLoading) return (
-  <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-    <Navbar page="Portefeuille" initiale={initiale} photoUrl={photoUrl} />
-  </div>
-)
 
-if (!isPremium) {
-  return <PremiumModal onClose={() => navigate(-1)} />
-}
+  if (premiumLoading) return (
+    <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <Navbar page="Portefeuille" initiale={initiale} photoUrl={photoUrl} />
+    </div>
+  )
+
+  if (!isPremium) {
+    return <PremiumModal onClose={() => navigate(-1)} />
+  }
+
   return (
     <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar page="Portefeuille" initiale={initiale} photoUrl={photoUrl} />
       <PageGuide
-  pageId="portefeuille"
-  titre="Portefeuille"
-  etapes={GUIDE_PORTEFEUILLE}
-  forceVisible={showGuide}
-  onClose={fermerGuide}
-/>
-<button
-  onClick={ouvrirGuide}
-  style={{
-    position: 'fixed', bottom: 80, right: 16, zIndex: 100,
-    width: 36, height: 36, borderRadius: '50%',
-    background: '#034065', color: '#fff',
-    border: 'none', fontSize: 16, fontWeight: 700,
-    cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
-    display: 'flex', alignItems: 'center', justifyContent: 'center',
-  }}
->
-  ?
-</button>
+        pageId="portefeuille"
+        titre="Portefeuille"
+        etapes={GUIDE_PORTEFEUILLE}
+        forceVisible={showGuide}
+        onClose={fermerGuide}
+      />
+      <button
+        onClick={ouvrirGuide}
+        style={{
+          position: 'fixed', bottom: 80, right: 16, zIndex: 100,
+          width: 36, height: 36, borderRadius: '50%',
+          background: '#034065', color: '#fff',
+          border: 'none', fontSize: 16, fontWeight: 700,
+          cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}
+      >
+        ?
+      </button>
       <div style={{ padding: isMobile ? '16px 12px' : '16px 20px', flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
 
         {succesEdit && <div style={{ background: '#EAF6E4', border: '0.5px solid #4CAF2E', borderRadius: 8, padding: '8px 14px', fontSize: 12, color: '#2E7D1E', fontWeight: 500 }}>✓ Compte mis à jour avec succès !</div>}
@@ -362,11 +364,15 @@ if (!isPremium) {
               <div style={{ fontSize: 13, fontWeight: 500, color: t.text }}>Matelas de sécurité</div>
               <div style={{ fontSize: 11, color: t.textMuted, marginTop: 2 }}>
                 Couvrir{' '}
-                <select value={nbMoisMatelas} onChange={async e => {
-  const val = parseInt(e.target.value)
-  setNbMoisMatelas(val)
-  await supabase.from('profils').update({ nb_mois_matelas: val }).eq('user_id', user.id)
-}} style={{ padding: '2px 6px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }}>
+                <select
+                  value={nbMoisMatelas}
+                  onChange={async e => {
+                    const val = parseInt(e.target.value)
+                    setNbMoisMatelas(val)
+                    if (user) await supabase.from('profils').update({ nb_mois_matelas: val }).eq('user_id', user.id)
+                  }}
+                  style={{ padding: '2px 6px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }}
+                >
                   {[3,4,5,6,7,8,9,10,11,12].map(m => <option key={m} value={m}>{m}</option>)}
                 </select>
                 {' '}mois de dépenses fixes
@@ -584,8 +590,8 @@ if (!isPremium) {
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, minWidth: 680 }}>
               <thead>
                 <tr style={{ background: t.bgSecondary }}>
-                {['', 'Destination', 'Compte bancaire', 'Répartition (%)', 'Montant à virer ce mois', ''].map((h, i) => (
-  <th key={i} style={{ padding: '8px 14px', textAlign: 'left', fontSize: 10, color: t.textMuted, fontWeight: 500, borderBottom: `0.5px solid ${t.border}`, whiteSpace: 'nowrap' }}>{h}</th>
+                  {['', 'Destination', 'Compte bancaire', 'Répartition (%)', 'Montant à virer ce mois', ''].map((h, i) => (
+                    <th key={i} style={{ padding: '8px 14px', textAlign: 'left', fontSize: 10, color: t.textMuted, fontWeight: 500, borderBottom: `0.5px solid ${t.border}`, whiteSpace: 'nowrap' }}>{h}</th>
                   ))}
                 </tr>
               </thead>
