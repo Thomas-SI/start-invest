@@ -47,7 +47,7 @@ const plansData = [
   },
 ]
 
-function PlanCard({ plan, abonnementAnnuel, openSignup }) {
+function PlanCard({ plan, abonnementAnnuel, setAbonnementAnnuel, openSignup }) {
   const [expanded, setExpanded] = useState(false)
   const { nom, recommande, features, pages, prixMensuel, prixAnnuel, periodeMensuel, periodeAnnuel } = plan
   const prix = abonnementAnnuel ? prixAnnuel : prixMensuel
@@ -56,8 +56,16 @@ function PlanCard({ plan, abonnementAnnuel, openSignup }) {
 
   return (
     <div style={{ background: recommande ? '#034065' : '#fff', border: `${recommande ? '2px' : '0.5px'} solid ${recommande ? '#4CAF2E' : '#E0EAE3'}`, borderRadius: 20, padding: '28px 24px', display: 'flex', flexDirection: 'column', position: 'relative', textAlign: 'left' }}>
-      {recommande && <div style={{ position: 'absolute', top: -14, left: '50%', transform: 'translateX(-50%)', background: '#4CAF2E', color: '#fff', fontSize: 11, fontWeight: 600, padding: '4px 16px', borderRadius: 20, whiteSpace: 'nowrap' }}>Recommandé</div>}
       <div style={{ fontSize: 16, fontWeight: 600, color: recommande ? '#fff' : '#034065', marginBottom: 4 }}>{nom}</div>
+      {recommande && (
+  <div style={{ display: 'inline-flex', alignSelf: 'flex-start', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.1)', border: '0.5px solid rgba(255,255,255,0.2)', borderRadius: 30, padding: '4px 6px', marginBottom: 10 }}>
+    <button onClick={() => setAbonnementAnnuel(false)} style={{ padding: '4px 12px', borderRadius: 20, border: 'none', background: !abonnementAnnuel ? '#fff' : 'transparent', color: !abonnementAnnuel ? '#034065' : 'rgba(255,255,255,0.7)', fontSize: 11, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Mensuel</button>
+<button onClick={() => setAbonnementAnnuel(true)} style={{ padding: '4px 12px', borderRadius: 20, border: 'none', background: abonnementAnnuel ? '#fff' : 'transparent', color: abonnementAnnuel ? '#034065' : 'rgba(255,255,255,0.7)', fontSize: 11, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 4 }}>
+  Annuel
+  <span style={{ fontSize: 9, background: '#4CAF2E', color: '#fff', padding: '1px 5px', borderRadius: 10, fontWeight: 600 }}>-29%</span>
+</button>
+  </div>
+)}
       <div style={{ fontSize: 32, fontWeight: 700, color: recommande ? '#fff' : '#034065', marginBottom: 2 }}>{prix}</div>
       <div style={{ fontSize: 11, color: recommande ? 'rgba(255,255,255,0.5)' : '#9CA3AF', marginBottom: recommande ? 4 : 20 }}>{periode}</div>
       {recommande && <div style={{ fontSize: 11, color: '#4CAF2E', fontWeight: 500, marginBottom: 16 }}>15 jours gratuits pour essayer</div>}
@@ -239,7 +247,7 @@ export default function Accueil() {
   const [authOpen, setAuthOpen] = useState(false)
   const [authMode, setAuthMode] = useState('login')
   const [challengesOpen, setChallengesOpen] = useState(false)
-  const [abonnementAnnuel, setAbonnementAnnuel] = useState(false)
+  const [abonnementAnnuel, setAbonnementAnnuel] = useState(true)
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
 
   useEffect(() => {
@@ -470,28 +478,21 @@ useEffect(() => {
       </section>
 
       {/* ABONNEMENT */}
-      <section id="abonnement" style={{ padding: isMobile ? '60px 16px 50px' : '100px 40px 80px', background: '#F4F7F5', textAlign: 'center' }}>
-        <div style={{ maxWidth: 820, margin: '0 auto' }}>
-          <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 16, background: '#EAF6E4', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Rejoignez-nous</div>
-          <h2 style={{ fontSize: isMobile ? 26 : 34, fontWeight: 700, color: '#034065', lineHeight: 1.3, margin: '0 0 16px' }}>
-            Ne laissez plus jamais <span style={{ color: '#4CAF2E' }}>votre argent dormir.</span>
-          </h2>
-          <p style={{ fontSize: isMobile ? 13 : 14, color: '#9CA3AF', lineHeight: 1.8, margin: '0 0 8px' }}>Trouvez votre façon de faire de l'argent en dormant.</p>
-          <p style={{ fontSize: 13, color: '#4CAF2E', fontWeight: 500, margin: '0 0 32px' }}>Essayez gratuitement pendant 15 jours</p>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 0, background: '#fff', border: '0.5px solid #E0EAE3', borderRadius: 30, padding: '4px', marginBottom: 40 }}>
-            <button onClick={() => setAbonnementAnnuel(false)} style={{ padding: '7px 20px', borderRadius: 20, border: 'none', background: !abonnementAnnuel ? '#034065' : 'transparent', color: !abonnementAnnuel ? '#fff' : '#9CA3AF', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' }}>Mensuel</button>
-            <button onClick={() => setAbonnementAnnuel(true)} style={{ padding: '7px 20px', borderRadius: 20, border: 'none', background: abonnementAnnuel ? '#034065' : 'transparent', color: abonnementAnnuel ? '#fff' : '#9CA3AF', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s', display: 'flex', alignItems: 'center', gap: 6 }}>
-              Annuel
-              <span style={{ fontSize: 9, background: '#4CAF2E', color: '#fff', padding: '2px 6px', borderRadius: 10, fontWeight: 600 }}>-29%</span>
-            </button>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 20 }}>
-            {plansData.map(plan => (
-              <PlanCard key={plan.id} plan={plan} abonnementAnnuel={abonnementAnnuel} openSignup={openSignup} />
-            ))}
-          </div>
-        </div>
-      </section>
+<section id="abonnement" style={{ padding: isMobile ? '60px 16px 50px' : '100px 40px 80px', background: '#F4F7F5', textAlign: 'center' }}>
+  <div style={{ maxWidth: 820, margin: '0 auto' }}>
+    <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 16, background: '#EAF6E4', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Rejoignez-nous</div>
+    <h2 style={{ fontSize: isMobile ? 26 : 34, fontWeight: 700, color: '#034065', lineHeight: 1.3, margin: '0 0 16px' }}>
+      Ne laissez plus jamais <span style={{ color: '#4CAF2E' }}>votre argent dormir.</span>
+    </h2>
+    <p style={{ fontSize: isMobile ? 13 : 14, color: '#9CA3AF', lineHeight: 1.8, margin: '0 0 8px' }}>Trouvez votre façon de faire de l'argent en dormant.</p>
+    <p style={{ fontSize: 13, color: '#4CAF2E', fontWeight: 500, margin: '0 0 32px' }}>Essayez gratuitement pendant 15 jours</p>
+    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 20 }}>
+      {plansData.map(plan => (
+        <PlanCard key={plan.id} plan={plan} abonnementAnnuel={abonnementAnnuel} setAbonnementAnnuel={setAbonnementAnnuel} openSignup={openSignup} />
+      ))}
+    </div>
+  </div>
+</section>
 
       {/* SOCIAL */}
 <section style={{ background: '#fff', borderTop: '0.5px solid #E0EAE3', padding: isMobile ? '40px 16px' : '60px 40px', textAlign: 'center' }}>

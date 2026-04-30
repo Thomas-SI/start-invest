@@ -148,7 +148,7 @@ function FaqItem({ question, reponse }) {
   )
 }
 export default function AbonnementPublic() {
-  const [annuel, setAnnuel] = useState(false)
+  const [annuel, setAnnuel] = useState(true)
   const [authOpen, setAuthOpen] = useState(false)
   const [authMode, setAuthMode] = useState('login')
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
@@ -200,13 +200,6 @@ export default function AbonnementPublic() {
     ))}
   </div>
 </div>
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 0, background: '#fff', border: '0.5px solid #E0EAE3', borderRadius: 30, padding: '4px', marginBottom: isMobile ? 36 : 48 }}>
-          <button onClick={() => setAnnuel(false)} style={{ padding: '7px 20px', borderRadius: 20, border: 'none', background: !annuel ? '#034065' : 'transparent', color: !annuel ? '#fff' : '#9CA3AF', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' }}>Mensuel</button>
-          <button onClick={() => setAnnuel(true)} style={{ padding: '7px 20px', borderRadius: 20, border: 'none', background: annuel ? '#034065' : 'transparent', color: annuel ? '#fff' : '#9CA3AF', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s', display: 'flex', alignItems: 'center', gap: 6 }}>
-            Annuel
-            <span style={{ fontSize: 9, background: '#4CAF2E', color: '#fff', padding: '2px 6px', borderRadius: 10, fontWeight: 600 }}>-29%</span>
-          </button>
-        </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 20, maxWidth: 720, margin: '0 auto' }}>
 
@@ -232,9 +225,15 @@ export default function AbonnementPublic() {
 
           {/* PREMIUM */}
           <div style={{ background: '#034065', border: '2px solid #4CAF2E', borderRadius: 20, padding: isMobile ? '28px 22px' : '32px 28px', textAlign: 'left', position: 'relative' }}>
-            <div style={{ position: 'absolute', top: -14, left: '50%', transform: 'translateX(-50%)', background: '#4CAF2E', color: '#fff', fontSize: 11, fontWeight: 600, padding: '4px 16px', borderRadius: 20, whiteSpace: 'nowrap' }}>Recommandé</div>
             <div style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.6)', marginBottom: 8 }}>Premium</div>
-            <div style={{ fontSize: 36, fontWeight: 700, color: '#fff', marginBottom: 4 }}>{annuel ? '67 euros' : '7.99 euros'}</div>
+<div style={{ display: 'inline-flex', alignSelf: 'flex-start', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.1)', border: '0.5px solid rgba(255,255,255,0.2)', borderRadius: 30, padding: '4px 6px', marginBottom: 10 }}>
+  <button onClick={() => setAnnuel(false)} style={{ padding: '4px 12px', borderRadius: 20, border: 'none', background: !annuel ? '#fff' : 'transparent', color: !annuel ? '#034065' : 'rgba(255,255,255,0.7)', fontSize: 11, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' }}>Mensuel</button>
+  <button onClick={() => setAnnuel(true)} style={{ padding: '4px 12px', borderRadius: 20, border: 'none', background: annuel ? '#fff' : 'transparent', color: annuel ? '#034065' : 'rgba(255,255,255,0.7)', fontSize: 11, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s', display: 'flex', alignItems: 'center', gap: 4 }}>
+    Annuel
+    <span style={{ fontSize: 9, background: '#4CAF2E', color: '#fff', padding: '1px 5px', borderRadius: 10, fontWeight: 600 }}>-29%</span>
+  </button>
+</div>
+<div style={{ fontSize: 36, fontWeight: 700, color: '#fff', marginBottom: 4 }}>{annuel ? '67 euros' : '7.99 euros'}</div>
             <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', marginBottom: 4 }}>{annuel ? 'facture en une fois par an' : 'par mois'}</div>
             <div style={{ fontSize: 11, color: '#4CAF2E', fontWeight: 500, marginBottom: 24 }}>15 jours gratuits pour essayer</div>
             <div style={{ borderTop: '0.5px solid rgba(255,255,255,0.1)', paddingTop: 20, marginBottom: 24 }}>
