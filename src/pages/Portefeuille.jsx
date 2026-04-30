@@ -113,7 +113,7 @@ export default function Portefeuille() {
   const [newObjectif, setNewObjectif] = useState('')
   const [chartReady, setChartReady] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [nbMoisMatelas, setNbMoisMatelas] = useState(6)
+  const [nbMoisMatelas, setNbMoisMatelas] = useState(null)
   const [erreurAdd, setErreurAdd] = useState(null)
   const [erreurEdit, setErreurEdit] = useState(null)
   const [succesEdit, setSuccesEdit] = useState(false)
@@ -153,7 +153,8 @@ export default function Portefeuille() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
     const { data } = await supabase.from('profils').select('nb_mois_matelas').eq('user_id', user.id).single()
-    if (data?.nb_mois_matelas) setNbMoisMatelas(data.nb_mois_matelas)
+    if (data?.nb_mois_matelas != null) setNbMoisMatelas(data.nb_mois_matelas)
+else setNbMoisMatelas(6)
   }
   chargerMois()
 }, [])
@@ -366,20 +367,22 @@ export default function Portefeuille() {
               <div style={{ fontSize: 13, fontWeight: 500, color: t.text }}>Matelas de sécurité</div>
               <div style={{ fontSize: 11, color: t.textMuted, marginTop: 2 }}>
                 Couvrir{' '}
-                <select
-                  value={nbMoisMatelas}
-                  onChange={async e => {
-                    const val = parseInt(e.target.value)
-                    setNbMoisMatelas(val)
-                    if (user) await supabase.from('profils').update({ nb_mois_matelas: val }).eq('user_id', user.id)
-                  }}
-                  style={{ padding: '2px 6px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }}
-                >
-                  {[3,4,5,6,7,8,9,10,11,12].map(m => <option key={m} value={m}>{m}</option>)}
-                </select>
-                {' '}mois de dépenses fixes
-              </div>
-            </div>
+                {nbMoisMatelas !== null ? (
+  <select
+    value={nbMoisMatelas}
+    onChange={async e => {
+      const val = parseInt(e.target.value)
+      setNbMoisMatelas(val)
+      if (user) await supabase.from('profils').update({ nb_mois_matelas: val }).eq('user_id', user.id)
+    }}
+    style={{ padding: '2px 6px', borderRadius: 5, border: `0.5px solid ${t.border}`, fontSize: 11, fontFamily: 'inherit', outline: 'none', background: t.bgSecondary, color: t.text }}
+  >
+    {[3,4,5,6,7,8,9,10,11,12].map(m => <option key={m} value={m}>{m}</option>)}
+  </select>
+) : <span style={{ fontSize: 11, color: t.textMuted }}>...</span>}
+{' '}mois de dépenses fixes
+</div>
+</div>
             <div style={{ textAlign: isMobile ? 'left' : 'right' }}>
               <div style={{ fontSize: 18, fontWeight: 500, color: remplissageMatelas >= 100 ? '#4CAF2E' : t.text }}>{totalSecurite.toLocaleString('fr-FR')} €</div>
               <div style={{ fontSize: 11, color: t.textMuted }}>sur {objectifMatelas.toLocaleString('fr-FR')} € objectif</div>
