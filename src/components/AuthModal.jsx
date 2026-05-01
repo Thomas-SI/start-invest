@@ -2,6 +2,23 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 
+const DOMAINES_JETABLES = [
+  'yopmail.com', 'yopmobile.fr', 'mailinator.com', 'guerrillamail.com',
+  'tempmail.com', 'throwaway.email', 'sharklasers.com', 'guerrillamailblock.com',
+  'grr.la', 'guerrillamail.info', 'spam4.me', 'trashmail.com', 'trashmail.me',
+  'dispostable.com', 'mailnull.com', 'spamgourmet.com', 'maildrop.cc',
+  'fakeinbox.com', 'getairmail.com', 'filzmail.com', 'throwam.com',
+  'tempr.email', 'discard.email', 'spamherelots.com', 'mailnew.com',
+  'tempinbox.com', '10minutemail.com', 'minutemail.com', 'temp-mail.org',
+  'emailondeck.com', 'moakt.com', 'mailnesia.com', 'mailnull.com',
+  'spamgourmet.net', 'trashmail.at', 'trashmail.io', 'trashmail.net',
+  'spambox.us', 'spamfree24.org', 'spamgourmet.com', 'spamhole.com',
+  'spamify.com', 'spammotel.com', 'spaml.com', 'spamoff.de',
+  'tempmail.net', 'tempomail.fr', 'temporarymail.com', 'throwam.com',
+  'jetable.fr.nf', 'jetable.net', 'jetable.org', 'jetable.pp.ua',
+  'nospam.ze.tc', 'notsharingmy.info', 'nowmymail.com',
+]
+
 export default function AuthModal({ onClose, defaultMode = 'login' }) {
   const navigate = useNavigate()
   const [mode, setMode] = useState(defaultMode)
@@ -28,6 +45,13 @@ export default function AuthModal({ onClose, defaultMode = 'login' }) {
 
   const handleSignup = async () => {
     if (!prenom.trim()) { setError('Le prénom est requis.'); return }
+
+    const domaine = email.split('@')[1]?.toLowerCase()
+    if (DOMAINES_JETABLES.includes(domaine)) {
+      setError('Les adresses email temporaires ne sont pas acceptées.')
+      return
+    }
+
     setLoading(true)
     setError('')
     const { error } = await supabase.auth.signUp({
@@ -122,11 +146,11 @@ export default function AuthModal({ onClose, defaultMode = 'login' }) {
               <div>
                 <label style={{ fontSize: 12, fontWeight: 500, color: '#6B7280', display: 'block', marginBottom: 6 }}>Mot de passe</label>
                 <div style={{ position: 'relative' }}>
-  <input type={showPassword ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" onKeyDown={e => e.key === 'Enter' && (mode === 'login' ? handleLogin() : handleSignup())} style={{ ...inputStyle, paddingRight: 40 }} />
-  <button onClick={() => setShowPassword(v => !v)} type="button" style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#9CA3AF', fontSize: 16, padding: 0 }}>
-    {showPassword ? '🙈' : '👁️'}
-  </button>
-</div>
+                  <input type={showPassword ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" onKeyDown={e => e.key === 'Enter' && (mode === 'login' ? handleLogin() : handleSignup())} style={{ ...inputStyle, paddingRight: 40 }} />
+                  <button onClick={() => setShowPassword(v => !v)} type="button" style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#9CA3AF', fontSize: 16, padding: 0 }}>
+                    {showPassword ? '🙈' : '👁️'}
+                  </button>
+                </div>
                 {mode === 'login' && (
                   <div style={{ textAlign: 'right', marginTop: 6 }}>
                     <span onClick={handleResetPassword} style={{ fontSize: 12, color: '#4CAF2E', cursor: 'pointer' }}>
