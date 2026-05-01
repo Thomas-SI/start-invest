@@ -303,19 +303,18 @@ useEffect(() => {
   useEffect(() => { chargerAmis() }, [userId])
 
   const rechercherPseudo = async (val) => {
-    const terme = (val ?? recherche).trim()
-    if (!terme || terme === monPseudo) { setResultatsRecherche([]); return }
-    if (terme.length < 2) { setResultatsRecherche([]); return }
-    setSearching(true)
-    const { data } = await supabase
-      .from('profils')
-      .select('user_id, pseudo')
-      .ilike('pseudo', `%${terme}%`)
-      .neq('user_id', userId)
-      .limit(5)
-    setResultatsRecherche(data || [])
-    setSearching(false)
-  }
+  const terme = (val ?? recherche).trim()
+  if (!terme || terme === monPseudo) { setResultatsRecherche([]); return }
+  setSearching(true)
+  const { data } = await supabase
+    .from('profils')
+    .select('user_id, pseudo')
+    .eq('pseudo', terme)
+    .neq('user_id', userId)
+    .limit(1)
+  setResultatsRecherche(data || [])
+  setSearching(false)
+}
 
   const envoyerDemande = async (amiId) => {
     setActionLoading(amiId)
