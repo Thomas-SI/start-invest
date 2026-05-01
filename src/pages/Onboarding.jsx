@@ -316,6 +316,7 @@ export default function Onboarding() {
   }, [pseudo])
 
   const handleSubmit = async () => {
+    console.log('🔥 handleSubmit appelé !')
     if (loading) return
     if (!prenom.trim() || !nom.trim() || !metier.trim()) {
       setErreur('Veuillez remplir tous les champs obligatoires.')
@@ -345,7 +346,25 @@ export default function Onboarding() {
         }).eq('user_id', user.id)
       }
 
-      navigate('/dashboard')
+      // Envoi email de bienvenue
+try {
+  console.log('🚀 Envoi email bienvenue...')
+  const { data: { user: currentUser } } = await supabase.auth.getUser()
+  console.log('📧 Email:', currentUser?.email)
+  const res = await fetch('https://ylxxdhwakdtmidtqpacj.supabase.co/functions/v1/welcome-email', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      prenom: prenom.trim(),
+      email: currentUser.email,
+    }),
+  })
+  console.log('✅ Réponse:', res.status)
+} catch (e) {
+  console.error('❌ Erreur:', e)
+}
+
+navigate('/dashboard')
     } catch (e) {
       setErreur(e.message)
     } finally {
