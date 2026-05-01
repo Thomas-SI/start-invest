@@ -14,9 +14,11 @@ export default function AuthCallback() {
       if (token_hash && type) {
         const { error } = await supabase.auth.verifyOtp({ token_hash, type })
         if (!error) {
-          navigate('/dashboard', { replace: true })
-          return
-        }
+  const { data: { user } } = await supabase.auth.getUser()
+  const onboardingDone = user?.user_metadata?.onboarding_done
+  navigate(onboardingDone ? '/dashboard' : '/onboarding', { replace: true })
+  return
+}
       }
 
       // Fallback si pas de token
