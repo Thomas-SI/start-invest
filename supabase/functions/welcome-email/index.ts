@@ -1,15 +1,23 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+
 serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders })
+  }
+
   try {
     const { prenom, email } = await req.json()
 
-    const html = `
-<!DOCTYPE html>
+    const html = `<!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"></head>
 <body style="font-family: inherit; background: #F4F7F5; padding: 40px 20px;">
-  <div style="max-width: 600px; margin: 0 auto; background: #fff; borderRadius: 16px; padding: 40px; border: 0.5px solid #E0EAE3;">
+  <div style="max-width: 600px; margin: 0 auto; background: #fff; border-radius: 16px; padding: 40px; border: 0.5px solid #E0EAE3;">
     
     <img src="https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/IMG_2819.jpeg" alt="Start Invest" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; display: block; margin: 0 auto 24px;" />
 
@@ -53,8 +61,7 @@ serve(async (req) => {
     <p style="font-size: 11px; color: #9CA3AF; text-align: center; margin-top: 16px;">Start Invest · start-invest.fr<br/>Tu reçois cet email car tu viens de créer un compte.</p>
   </div>
 </body>
-</html>
-`
+</html>`
 
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -65,7 +72,7 @@ serve(async (req) => {
       body: JSON.stringify({
         from: 'Thomas de Start Invest <thomas@start-invest.fr>',
         to: email,
-        subject: `Bienvenue ${prenom}, ton aventure commence maintenant !`,
+        subject: `Bienvenue ${prenom}, ton aventure commence maintenant 🚀`,
         html,
       }),
     })
@@ -75,8 +82,13 @@ serve(async (req) => {
       throw new Error(`Resend error: ${err}`)
     }
 
-    return new Response(JSON.stringify({ ok: true }), { headers: { 'Content-Type': 'application/json' } })
+    return new Response(JSON.stringify({ ok: true }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    })
   } catch (e) {
-    return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: { 'Content-Type': 'application/json' } })
+    return new Response(JSON.stringify({ error: e.message }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    })
   }
 })
