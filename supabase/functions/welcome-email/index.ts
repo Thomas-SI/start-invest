@@ -21,25 +21,25 @@ serve(async (req) => {
 
     <hr style="border: none; border-top: 0.5px solid #E0EAE3; margin: 28px 0;" />
 
-    <p style="font-size: 15px; font-weight: 600; color: #034065;">1. Pose les bases — Mes Finances</p>
+    <p style="font-size: 15px; font-weight: 600; color: #034065;">1. Pose les bases | Mes Finances</p>
     <p style="font-size: 14px; color: #6B7280; line-height: 1.8;">Avant tout, prends 1 heure pour toi. Assieds-toi, ouvre l'application, et rentre tes revenus et tes dépenses aussi précisément que possible. Start Invest a fait le choix de ne pas se connecter à ta banque, volontairement. Parce que taper ces chiffres manuellement, c'est prendre pleine conscience de là où part ton argent. Et cette prise de conscience, elle change tout.</p>
     <p style="font-size: 13px; color: #034065; font-style: italic; border-left: 3px solid #4CAF2E; padding-left: 12px; margin: 20px 0;">"Le seul risque que l'on prend, c'est que ça puisse changer notre vie."</p>
 
     <hr style="border: none; border-top: 0.5px solid #E0EAE3; margin: 28px 0;" />
 
-    <p style="font-size: 15px; font-weight: 600; color: #034065;">2. Forme-toi — Le Guide</p>
+    <p style="font-size: 15px; font-weight: 600; color: #034065;">2. Forme-toi | Le Guide</p>
     <p style="font-size: 14px; color: #6B7280; line-height: 1.8;">Une fois tes finances posées, direction le Guide. 23 fiches rédigées sans jargon pour comprendre l'investissement, éviter les erreurs classiques et savoir exactement où et comment investir selon ton profil. L'investissement ne s'improvise pas, il se prépare.</p>
     <p style="font-size: 13px; color: #034065; font-style: italic; border-left: 3px solid #4CAF2E; padding-left: 12px; margin: 20px 0;">"L'exercice du talent, c'est le travail."</p>
 
     <hr style="border: none; border-top: 0.5px solid #E0EAE3; margin: 28px 0;" />
 
-    <p style="font-size: 15px; font-weight: 600; color: #034065;">3. Passe à l'action — Premium</p>
+    <p style="font-size: 15px; font-weight: 600; color: #034065;">3. Passe à l'action | Premium</p>
     <p style="font-size: 14px; color: #6B7280; line-height: 1.8;">Si tu te sens aligné(e) avec ta stratégie, la formule Premium va t'accompagner pas à pas. Rentre tes comptes d'investissement, suis tes achats ligne par ligne, et regarde ta croissance s'accélérer sur le long terme grâce aux intérêts composés. Chaque mois qui passe travaille pour toi.</p>
     <p style="font-size: 13px; color: #034065; font-style: italic; border-left: 3px solid #4CAF2E; padding-left: 12px; margin: 20px 0;">"Le lâche ne commence jamais, le faible ne termine jamais, et le gagnant n'abandonne jamais."</p>
 
     <hr style="border: none; border-top: 0.5px solid #E0EAE3; margin: 28px 0;" />
 
-    <p style="font-size: 15px; font-weight: 600; color: #034065;">4. Reste dans la course — Challenges</p>
+    <p style="font-size: 15px; font-weight: 600; color: #034065;">4. Reste dans la course | Challenges</p>
     <p style="font-size: 14px; color: #6B7280; line-height: 1.8;">La vraie bataille, ce n'est pas de bien démarrer. C'est de tenir. Les challenges sont là pour ça : garder ta discipline à toute épreuve, ne jamais douter de ta stratégie, et avancer avec tes amis. Parce que la motivation collective, ça change la donne.</p>
     <p style="font-size: 13px; color: #034065; font-style: italic; border-left: 3px solid #4CAF2E; padding-left: 12px; margin: 20px 0;">"Le secret de la réussite n'est pas la vitesse, mais la constance."</p>
 
@@ -49,7 +49,7 @@ serve(async (req) => {
 
     <a href="https://start-invest.fr/dashboard" style="display: block; width: fit-content; margin: 24px auto; background: #4CAF2E; color: #fff; padding: 14px 32px; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 14px;">Accéder à mon dashboard</a>
 
-    <p style="font-size: 13px; color: #6B7280; text-align: center; margin-top: 32px;">À très vite,<br/><strong style="color: #034065;">Thomas — Fondateur de Start Invest</strong></p>
+    <p style="font-size: 13px; color: #6B7280; text-align: center; margin-top: 32px;">À très vite,<br/><strong style="color: #034065;">Thomas | Fondateur de Start Invest</strong></p>
     <p style="font-size: 11px; color: #9CA3AF; text-align: center; margin-top: 16px;">Start Invest · start-invest.fr<br/>Tu reçois cet email car tu viens de créer un compte.</p>
   </div>
 </body>
@@ -65,7 +65,7 @@ serve(async (req) => {
       body: JSON.stringify({
         from: 'Thomas de Start Invest <thomas@start-invest.fr>',
         to: email,
-        subject: `Bienvenue ${prenom}, ton aventure commence maintenant 🚀`,
+        subject: `Bienvenue ${prenom}, ton aventure commence maintenant !`,
         html,
       }),
     })
