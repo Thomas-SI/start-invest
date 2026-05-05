@@ -156,7 +156,21 @@ export default function QuestionnaireFinances({ onComplete }) {
       }
       if (existing) await supabase.from('finances').update(payload).eq('user_id', userId)
       else await supabase.from('finances').insert(payload)
-
+      
+      // Mettre à jour la table depenses
+if (depensesFixes > 0 || depensesVariables > 0) {
+  await supabase.from('depenses').delete().eq('user_id', userId)
+  const toInsert = []
+  if (depensesFixes > 0) {
+    toInsert.push({ user_id: userId, type: 'fixes', categorie: 'Loyer / Prêt', montant: depensesFixes })
+  }
+  if (depensesVariables > 0) {
+    toInsert.push({ user_id: userId, type: 'variables', categorie: 'Sorties', montant: depensesVariables })
+  }
+  if (toInsert.length > 0) {
+    await supabase.from('depenses').insert(toInsert)
+  }
+}
       // Mettre à jour profil
       await supabase.from('profils').update({
         questionnaire_step: 5,
