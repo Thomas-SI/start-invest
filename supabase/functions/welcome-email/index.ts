@@ -24,9 +24,9 @@ serve(async (req) => {
     <p style="font-size: 16px; color: #034065; font-weight: 600;">Salut ${prenom},</p>
     <p style="font-size: 14px; color: #6B7280; line-height: 1.8;">Tu es là. Et ça, c'est déjà tout.</p>
     <p style="font-size: 14px; color: #6B7280; line-height: 1.8;">Beaucoup parlent d'investir. Peu passent à l'action. Toi, tu viens de franchir ce cap et ce n'est pas un hasard. Start Invest est né pour les gens comme toi : ceux qui ont décidé de construire quelque chose, euro par euro, mois après mois, sans se laisser dépasser par le temps qui passe.</p>
+    <p style="font-size: 14px; color: #6B7280; line-height: 1.8;">Pour bien démarrer, un court questionnaire t'attend dans l'application. En quelques réponses, il permet à l'IA d'analyser ton profil financier et de te donner un premier bilan personnalisé — tes forces, tes axes d'amélioration, et les premières actions concrètes adaptées à ta situation. Plus tu utilises l'application, plus l'analyse s'affine et devient précise. C'est ton coach financier personnel, qui apprend à te connaître.</p>
     <p style="font-size: 14px; color: #6B7280; line-height: 1.8;">L'application ne va pas tout faire à ta place. Elle va t'aider à rester discipliné(e), à te challenger, à progresser et à ne jamais perdre de vue pourquoi tu as commencé.</p>
     <p style="font-size: 13px; color: #034065; font-style: italic; border-left: 3px solid #4CAF2E; padding-left: 12px; margin: 20px 0;">"La seule personne à dépasser, c'est celle que tu étais hier."</p>
-
     <hr style="border: none; border-top: 0.5px solid #E0EAE3; margin: 28px 0;" />
 
     <p style="font-size: 15px; font-weight: 600; color: #034065;">1. Pose les bases | Mes Finances</p>
