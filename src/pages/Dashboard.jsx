@@ -7,6 +7,7 @@ import FooterApp from '../components/FooterApp'
 import { useTheme } from '../lib/ThemeContext'
 import PageGuide from '../components/PageGuide'
 import { usePageGuide } from '../lib/usePageGuide'
+import QuestionnaireFinances from '../components/QuestionnaireFinances'
 
 const moisListe = ['Mensuel', 'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
 const categoriesListe = ['Logement', 'Véhicules', 'Santé', 'Impôts', 'Assurances', 'Autres']
@@ -189,50 +190,84 @@ const fetchDashboardData = async () => {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Non connecté')
 
-  const [finRes, depRes, echRes, revRes] = await Promise.all([
+  const [finRes, depRes, echRes, revRes, profilRes] = await Promise.all([
     supabase.from('finances').select('*').eq('user_id', user.id).single(),
     supabase.from('depenses').select('*').eq('user_id', user.id),
     supabase.from('echeances').select('*').eq('user_id', user.id),
     supabase.from('revenus').select('*').eq('user_id', user.id).order('created_at', { ascending: true }),
+    supabase.from('profils').select('questionnaire_done, analyse_ia').eq('user_id', user.id).single(),
   ])
 
   return {
-    user,
-    finances: finRes.data || { revenus: 0, autre_revenu: 0, depenses_fixes: 0, depenses_variables: 0 },
-    depenses: depRes.data || [],
-    echeances: echRes.data || [],
-    revenus: revRes.data || [],
-  }
+  user,
+  finances: finRes.data || { revenus: 0, autre_revenu: 0, depenses_fixes: 0, depenses_variables: 0 },
+  depenses: depRes.data || [],
+  echeances: echRes.data || [],
+  revenus: revRes.data || [],
+  questionnaireDone: profilRes.data?.questionnaire_done || false,
+  analyseIAData: profilRes.data?.analyse_ia || null,
+}
 }
 
 export default function Dashboard() {
   const navigate = useNavigate()
   const t = useTheme()
   const { showGuide, ouvrirGuide, fermerGuide } = usePageGuide()
+  const queryClient = useQueryClient()
 
-const GUIDE_FINANCES = [
+  const GUIDE_FINANCES = [
   {
-    titre: '⏱️ Prends 1h pour tout saisir',
-    description: 'Une fois que c\'est fait, tu n\'auras plus besoin de consacrer du temps à cette tâche, juste quelques petits ajustements. Rentre tes revenus et dépenses au plus juste. L\'app est volontairement sans connexion bancaire, pour que tu gardes le contrôle total et que tu prennes vraiment conscience de tes habitudes.',
+    titre: '🎯 Commence par te poser',
+    description: 'Un questionnaire rapide va t\'accueillir pour rentrer tes informations de base. Plus tu es précis, plus l\'analyse sera pertinente. Prends 10 minutes pour bien démarrer.',
+  },
+  {
+    titre: '⏱️ Affine tes finances',
+    description: 'Rentre tes revenus et dépenses au plus juste. L\'application est volontairement sans connexion bancaire, pour que tu prennes vraiment conscience de là où part ton argent chaque mois.',
   },
   {
     titre: '📅 Ajoute tes échéances annuelles',
-    description: 'Assurance, impôts, abonnements annuels... Indique le mois où ça tombe. L\'app te rappellera un mois avant pour que tu ne sois jamais surpris.',
+    description: 'Assurance, impôts, abonnements annuels... Indique le mois où ça tombe. L\'application te rappellera un mois avant pour que tu ne sois jamais surpris.',
   },
   {
-    titre: '📊 Découvre ta règle 50/30/20',
-    description: 'Avec tes vraies données, tu vois exactement combien tu peux investir chaque mois. Ce chiffre sera utilisé sur toutes les autres pages.',
-  },
-  {
-    titre: '📈 Visualise ton futur',
-    description: 'La courbe de croissance te montre ce que ton épargne mensuelle peut devenir sur 10, 20 ou 30 ans. Le temps est ton meilleur allié.',
+    titre: '🧠 Ton analyse personnalisée',
+    description: 'Une fois tes données renseignées, l\'IA génère un bilan personnalisé avec des recommandations concrètes adaptées à ton profil et ton objectif. Plus tu utilises l\'application, plus l\'analyse s\'affine.',
   },
 ]
-  const queryClient = useQueryClient()
 
+  // 1. Tous les useState
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
   const [photoUrl, setPhotoUrl] = useState(null)
+  const [showModalRevenu, setShowModalRevenu] = useState(false)
+  const [showModalDepenses, setShowModalDepenses] = useState(false)
+  const [formRevenu, setFormRevenu] = useState({ revenus: '', autre_revenu: '' })
+  const [formEch, setFormEch] = useState({ categorie: '', libelle: '', mois: '', montant_annuel: '' })
+  const [loading, setLoading] = useState(false)
+  const [erreurRevenu, setErreurRevenu] = useState(null)
+  const [erreurDepenses, setErreurDepenses] = useState(null)
+  const [erreurEcheance, setErreurEcheance] = useState(null)
+  const [succesRevenu, setSuccesRevenu] = useState(false)
+  const [succesDepenses, setSuccesDepenses] = useState(false)
+  const [showAddEch, setShowAddEch] = useState(false)
+  const [editingId, setEditingId] = useState(null)
+  const [editForm, setEditForm] = useState({ libelle: '', mois: '', montant_annuel: '' })
+  const [showSimulateur, setShowSimulateur] = useState(false)
+  const [showQuestionnaire, setShowQuestionnaire] = useState(false)
+  const [questionnaireDone, setQuestionnaireDone] = useState(null)
+  const [formRevenus, setFormRevenus] = useState([])
+  const [newRevenuLibelle, setNewRevenuLibelle] = useState('')
+  const [newRevenuMontant, setNewRevenuMontant] = useState('')
+  const [analyseIA, setAnalyseIA] = useState(null)
+  const [analyseLoading, setAnalyseLoading] = useState(false)
 
+  // 2. useQuery
+  const { data, isLoading } = useQuery({
+    queryKey: ['dashboard'],
+    queryFn: fetchDashboardData,
+    refetchOnMount: true,
+    staleTime: 0,
+  })
+
+  // 3. Tous les useEffect
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768)
     window.addEventListener('resize', handleResize)
@@ -240,17 +275,48 @@ const GUIDE_FINANCES = [
   }, [])
 
   useEffect(() => {
-  const loadPhoto = async () => {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (user) setPhotoUrl(user.user_metadata?.photo_url || null)
-  }
-  loadPhoto()
-}, [])
+    const loadPhoto = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) setPhotoUrl(user.user_metadata?.photo_url || null)
+    }
+    loadPhoto()
+  }, [])
 
-  const { data, isLoading } = useQuery({
-    queryKey: ['dashboard'],
-    queryFn: fetchDashboardData,
-  })
+  useEffect(() => {
+  if (data === undefined) return
+  console.log('useEffect data:', data?.questionnaireDone)
+  setQuestionnaireDone(data.questionnaireDone ?? false)
+  
+  if (data.analyseIAData) {
+    try {
+      setAnalyseIA(JSON.parse(data.analyseIAData))
+    } catch (e) {}
+  } else if (data.questionnaireDone) {
+    const loadUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) genererAnalyse(user.id)
+    }
+    loadUser()
+  }
+}, [data])
+
+  // 4. Fonctions
+  const genererAnalyse = async (userId) => {
+    setAnalyseLoading(true)
+    try {
+      const res = await fetch('https://ylxxdhwakdtmidtqpacj.supabase.co/functions/v1/analyse-ia', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: userId }),
+      })
+      const data = await res.json()
+      if (data.analyse) setAnalyseIA(data.analyse)
+    } catch (e) {
+      console.error('Erreur analyse IA:', e)
+    } finally {
+      setAnalyseLoading(false)
+    }
+  }
 
   const user = data?.user || null
   const finances = data?.finances || { revenus: 0, autre_revenu: 0, depenses_fixes: 0, depenses_variables: 0 }
@@ -275,26 +341,21 @@ const depensesFixesDetail = data?.depenses?.length > 0
   const depensesVariablesDetail = data?.depenses?.length > 0
     ? data.depenses.filter(d => d.type === 'variables').map(d => ({ categorie: d.categorie, montant: d.montant, defaut: DEPENSES_VARIABLES_DEFAULT.some(dv => dv.categorie === d.categorie) }))
     : DEPENSES_VARIABLES_DEFAULT
-
-  const [showModalRevenu, setShowModalRevenu] = useState(false)
-  const [showModalDepenses, setShowModalDepenses] = useState(false)
-  const [formRevenu, setFormRevenu] = useState({ revenus: '', autre_revenu: '' })
-  const [formEch, setFormEch] = useState({ categorie: '', libelle: '', mois: '', montant_annuel: '' })
-  const [loading, setLoading] = useState(false)
-  const [erreurRevenu, setErreurRevenu] = useState(null)
-  const [erreurDepenses, setErreurDepenses] = useState(null)
-  const [erreurEcheance, setErreurEcheance] = useState(null)
-  const [succesRevenu, setSuccesRevenu] = useState(false)
-  const [succesDepenses, setSuccesDepenses] = useState(false)
-  const [showAddEch, setShowAddEch] = useState(false)
-  const [editingId, setEditingId] = useState(null)
-  const [editForm, setEditForm] = useState({ libelle: '', mois: '', montant_annuel: '' })
-  const [showSimulateur, setShowSimulateur] = useState(false)
-  const [formRevenus, setFormRevenus] = useState([])
-  const [newRevenuLibelle, setNewRevenuLibelle] = useState('')
-  const [newRevenuMontant, setNewRevenuMontant] = useState('')
+ 
+useEffect(() => {
+  if (data) {
+    setQuestionnaireDone(data.questionnaireDone)
+    if (data.analyseIAData) {
+      try {
+        setAnalyseIA(JSON.parse(data.analyseIAData))
+      } catch (e) {}
+    }
+  }
+}, [data])
 
   const revenus = data?.revenus || []
+  const questionnaireDoneFromData = data?.questionnaireDone || false
+const analyseIAFromData = data?.analyseIAData || null
 const totalRevenus = revenus.length > 0 
   ? revenus.reduce((acc, r) => acc + (parseFloat(r.montant) || 0), 0)
   : (parseFloat(finances.revenus) || 0) + (parseFloat(finances.autre_revenu) || 0)
@@ -364,6 +425,7 @@ const totalRevenus = revenus.length > 0
     setShowModalRevenu(false)
     setSuccesRevenu(true)
     setTimeout(() => setSuccesRevenu(false), 3000)
+    if (questionnaireDone) genererAnalyse(currentUser.id)
   } catch (e) {
     setErreurRevenu(e.message || 'Une erreur est survenue.')
   } finally {
@@ -392,6 +454,7 @@ const totalRevenus = revenus.length > 0
       setShowModalDepenses(false)
       setSuccesDepenses(true)
       setTimeout(() => setSuccesDepenses(false), 3000)
+      if (questionnaireDone) genererAnalyse(currentUser.id)
     } catch (e) {
       setErreurDepenses(e.message || 'Une erreur est survenue.')
     } finally {
@@ -409,8 +472,9 @@ const totalRevenus = revenus.length > 0
       const { error } = await supabase.from('echeances').insert({ user_id: currentUser.id, categorie: formEch.categorie, libelle: formEch.libelle, mois: formEch.mois, montant_annuel: parseFloat(formEch.montant_annuel) })
       if (error) throw new Error('Erreur lors de l\'ajout.')
       queryClient.invalidateQueries({ queryKey: ['dashboard'] })
-      setFormEch({ categorie: '', libelle: '', mois: '', montant_annuel: '' })
-    } catch (e) {
+setFormEch({ categorie: '', libelle: '', mois: '', montant_annuel: '' })
+if (questionnaireDone) genererAnalyse(currentUser.id)
+} catch (e) {
       setErreurEcheance(e.message || 'Une erreur est survenue.')
     } finally {
       setLoading(false)
@@ -418,9 +482,13 @@ const totalRevenus = revenus.length > 0
   }
 
   const handleDeleteEcheance = async (id) => {
-    const { error } = await supabase.from('echeances').delete().eq('id', id)
-    if (!error) queryClient.invalidateQueries({ queryKey: ['dashboard'] })
+  const { error } = await supabase.from('echeances').delete().eq('id', id)
+  if (!error) {
+    queryClient.invalidateQueries({ queryKey: ['dashboard'] })
+    const { data: { user: currentUser } } = await supabase.auth.getUser()
+    if (questionnaireDone) genererAnalyse(currentUser.id)
   }
+}
 
   const handleEditStart = (e) => { setEditingId(e.id); setEditForm({ libelle: e.libelle, mois: e.mois, montant_annuel: e.montant_annuel }) }
 
@@ -432,8 +500,10 @@ const totalRevenus = revenus.length > 0
       const { error } = await supabase.from('echeances').update(payload).eq('id', id)
       if (error) throw new Error('Erreur lors de la modification.')
       queryClient.invalidateQueries({ queryKey: ['dashboard'] })
-      setEditingId(null)
-    } catch (e) {
+setEditingId(null)
+const { data: { user: currentUser } } = await supabase.auth.getUser()
+if (questionnaireDone) genererAnalyse(currentUser.id)
+} catch (e) {
       setErreurEcheance(e.message)
     } finally {
       setLoading(false)
@@ -461,9 +531,26 @@ const totalRevenus = revenus.length > 0
   titre="Mes Finances"
   etapes={GUIDE_FINANCES}
   forceVisible={showGuide}
-  onClose={fermerGuide}
+  onClose={() => {
+    fermerGuide()
+    if (!questionnaireDone) setShowQuestionnaire(true)
+  }}
 />
       {showSimulateur && <PopupSimulateur versement={reelInvestissable} onClose={() => setShowSimulateur(false)} isMobile={isMobile} />}
+
+      {showQuestionnaire && (
+  <QuestionnaireFinances
+    onComplete={async (data) => {
+      setShowQuestionnaire(false)
+      setQuestionnaireDone(true)
+      if (data) {
+        queryClient.invalidateQueries({ queryKey: ['dashboard'] })
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) genererAnalyse(user.id)
+      }
+    }}
+  />
+)}
 
       {showModalDepenses && (
         <ModalDepenses t={t} onClose={() => setShowModalDepenses(false)} onSave={handleSaveDepenses} depensesFixesInit={depensesFixesDetail} depensesVariablesInit={depensesVariablesDetail} loading={loading} erreur={erreurDepenses} isMobile={isMobile} />
@@ -607,6 +694,20 @@ const totalRevenus = revenus.length > 0
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, minWidth: 0 }}>
 
+{questionnaireDone === false && (
+  <div style={{ background: '#034065', borderRadius: 12, padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+      <span style={{ background: '#4CAF2E', color: '#fff', fontSize: 9, fontWeight: 700, padding: '2px 8px', borderRadius: 20, textTransform: 'uppercase', letterSpacing: '.05em' }}>Nouveau</span>
+      <span style={{ fontSize: 13, color: '#fff', fontWeight: 500 }}>Ton analyse financière personnalisée par l'IA est disponible !</span>
+    </div>
+    <button
+      onClick={() => setShowQuestionnaire(true)}
+      style={{ background: '#4CAF2E', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}
+    >
+      Découvrir →
+    </button>
+  </div>
+)}
           {alertes.length > 0 && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {alertes.map((a, i) => (
@@ -618,6 +719,49 @@ const totalRevenus = revenus.length > 0
             </div>
           )}
 
+          {/* BLOC ANALYSE IA */}
+{questionnaireDone === true && (
+  <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: 16 }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+      <div style={{ fontSize: 13, fontWeight: 500, color: t.text }}>🧠 Ton analyse personnalisée</div>
+      <button
+        onClick={async () => {
+          const { data: { user } } = await supabase.auth.getUser()
+          if (user) genererAnalyse(user.id)
+        }}
+        style={{ fontSize: 11, color: bleu, background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}
+      >
+        ↻ Actualiser
+      </button>
+    </div>
+
+    {analyseLoading ? (
+      <div style={{ fontSize: 12, color: t.textMuted, textAlign: 'center', padding: '20px 0' }}>
+        ⏳ Génération de ton analyse...
+      </div>
+    ) : analyseIA ? (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <p style={{ fontSize: 13, color: t.textSecondary, lineHeight: 1.7, margin: 0 }}>{analyseIA.bilan}</p>
+        <div>
+          <div style={{ fontSize: 11, fontWeight: 600, color: t.text, textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 8 }}>Recommandations</div>
+          {analyseIA.recommandations?.map((r, i) => (
+            <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 6, fontSize: 12, color: t.textSecondary, lineHeight: 1.6 }}>
+              <span style={{ color: '#4CAF2E', fontWeight: 700, flexShrink: 0 }}>•</span>
+              <span>{r}</span>
+            </div>
+          ))}
+        </div>
+        <div style={{ background: bleu + '10', border: `0.5px solid ${bleu}30`, borderRadius: 8, padding: '10px 12px', fontSize: 12, color: bleu, lineHeight: 1.6 }}>
+          ✨ {analyseIA.prochaine_etape}
+        </div>
+      </div>
+    ) : (
+      <div style={{ fontSize: 12, color: t.textMuted, textAlign: 'center', padding: '20px 0' }}>
+        Ton analyse sera générée automatiquement.
+      </div>
+    )}
+  </div>
+)}
           <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: 16 }}>
             <div style={{ fontSize: 13, fontWeight: 500, color: t.text, marginBottom: 4 }}>Règle 50 / 30 / 20</div>
             <div style={{ fontSize: 11, color: t.textMuted, marginBottom: 12 }}>50% besoins · 30% envies · 20% investissement</div>
