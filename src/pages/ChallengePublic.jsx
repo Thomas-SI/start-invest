@@ -105,9 +105,11 @@ function PublicNavbar({ isMobile, openLogin, openSignup, activeLink = 'Challenge
 }
 
 export default function ChallengePublic() {
+  const navigate = useNavigate()
   const [authOpen, setAuthOpen] = useState(false)
   const [authMode, setAuthMode] = useState('login')
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768)
@@ -131,34 +133,162 @@ export default function ChallengePublic() {
   return (
     <div style={{ fontFamily: 'inherit', background: '#F4F7F5', minHeight: '100vh' }}>
 
-      <PublicNavbar isMobile={isMobile} openLogin={openLogin} openSignup={openSignup} activeLink="Challenge" />
-
       {/* HERO */}
-      <section style={{ background: '#034065', padding: isMobile ? '50px 16px' : '80px 40px' }}>
-        <div style={{ maxWidth: 700, margin: '0 auto', textAlign: 'center' }}>
-          <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 20, background: 'rgba(76,175,46,0.15)', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Challenge</div>
-          <h1 style={{ fontSize: isMobile ? 26 : 36, fontWeight: 700, color: '#fff', lineHeight: 1.4, margin: '0 0 24px' }}>
-            Parce que l'investissement se court comme un <span style={{ color: '#4CAF2E' }}>marathon</span> et non comme un sprint
-          </h1>
-          <p style={{ fontSize: isMobile ? 14 : 16, color: 'rgba(255,255,255,0.6)', lineHeight: 1.8, margin: '0 auto 40px', maxWidth: 560 }}>
-            Nous avons créé les challenges pour vous tirer vers les sommets, comme dans le sport, avec une communauté qui nous pousse à nous dépasser.
-          </p>
-          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: isMobile ? 10 : 14, maxWidth: 600, margin: '0 auto' }}>
-            {[
-              { val: 'LONG TERME', label: 'La clé de la richesse' },
-              { val: 'RÉGULARITÉ', label: 'Plus que le timing' },
-              { val: 'DISCIPLINE', label: "L'arme secrète" },
-            ].map(({ val, label }) => (
-              <div key={val} style={{ background: 'rgba(255,255,255,0.06)', border: '0.5px solid rgba(255,255,255,0.1)', borderRadius: 12, padding: isMobile ? '14px' : '16px' }}>
-                <div style={{ fontSize: 15, fontWeight: 700, color: '#4CAF2E', marginBottom: 4 }}>{val}</div>
-                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>{label}</div>
-              </div>
+<section style={{ position: 'relative', height: isMobile ? '70vh' : '80vh', overflow: 'hidden' }}>
+
+  <img
+    src="https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/image-montagne-cha.jpeg"
+    alt="Montagne"
+    style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 40%' }}
+  />
+
+  <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.7) 100%)' }} />
+
+  {/* NAVBAR */}
+  <div style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10, padding: isMobile ? '16px 20px' : '20px 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+    <img src="https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/IMG_2819.jpeg" alt="StartInvest" style={{ height: 60, width: 60, borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(255,255,255,0.4)', cursor: 'pointer' }} onClick={() => navigate('/')} />
+    {!isMobile && (
+      <div style={{ display: 'flex', gap: 4 }}>
+        {[['Accueil', '/'], ['Fonctionnalités', '/fonctionnalites'], ['Challenge', '/challenge-public'], ['Abonnement', '/abonnement-public']].map(([label, path]) => (
+          <span key={label} onClick={() => navigate(path)} style={{ fontSize: 16, color: label === 'Challenge' ? '#4CAF2E' : 'rgba(255,255,255,0.9)', padding: '6px 14px', borderRadius: 6, cursor: 'pointer', fontWeight: 600 }}
+            onMouseEnter={e => e.currentTarget.style.color = '#fff'}
+            onMouseLeave={e => e.currentTarget.style.color = label === 'Challenge' ? '#4CAF2E' : 'rgba(255,255,255,0.9)'}
+          >
+            {label}
+          </span>
+        ))}
+      </div>
+    )}
+    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+      {!isMobile && (
+        <>
+          <button onClick={openLogin} style={{ background: 'rgba(255,255,255,0.12)', color: '#fff', border: '1px solid rgba(255,255,255,0.3)', borderRadius: 8, padding: '9px 20px', fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Se connecter</button>
+          <button onClick={openSignup} style={{ background: '#4CAF2E', color: '#fff', border: 'none', borderRadius: 8, padding: '9px 20px', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>S'inscrire gratuitement</button>
+        </>
+      )}
+      {isMobile && (
+        <button onClick={() => setMobileMenuOpen(v => !v)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 5, padding: 8 }}>
+          <span style={{ width: 24, height: 2, background: '#fff', borderRadius: 2 }} />
+          <span style={{ width: 24, height: 2, background: '#fff', borderRadius: 2 }} />
+          <span style={{ width: 24, height: 2, background: '#fff', borderRadius: 2 }} />
+        </button>
+      )}
+    </div>
+  </div>
+
+  {/* MENU MOBILE */}
+  {isMobile && mobileMenuOpen && (
+    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 20, background: '#fff', overflowY: 'auto' }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '16px 20px', borderBottom: '0.5px solid #E0EAE3' }}>
+        <button onClick={() => setMobileMenuOpen(false)} style={{ background: 'none', border: 'none', fontSize: 24, cursor: 'pointer', color: '#034065' }}>×</button>
+      </div>
+      {[['Accueil', '/'], ['Fonctionnalités', '/fonctionnalites'], ['Challenge', '/challenge-public'], ['Abonnement', '/abonnement-public']].map(([label, path]) => (
+        <div key={label} onClick={() => { navigate(path); setMobileMenuOpen(false) }} style={{ fontSize: 16, color: label === 'Challenge' ? '#4CAF2E' : '#034065', padding: '14px 24px', cursor: 'pointer', fontWeight: label === 'Challenge' ? 600 : 500, borderBottom: '0.5px solid #E0EAE3' }}>
+          {label}
+        </div>
+      ))}
+      <div style={{ padding: '16px 24px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <button onClick={() => { openLogin(); setMobileMenuOpen(false) }} style={{ padding: '12px', borderRadius: 8, border: '0.5px solid #034065', background: 'transparent', color: '#034065', fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Se connecter</button>
+        <button onClick={() => { openSignup(); setMobileMenuOpen(false) }} style={{ padding: '12px', borderRadius: 8, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>S'inscrire gratuitement</button>
+      </div>
+    </div>
+  )}
+
+  {/* TEXTE BAS */}
+  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: isMobile ? '0 20px 40px' : '0 60px 60px' }}>
+    <div style={{ display: 'inline-block', background: 'rgba(76,175,46,0.25)', border: '1px solid rgba(76,175,46,0.5)', color: '#fff', fontSize: 11, fontWeight: 500, padding: '3px 12px', borderRadius: 20, letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 16 }}>
+      Challenge
+    </div>
+    <h1 style={{ fontSize: isMobile ? 30 : 48, fontWeight: 700, color: '#fff', lineHeight: 1.15, margin: '0 0 16px', maxWidth: 600 }}>
+      Parce que l'investissement se court comme un <span style={{ color: '#4CAF2E' }}>marathon</span> et non comme un sprint.
+    </h1>
+    <p style={{ fontSize: isMobile ? 14 : 16, color: 'rgba(255,255,255,0.85)', fontStyle: 'italic', lineHeight: 1.7, margin: '0 0 28px', maxWidth: 500 }}>
+      "Le secret de la réussite n'est pas la vitesse, mais la constance."
+    </p>
+    <div style={{ display: 'flex', gap: 12 }}>
+      <button onClick={openSignup} style={{ background: '#4CAF2E', color: '#fff', border: 'none', borderRadius: 10, padding: '13px 28px', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
+        Rejoindre la communauté
+      </button>
+    </div>
+  </div>
+
+</section>
+
+      {/* TÉMOIGNAGES */}
+<section style={{ padding: isMobile ? '50px 16px' : '80px 40px', background: '#fff' }}>
+  <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+    <div style={{ textAlign: 'center', marginBottom: isMobile ? 36 : 52 }}>
+      <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 12, background: '#EAF6E4', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Ils nous font confiance</div>
+      <h2 style={{ fontSize: isMobile ? 24 : 30, fontWeight: 700, color: '#034065', margin: '0 0 12px' }}>Ce que disent nos membres</h2>
+      <p style={{ fontSize: 14, color: '#6B7280', maxWidth: 480, margin: '0 auto' }}>
+        Une communauté qui grandit, qui s'entraide et qui avance ensemble vers la liberté financière.
+      </p>
+    </div>
+
+    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: isMobile ? 16 : 24 }}>
+      {[
+        {
+          initiales: 'LM',
+          nom: 'Lucas',
+          age: 24,
+          metier: 'Développeur',
+          badge: 'Le Métronome · Bronze',
+          badgeColor: '#854F0B',
+          badgeBg: '#FFF0DC',
+          temoignage: 'Je pensais que l\'investissement c\'était réservé aux gens riches. Start Invest m\'a montré que 100€/mois bien placés peuvent vraiment changer la donne. 3 mois d\'affilée, je lâche plus !',
+          etoiles: 5,
+        },
+        {
+          initiales: 'MR',
+          nom: 'Marie',
+          age: 31,
+          metier: 'Infirmière',
+          badge: 'L\'Architecte · Or',
+          badgeColor: '#633806',
+          badgeBg: '#FFF8DC',
+          temoignage: 'Ce que j\'aime c\'est le côté ludique. Les badges, les challenges avec mes amis... ça m\'a aidée à rester disciplinée même dans les moments difficiles. Mon portefeuille a doublé en 5 ans.',
+          etoiles: 5,
+        },
+        {
+          initiales: 'TG',
+          nom: 'Thomas',
+          age: 35,
+          metier: 'Commercial',
+          badge: 'Le Grand Saut · Obtenu',
+          badgeColor: '#2E7D1E',
+          badgeBg: '#EAF6E4',
+          temoignage: 'J\'aurais dû commencer bien plus tôt. À 35 ans j\'ai enfin compris l\'importance des intérêts composés. Le guide est clair, sans jargon. En 1 mois j\'avais tout compris et j\'avais placé mes premiers euros.',
+          etoiles: 5,
+        },
+      ].map(({ initiales, nom, age, metier, badge, badgeColor, badgeBg, temoignage, etoiles }) => (
+        <div key={nom} style={{ background: '#F4F7F5', borderRadius: 16, padding: '24px', border: '0.5px solid #E0EAE3', display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {/* ÉTOILES */}
+          <div style={{ display: 'flex', gap: 4 }}>
+            {Array.from({ length: etoiles }).map((_, i) => (
+              <span key={i} style={{ color: '#F59E0B', fontSize: 16 }}>★</span>
             ))}
           </div>
+          {/* TÉMOIGNAGE */}
+          <p style={{ fontSize: 14, color: '#034065', lineHeight: 1.8, margin: 0, fontStyle: 'italic', flex: 1 }}>
+            "{temoignage}"
+          </p>
+          {/* PROFIL */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, paddingTop: 16, borderTop: '0.5px solid #E0EAE3' }}>
+            <div style={{ width: 44, height: 44, borderRadius: '50%', background: '#185FA5', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, fontWeight: 700, color: '#fff', flexShrink: 0 }}>
+              {initiales}
+            </div>
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: '#034065' }}>{nom}, {age} ans · {metier}</div>
+              <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 20, background: badgeBg, color: badgeColor, fontWeight: 500 }}>{badge}</span>
+            </div>
+          </div>
         </div>
-      </section>
+      ))}
+    </div>
+  </div>
+</section>
 
-      {/* ACCOMPLISSEMENTS */}
+{/* ACCOMPLISSEMENTS */}
 <section style={{ padding: isMobile ? '50px 16px' : '80px 40px', maxWidth: 1100, margin: '0 auto' }}>
   <div style={{ textAlign: 'center', marginBottom: isMobile ? 36 : 52 }}>
     <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 12, background: '#EAF6E4', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Accomplissements</div>

@@ -473,48 +473,96 @@ useEffect(() => {
 </section>
 
       {/* CHALLENGE */}
-      <section id="challenge" style={{ background: '#034065', padding: isMobile ? '50px 16px' : '80px 40px', marginTop: isMobile ? 40 : 60 }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: isMobile ? 36 : 52 }}>
-            <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 16, background: 'rgba(76,175,46,0.15)', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Challenge</div>
-            <h2 style={{ fontSize: isMobile ? 26 : 34, fontWeight: 700, color: '#fff', lineHeight: 1.3, margin: '0 0 16px' }}>
-              Pensez à cinq ans, <span style={{ color: '#4CAF2E' }}>pas à cinq mois.</span>
-            </h2>
-            <p style={{ fontSize: isMobile ? 13 : 14, color: 'rgba(255,255,255,0.55)', lineHeight: 1.8, margin: '0 auto 32px', maxWidth: 460 }}>
-              Fixez-vous des objectifs et atteignez-les avec discipline au fil du temps.
-            </p>
-            <button onClick={() => setChallengesOpen(true)} style={{ padding: '11px 28px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.2)', background: 'rgba(255,255,255,0.08)', color: '#fff', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>
-              Voir tous les challenges
-            </button>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: isMobile ? 14 : 20 }}>
-            <div style={{ background: 'rgba(255,255,255,0.06)', border: '0.5px solid rgba(255,255,255,0.1)', borderRadius: 16, padding: '24px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 12 }}>
-              <div style={{ width: 64, height: 64, borderRadius: '50%', overflow: 'hidden', border: '2px solid #4CAF2E' }}>
-  <img src="https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/Le%20grand%20saut.png" alt="Grand Saut" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-</div>
-              <div style={{ fontSize: 15, fontWeight: 600, color: '#fff' }}>Le Grand Saut</div>
-              <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, background: '#EAF6E4', color: '#2E7D1E', fontWeight: 500 }}>Obtenu</span>
-              <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', lineHeight: 1.6 }}>Tu n'es plus spectateur, tu es le pilote de ton futur.</div>
-            </div>
-            <div style={{ background: 'rgba(255,255,255,0.06)', border: '0.5px solid rgba(255,255,255,0.1)', borderRadius: 16, padding: '24px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 12 }}>
-              <div style={{ width: 64, height: 64, borderRadius: '50%', border: '2px solid #854F0B', overflow: 'hidden' }}>
-                <img src="https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/Metronome.png" alt="métronome" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-              </div>
-              <div style={{ fontSize: 15, fontWeight: 600, color: '#fff' }}>Le Métronome</div>
-              <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, background: '#FFF0DC', color: '#854F0B', fontWeight: 500 }}>Bronze 3 mois</span>
-              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>3 / 6 mois vers Argent</div>
-            </div>
-            <div style={{ background: 'rgba(255,255,255,0.06)', border: '0.5px solid rgba(255,255,255,0.1)', borderRadius: 16, padding: '24px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 12 }}>
-              <div style={{ width: 64, height: 64, borderRadius: '50%', overflow: 'hidden', border: '2px solid #854F0B' }}>
-  <img src="https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/Ascension.png" alt="Ascension" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-</div>
-              <div style={{ fontSize: 15, fontWeight: 600, color: '#fff' }}>Ascension</div>
-              <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, background: '#FFF8DC', color: '#633806', fontWeight: 500 }}>Or 1 000 euros</span>
-              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>1 200 / 2 000 euros vers Platine</div>
-            </div>
-          </div>
+<section id="challenge" style={{ background: '#034065', padding: isMobile ? '50px 16px' : '80px 40px' }}>
+  <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+
+    {/* HEADER */}
+    <div style={{ textAlign: 'center', marginBottom: isMobile ? 36 : 52 }}>
+      <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 16, background: 'rgba(76,175,46,0.15)', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Challenge</div>
+      <h2 style={{ fontSize: isMobile ? 26 : 34, fontWeight: 700, color: '#fff', lineHeight: 1.3, margin: '0 0 16px' }}>
+        Pensez à cinq ans, <span style={{ color: '#4CAF2E' }}>pas à cinq mois.</span>
+      </h2>
+      <p style={{ fontSize: isMobile ? 13 : 14, color: 'rgba(255,255,255,0.55)', lineHeight: 1.8, margin: '0 auto 32px', maxWidth: 460 }}>
+        Fixez-vous des objectifs et atteignez-les avec discipline au fil du temps. Motivez-vous avec vos amis et grâce à une communauté qui vous tire vers le haut.
+      </p>
+    </div>
+
+    {/* COMPTEURS */}
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: isMobile ? 36 : 52 }}>
+      {[
+        { val: '47+', label: 'membres actifs' },
+        { val: '312', label: 'badges débloqués' },
+        { val: '89', label: 'challenges en cours' },
+      ].map(({ val, label }) => (
+        <div key={label} style={{ textAlign: 'center', background: 'rgba(255,255,255,0.06)', border: '0.5px solid rgba(255,255,255,0.1)', borderRadius: 12, padding: '16px 8px' }}>
+          <div style={{ fontSize: isMobile ? 22 : 28, fontWeight: 700, color: '#4CAF2E' }}>{val}</div>
+          <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginTop: 4 }}>{label}</div>
         </div>
-      </section>
+      ))}
+    </div>
+
+    {/* MEMBRES FICTIFS */}
+    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: isMobile ? 12 : 20, marginBottom: isMobile ? 36 : 52 }}>
+      {[
+        { initiales: 'LM', nom: 'Lucas', age: 24, badge: 'Le Métronome', niveau: 'Bronze · 3 mois', color: '#854F0B', bg: '#FFF0DC', phrase: '"3 mois d\'affilée, je lâche plus !"' },
+        { initiales: 'MR', nom: 'Marie', age: 31, badge: 'L\'Architecte', niveau: 'Or · 10 000€', color: '#633806', bg: '#FFF8DC', phrase: '"Mon portefeuille a doublé en 5 ans."' },
+        { initiales: 'TG', nom: 'Thomas', age: 35, badge: 'Le Grand Saut', niveau: 'Obtenu', color: '#2E7D1E', bg: '#EAF6E4', phrase: '"J\'aurais dû commencer bien plus tôt !"' },
+      ].map(({ initiales, nom, age, badge, niveau, color, bg, phrase }) => (
+        <div key={nom} style={{ background: 'rgba(255,255,255,0.06)', border: '0.5px solid rgba(255,255,255,0.12)', borderRadius: 16, padding: '20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{ width: 44, height: 44, borderRadius: '50%', background: '#185FA5', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, fontWeight: 700, color: '#fff', flexShrink: 0 }}>
+              {initiales}
+            </div>
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: '#fff' }}>{nom}, {age} ans</div>
+              <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 20, background: bg, color: color, fontWeight: 500 }}>{badge} · {niveau}</span>
+            </div>
+          </div>
+          <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', fontStyle: 'italic', lineHeight: 1.6, margin: 0 }}>{phrase}</p>
+        </div>
+      ))}
+    </div>
+
+    {/* BADGES */}
+    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: isMobile ? 14 : 20, marginBottom: 40 }}>
+      <div style={{ background: 'rgba(255,255,255,0.06)', border: '0.5px solid rgba(255,255,255,0.1)', borderRadius: 16, padding: '24px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 12 }}>
+        <div style={{ width: 64, height: 64, borderRadius: '50%', overflow: 'hidden', border: '2px solid #4CAF2E' }}>
+          <img src="https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/Le%20grand%20saut.png" alt="Grand Saut" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        </div>
+        <div style={{ fontSize: 15, fontWeight: 600, color: '#fff' }}>Le Grand Saut</div>
+        <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, background: '#EAF6E4', color: '#2E7D1E', fontWeight: 500 }}>Obtenu</span>
+        <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', lineHeight: 1.6 }}>Tu n'es plus spectateur, tu es le pilote de ton futur.</div>
+      </div>
+      <div style={{ background: 'rgba(255,255,255,0.06)', border: '0.5px solid rgba(255,255,255,0.1)', borderRadius: 16, padding: '24px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 12 }}>
+        <div style={{ width: 64, height: 64, borderRadius: '50%', border: '2px solid #854F0B', overflow: 'hidden' }}>
+          <img src="https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/Metronome.png" alt="métronome" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        </div>
+        <div style={{ fontSize: 15, fontWeight: 600, color: '#fff' }}>Le Métronome</div>
+        <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, background: '#FFF0DC', color: '#854F0B', fontWeight: 500 }}>Bronze 3 mois</span>
+        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>3 / 6 mois vers Argent</div>
+      </div>
+      <div style={{ background: 'rgba(255,255,255,0.06)', border: '0.5px solid rgba(255,255,255,0.1)', borderRadius: 16, padding: '24px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 12 }}>
+        <div style={{ width: 64, height: 64, borderRadius: '50%', overflow: 'hidden', border: '2px solid #854F0B' }}>
+          <img src="https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/Ascension.png" alt="Ascension" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        </div>
+        <div style={{ fontSize: 15, fontWeight: 600, color: '#fff' }}>Ascension</div>
+        <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, background: '#FFF8DC', color: '#633806', fontWeight: 500 }}>Or 1 000 euros</span>
+        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>1 200 / 2 000 euros vers Platine</div>
+      </div>
+    </div>
+
+    {/* CTA */}
+<div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
+  <button onClick={() => setChallengesOpen(true)} style={{ padding: '11px 28px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.2)', background: 'rgba(255,255,255,0.08)', color: '#fff', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', width: 'auto' }}>
+    Voir tous les challenges
+  </button>
+  <button onClick={openSignup} style={{ padding: '11px 28px', borderRadius: 10, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', width: 'auto' }}>
+    Rejoindre la communauté
+  </button>
+</div>
+
+  </div>
+</section>
 
       {/* ABONNEMENT */}
 <section id="abonnement" style={{ padding: isMobile ? '60px 16px 50px' : '100px 40px 80px', background: '#F4F7F5', textAlign: 'center' }}>
