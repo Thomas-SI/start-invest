@@ -244,11 +244,13 @@ function PublicNavbar({ isMobile, openLogin, openSignup, activeLink = 'Accueil' 
 }
 
 export default function Accueil() {
+  const navigate = useNavigate()
   const [authOpen, setAuthOpen] = useState(false)
   const [authMode, setAuthMode] = useState('login')
   const [challengesOpen, setChallengesOpen] = useState(false)
   const [abonnementAnnuel, setAbonnementAnnuel] = useState(true)
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   useEffect(() => {
   const checkSession = async () => {
@@ -279,159 +281,196 @@ useEffect(() => {
   return (
     <div style={{ fontFamily: 'inherit', background: '#F4F7F5', minHeight: '100vh' }}>
 
-      <PublicNavbar isMobile={isMobile} openLogin={openLogin} openSignup={openSignup} activeLink="Accueil" />
-
       {/* HERO */}
-      <section id="hero" style={{ padding: isMobile ? '40px 16px 80px' : '80px 40px 60px', maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 40 : 60, alignItems: 'center' }}>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 16, background: '#EAF6E4', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Nouvelle façon d'investir</div>
-          <h1 style={{ fontSize: isMobile ? 32 : 42, fontWeight: 700, color: '#034065', lineHeight: 1.2, margin: '0 0 20px' }}>
-            Prenez une longueur<br />
-            <span style={{ color: '#4CAF2E' }}>d'avance.</span>
-          </h1>
-          <p style={{ fontSize: isMobile ? 13 : 14, color: '#6B7280', lineHeight: 1.8, margin: '0 0 36px', textAlign: 'justify' }}>
-  "La retraite est incertaine. Ton avenir, lui, peut l'être un peu moins."
-  <br /><br />
-  Une nouvelle génération prend les choses en main. Sans tabou, sans jargon, sans prétendre être des experts, juste des gens qui décident de construire quelque chose, euro par euro, mois après mois. Peu importe ton objectif. Peu importe ton point de départ. Ce qui compte, c'est de commencer.
-  <br /><br />
-  Start Invest, c'est l'équivalent d'une grande app de sport très connue, mais appliqué à ton patrimoine. Comme elle t'apprends à te dépasser et à rester régulier, Start Invest t'accompagne pour construire ta liberté financière. Challenges-toi, collectionne tes badges, suis ta progression et celle de tes amis. Ensemble, restez motivés et avancez avec discipline. Le temps est ton meilleur allié, utilise-le à bon escient.
-  <br /><br />
-  <strong style={{ color: '#034065' }}>"Le chemin commence maintenant. Ensemble, tirons-nous vers les sommets."</strong>
-</p>
-          <div style={{ display: 'flex', justifyContent: 'center' }}>
-            <button onClick={openSignup} style={{ padding: '12px 28px', borderRadius: 10, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
-              Commencer gratuitement
-            </button>
+<section style={{ position: 'relative', height: isMobile ? '100svh' : '90vh', overflow: 'hidden' }}>
+
+  <img
+    src="https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/image-montagne.jpeg"
+    alt="Montagne"
+    style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 30%' }}
+  />
+
+  <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.7) 100%)' }} />
+
+  {/* NAVBAR */}
+<div style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10, padding: isMobile ? '16px 20px' : '20px 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+  <img src="https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/IMG_2819.jpeg" alt="StartInvest" style={{ height: 60, width: 60, borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(255,255,255,0.4)' }} />
+  
+  {!isMobile && (
+    <div style={{ display: 'flex', gap: 4 }}>
+      {[['Accueil', '/'], ['Fonctionnalités', '/fonctionnalites'], ['Challenge', '/challenge-public'], ['Abonnement', '/abonnement-public']].map(([label, path]) => (
+        <span key={label} onClick={() => navigate(path)} style={{ fontSize: 16, color: 'rgba(255,255,255,0.9)', padding: '6px 14px', borderRadius: 6, cursor: 'pointer', fontWeight: 600 }}
+          onMouseEnter={e => e.currentTarget.style.color = '#fff'}
+          onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.9)'}
+        >
+          {label}
+        </span>
+      ))}
+    </div>
+  )}
+
+  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+    {!isMobile && (
+      <>
+        <button onClick={openLogin} style={{ background: 'rgba(255,255,255,0.12)', color: '#fff', border: '1px solid rgba(255,255,255,0.3)', borderRadius: 8, padding: '9px 20px', fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Se connecter</button>
+        <button onClick={openSignup} style={{ background: '#4CAF2E', color: '#fff', border: 'none', borderRadius: 8, padding: '9px 20px', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>S'inscrire gratuitement</button>
+      </>
+    )}
+    {isMobile && (
+      <button onClick={() => setMobileMenuOpen(v => !v)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 5, padding: 8 }}>
+        <span style={{ width: 24, height: 2, background: '#fff', borderRadius: 2 }} />
+        <span style={{ width: 24, height: 2, background: '#fff', borderRadius: 2 }} />
+        <span style={{ width: 24, height: 2, background: '#fff', borderRadius: 2 }} />
+      </button>
+    )}
+  </div>
+</div>
+
+{/* MENU MOBILE */}
+{isMobile && mobileMenuOpen && (
+  <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 20, background: '#fff', padding: '20px 0', overflowY: 'auto' }}>
+    <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '16px 20px', borderBottom: '0.5px solid #E0EAE3' }}>
+  <button onClick={() => setMobileMenuOpen(false)} style={{ background: 'none', border: 'none', fontSize: 24, cursor: 'pointer', color: '#034065' }}>×</button>
+</div>
+    {[['Accueil', '/'], ['Fonctionnalités', '/fonctionnalites'], ['Challenge', '/challenge-public'], ['Abonnement', '/abonnement-public']].map(([label, path]) => (
+      <div key={label} onClick={() => { navigate(path); setMobileMenuOpen(false) }} style={{ fontSize: 16, color: '#034065', padding: '14px 24px', cursor: 'pointer', fontWeight: 500, borderBottom: '0.5px solid #E0EAE3' }}>
+        {label}
+      </div>
+    ))}
+    <div style={{ padding: '16px 24px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <button onClick={() => { openLogin(); setMobileMenuOpen(false) }} style={{ padding: '12px', borderRadius: 8, border: '0.5px solid #034065', background: 'transparent', color: '#034065', fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Se connecter</button>
+      <button onClick={() => { openSignup(); setMobileMenuOpen(false) }} style={{ padding: '12px', borderRadius: 8, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>S'inscrire gratuitement</button>
+    </div>
+  </div>
+)}
+
+  {/* TEXTE BAS */}
+  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: isMobile ? '0 20px 40px' : '0 60px 60px' }}>
+    <div style={{ display: 'inline-block', background: 'rgba(76,175,46,0.25)', border: '1px solid rgba(76,175,46,0.5)', color: '#fff', fontSize: 11, fontWeight: 500, padding: '3px 12px', borderRadius: 20, letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 16 }}>
+      Nouvelle façon d'investir
+    </div>
+    <h1 style={{ fontSize: isMobile ? 34 : 52, fontWeight: 700, color: '#fff', lineHeight: 1.15, margin: '0 0 16px', maxWidth: 600 }}>
+      Prenez une longueur<br />
+      <span style={{ color: '#4CAF2E' }}>d'avance.</span>
+    </h1>
+    <p style={{ fontSize: isMobile ? 14 : 16, color: 'rgba(255,255,255,0.85)', fontStyle: 'italic', lineHeight: 1.7, margin: '0 0 28px', maxWidth: 500 }}>
+      "Le bonheur ne se trouve pas au sommet de la montagne,<br />mais dans la façon dont on l'a gravie."
+    </p>
+    <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
+  <button onClick={openSignup} style={{ background: '#4CAF2E', color: '#fff', border: 'none', borderRadius: 10, padding: '13px 28px', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
+    Commencer gratuitement
+  </button>
+  <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', fontStyle: 'italic' }}>
+    Déjà + de 50 utilisateurs, rejoins-les !
+  </span>
+</div>
+</div>
+
+</section>
+
+{/* MOT DU FONDATEUR */}
+<section style={{ background: '#fff', padding: isMobile ? '40px 20px' : '60px 60px', borderBottom: '0.5px solid #E0EAE3' }}>
+  <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', gap: 24, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+    <div style={{ width: 72, height: 72, borderRadius: '50%', overflow: 'hidden', border: '2px solid #4CAF2E', flexShrink: 0 }}>
+      <img src="https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/IMG_2914.jpeg" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+    </div>
+    <div style={{ flex: 1, minWidth: 260 }}>
+      <div style={{ fontSize: 11, color: '#4CAF2E', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 8 }}>Le mot du fondateur</div>
+      <p style={{ fontSize: 15, color: '#034065', lineHeight: 1.8, margin: '0 0 12px' }}>
+        J'ai créé Start Invest parce que j'ai cherché cette application, et elle n'existait pas. Un outil ludique, éducatif, qui te challenge dans le temps. Pas une application froide pleine de jargon technique, pas juste un simple tracker de dépenses. Quelque chose de différent, pensé pour t'accompagner sur le long terme.
+      </p>
+      <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.7, margin: '0 0 24px' }}>
+        Si tu es discipliné dans ton sport ou ton travail, tu peux l'être dans tes finances. Le reste, c'est une question d'outils et de régularité.
+      </p>
+      <div style={{ background: '#F4F7F5', borderRadius: 12, padding: '20px 24px', borderLeft: '3px solid #4CAF2E', borderRadius: 0 }}>
+        <p style={{ fontSize: 14, fontWeight: 600, color: '#034065', lineHeight: 1.8, margin: '0 0 12px' }}>
+          La retraite est incertaine. Ton avenir, lui, peut l'être un peu moins.
+        </p>
+        <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.8, margin: '0 0 12px' }}>
+          Une nouvelle génération prend les choses en main. Sans tabou, sans jargon, sans prétendre être des experts. Juste des gens qui décident de construire quelque chose, euro par euro, mois après mois. Peu importe ton point de départ. Ce qui compte, c'est de commencer.
+        </p>
+        <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.8, margin: 0 }}>
+          Start Invest, c'est l'équivalent d'une grande app de sport, appliqué à ton patrimoine. Challenge-toi, collectionne tes badges, suis ta progression et celle de tes amis. Le temps est ton meilleur allié, utilise-le.
+        </p>
+      </div>
+      <div style={{ fontSize: 12, color: '#9CA3AF', marginTop: 16 }}>Thomas — Fondateur de Start Invest</div>
+    </div>
+  </div>
+</section>
+
+      {/* 4 ÉTAPES */}
+<section style={{ background: '#F4F7F5', padding: isMobile ? '50px 20px' : '80px 60px' }}>
+  <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: isMobile ? 32 : 60, gap: 16 }}>
+  <div style={{ textAlign: 'center', flex: 1 }}>
+    <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 12, background: '#EAF6E4', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Comment ça marche</div>
+    <h2 style={{ fontSize: isMobile ? 22 : 34, fontWeight: 700, color: '#034065', lineHeight: 1.3, margin: 0 }}>
+      4 étapes pour construire<br /><span style={{ color: '#4CAF2E' }}>ton avenir.</span>
+    </h2>
+  </div>
+  {isMobile && (
+    <div style={{ flexShrink: 0 }}>
+      <div style={{ width: 110, background: '#111', borderRadius: 20, padding: '6px' }}>
+        <div style={{ background: '#000', borderRadius: 16, overflow: 'hidden' }}>
+          <div style={{ background: '#000', height: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: 40, height: 3, background: '#222', borderRadius: 2 }} />
           </div>
+          <img src="https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/screen-app-ia.PNG" alt="App" style={{ width: '100%', display: 'block' }} />
         </div>
+      </div>
+    </div>
+  )}
+</div>
 
-        <div style={{ position: 'relative', marginBottom: isMobile ? 30 : 0 }}>
-          <div style={{ background: '#fff', borderRadius: 16, border: '0.5px solid #E0EAE3', padding: isMobile ? '20px' : '24px', boxShadow: '0 4px 24px rgba(27,46,75,0.06)' }}>
-            <div style={{ fontSize: 14, fontWeight: 600, color: '#034065', marginBottom: 2 }}>Mon Portefeuille</div>
-            <div style={{ fontSize: 11, color: '#9CA3AF', marginBottom: 20 }}>Repartition par enveloppe</div>
-            <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', alignItems: 'center', gap: isMobile ? 20 : 28 }}>
-              <div style={{ flexShrink: 0 }}>
-                <svg width="160" height="160" viewBox="0 0 120 120">
-                  <circle cx="60" cy="60" r="45" fill="none" stroke="#034065" strokeWidth="26" strokeDasharray="141.3 141.3" strokeDashoffset="0" transform="rotate(-90 60 60)" />
-                  <circle cx="60" cy="60" r="45" fill="none" stroke="#4CAF2E" strokeWidth="26" strokeDasharray="84.8 198.0" strokeDashoffset="-141.3" transform="rotate(-90 60 60)" />
-                  <circle cx="60" cy="60" r="45" fill="none" stroke="#BA7517" strokeWidth="26" strokeDasharray="56.5 226.2" strokeDashoffset="-226.1" transform="rotate(-90 60 60)" />
-                  <circle cx="60" cy="60" r="33" fill="#fff" />
-                  <text x="60" y="57" textAnchor="middle" fontSize="10" fontWeight="700" fill="#034065">34 600</text>
-                  <text x="60" y="69" textAnchor="middle" fontSize="9" fill="#9CA3AF">euros</text>
-                </svg>
-              </div>
-              <div style={{ flex: 1, width: '100%', display: 'flex', flexDirection: 'column', gap: 12 }}>
-                {[
-                  { label: 'PEA', pct: '50%', val: '15 400 euros', color: '#034065' },
-                  { label: 'CTO', pct: '30%', val: '6 800 euros', color: '#4CAF2E' },
-                  { label: 'Ass. Vie', pct: '20%', val: '4 200 euros', color: '#BA7517' },
-                ].map(({ label, pct, val, color }) => (
-                  <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <div style={{ width: 10, height: 10, borderRadius: '50%', background: color, flexShrink: 0 }} />
-                    <div style={{ flex: 1 }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontSize: 13, fontWeight: 600, color: '#034065' }}>{label}</span>
-                        <span style={{ fontSize: 12, fontWeight: 600, color }}>{pct}</span>
-                      </div>
-                      <div style={{ fontSize: 11, color: '#9CA3AF' }}>{val}</div>
-                      <div style={{ background: '#F0F0F0', borderRadius: 3, height: 4, marginTop: 4, overflow: 'hidden' }}>
-                        <div style={{ height: '100%', borderRadius: 3, background: color, width: pct }} />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-                <div style={{ paddingTop: 10, borderTop: '0.5px solid #E0EAE3', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: 11, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '.05em' }}>Total</span>
-                  <span style={{ fontSize: 14, fontWeight: 700, color: '#034065' }}>34 600 euros</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div style={{ position: 'absolute', bottom: isMobile ? -15 : -20, right: isMobile ? 10 : -20, background: '#fff', border: '0.5px solid #185FA5', borderRadius: 14, padding: isMobile ? '8px 10px' : '10px 14px', display: 'flex', alignItems: 'center', gap: isMobile ? 8 : 10, boxShadow: '0 4px 16px rgba(24,95,165,0.12)' }}>
-            <div style={{ width: isMobile ? 30 : 36, height: isMobile ? 30 : 36, borderRadius: '50%', overflow: 'hidden', border: '2px solid #185FA5', flexShrink: 0 }}>
-              <img src="https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/Larchitecte.png" alt="Architecte" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            </div>
-            <div>
-              <div style={{ fontSize: isMobile ? 10 : 11, fontWeight: 600, color: '#034065' }}>{"L'Architecte"}</div>
-              <div style={{ fontSize: isMobile ? 9 : 10, color: '#185FA5' }}>Accomplissement débloqué !</div>
-            </div>
-          </div>
+    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 40, alignItems: 'center' }}>
+
+  {/* ÉTAPES */}
+  <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+    {[
+      { num: '01', titre: 'Pose tes bases', desc: 'Réponds à 5 questions. L\'IA analyse ton profil et génère ton bilan personnalisé.' },
+      { num: '02', titre: 'Suis tes finances', desc: 'Revenus, dépenses, règle 50/30/20. Tu vois exactement combien tu peux investir.' },
+      { num: '03', titre: 'Forme-toi', desc: '23 fiches sans jargon pour comprendre l\'investissement et choisir ta stratégie.' },
+      { num: '04', titre: 'Investis et challenge-toi', desc: 'Suis tes ETF, débloque des badges, avance avec tes amis.' },
+    ].map(({ num, titre, desc }) => (
+      <div key={num} style={{ display: 'flex', gap: 16, alignItems: 'flex-start', background: '#fff', borderRadius: 12, padding: '18px 20px', border: '0.5px solid #E0EAE3' }}>
+        <div style={{ fontSize: 22, fontWeight: 700, color: '#4CAF2E', lineHeight: 1, flexShrink: 0, width: 36 }}>{num}</div>
+        <div>
+          <div style={{ fontSize: 15, fontWeight: 600, color: '#034065', marginBottom: 4 }}>{titre}</div>
+          <div style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6 }}>{desc}</div>
         </div>
-      </section>
+      </div>
+    ))}
+  </div>
 
-      {/* FEATURES */}
-      <section id="features" style={{ padding: isMobile ? '40px 16px 20px' : '80px 40px 40px', maxWidth: 1100, margin: '0 auto' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: isMobile ? 16 : 24 }}>
-          <div style={{ background: '#fff', borderRadius: 16, border: '0.5px solid #E0EAE3', overflow: 'hidden' }}>
-            <div style={{ background: '#F4F7F5', padding: '28px 24px', minHeight: 200, display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {[
-                { label: 'Revenus', val: '2 000 euros', color: '#4CAF2E', w: '80%' },
-                { label: 'Dépenses fixes', val: '1 000 euros', color: '#034065', w: '50%' },
-                { label: 'Investissable', val: '400 euros', color: '#BA7517', w: '20%' },
-              ].map(({ label, val, color, w }) => (
-                <div key={label}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 4 }}>
-                    <span style={{ color: '#6B7280' }}>{label}</span>
-                    <span style={{ fontWeight: 600, color }}>{val}</span>
-                  </div>
-                  <div style={{ background: '#E0EAE3', borderRadius: 3, height: 6, overflow: 'hidden' }}>
-                    <div style={{ height: '100%', borderRadius: 3, background: color, width: w }} />
-                  </div>
-                </div>
-              ))}
-              <div style={{ marginTop: 8, background: '#EAF6E4', borderRadius: 8, padding: '6px 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: 10, color: '#2E7D1E' }}>Règle 50/30/20</span>
-                <span style={{ fontSize: 12, fontWeight: 700, color: '#4CAF2E' }}>OK</span>
-              </div>
-            </div>
-            <div style={{ padding: '18px 24px' }}>
-              <div style={{ fontSize: 15, fontWeight: 600, color: '#034065', marginBottom: 6 }}>Analysez vos dépenses</div>
-              <div style={{ fontSize: 13, color: '#9CA3AF', lineHeight: 1.6 }}>Donnez-leur une importance.</div>
-            </div>
+  {/* MOCKUP TÉLÉPHONE */}
+  {!isMobile && (
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      <div style={{ width: 200, background: '#111', borderRadius: 32, padding: '10px', boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
+        <div style={{ background: '#000', borderRadius: 26, overflow: 'hidden' }}>
+          <div style={{ background: '#000', height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: 60, height: 5, background: '#222', borderRadius: 3 }} />
           </div>
-
-          <div style={{ background: '#fff', borderRadius: 16, border: '0.5px solid #E0EAE3', overflow: 'hidden' }}>
-            <div style={{ background: '#F4F7F5', padding: '28px 24px', minHeight: 200, display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {[
-                { label: 'PEA', desc: 'Bourse européenne', color: '#034065', w: '80%', tag: 'Plafond 150 000 euros' },
-                { label: 'CTO', desc: 'Bourse mondiale', color: '#3B82F6', w: '60%', tag: 'Sans plafond' },
-                { label: 'Ass. Vie', desc: 'Épargne long terme', color: '#BA7517', w: '40%', tag: 'Avantage fiscal' },
-              ].map(({ label, desc, color, w, tag }) => (
-                <div key={label} style={{ background: '#fff', borderRadius: 8, padding: '8px 10px', border: '0.5px solid #E0EAE3' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4, gap: 8 }}>
-                    <div style={{ minWidth: 0, flex: 1 }}>
-                      <div style={{ fontSize: 12, fontWeight: 600, color: '#034065' }}>{label}</div>
-                      <div style={{ fontSize: 10, color: '#9CA3AF' }}>{desc}</div>
-                    </div>
-                    <span style={{ fontSize: 9, padding: '2px 6px', borderRadius: 10, background: '#F4F7F5', color: '#6B7280', whiteSpace: 'nowrap', flexShrink: 0 }}>{tag}</span>
-                  </div>
-                  <div style={{ background: '#E0EAE3', borderRadius: 3, height: 4, overflow: 'hidden' }}>
-                    <div style={{ height: '100%', borderRadius: 3, background: color, width: w }} />
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div style={{ padding: '18px 24px' }}>
-              <div style={{ fontSize: 15, fontWeight: 600, color: '#034065', marginBottom: 6 }}>Découvrez comment investir</div>
-              <div style={{ fontSize: 13, color: '#9CA3AF', lineHeight: 1.6 }}>Il y a différentes facons d'investir, choisissez les bonnes.</div>
-            </div>
-          </div>
-
-          <div style={{ background: '#fff', borderRadius: 16, border: '0.5px solid #E0EAE3', overflow: 'hidden' }}>
-            <div style={{ background: '#F4F7F5', padding: '20px 24px', minHeight: 200, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-              <DCAChart />
-            </div>
-            <div style={{ padding: '18px 24px' }}>
-              <div style={{ fontSize: 15, fontWeight: 600, color: '#034065', marginBottom: 6 }}>Prévoyez vos performances</div>
-              <div style={{ fontSize: 13, color: '#9CA3AF', lineHeight: 1.6 }}>Découvrez les performances atteignables selon votre capacite d'épargne.</div>
-            </div>
-          </div>
+          <img
+            src="https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/screen-app-ia.PNG"
+            alt="App Start Invest"
+            style={{ width: '100%', display: 'block' }}
+          />
         </div>
+      </div>
+    </div>
+  )}
 
-        <div style={{ textAlign: 'center', marginTop: isMobile ? 32 : 48 }}>
-          <button onClick={openSignup} style={{ padding: isMobile ? '12px 40px' : '14px 48px', borderRadius: 12, border: 'none', background: '#4CAF2E', color: '#fff', fontSize: 16, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>Go</button>
-        </div>
-      </section>
+</div>
+
+{/* BOUTON CENTRÉ */}
+<div style={{ textAlign: 'center', marginTop: 40 }}>
+  <button onClick={openSignup} style={{ background: '#4CAF2E', color: '#fff', border: 'none', borderRadius: 10, padding: '14px 40px', fontSize: 15, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
+    Commencer gratuitement
+  </button>
+</div>
+
+  </div>
+</section>
 
       {/* CHALLENGE */}
       <section id="challenge" style={{ background: '#034065', padding: isMobile ? '50px 16px' : '80px 40px', marginTop: isMobile ? 40 : 60 }}>
@@ -439,7 +478,7 @@ useEffect(() => {
           <div style={{ textAlign: 'center', marginBottom: isMobile ? 36 : 52 }}>
             <div style={{ fontSize: 11, fontWeight: 500, color: '#4CAF2E', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 16, background: 'rgba(76,175,46,0.15)', display: 'inline-block', padding: '4px 12px', borderRadius: 20 }}>Challenge</div>
             <h2 style={{ fontSize: isMobile ? 26 : 34, fontWeight: 700, color: '#fff', lineHeight: 1.3, margin: '0 0 16px' }}>
-              Pensez a 5 ans, <span style={{ color: '#4CAF2E' }}>pas à 5 mois.</span>
+              Pensez à cinq ans, <span style={{ color: '#4CAF2E' }}>pas à cinq mois.</span>
             </h2>
             <p style={{ fontSize: isMobile ? 13 : 14, color: 'rgba(255,255,255,0.55)', lineHeight: 1.8, margin: '0 auto 32px', maxWidth: 460 }}>
               Fixez-vous des objectifs et atteignez-les avec discipline au fil du temps.
@@ -490,31 +529,6 @@ useEffect(() => {
       {plansData.map(plan => (
         <PlanCard key={plan.id} plan={plan} abonnementAnnuel={abonnementAnnuel} setAbonnementAnnuel={setAbonnementAnnuel} openSignup={openSignup} />
       ))}
-    </div>
-  </div>
-</section>
-
-      {/* SOCIAL */}
-<section style={{ background: '#fff', borderTop: '0.5px solid #E0EAE3', padding: isMobile ? '40px 16px' : '60px 40px', textAlign: 'center' }}>
-  <div style={{ maxWidth: 400, margin: '0 auto' }}>
-    <div style={{ fontSize: 14, fontWeight: 500, color: '#034065', marginBottom: 28 }}>Vous pouvez me rejoindre sur :</div>
-    <div style={{ width: 100, height: 100, borderRadius: '50%', overflow: 'hidden', margin: '0 auto 20px', border: '3px solid #E0EAE3' }}>
-      <img src="https://ylxxdhwakdtmidtqpacj.supabase.co/storage/v1/object/public/guides/IMG_2914.jpeg" alt="StartInvest" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-    </div>
-    {/* Logos réseaux */}
-    <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginBottom: 24 }}>
-      {/* Instagram */}
-      <a href="https://www.instagram.com/startinvest.fr" target="_blank" rel="noopener noreferrer" style={{ width: 44, height: 44, borderRadius: '50%', background: 'linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }}>
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-      </a>
-      {/* TikTok */}
-      <a href="https://tiktok.com/@startinvest.fr" target="_blank" rel="noopener noreferrer" style={{ width: 44, height: 44, borderRadius: '50%', background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }}>
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.75a4.85 4.85 0 01-1.01-.06z"/></svg>
-      </a>
-      {/* LinkedIn */}
-      <a href="https://www.linkedin.com/in/thomas-bouchard-87187719a" target="_blank" rel="noopener noreferrer" style={{ width: 44, height: 44, borderRadius: '50%', background: '#0A66C2', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }}>
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-      </a>
     </div>
   </div>
 </section>
