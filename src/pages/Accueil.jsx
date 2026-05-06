@@ -571,7 +571,9 @@ useEffect(() => {
     <h2 style={{ fontSize: isMobile ? 26 : 34, fontWeight: 700, color: '#034065', lineHeight: 1.3, margin: '0 0 16px' }}>
       Ne laissez plus jamais <span style={{ color: '#4CAF2E' }}>votre argent dormir.</span>
     </h2>
-    <p style={{ fontSize: isMobile ? 13 : 14, color: '#9CA3AF', lineHeight: 1.8, margin: '0 0 8px' }}>Trouvez votre façon de faire de l'argent en dormant.</p>
+    <p style={{ fontSize: isMobile ? 13 : 14, color: '#6B7280', lineHeight: 1.8, margin: '0 0 32px', fontStyle: 'italic' }}>
+  Un abonnement pensé pour récompenser la discipline. Après 10 ans, l'application devient gratuite et vos performances s'envolent.
+</p>
     <p style={{ fontSize: 13, color: '#4CAF2E', fontWeight: 500, margin: '0 0 32px' }}>Essayez gratuitement pendant 15 jours</p>
     <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 20 }}>
       {plansData.map(plan => (
