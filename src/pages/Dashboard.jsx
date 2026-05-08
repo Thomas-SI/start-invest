@@ -208,6 +208,18 @@ const fetchDashboardData = async () => {
   analyseIAData: profilRes.data?.analyse_ia || null,
 }
 }
+function SkeletonBlock({ width = '100%', height = 12, mb = 0 }) {
+  return (
+    <div style={{
+      width,
+      height,
+      borderRadius: 4,
+      background: 'rgba(0,0,0,0.06)',
+      marginBottom: mb,
+      animation: 'pulse 1.5s ease-in-out infinite',
+    }} />
+  )
+}
 
 export default function Dashboard() {
   const navigate = useNavigate()
@@ -518,11 +530,57 @@ if (questionnaireDone) genererAnalyse(currentUser.id)
   }, {})
 
   if (isLoading) return (
-    <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <Navbar page="Mes Finances" initiale={initiale} photoUrl={photoUrl} />
-      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: t.textMuted, fontSize: 13 }}>Chargement...</div>
+  <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <Navbar page="Mes Finances" initiale={initiale} photoUrl={photoUrl} />
+    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '240px 1fr', gap: 12, padding: 12, flex: 1 }}>
+      
+      {/* COLONNE GAUCHE */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: 14, height: 140 }}>
+          <SkeletonBlock width="60%" height={12} mb={10} />
+          <SkeletonBlock width="40%" height={24} mb={8} />
+          <SkeletonBlock width="80%" height={8} mb={8} />
+          <SkeletonBlock width="100%" height={6} />
+        </div>
+        <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: 14, flex: 1 }}>
+          <SkeletonBlock width="50%" height={12} mb={12} />
+          {[1,2,3,4].map(i => (
+            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: `0.5px solid ${t.border}` }}>
+              <SkeletonBlock width="40%" height={10} />
+              <SkeletonBlock width="20%" height={10} />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* COLONNE DROITE */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: 16, height: 160 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
+            <SkeletonBlock width="40%" height={12} />
+            <SkeletonBlock width="15%" height={12} />
+          </div>
+          <SkeletonBlock width="100%" height={10} mb={8} />
+          <SkeletonBlock width="100%" height={10} mb={8} />
+          <SkeletonBlock width="100%" height={10} mb={8} />
+          <SkeletonBlock width="60%" height={10} />
+        </div>
+        <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: 16, height: 180 }}>
+          <SkeletonBlock width="30%" height={12} mb={12} />
+          {[1,2,3].map(i => (
+            <div key={i} style={{ marginBottom: 12 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                <SkeletonBlock width="40%" height={10} />
+                <SkeletonBlock width="15%" height={10} />
+              </div>
+              <SkeletonBlock width="100%" height={6} />
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
-  )
+  </div>
+)
 
   return (
     <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>

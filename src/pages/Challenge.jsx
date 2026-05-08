@@ -1037,6 +1037,20 @@ function PopupAmbitieux({ onClose }) {
     </>
   )
 }
+
+function SkeletonBlock({ width = '100%', height = 12, mb = 0 }) {
+  return (
+    <div style={{
+      width,
+      height,
+      borderRadius: 4,
+      background: 'rgba(0,0,0,0.06)',
+      marginBottom: mb,
+      animation: 'pulse 1.5s ease-in-out infinite',
+    }} />
+  )
+}
+
 // ─── Page principale ──────────────────────────────────────────────────────────
 export default function Challenge() {
   const t = useTheme()
@@ -1176,11 +1190,43 @@ const GUIDE_CHALLENGE = [
   const valeurActuelleAcc = badgeOuvert?.slug === 'metronome' ? streak : (badgeOuvert?.slug === 'cap' ? totalInvesti : 0)
 
   if (isLoading || checking) return (
-    <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <Navbar page="Challenge" initiale={initiale} photoUrl={photoUrl} />
-      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: t.textMuted, fontSize: 13 }}>Vérification des accomplissements...</div>
+  <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <Navbar page="Challenge" initiale={initiale} photoUrl={photoUrl} />
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: 12, flex: 1 }}>
+
+      {/* HEADER */}
+      <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <SkeletonBlock width="30%" height={14} />
+        <SkeletonBlock width="10%" height={32} />
+      </div>
+
+      {/* STREAK */}
+      <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: 16 }}>
+        <SkeletonBlock width="20%" height={12} mb={12} />
+        <div style={{ display: 'flex', gap: 8 }}>
+          {[1,2,3,4,5,6].map(i => (
+            <SkeletonBlock key={i} width={36} height={36} />
+          ))}
+        </div>
+      </div>
+
+      {/* BADGES */}
+      <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: 16 }}>
+        <SkeletonBlock width="25%" height={12} mb={16} />
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2,1fr)' : 'repeat(4,1fr)', gap: 12 }}>
+          {[1,2,3,4,5,6,7,8].map(i => (
+            <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+              <SkeletonBlock width={64} height={64} />
+              <SkeletonBlock width="80%" height={10} />
+              <SkeletonBlock width="60%" height={8} />
+            </div>
+          ))}
+        </div>
+      </div>
+
     </div>
-  )
+  </div>
+)
 
   return (
     <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column', overflowX: 'hidden' }}>

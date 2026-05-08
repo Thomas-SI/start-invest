@@ -541,6 +541,19 @@ function PopupFiche({ fiche, chapitre, onClose, onChapitreValide }) {
   )
 }
 
+function SkeletonBlock({ width = '100%', height = 12, mb = 0 }) {
+  return (
+    <div style={{
+      width,
+      height,
+      borderRadius: 4,
+      background: 'rgba(0,0,0,0.06)',
+      marginBottom: mb,
+      animation: 'pulse 1.5s ease-in-out infinite',
+    }} />
+  )
+}
+
 // ─── Page principale ──────────────────────────────────────────────────────────
 export default function Guide() {
   const t = useTheme()
@@ -578,6 +591,7 @@ const GUIDE_GUIDE = [
     description: 'Tu as les bases, la stratégie et la mentalité. Il ne manque plus qu\'une chose : commencer. Chaque euro investi aujourd\'hui travaille pour ton futur.',
   },
 ]
+  const [loadingPage, setLoadingPage] = useState(false)
   const [ficheOuverte, setFicheOuverte] = useState(null)
   const [chapitreOuvert, setChapitreOuvert] = useState(null)
   const [chapitresValides, setChapitresValides] = useState(new Set())
@@ -590,6 +604,7 @@ const GUIDE_GUIDE = [
       const slugsGuide = ['guide-ch01', 'guide-ch02', 'guide-ch03', 'guide-ch04', 'guide-ch05']
       const { data } = await supabase.from('accomplissements').select('slug').eq('user_id', user.id).in('slug', slugsGuide)
       if (data) setChapitresValides(new Set(data.map(a => a.slug)))
+    setLoadingPage(false)
     }
     charger()
   }, [])
@@ -597,6 +612,31 @@ const GUIDE_GUIDE = [
   const ouvrirFiche = (fiche, chapitre) => { setFicheOuverte(fiche); setChapitreOuvert(chapitre) }
   const fermerFiche = () => { setFicheOuverte(null); setChapitreOuvert(null) }
   const onChapitreValide = (slug) => setChapitresValides(prev => new Set([...prev, slug]))
+
+  if (loadingPage) return (
+  <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <Navbar page="Guide" initiale={initiale} photoUrl={photoUrl} />
+    <div style={{ padding: '24px 20px', flex: 1, display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 1000, margin: '0 auto', width: '100%' }}>
+      <div style={{ background: '#034065', borderRadius: 12, padding: '28px 24px', textAlign: 'center' }}>
+        <SkeletonBlock width="50%" height={20} mb={8} />
+        <SkeletonBlock width="35%" height={12} />
+      </div>
+      {[1,2,3,4,5].map(i => (
+        <div key={i} style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: '18px 20px' }}>
+          <div style={{ display: 'flex', gap: 12, marginBottom: 10 }}>
+            <SkeletonBlock width={38} height={38} />
+            <div style={{ flex: 1 }}>
+              <SkeletonBlock width="40%" height={12} mb={6} />
+              <SkeletonBlock width="70%" height={10} />
+            </div>
+          </div>
+          <SkeletonBlock width="100%" height={8} mb={6} />
+          <SkeletonBlock width="80%" height={8} />
+        </div>
+      ))}
+    </div>
+  </div>
+)
 
   return (
     <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column', overflowX: 'hidden' }}>
@@ -627,19 +667,27 @@ const GUIDE_GUIDE = [
       <div style={{ padding: '24px 20px', flex: 1, display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 1000, margin: '0 auto', width: '100%', overflowX: 'hidden', boxSizing: 'border-box' }}>
 
         {/* HEADER BLEU */}
-        <div style={{ background: '#034065', borderRadius: 12, padding: '28px 24px', textAlign: 'center' }}>
-          <div style={{ fontSize: 22, fontWeight: 600, color: '#fff', marginBottom: 8 }}>
-            De zéro à investisseur : Le guide complet
-          </div>
-          <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.65)' }}>
-            23 fiches pour comprendre, agir et ne pas se faire piéger
-          </div>
-          {chapitresValides.size > 0 && (
-            <div style={{ marginTop: 12, fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>
-              {chapitresValides.size} / 5 chapitres validés
-            </div>
-          )}
-        </div>
+<div style={{ background: '#034065', borderRadius: 12, padding: '28px 24px', textAlign: 'center' }}>
+  <div style={{ fontSize: 22, fontWeight: 600, color: '#fff', marginBottom: 8 }}>
+    De zéro à investisseur : Le guide complet
+  </div>
+  <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.65)' }}>
+    23 fiches pour comprendre, agir et ne pas se faire piéger
+  </div>
+</div>
+
+{/* PROGRESSION */}
+<div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+  <div style={{ fontSize: 13, color: t.text, fontWeight: 500 }}>Ta progression</div>
+  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+    <div style={{ display: 'flex', gap: 4 }}>
+      {[1,2,3,4,5].map(i => (
+        <div key={i} style={{ width: 28, height: 6, borderRadius: 3, background: i <= chapitresValides.size ? '#4CAF2E' : t.bgSecondary, transition: 'background 0.3s' }} />
+      ))}
+    </div>
+    <div style={{ fontSize: 12, color: t.textMuted }}>{chapitresValides.size} / 5</div>
+  </div>
+</div>
 
 
         {/* CHAPITRES */}

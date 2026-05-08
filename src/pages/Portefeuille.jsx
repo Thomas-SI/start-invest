@@ -89,6 +89,18 @@ return {
   nbMoisMatelas: prefRes.data?.nb_mois_matelas ?? 6,
 }
 }
+function SkeletonBlock({ width = '100%', height = 12, mb = 0 }) {
+  return (
+    <div style={{
+      width,
+      height,
+      borderRadius: 4,
+      background: 'rgba(0,0,0,0.06)',
+      marginBottom: mb,
+      animation: 'pulse 1.5s ease-in-out infinite',
+    }} />
+  )
+}
 
 export default function Portefeuille() {
   const t = useTheme()
@@ -333,11 +345,47 @@ else setNbMoisMatelas(6)
   const tousCoches = virements.length > 0 && virements.every(v => isCheckedCeMois(v))
 
   if (isLoading) return (
-    <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <Navbar page="Portefeuille" initiale={initiale} photoUrl={photoUrl} />
-      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: t.textMuted, fontSize: 13 }}>Chargement...</div>
+  <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <Navbar page="Portefeuille" initiale={initiale} photoUrl={photoUrl} />
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: 12, flex: 1 }}>
+      
+      {/* HEADER SKELETON */}
+      <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <SkeletonBlock width="30%" height={14} />
+        <SkeletonBlock width="15%" height={14} />
+      </div>
+
+      {/* CARDS SKELETON */}
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: 12 }}>
+        {[1,2,3].map(i => (
+          <div key={i} style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: 16 }}>
+            <SkeletonBlock width="50%" height={10} mb={10} />
+            <SkeletonBlock width="40%" height={22} mb={8} />
+            <SkeletonBlock width="70%" height={8} />
+          </div>
+        ))}
+      </div>
+
+      {/* TABLEAU SKELETON */}
+      <div style={{ background: t.bgCard, border: `0.5px solid ${t.border}`, borderRadius: 12, padding: 16, flex: 1 }}>
+        <SkeletonBlock width="25%" height={12} mb={16} />
+        {[1,2,3,4,5].map(i => (
+          <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0', borderBottom: `0.5px solid ${t.border}` }}>
+            <div style={{ display: 'flex', gap: 12, alignItems: 'center', flex: 1 }}>
+              <SkeletonBlock width={36} height={36} />
+              <div style={{ flex: 1 }}>
+                <SkeletonBlock width="40%" height={10} mb={6} />
+                <SkeletonBlock width="25%" height={8} />
+              </div>
+            </div>
+            <SkeletonBlock width="15%" height={10} />
+          </div>
+        ))}
+      </div>
+
     </div>
-  )
+  </div>
+)
 
   if (premiumLoading) return (
     <div style={{ background: t.bg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
