@@ -39,11 +39,11 @@ useEffect(() => {
 
   const liens = [
     ['Mes Finances', '/dashboard'],
+    ['Guide', '/guide'],
+    ['Challenge', '/challenge'],
     ['Portefeuille', '/portefeuille'],
     ['Investissement', '/investissement'],
     ['Croissance', '/croissance'],
-    ['Challenge', '/challenge'],
-    ['Guide', '/guide'],
     ['Abonnement', '/abonnement'],
     ['Compte', '/compte'],
   ]
